@@ -19,7 +19,11 @@ CGameFramework::CGameFramework()
 	for (int i = 0; i < m_nSwapChainBuffers; i++) m_nFenceValues[i] = 0;
 
 	m_pScene = NULL;
-	m_pCamera = NULL;
+	for (int i = 0; i < 8; i++)
+		m_pPlayer[i] = NULL;
+
+	for (int i = 0; i < 8; i++)
+		m_pCamera[i] = NULL;
 
 	for (int i = 0; i < m_nSwapChainBuffers; i++) m_ppd3dRenderTargetBuffers[i] = NULL;
 	m_nSwapChainBufferIndex = 0;
@@ -265,11 +269,18 @@ void CGameFramework::BuildObjects()
 	
 	m_pScene = new CScene();
 	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+
+	My_ID = CHARATER_ID_0; //원래는 서버에서 받아야함
+
+	//CAirplanePlayer *pAirplanePlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	CAirplanePlayer *pPlayer[8];
+	for (int i = 0; i < 8; i++)
+		pPlayer[i] = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	// player 위치 서버에서 받아서 초기화 해줘야함
 	
-	CAirplanePlayer *pAirplanePlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
-	m_pPlayer = pAirplanePlayer;
-	m_pCamera = m_pPlayer->GetCamera();
-	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
+	m_pPlayer[My_ID] = pPlayer[My_ID];
+	m_pCamera[My_ID] = m_pPlayer[My_ID]->GetCamera();
+	m_pCamera[My_ID] = m_pPlayer[My_ID]->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
 	
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -316,12 +327,11 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 	case WM_KEYUP:
 		switch (wParam)
 		{
-			/*‘F1’ 키를 누르면 1인칭 카메라, ‘F2’ 키를 누르면 스페이스-쉽 카메라로 변경한다, ‘F3’ 키를 누르면 3인칭 카메라
-			로 변경한다.*/
+			
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
-			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+			//m_pCamera[My_ID] = m_pPlayer[My_ID]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			//if (m_pPlayer) m_pPlayer->ChangeCamera((wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			break;
 		case VK_ESCAPE:
@@ -433,16 +443,16 @@ void CGameFramework::ProcessInput()
 			/*cxDelta는 y-축의 회전을 나타내고 cyDelta는 x-축의 회전을 나타낸다. 오른쪽 마우스 버튼이 눌려진 경우
 			cxDelta는 z-축의 회전을 나타낸다.*/
 			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
-				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+				m_pPlayer[My_ID]->Rotate(cyDelta, 0.0f, -cxDelta);
 			else
-				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				m_pPlayer[My_ID]->Rotate(cyDelta, cxDelta, 0.0f);
 		}
 		/*플레이어를 dwDirection 방향으로 이동한다(실제로는 속도 벡터를 변경한다). 이동 거리는 시간에 비례하도록 한다.
 		플레이어의 이동 속력은 (50/초)로 가정한다.*/
-		if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
+		if (dwDirection) m_pPlayer[My_ID]->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
 	}
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	m_pPlayer[My_ID]->Update(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::AnimateObjects()
@@ -510,15 +520,17 @@ void CGameFramework::FrameAdvance()
 	
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 	
-	if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
-	
+	if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera[My_ID]);
+	for (int i = 0; i < 8; i++)
+		if (m_pPlayer[i] && i != My_ID)
+			m_pPlayer[i]->Render(m_pd3dCommandList,m_pCamera[My_ID]); //왜 안나오지
 	//3인칭 카메라일 때 플레이어가 항상 보이도록 렌더링한다.
 #ifdef _WITH_PLAYER_TOP
 	//렌더 타겟은 그대로 두고 깊이 버퍼를 1.0으로 지우고 플레이어를 렌더링하면 플레이어는 무조건 그려질 것이다.
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,	D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+	//m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,	D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 	//3인칭 카메라일 때 플레이어를 렌더링한다.
-	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pPlayer[My_ID]) m_pPlayer[My_ID]->Render(m_pd3dCommandList, m_pCamera[My_ID]);
 	
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

@@ -379,7 +379,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList	*pd3dCom
 
 void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	int xObjects = 10, yObjects = 10, zObjects = 10, i = 0;
+	int xObjects = 1, yObjects = 1, zObjects = 1, i = 0;
 	m_nObjects = (xObjects * 2 + 1) * (yObjects * 2 + 1) * (zObjects * 2 + 1);
 	m_ppObjects = new CGameObject*[m_nObjects];
 	float fxPitch = 12.0f * 2.5f;
