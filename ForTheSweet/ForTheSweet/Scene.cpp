@@ -28,27 +28,45 @@ bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 
 void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
+	//서버에서 오브젝트, 캐릭터 위치를 받는다.
+
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
-	m_nShaders = 1;
-	m_pShaders = new CInstancingShader[m_nShaders];
-	m_pShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_pShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
+	m_nInstancingShaders = 1;
+	m_pInstancingShaders = new CInstancingShader[m_nInstancingShaders];
+	m_pInstancingShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
+
+	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+	m_nPlayerObjectShaders = 7;
+	m_pPlayerObjectShaders = new CPlayerObjectsShader[m_nPlayerObjectShaders];
+	for (int i = 0; i < m_nPlayerObjectShaders; i++) {
+		m_pPlayerObjectShaders[i].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+		m_pPlayerObjectShaders[i].BuildObjects(pd3dDevice, pd3dCommandList,XMFLOAT3(i*30,0,0));
+	}
 }
 
 void CScene::ReleaseObjects()
 {
 	if (m_pd3dGraphicsRootSignature) m_pd3dGraphicsRootSignature->Release();
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
-		m_pShaders[i].ReleaseShaderVariables();
-		m_pShaders[i].ReleaseObjects();
+		m_pInstancingShaders[i].ReleaseShaderVariables();
+		m_pInstancingShaders[i].ReleaseObjects();
 	}
-	if (m_pShaders) delete[] m_pShaders;
+	if (m_pInstancingShaders) delete[] m_pInstancingShaders;
+	for (int i = 0; i < m_nPlayerObjectShaders; i++)
+	{
+		m_pPlayerObjectShaders[i].ReleaseShaderVariables();
+		m_pPlayerObjectShaders[i].ReleaseObjects();
+	}
+	if (m_pPlayerObjectShaders) delete[] m_pPlayerObjectShaders;
 }
 
 void CScene::ReleaseUploadBuffers()
 {
-	for (int i = 0; i < m_nShaders; i++) m_pShaders[i].ReleaseUploadBuffers();
+	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].ReleaseUploadBuffers();
+	for (int i = 0; i < m_nPlayerObjectShaders; i++) m_pPlayerObjectShaders[i].ReleaseUploadBuffers();
+
 }
 
 ID3D12RootSignature *CScene::GetGraphicsRootSignature()
@@ -137,9 +155,13 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 
 void CScene::AnimateObjects(float fTimeElapsed)
 {
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
-		m_pShaders[i].AnimateObjects(fTimeElapsed);
+		m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
+	}
+	for (int i = 0; i < m_nPlayerObjectShaders; i++)
+	{
+		m_pPlayerObjectShaders[i].AnimateObjects(fTimeElapsed);
 	}
 }
 
@@ -148,8 +170,12 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
-		m_pShaders[i].Render(pd3dCommandList, pCamera);
+		m_pInstancingShaders[i].Render(pd3dCommandList, pCamera);
+	}
+	for (int i = 0; i < m_nPlayerObjectShaders; i++)
+	{
+		m_pPlayerObjectShaders[i].Render(pd3dCommandList, pCamera);
 	}
 }

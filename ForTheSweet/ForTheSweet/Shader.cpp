@@ -267,10 +267,13 @@ void CObjectsShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
 	m_nPipelineStates = 1;
 	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+
 }
 
-void CObjectsShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
+void CObjectsShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position)
 {
+	
+	
 }
 
 void CObjectsShader::ReleaseObjects()
@@ -304,6 +307,8 @@ void CObjectsShader::ReleaseUploadBuffers()
 void CObjectsShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	CShader::Render(pd3dCommandList, pCamera);
+	for (int j = 0; j < m_nObjects; j++) { if (m_ppObjects[j]) { m_ppObjects[j]->Render(pd3dCommandList, pCamera); } }
+
 }
 
 CInstancingShader::CInstancingShader()
@@ -414,4 +419,57 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCame
 	UpdateShaderVariables(pd3dCommandList);
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
 	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects);
+}
+
+void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, XMFLOAT3 Position)
+{
+	m_nObjects = 1;
+	m_ppPlayerObjects = new CPlayerObject*[m_nObjects];
+
+	CPlayerObject *pGameObject = NULL;
+
+	pGameObject = new CPlayerObject();
+	pGameObject->SetPosition(Position.x, Position.y, Position.z);
+	m_ppPlayerObjects[0] = pGameObject;
+
+	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 20, 10);
+
+	m_ppPlayerObjects[0]->SetMesh(pCubeMesh);
+	//인스턴싱을 위한 버퍼(Structured Buffer)를 생성한다.
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+
+void CPlayerObjectsShader::ReleaseObjects()
+{
+	if (m_ppPlayerObjects)
+	{
+		for (int j = 0; j < m_nObjects; j++)
+		{
+			if (m_ppPlayerObjects[j]) delete m_ppPlayerObjects[j];
+		}
+		delete[] m_ppPlayerObjects;
+	}
+}
+
+void CPlayerObjectsShader::AnimateObjects(float fTimeElapsed)
+{
+	for (int j = 0; j < m_nObjects; j++)
+	{
+		m_ppPlayerObjects[j]->Animate(fTimeElapsed);
+	}
+}
+
+void CPlayerObjectsShader::ReleaseUploadBuffers()
+{
+	if (m_ppPlayerObjects)
+	{
+		for (int j = 0; j < m_nObjects; j++) m_ppPlayerObjects[j]->ReleaseUploadBuffers();
+	}
+}
+
+void CPlayerObjectsShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
+{
+	CShader::Render(pd3dCommandList, pCamera);
+	for (int j = 0; j < m_nObjects; j++) { if (m_ppPlayerObjects[j]) { m_ppPlayerObjects[j]->Render(pd3dCommandList, pCamera); } }
+
 }

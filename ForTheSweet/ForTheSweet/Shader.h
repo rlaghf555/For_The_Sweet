@@ -68,7 +68,7 @@ public:
 	CObjectsShader();
 	virtual ~CObjectsShader();
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList);
+		*pd3dCommandList, XMFLOAT3 Position);
 	virtual void AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
@@ -79,8 +79,19 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 protected:
-	CGameObject * *m_ppObjects = NULL;
+	CGameObject **m_ppObjects = NULL;
 	int m_nObjects = 0;
+};
+class CPlayerObjectsShader : public CObjectsShader {
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+		*pd3dCommandList, XMFLOAT3 Position);
+	virtual void AnimateObjects(float fTimeElapsed);
+	virtual void ReleaseObjects();
+	virtual void ReleaseUploadBuffers();
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+protected:
+	CPlayerObject **m_ppPlayerObjects = NULL;
 };
 
 class CInstancingShader : public CObjectsShader

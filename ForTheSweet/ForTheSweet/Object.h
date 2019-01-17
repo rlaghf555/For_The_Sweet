@@ -50,6 +50,12 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera, UINT nInstances);
 };
+class CPlayerObject : public CGameObject {
+public:
+	CPlayerObject();
+	virtual ~CPlayerObject();
+
+};
 
 class CRotatingObject : public CGameObject
 {
