@@ -108,12 +108,12 @@ public:
 		NULL);
 };
 
-class CAirplanePlayer : public CPlayer
+class CGamePlayer : public CPlayer
 {
 public:
-	CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,
+	CGamePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,
 		ID3D12RootSignature *pd3dGraphicsRootSignature);
-	virtual ~CAirplanePlayer();
+	virtual ~CGamePlayer();
 	
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void OnPrepareRender();

@@ -28,6 +28,10 @@ protected:
 	//CObjectsShader *m_pShaders = NULL;
 	CInstancingShader *m_pInstancingShaders = NULL;
 	int m_nInstancingShaders = 0;
+
+	CObjectsShader *m_pMapShader = NULL;
+	int m_nMapShader = 0;
+
 	CPlayerObjectsShader *m_pPlayerObjectShaders = NULL;
 	int m_nPlayerObjectShaders = 0;
 

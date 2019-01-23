@@ -30,18 +30,24 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 {
 	//서버에서 오브젝트, 캐릭터 위치를 받는다.
 
+	//m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+	//m_nInstancingShaders = 1;
+	//m_pInstancingShaders = new CInstancingShader[m_nInstancingShaders];
+	//m_pInstancingShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	//m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
+
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
-	m_nInstancingShaders = 1;
-	m_pInstancingShaders = new CInstancingShader[m_nInstancingShaders];
-	m_pInstancingShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
+	m_nMapShader = 1;
+	m_pMapShader = new CObjectsShader[m_nMapShader];
+	m_pMapShader[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pMapShader[0].BuildObjects(pd3dDevice, pd3dCommandList, XMFLOAT3(0, -10, 0), OBJECT_MAP);
 
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 	m_nPlayerObjectShaders = 7;
 	m_pPlayerObjectShaders = new CPlayerObjectsShader[m_nPlayerObjectShaders];
 	for (int i = 0; i < m_nPlayerObjectShaders; i++) {
 		m_pPlayerObjectShaders[i].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-		m_pPlayerObjectShaders[i].BuildObjects(pd3dDevice, pd3dCommandList,XMFLOAT3(i*30,0,0));
+		m_pPlayerObjectShaders[i].BuildObjects(pd3dDevice, pd3dCommandList,XMFLOAT3((i-3)*200,50,0));
 	}
 }
 
@@ -170,6 +176,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
+	for (int i = 0; i < m_nMapShader; i++) {
+		m_pMapShader[i].Render(pd3dCommandList, pCamera);
+	}
 	for (int i = 0; i < m_nInstancingShaders; i++)
 	{
 		m_pInstancingShaders[i].Render(pd3dCommandList, pCamera);

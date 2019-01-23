@@ -276,6 +276,26 @@ void CObjectsShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsComman
 	
 }
 
+void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, XMFLOAT3 Position, int Object_Kind)
+{
+	if (Object_Kind == OBJECT_MAP) {
+		m_nObjects = 1;
+		m_ppObjects = new CGameObject*[m_nObjects];
+
+		CGameObject *Map_Object = NULL;
+
+		Map_Object = new CGameObject();
+		Map_Object->SetPosition(Position.x,Position.y,Position.z);
+		m_ppObjects[0] = Map_Object;
+
+		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 2000, 20, 1500);
+		m_ppObjects[0]->SetMesh(pCubeMesh);
+
+		CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	}
+
+}
+
 void CObjectsShader::ReleaseObjects()
 {
 	if (m_ppObjects)
@@ -432,11 +452,15 @@ void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphic
 	pGameObject->SetPosition(Position.x, Position.y, Position.z);
 	m_ppPlayerObjects[0] = pGameObject;
 
-	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 20, 10);
+	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 50, 100, 30);
 
 	m_ppPlayerObjects[0]->SetMesh(pCubeMesh);
 	//인스턴싱을 위한 버퍼(Structured Buffer)를 생성한다.
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+
+void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, XMFLOAT3 Position, int Object_Kind)
+{
 }
 
 void CPlayerObjectsShader::ReleaseObjects()
