@@ -58,11 +58,26 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 	{
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 		//화살표 키 ‘↑’를 누르면 로컬 z-축 방향으로 이동(전진)한다. ‘↓’를 누르면 반대 방향으로 이동한다.
-		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
-		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look,	-fDistance);
+		if (dwDirection & DIR_FORWARD) {
+			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+			m_xmf3Look.z = 1.f;
+		}
+		if (dwDirection & DIR_BACKWARD) {
+			//xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
+			m_xmf3Look.z = -1.f;
+			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+		}
 		//화살표 키 ‘→’를 누르면 로컬 x-축 방향으로 이동한다. ‘←’를 누르면 반대 방향으로 이동한다.
-		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right,-fDistance);
+		if (dwDirection & DIR_RIGHT) {
+			//xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
+			m_xmf3Look.x = 1.f;
+			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+		}
+		if (dwDirection & DIR_LEFT) {
+			//xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
+			m_xmf3Look.x = -1.f;
+			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+		}
 		//‘Page Up’을 누르면 로컬 y-축 방향으로 이동한다. ‘Page Down’을 누르면 반대 방향으로 이동한다.
 		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
 		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
