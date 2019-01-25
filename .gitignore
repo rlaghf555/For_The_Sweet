@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+/ForTheSweet/x64
+/ForTheSweet/.vs
+*.idb
+*.pdb
