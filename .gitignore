@@ -30,5 +30,7 @@
 *.app
 /ForTheSweet/x64
 /ForTheSweet/.vs
+/x64
 *.idb
 *.pdb
+*.vs
