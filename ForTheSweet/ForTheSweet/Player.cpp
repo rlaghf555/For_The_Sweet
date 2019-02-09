@@ -278,8 +278,14 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 CGamePlayer::CGamePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature)
 {
 
-	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 50, 30, 100);
-	SetMesh(pCubeMesh);
+	//CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 50, 30, 100);
+	//CMesh *pCubeMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList);
+	//SetMesh(pCubeMesh);
+
+	MeshGeometry *pCubeMesh = new LoadModel("resource\character\main_character.FBX");
+	
+	aa.SetMeshes(pd3dDevice, pd3dCommandList);
+
 	//플레이어의 카메라를 스페이스-쉽 카메라로 변경(생성)한다.
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	
