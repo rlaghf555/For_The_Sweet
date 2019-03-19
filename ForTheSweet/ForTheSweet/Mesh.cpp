@@ -1,5 +1,3 @@
-
-
 #include "stdafx.h"
 #include "Mesh.h"
 #include "UploadBuffer.h"
@@ -645,7 +643,10 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsC
 		{
 			fHeight = OnGetHeight(x, z, pContext);
 			pVertices[i].m_xmf3Position = XMFLOAT3((x*m_xmf3Scale.x), fHeight, (z*m_xmf3Scale.z));
-			pVertices[i].m_xmf4Diffuse = Vector4::Add(OnGetColor(x, z, pContext), xmf4Color);
+			
+			XMFLOAT4 tmp = OnGetColor(x, z, pContext);
+			
+			pVertices[i].m_xmf4Diffuse = Vector4::Add(tmp, xmf4Color);
 			pVertices[i].m_xmf2TexCoord0 = XMFLOAT2(float(x) / float(cxHeightMap - 1), float(czHeightMap - 1 - z) / float(czHeightMap - 1));
 			pVertices[i].m_xmf2TexCoord1 = XMFLOAT2(float(x) / float(m_xmf3Scale.x*0.5f), float(z) / float(m_xmf3Scale.z*0.5f));
 			if (fHeight < fMinHeight) fMinHeight = fHeight;
@@ -711,11 +712,12 @@ float CHeightMapGridMesh::OnGetHeight(int x, int z, void *pContext)
 
 XMFLOAT4 CHeightMapGridMesh::OnGetColor(int x, int z, void *pContext)
 {
+	//조명의 방향 벡터(정점에서 조명까지의 벡터) 
 	XMFLOAT3 xmf3LightDirection = XMFLOAT3(-1.0f, 1.0f, 1.0f);
 	xmf3LightDirection = Vector3::Normalize(xmf3LightDirection);
 	CHeightMapImage *pHeightMapImage = (CHeightMapImage *)pContext;
 	XMFLOAT3 xmf3Scale = pHeightMapImage->GetScale();
-	XMFLOAT4 xmf4IncidentLightColor(0.9f, 0.8f, 0.4f, 1.0f);
+	XMFLOAT4 xmf4IncidentLightColor(0.9f, 0.8f, 0.4f, 1.0f);	//조명의 색상(세기, 밝기)
 	float fScale = Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x, z), xmf3LightDirection);
 	fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x + 1, z), xmf3LightDirection);
 	fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x + 1, z + 1), xmf3LightDirection);

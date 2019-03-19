@@ -55,7 +55,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 void CScene::ReleaseObjects()
 {
-	if (m_pBuildings) m_pBuildings->Release();
+	//if (m_pBuildings) m_pBuildings->Release();
 	if (m_pd3dGraphicsRootSignature) m_pd3dGraphicsRootSignature->Release();
 
 	if (m_ppShaders)
@@ -80,17 +80,17 @@ void CScene::ReleaseObjects()
 	if (m_pTerrain) delete m_pTerrain;
 	if (m_pLights) delete m_pLights;
 	if (m_pMaterials) delete m_pMaterials;
-	if (m_pBuildings) delete m_pBuildings;
-	if (m_ppUIShaders)
-	{
-		for (int i = 0; i < m_nUIShaders; i++) delete m_ppUIShaders[i];
-		delete[] m_ppUIShaders;
-	}
+	//if (m_pBuildings) delete m_pBuildings;
+	//if (m_ppUIShaders)
+	//{
+	//	for (int i = 0; i < m_nUIShaders; i++) delete m_ppUIShaders[i];
+	//	delete[] m_ppUIShaders;
+	//}
 }
 
 void CScene::ReleaseUploadBuffers()
 {
-	if (m_pBuildings) m_pBuildings->ReleaseUploadBuffers();
+	//if (m_pBuildings) m_pBuildings->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->ReleaseUploadBuffers();
 
 	for (int i = 0; i < m_nObjects; i++) m_ppObjects[i]->ReleaseUploadBuffers();
@@ -295,7 +295,7 @@ void CScene::AnimateObjects(float fTimeElapsed, CCamera *pCamera)
 {
 	/*if(CGameFramework::m_pCamera->GetMode == SPACESHIP_CAMERA)
 		m_ppShaders[0]*/
-	m_pBuildings->AnimateObjects(fTimeElapsed, pCamera);
+	//m_pBuildings->AnimateObjects(fTimeElapsed, pCamera);
 	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->AnimateObjects(fTimeElapsed, pCamera);
 
 	for (int i = 0; i < m_nObjects; i++) m_ppObjects[i]->Animate(fTimeElapsed);
@@ -312,7 +312,7 @@ void CScene::AnimateObjects(float fTimeElapsed, CCamera *pCamera)
 		m_pPlayer[i]->SetScale(0.093, 0.093, 0.093);	// 캐릭터 크기 조정
 	}
 
-	for (int i = 0; i < m_nObjects; i++) m_ppUIShaders[i]->AnimateObjects(fTimeElapsed, pCamera);
+	//for (int i = 0; i < m_nObjects; i++) m_ppUIShaders[i]->AnimateObjects(fTimeElapsed, pCamera);
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
@@ -331,10 +331,10 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pd3dCommandList->SetGraphicsRootConstantBufferView(3, d3dcbMaterialsGpuVirtualAddress); //Materials
 
 
-	if (m_pSkyBox) m_pSkyBox->Render(pd3dCommandList, pCamera);
+	//if (m_pSkyBox) m_pSkyBox->Render(pd3dCommandList, pCamera);
 	if (m_pTerrain) m_pTerrain->Render(pd3dCommandList, pCamera);
 
-	if (m_pBuildings) m_pBuildings->Render(pd3dCommandList, pCamera);
+	//if (m_pBuildings) m_pBuildings->Render(pd3dCommandList, pCamera);
 
 	for (int i = 1; i < m_nShaders; i++) m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < m_nObjects; i++) m_ppObjects[i]->UpdateTransform(NULL);

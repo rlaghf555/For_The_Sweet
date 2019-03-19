@@ -510,8 +510,8 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 
 	CTexture *pTerrainTexture = new CTexture(2, RESOURCE_TEXTURE2D, 0);
 
-	pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"../Assets/Image/Terrain/Base_Texture.dds", 0);
-	pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"../Assets/Image/Terrain/Detail_Texture_7.dds", 1);
+	//pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, "../Assets/Image/Terrain/Base_Texture.dds", 0);
+	//pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, "../Assets/Image/Terrain/Detail_Texture_7.dds", 1);
 
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256ÀÇ ¹è¼ö
 
