@@ -10,11 +10,11 @@ public:
 
 	void Tick(float fLockFPS = 0.0f);	// 타이머 시간 갱신
 	unsigned long GetFrameRate(LPTSTR lpszString = NULL, int nCharacters = 0);	//프레임레이트 반환
-
 	void Start();
 	void Stop();
 	void Reset();
 
+	float GetTotalTime();
 	float GetTimeElapsed();				// 프레임의 평균시간 반환
 private:
 	bool			m_bHardwareHasPerformanceCounter;	// 컴퓨터가 Performance Counter를 가지고 있는지
@@ -27,6 +27,7 @@ private:
 	__int64			m_nBasePerformanceCounter;
 	__int64			m_nPausedPerformanceCounter;
 	__int64			m_nStopPerformanceCounter;
+	__int64			m_nCurrentPerformanceCounter;
 	__int64			m_nLastPerformanceCounter;
 
 	float			m_fFrameTime[MAX_SAMPLE_COUNT];		// 프레임 시간을 누적하기 위한 배열
