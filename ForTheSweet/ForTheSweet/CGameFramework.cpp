@@ -3,7 +3,6 @@
 #include "CGameFramework.h"
 #include "resource.h"
 #pragma comment (lib,"winmm")
-int CShader::shootBullet;
 
 CGameFramework::CGameFramework()
 {
