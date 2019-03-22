@@ -9,7 +9,7 @@
 
 #include "Object.h"
 #include "Camera.h"
-
+#include "Model.h"
 struct CB_PLAYER_INFO
 {
 	XMFLOAT4X4					m_xmf4x4World;
@@ -118,4 +118,13 @@ public:
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	/*virtual void OnPlayerUpdateCallback(float fTimeElapsed);
 	virtual void OnCameraUpdateCallback(float fTimeElapsed);*/
+};
+
+class ModelPlayer : public CPlayer {
+private:
+	LoadModel *lm;
+public:
+	ModelPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext = NULL, int nMeshes = 1);
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
+	virtual ~ModelPlayer();
 };
