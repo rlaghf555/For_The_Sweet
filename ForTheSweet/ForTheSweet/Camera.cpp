@@ -18,7 +18,7 @@ CCamera::CCamera()
 	m_xmf3Offset = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_fTimeLag = 0.0f;
 	m_xmf3LookAtWorld = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_nMode = 0x00;
+	m_nMode = THIRD_PERSON_CAMERA;
 	m_pPlayer = NULL;
 }
 
@@ -44,7 +44,7 @@ CCamera::CCamera(CCamera *pCamera)
 		m_xmf3Offset = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		m_fTimeLag = 0.0f;
 		m_xmf3LookAtWorld = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		m_nMode = 0x00;
+		m_nMode = THIRD_PERSON_CAMERA;
 		m_pPlayer = NULL;
 	}
 }

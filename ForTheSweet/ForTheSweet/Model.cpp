@@ -147,8 +147,8 @@ void LoadModel::InitScene()
 	for (UINT i = 0; i < m_meshes.size(); ++i) {
 		const aiMesh* pMesh = m_pScene->mMeshes[i];
 		InitMesh(i, pMesh);
-		if (pMesh->HasBones())
-			InitBones(i, pMesh);
+		//if (pMesh->HasBones())
+		//	InitBones(i, pMesh);
 		m_numVertices += (UINT)m_meshes[i].m_vertices.size();
 	}
 	m_numBones = (UINT)m_Bones.size();
@@ -162,17 +162,17 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 
 	for (UINT i = 0; i < pMesh->mNumVertices; ++i) {
 		XMFLOAT3 pos(0, 0, 0);
-		pos.x = pMesh->mVertices[i].x;
-		pos.y = pMesh->mVertices[i].y;
-		pos.z = pMesh->mVertices[i].z;
+	//	pos.x = pMesh->mVertices[i].x;
+	//	pos.y = pMesh->mVertices[i].y;
+	//	pos.z = pMesh->mVertices[i].z;
 		XMFLOAT3 normal(0,0,0);
-		normal.x = pMesh->mNormals[i].x;
-		normal.y = pMesh->mNormals[i].y;
-		normal.z = pMesh->mNormals[i].z;
+	//	normal.x = pMesh->mNormals[i].x;
+	//	normal.y = pMesh->mNormals[i].y;
+	//	normal.z = pMesh->mNormals[i].z;
 		XMFLOAT2 tex(0,0);
 		if (pMesh->HasTextureCoords(0)) {
-			tex.x = pMesh->mTextureCoords[0][i].x;
-			tex.y = pMesh->mTextureCoords[0][i].y;
+	//		tex.x = pMesh->mTextureCoords[0][i].x;
+	//		tex.y = pMesh->mTextureCoords[0][i].y;
 		}
 		else
 			tex = XMFLOAT2(0.0f, 0.0f);
@@ -199,7 +199,7 @@ void LoadModel::SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	}
 }
 
-
+/*
 void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 {
 	for (UINT i = 0; i < pMesh->mNumBones; ++i) {
@@ -235,7 +235,7 @@ void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 		}
 	}
 }
-
+*/
 MMesh::MMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 }

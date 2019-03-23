@@ -1,18 +1,9 @@
-#pragma once
 #include "stdafx.h"
-#include "assimp\Importer.hpp"
-#include "assimp\cimport.h"
-#include "assimp\postprocess.h"
-#include "assimp\scene.h"
-
-
-#pragma comment(lib, "lib/assimp-vc140-mt.lib")
-
-
+/*
 inline XMMATRIX aiMatrixToXMMatrix(const aiMatrix4x4& offset)
 {
 	return XMMATRIX(&offset.a1);
-}
+}*/
 
 struct vertexDatas
 {

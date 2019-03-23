@@ -68,7 +68,7 @@ public:
 	CPlayer *GetPlayer() { return(m_pPlayer); }
 
 	void SetMode(DWORD nMode) { m_nMode = nMode; }
-	DWORD GetMode() { return(m_nMode); }
+	//DWORD GetMode() { return(m_nMode); }
 
 	void SetPosition(XMFLOAT3 xmf3Position) { m_xmf3Position = xmf3Position; }
 	XMFLOAT3& GetPosition() { return(m_xmf3Position); }

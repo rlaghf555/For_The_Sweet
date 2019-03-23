@@ -91,7 +91,7 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	else
 	{
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
-		m_pCamera->Move(xmf3Shift);
+	//	m_pCamera->Move(xmf3Shift);
 	}
 }
 
@@ -101,9 +101,7 @@ XMFLOAT3 CPlayer::GetCameraLook() {
 
 void CPlayer::Rotate(float x, float y, float z)
 {
-	DWORD nCurrentCameraMode = m_pCamera->GetMode();
-	if ((nCurrentCameraMode == FIRST_PERSON_CAMERA) || (nCurrentCameraMode == THIRD_PERSON_CAMERA))
-	{
+	
 		if (x != 0.0f)
 		{
 			m_fPitch += x;
@@ -129,30 +127,6 @@ void CPlayer::Rotate(float x, float y, float z)
 			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
 			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
 		}
-	}
-	else if (nCurrentCameraMode == SPACESHIP_CAMERA)
-	{
-		m_pCamera->Rotate(x, y, z);
-		if (x != 0.0f)
-		{
-			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
-			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
-			m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
-		}
-		if (y != 0.0f)
-		{
-			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
-			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
-			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
-		}
-		if (z != 0.0f)
-		{
-			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Look), XMConvertToRadians(z));
-			m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
-			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
-		}
-	}
-
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
 	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
@@ -176,12 +150,10 @@ void CPlayer::Update(float fTimeElapsed)
 
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 
-	DWORD nCurrentCameraMode = m_pCamera->GetMode();
-	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
-	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
-	if (nCurrentCameraMode == FIRST_PERSON_CAMERA) m_pCamera->SetPosition(XMFLOAT3(GetPosition().x - 15 * GetLookVector().x, GetPosition().y + 25, GetPosition().z - 15 * GetLookVector().z));	// 1인칭 카메라 움직이기
-	if (nCurrentCameraMode == SPACESHIP_CAMERA) m_pCamera->SetPosition(XMFLOAT3(GetPosition().x, GetPosition().y + 15, GetPosition().z));	// 줌 카메라 움직이기
+	m_pCamera->SetLookAt(m_xmf3Position);
+
 
 	m_pCamera->RegenerateViewMatrix();
 
@@ -227,7 +199,7 @@ void CPlayer::OnPrepareRender()
 
 void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
-	DWORD nCameraMode = (pCamera) ? pCamera->GetMode() : 0x00; CGameObject::Render(pd3dCommandList, pCamera);
+	CGameObject::Render(pd3dCommandList, pCamera);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -250,40 +222,24 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 CAirplanePlayer::~CAirplanePlayer()
 {
 }
-
-CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
-{
-	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
-	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
-	switch (nNewCameraMode)
-	{
-
-	case THIRD_PERSON_CAMERA:
-		SetFriction(250.0f);
-		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		SetMaxVelocityXZ(125.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
-		m_pCamera->SetTimeLag(0.25f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -40.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-		break;
-	default:
-		break;
-	}
-	Update(fTimeElapsed);
-
-	return(m_pCamera);
-}
 ModelPlayer::ModelPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext, int nMeshes) : CPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pContext, nMeshes) {
+	m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
+	if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	//LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, L"../Assets/Model/Flyer.txt");
 	lm = new LoadModel("police.fbx", true);
+
+	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)pContext;
+	SetPlayerUpdatedContext(pTerrain);
+	SetCameraUpdatedContext(pTerrain);
 
 }
 void ModelPlayer::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
 {
-
+	CGameObject::Render(pd3dCommandList, pCamera);
+	/*for (int i = 0; i < lm->getNumMesh(); i++) {
+		lm->getMeshes()[i]->Render(pd3dCommandList);
+	}*/
 }
 ModelPlayer::~ModelPlayer() {
 	

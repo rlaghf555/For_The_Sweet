@@ -516,9 +516,8 @@ void CGameFramework::BuildObjects()
 	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 
 	for (int i = 0; i < MAX_PLAYER_NUM; ++i)
-		m_pScene->m_pPlayer[i] = m_pPlayer[i] = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
-
-	//m_pCamera = m_pPlayer[my_client_id]->GetCamera();
+		m_pScene->m_pPlayer[i] = m_pPlayer[i] = new ModelPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
+	m_pCamera = m_pPlayer[0]->GetCamera();
 
 #ifdef _WITH_APACHE_MODEL
 	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -300.0f));
@@ -588,23 +587,7 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
-			if (m_pCamera->GetMode() == FIRST_PERSON_CAMERA) {
-				if (cxDelta || cyDelta)
-				{
-					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-
-						m_pPlayer[my_client_id]->Rotate(cyDelta, 0.0f, -cxDelta);
-					else
-						m_pPlayer[my_client_id]->Rotate(cyDelta, cxDelta, 0.0f);
-				}
-				if (dwDirection) {
-					for (int i = 0; i < MAX_PLAYER_NUM; ++i) {
-						// 중요
-						m_pPlayer[i]->Move(dwDirection, WALK_SPEED * METER_PER_PIXEL * m_GameTimer.GetTimeElapsed(), false);
-					}
-				}
-			}
-			else {
+			
 				if (cxDelta || cyDelta)
 				{
 					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
@@ -619,7 +602,7 @@ void CGameFramework::ProcessInput()
 						m_pPlayer[i]->Move(dwDirection, WALK_SPEED * METER_PER_PIXEL * m_GameTimer.GetTimeElapsed(), false);
 					}
 				}
-			}
+			
 		}
 	}
 	for (int i = 0; i < MAX_PLAYER_NUM; ++i) {
@@ -705,9 +688,7 @@ void CGameFramework::FrameAdvance()
 #endif
 	for (int i = 0; i < 4; ++i) {
 		m_pPlayer[i]->UpdateTransform(NULL);
-		if (i == my_client_id && m_pCamera->GetMode() == SPACESHIP_CAMERA);
-		else
-			m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
+		m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
 	}
 
 
