@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Model.h"
 
-ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, mesh& meshData) : MeshGeometry(pd3dDevice, pd3dCommandList)
+ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, mesh& meshData) : MMesh(pd3dDevice, pd3dCommandList)
 {
 	m_nVertices = (int)meshData.m_vertices.size();
 	m_nIndices = (int)meshData.m_indices.size();
@@ -199,7 +199,7 @@ void LoadModel::SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	}
 }
 
-/*
+
 void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 {
 	for (UINT i = 0; i < pMesh->mNumBones; ++i) {
@@ -234,4 +234,4 @@ void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 			m_meshes[index].m_vertices[vertexID].AddBoneData(BoneIndex, weight);
 		}
 	}
-}*/
+}

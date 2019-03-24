@@ -11,11 +11,11 @@
 #pragma comment(lib, "assimp-vc140-mt.lib")
 
 using namespace std;
-/*
+
 inline XMMATRIX aiMatrixToXMMatrix(const aiMatrix4x4& offset)
 {
 	return XMMATRIX(&offset.a1);
-}*/
+}
 
 struct vertexDatas
 {
@@ -78,7 +78,7 @@ struct Bone
 	}
 };
 
-class ModelMesh : public MeshGeometry
+class ModelMesh : public MMesh
 {
 public:
 	ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, mesh& meshData);
@@ -103,7 +103,7 @@ public:
 	void InitScene();
 	void InitMesh(UINT index, const aiMesh* pMesh);
 	void SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
-	//void InitBones(UINT index, const aiMesh* pMesh);
+	void InitBones(UINT index, const aiMesh* pMesh);
 	void SetTextureIndex(UINT meshIndex, UINT textureIndex) { m_meshes[meshIndex].SetMeshesTextureIndex(textureIndex); };
 
 	ModelMesh**					getMeshes() { return m_ModelMeshes.data(); }

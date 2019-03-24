@@ -1,19 +1,19 @@
 #include "stdafx.h"
 #include "Mesh.h"
 
-MeshGeometry::MeshGeometry(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
+MMesh::MMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 }
 
-MeshGeometry::~MeshGeometry()
+MMesh::~MMesh()
 {
 }
 
-void MeshGeometry::ReleaseUploadBuffers()
+void MMesh::ReleaseUploadBuffers()
 {
 };
 
-void MeshGeometry::Render(ID3D12GraphicsCommandList *pd3dCommandList)
+void MMesh::Render(ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);			// 입력 조립기 프리미티브 토폴로지 셋
 	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);	// m_nslot번째 슬롯부터 n개의 view를 통해 버퍼를 사용하게따
@@ -28,7 +28,7 @@ void MeshGeometry::Render(ID3D12GraphicsCommandList *pd3dCommandList)
 	}
 }
 
-void MeshGeometry::Render(ID3D12GraphicsCommandList * pd3dCommandList, UINT nInstanceCount)
+void MMesh::Render(ID3D12GraphicsCommandList * pd3dCommandList, UINT nInstanceCount)
 {
 	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);			// 입력 조립기 프리미티브 토폴로지 셋
 	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);	// m_nslot번째 슬롯부터 n개의 view를 통해 버퍼를 사용하게따

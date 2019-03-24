@@ -91,11 +91,11 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class MeshGeometry
+class MMesh
 {
 public:
-	MeshGeometry(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
-	virtual ~MeshGeometry();
+	MMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual ~MMesh();
 
 private:
 	int								m_nReferences = 0;

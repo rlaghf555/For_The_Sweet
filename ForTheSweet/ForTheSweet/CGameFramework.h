@@ -52,6 +52,8 @@ private:
 
 	HANDLE m_hFenceEvent;
 	//펜스 인터페이스 포인터, 펜스의 값, 이벤트 핸들이다.
+
+	LoadModel *Character_Model;
 #if defined(_DEBUG)
 	ID3D12Debug *m_pd3dDebugController;
 
@@ -76,6 +78,8 @@ public:
 	void CreateRtvAndDsvDescriptorHeaps();
 	void CreateCommandQueueAndList();
 	//스왑 체인, 디바이스, 서술자 힙, 명령 큐/할당자/리스트를 생성하는 함수이다.
+
+	void LoadModels();
 
 	void BuildObjects();
 	void ReleaseObjects();

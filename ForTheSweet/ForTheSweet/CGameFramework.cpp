@@ -40,6 +40,8 @@ CGameFramework::CGameFramework()
 	//m_nFenceValue = 0;
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
+	
+	Character_Model = NULL;
 }
 
 //다음 함수는 응용 프로그램이 실행되어 주 윈도우가 생성되면 호출된다는 것에 유의하라.
@@ -53,6 +55,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
 	CreateSwapChain();
+	LoadModels();
 	//CreateRenderTargetView();
 	//CreateDepthStencilView();
 
@@ -261,6 +264,11 @@ void CGameFramework::CreateDepthStencilView()
 	//깊이-스텐실 버퍼 뷰를 생성한다.
 }
 
+void CGameFramework::LoadModels()
+{
+	Character_Model = new LoadModel("police.fbx", false);
+}
+
 void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -271,8 +279,9 @@ void CGameFramework::BuildObjects()
 	My_ID = CHARATER_ID_7; //원래는 서버에서 받아야함
 
 	//CAirplanePlayer *pAirplanePlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
-	CGamePlayer *pPlayer;
-	pPlayer = new CGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	ModelPlayer *pPlayer;
+	//pPlayer = new CGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	pPlayer = new ModelPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), Character_Model);
 	// player 위치 서버에서 받아서 초기화 해줘야함
 	
 	m_pPlayer = pPlayer;

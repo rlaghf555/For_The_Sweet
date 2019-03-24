@@ -41,9 +41,12 @@ public:
 	XMFLOAT4X4 m_xmf4x4World;
 	CMesh *m_pMesh = NULL;
 	CShader *m_pShader = NULL;
+	vector<unique_ptr<MMesh>>	m_ppMeshes;
+	UINT m_nMeshes;
 public:
 	void ReleaseUploadBuffers();
 	virtual void SetMesh(CMesh *pMesh);
+	virtual void SetMesh(int nIndex, MMesh *pMesh);
 	virtual void SetShader(CShader *pShader);
 	virtual void Animate(float fTimeElapsed);
 	virtual void OnPrepareRender();

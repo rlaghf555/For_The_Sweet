@@ -91,6 +91,7 @@ void CGameObject::Rotate(XMFLOAT3 *pxmf3Axis, float fAngle)
 CGameObject::CGameObject()
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+
 }
 
 CGameObject::~CGameObject()
@@ -117,8 +118,25 @@ void CGameObject::SetMesh(CMesh *pMesh)
 	if (m_pMesh) m_pMesh->AddRef();
 }
 
+void CGameObject::SetMesh(int nIndex, MMesh * pMesh)
+{
+	if (!m_ppMeshes.empty())
+	{
+		if (m_ppMeshes[nIndex]) m_ppMeshes[nIndex].release();
+		m_ppMeshes[nIndex] = make_unique<MMesh>(*pMesh);
+	}
+}
+
 void CGameObject::ReleaseUploadBuffers()
 {
+	if (!m_ppMeshes.empty())
+	{
+		for (UINT i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i])
+				m_ppMeshes[i]->ReleaseUploadBuffers();
+		}
+	}
 	//정점 버퍼를 위한 업로드 버퍼를 소멸시킨다.
 	if (m_pMesh) m_pMesh->ReleaseUploadBuffers();
 }
@@ -138,6 +156,14 @@ void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pC
 	UpdateShaderVariables(pd3dCommandList);
 	if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
 	if (m_pMesh) m_pMesh->Render(pd3dCommandList);
+	if (!m_ppMeshes.empty())
+	{
+		for (UINT i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i])
+				m_ppMeshes[i]->Render(pd3dCommandList);
+		}
+	}
 }
 
 void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera, UINT nInstances)
