@@ -266,7 +266,8 @@ void CGameFramework::CreateDepthStencilView()
 
 void CGameFramework::LoadModels()
 {
-	Character_Model = new LoadModel("police.fbx", false);
+	//Character_Model = new LoadModel("police.fbx", false);
+	Character_Model = new LoadModel("main_character.FBX", false);
 }
 
 void CGameFramework::BuildObjects()
@@ -283,7 +284,7 @@ void CGameFramework::BuildObjects()
 	//pPlayer = new CGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 	pPlayer = new ModelPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), Character_Model);
 	// player 위치 서버에서 받아서 초기화 해줘야함
-	
+
 	m_pPlayer = pPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
@@ -303,8 +304,7 @@ void CGameFramework::ReleaseObjects()
 	if (m_pScene) delete m_pScene;
 }
 
-void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam,
-	LPARAM lParam)
+void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	switch (nMessageID)
 	{

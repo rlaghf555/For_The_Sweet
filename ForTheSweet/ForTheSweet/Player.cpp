@@ -57,26 +57,32 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 	if (dwDirection)
 	{
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
+		XMFLOAT3 xmf3Direction = XMFLOAT3(0, 0, 0);
 		//화살표 키 ‘↑’를 누르면 로컬 z-축 방향으로 이동(전진)한다. ‘↓’를 누르면 반대 방향으로 이동한다.
 		if (dwDirection & DIR_FORWARD) {
-			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
-			m_xmf3Look.z = 1.f;
+			m_xmf3Look.z = -1.f;
+			xmf3Direction = m_xmf3Look;
+			xmf3Direction.z = 1.f;
+			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, fDistance);
 		}
 		if (dwDirection & DIR_BACKWARD) {
-			//xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
-			m_xmf3Look.z = -1.f;
-			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+			m_xmf3Look.z = 1.f;
+			xmf3Direction = m_xmf3Look;
+			xmf3Direction.z = -1.f;
+			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, fDistance);
 		}
 		//화살표 키 ‘→’를 누르면 로컬 x-축 방향으로 이동한다. ‘←’를 누르면 반대 방향으로 이동한다.
 		if (dwDirection & DIR_RIGHT) {
-			//xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-			m_xmf3Look.x = 1.f;
-			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+			m_xmf3Look.x = -1.f;
+			xmf3Direction = m_xmf3Look;
+			xmf3Direction.x = 1.f;
+			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, fDistance);
 		}
 		if (dwDirection & DIR_LEFT) {
-			//xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
-			m_xmf3Look.x = -1.f;
-			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+			m_xmf3Look.x = 1.f;
+			xmf3Direction = m_xmf3Look;
+			xmf3Direction.x = -1.f;
+			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, fDistance);
 		}
 		//‘Page Up’을 누르면 로컬 y-축 방향으로 이동한다. ‘Page Down’을 누르면 반대 방향으로 이동한다.
 		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
@@ -166,13 +172,11 @@ void CPlayer::Update(float fTimeElapsed)
 {
 	/*플레이어의 속도 벡터를 중력 벡터와 더한다. 중력 벡터에 fTimeElapsed를 곱하는 것은 중력을 시간에 비례하도록
 	적용한다는 의미이다.*/
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity,
-		fTimeElapsed, false));
+	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
 	
 	/*플레이어의 속도 벡터의 XZ-성분의 크기를 구한다. 이것이 XZ-평면의 최대 속력보다 크면 속도 벡터의 x와 z-방향
 	성분을 조정한다.*/
-	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z *
-		m_xmf3Velocity.z);
+	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	
 	float fMaxVelocityXZ = m_fMaxVelocityXZ * fTimeElapsed;
 	if (fLength > m_fMaxVelocityXZ)
@@ -309,7 +313,7 @@ void CGamePlayer::OnPrepareRender()
 	CPlayer::OnPrepareRender();
 	
 	//비행기 모델을 그리기 전에 x-축으로 90도 회전한다.
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f);
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.f), 0.0f, 0.0f);
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 }
 /*3인칭 카메라일 때 플레이어 메쉬를 로컬 x-축을 중심으로 +90도 회전하고 렌더링한다. 왜냐하면 비행기 모델 메쉬
@@ -351,11 +355,9 @@ CCamera *CGamePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 
 ModelPlayer::ModelPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, LoadModel *Character_Model)
 {
-	
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
-	
+		
 	lm = Character_Model;
 	m_nMeshes = lm->getNumMesh();
 	if (m_nMeshes > 0)
@@ -377,7 +379,6 @@ ModelPlayer::ModelPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd
 	//플레이어의 위치를 설정한다.
 	XMFLOAT3 pposition = XMFLOAT3(0.0f, 0.0f, -50.0f);
 	SetPosition(pposition);
-
 }
 CCamera * ModelPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 {
