@@ -9,11 +9,14 @@
 
 #include "Object.h"
 #include "Camera.h"
+<<<<<<< HEAD
 #include "Model.h"
 struct CB_PLAYER_INFO
 {
 	XMFLOAT4X4					m_xmf4x4World;
 };
+=======
+>>>>>>> parent of ecc8677... ëª¨ë¸ë°ì´í„° assimp ì´ìš© ì½”ë“œ ì¶”ê°€
 
 class CPlayer : public CGameObject
 {
@@ -101,12 +104,19 @@ public:
 
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed) { return(NULL); }
 	virtual void OnPrepareRender();
+<<<<<<< HEAD
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 	virtual void Animate(float fTimeElapsed);
 
 protected:
 	ID3D12Resource					*m_pd3dcbPlayer = NULL;
 	CB_PLAYER_INFO					*m_pcbMappedPlayer = NULL;
+=======
+	
+	//ÇÃ·¹ÀÌ¾îÀÇ Ä«¸Ş¶ó°¡ 3ÀÎÄª Ä«¸Ş¶óÀÏ ¶§ ÇÃ·¹ÀÌ¾î(¸Ş½¬)¸¦ ·»´õ¸µÇÑ´Ù.
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera =
+		NULL);
+>>>>>>> parent of ecc8677... ëª¨ë¸ë°ì´í„° assimp ì´ìš© ì½”ë“œ ì¶”ê°€
 };
 
 class CAirplanePlayer : public CPlayer

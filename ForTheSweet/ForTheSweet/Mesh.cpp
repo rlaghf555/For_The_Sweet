@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "UploadBuffer.h"
 
+<<<<<<< HEAD
 CMesh::CMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 }
@@ -138,6 +139,33 @@ CMeshIlluminated::CMeshIlluminated(ID3D12Device *pd3dDevice, ID3D12GraphicsComma
 		m_d3dIndexBufferView.SizeInBytes = sizeof(UINT) * m_nIndices;
 	}
 }
+=======
+//LoadModel::LoadModel(const string& fileName)
+//{
+//	m_pScene = aiImportFile(fileName.c_str(), aiProcess_JoinIdenticalVertices |        // µ¿ÀÏÇÑ ²ÀÁöÁ¡ °áÇÕ, ÀÎµ¦½Ì ÃÖÀûÈ­
+//				aiProcess_ValidateDataStructure |        // ·Î´õÀÇ Ãâ·ÂÀ» °ËÁõ
+//				aiProcess_ImproveCacheLocality |        // Ãâ·Â Á¤Á¡ÀÇ Ä³½¬À§Ä¡¸¦ °³¼±
+//				aiProcess_RemoveRedundantMaterials |    // Áßº¹µÈ ¸ÅÅÍ¸®¾ó Á¦°Å
+//				aiProcess_GenUVCoords |                    // ±¸Çü, ¿øÅëÇü, »óÀÚ ¹× Æò¸é ¸ÅÇÎÀ» ÀûÀıÇÑ UV·Î º¯È¯
+//				aiProcess_TransformUVCoords |            // UV º¯È¯ Ã³¸®±â (½ºÄÉÀÏ¸µ, º¯È¯...)
+//				aiProcess_FindInstances |                // ÀÎ½ºÅÏ½ºµÈ ¸Å½¬¸¦ °Ë»öÇÏ¿© ÇÏ³ªÀÇ ¸¶½ºÅÍ¿¡ ´ëÇÑ ÂüÁ¶·Î Á¦°Å
+//				aiProcess_LimitBoneWeights |            // Á¤Á¡´ç »ÀÀÇ °¡ÁßÄ¡¸¦ ÃÖ´ë 4°³·Î Á¦ÇÑ
+//				aiProcess_OptimizeMeshes |                // °¡´ÉÇÑ °æ¿ì ÀÛÀº ¸Å½¬¸¦ Á¶ÀÎ
+//				aiProcess_GenSmoothNormals |            // ºÎµå·¯¿î ³ë¸»º¤ÅÍ(¹ı¼±º¤ÅÍ) »ı¼º
+//				aiProcess_SplitLargeMeshes |            // °Å´ëÇÑ ÇÏ³ªÀÇ ¸Å½¬¸¦ ÇÏÀ§¸Å½¬µé·Î ºĞÈ°(³ª´®)
+//				aiProcess_Triangulate |                    // 3°³ ÀÌ»óÀÇ ¸ğ¼­¸®¸¦ °¡Áø ´Ù°¢Çü ¸éÀ» »ï°¢ÇüÀ¸·Î ¸¸µë(³ª´®)
+//				aiProcess_ConvertToLeftHanded |            // D3DÀÇ ¿Ş¼ÕÁÂÇ¥°è·Î º¯È¯
+//				aiProcess_SortByPType);                    // ´ÜÀÏÅ¸ÀÔÀÇ ÇÁ¸®¹ÌÆ¼ºê·Î ±¸¼ºµÈ '±ú²ıÇÑ' ¸Å½¬¸¦ ¸¸µë
+//		
+//	if (m_pScene) {
+//		m_meshes.resize(m_pScene->mNumMeshes);
+//		m_numMaterial = m_pScene->mNumMaterials;
+//		m_numBones = 0;
+//		InitScene();
+//		m_ModelMeshes.resize(m_meshes.size());
+//	}
+//}
+>>>>>>> parent of ecc8677... ëª¨ë¸ë°ì´í„° assimp ì´ìš© ì½”ë“œ ì¶”ê°€
 
 CMeshIlluminated::~CMeshIlluminated()
 {

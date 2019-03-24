@@ -205,6 +205,7 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CAirplanePlayer
 
+<<<<<<< HEAD
 CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext, int nMeshes) : CPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pContext, nMeshes)
 {
 	/*
@@ -217,6 +218,24 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	SetPlayerUpdatedContext(pTerrain);
 	SetCameraUpdatedContext(pTerrain);
 	*/
+=======
+	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 50, 30, 100);
+	SetMesh(pCubeMesh);
+	//ÇÃ·¹ÀÌ¾îÀÇ Ä«¸Ş¶ó¸¦ ½ºÆäÀÌ½º-½± Ä«¸Ş¶ó·Î º¯°æ(»ı¼º)ÇÑ´Ù.
+	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
+	
+	//ÇÃ·¹ÀÌ¾î¸¦ À§ÇÑ ¼ÎÀÌ´õ º¯¼ö¸¦ »ı¼ºÇÑ´Ù.
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	
+	//ÇÃ·¹ÀÌ¾îÀÇ À§Ä¡¸¦ ¼³Á¤ÇÑ´Ù.
+	XMFLOAT3 pposition = XMFLOAT3(0.0f, 0.0f, -50.0f);
+	SetPosition(pposition);
+	
+	//ÇÃ·¹ÀÌ¾î(ºñÇà±â) ¸Ş½¬¸¦ ·»´õ¸µÇÒ ¶§ »ç¿ëÇÒ ¼ÎÀÌ´õ¸¦ »ı¼ºÇÑ´Ù.
+	CPlayerShader *pShader = new CPlayerShader();
+	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	SetShader(pShader);
+>>>>>>> parent of ecc8677... ëª¨ë¸ë°ì´í„° assimp ì´ìš© ì½”ë“œ ì¶”ê°€
 }
 
 CAirplanePlayer::~CAirplanePlayer()

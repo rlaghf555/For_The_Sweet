@@ -1,10 +1,52 @@
 
 #pragma once
 
+<<<<<<< HEAD
 #include"UploadBuffer.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 class CVertex
+=======
+// ¸Ş½¬ : ÀÌ¸§, ³ë¸» Á¤º¸, ¹öÅØ½º Á¤º¸, »ÀÁ¤º¸, ¸éÁ¤º¸, ÅØ½ºÃÄÁ¤º¸
+struct vertexDatas
+{
+	XMFLOAT3	m_pos;
+	XMFLOAT3	m_normal;
+	XMFLOAT2	m_tex;
+
+	vertexDatas(){}
+	vertexDatas(XMFLOAT3& pos, XMFLOAT3& normal, XMFLOAT2& tex) : m_pos(pos), m_normal(normal), m_tex(tex){}
+};
+
+// ¹öÅØ½º Á¶ÇÕ¼ø¼­(ÀÎµ¦½º Á¤º¸) : ¸Ş½¬ Á¤º¸
+struct mesh
+{
+	std::vector<vertexDatas>	m_vertices;
+	std::vector<int>			m_indices;
+	UINT						m_materialIndex;
+	mesh() { m_materialIndex = 0; }
+};
+
+//class LoadModel
+//{
+//private:
+//	const aiScene*					m_pScene;	// ¸ğµ¨ Á¤º¸
+//	std::vector<mesh>				m_meshes;	// ¸Å½¬ Á¤º¸
+//	std::vector<pair<string, Bone>>	m_Bones;	// »À Á¤º¸
+//	UINT                            m_numVertices;
+//	UINT                            m_numMaterial;
+//public:
+//	LoadModel(const string& fileName);
+//	~LoadModel();
+//	void InitScene();
+//	void InitMesh(UINT index, const aiMesh* pMesh);
+//	void SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+//	ModelMesh**    getMeshes() { return m_ModelMeshes.data(); }
+//	UINT           getNumMesh() const { return (UINT)m_meshes.size(); }
+//};
+
+class CMesh
+>>>>>>> parent of ecc8677... ëª¨ë¸ë°ì´í„° assimp ì´ìš© ì½”ë“œ ì¶”ê°€
 {
 public:
 	XMFLOAT3						m_xmf3Position;
@@ -55,6 +97,7 @@ public:
 class CDiffused2TexturedVertex : public CDiffusedVertex
 {
 public:
+<<<<<<< HEAD
 	XMFLOAT2						m_xmf2TexCoord0;
 	XMFLOAT2						m_xmf2TexCoord1;
 
@@ -247,3 +290,10 @@ public:
 	virtual ~CTexturedRectMesh();
 };
 
+=======
+	CAirplaneMeshDiffused(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+		*pd3dCommandList, float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 4.0f,
+		XMFLOAT4 xmf4Color = XMFLOAT4(1.0f, 1.0f, 0.0f, 0.0f));
+	virtual ~CAirplaneMeshDiffused();
+};
+>>>>>>> parent of ecc8677... ëª¨ë¸ë°ì´í„° assimp ì´ìš© ì½”ë“œ ì¶”ê°€
