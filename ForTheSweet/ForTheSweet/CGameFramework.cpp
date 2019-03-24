@@ -1,21 +1,32 @@
-Ôªø
 #include "stdafx.h"
 #include "CGameFramework.h"
-#include "resource.h"
-#pragma comment (lib,"winmm")
+
 
 CGameFramework::CGameFramework()
 {
+	_tcscpy_s(m_pszFrameRate, _T("ForTheSweet("));
+
 	m_pdxgiFactory = NULL;
 	m_pdxgiSwapChain = NULL;
 	m_pd3dDevice = NULL;
 
-	for (int i = 0; i < m_nSwapChainBuffers; i++) m_ppd3dSwapChainBackBuffers[i] = NULL;
-	m_nSwapChainBufferIndex = 0;
-
 	m_pd3dCommandAllocator = NULL;
 	m_pd3dCommandQueue = NULL;
 	m_pd3dCommandList = NULL;
+
+	m_pd3dPipelineState = NULL;
+
+	for (int i = 0; i < m_nSwapChainBuffers; i++) m_nFenceValues[i] = 0;
+
+	m_pScene = NULL;
+	m_pPlayer = NULL;
+
+	m_pCamera = NULL;
+
+	for (int i = 0; i < m_nSwapChainBuffers; i++) m_ppd3dRenderTargetBuffers[i] = NULL;
+	m_nSwapChainBufferIndex = 0;
+
+	m_pd3dDepthStencilBuffer = NULL;
 
 	m_pd3dRtvDescriptorHeap = NULL;
 	m_pd3dDsvDescriptorHeap = NULL;
@@ -25,43 +36,52 @@ CGameFramework::CGameFramework()
 
 	m_hFenceEvent = NULL;
 	m_pd3dFence = NULL;
-	for (int i = 0; i < m_nSwapChainBuffers; i++) m_nFenceValues[i] = 0;
 
+	//m_nFenceValue = 0;
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
-
-	m_pScene = NULL;
-	for (int i = 0; i < MAX_PLAYER_NUM; ++i)
-		m_pPlayer[i] = NULL;
-
-	_tcscpy_s(m_pszFrameRate, _T("For_The_Sweet ("));
-
 }
 
-CGameFramework::~CGameFramework()
-{
-}
-
+//¥Ÿ¿Ω «‘ºˆ¥¬ ¿¿øÎ «¡∑Œ±◊∑•¿Ã Ω««‡µ«æÓ ¡÷ ¿©µµøÏ∞° ª˝º∫µ«∏È »£√‚µ»¥Ÿ¥¬ ∞Õø° ¿Ø¿««œ∂Û.
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 {
-	//ÏÑúÎ≤Ñ ÌïÑÏöî
-	//-----
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
+	//Direct3D µπŸ¿ÃΩ∫, ∏Ì∑… ≈•øÕ ∏Ì∑… ∏ÆΩ∫∆Æ, Ω∫ø“ √º¿Œ µÓ¿ª ª˝º∫«œ¥¬ «‘ºˆ∏¶ »£√‚«—¥Ÿ.
 
 	CreateDirect3DDevice();
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
 	CreateSwapChain();
+	//CreateRenderTargetView();
+	//CreateDepthStencilView();
 
-	BuildObjects();
+	BuildObjects();		//∑ª¥ı∏µ«“ ∞¥√º(∞‘¿” ø˘µÂ ∞¥√º)∏¶ ª˝º∫«—¥Ÿ.
 
-	//Îã§Î†â Ï¥àÍ∏∞Ìôî Ïù¥ÌõÑ Ïó∞Í≤∞
-	//---
 	return(true);
 }
 
-//#define _WITH_SWAPCHAIN
+void CGameFramework::OnDestroy()
+{
+	ReleaseObjects();
+	::CloseHandle(m_hFenceEvent);
+#if defined(_DEBUG)
+	if (m_pd3dDebugController) m_pd3dDebugController->Release();
+#endif
+	for (int i = 0; i < m_nSwapChainBuffers; i++) if (m_ppd3dRenderTargetBuffers[i])
+		m_ppd3dRenderTargetBuffers[i]->Release();
+	if (m_pd3dRtvDescriptorHeap) m_pd3dRtvDescriptorHeap->Release();
+	if (m_pd3dDepthStencilBuffer) m_pd3dDepthStencilBuffer->Release();
+	if (m_pd3dDsvDescriptorHeap) m_pd3dDsvDescriptorHeap->Release();
+	if (m_pd3dCommandAllocator) m_pd3dCommandAllocator->Release();
+	if (m_pd3dCommandQueue) m_pd3dCommandQueue->Release();
+	if (m_pd3dCommandList) m_pd3dCommandList->Release();
+	if (m_pd3dFence) m_pd3dFence->Release();
+	m_pdxgiSwapChain->SetFullscreenState(FALSE, NULL);
+	if (m_pdxgiSwapChain) m_pdxgiSwapChain->Release();
+	if (m_pd3dDevice) m_pd3dDevice->Release();
+	if (m_pdxgiFactory) m_pdxgiFactory->Release();
+}
 
 void CGameFramework::CreateSwapChain()
 {
@@ -70,35 +90,7 @@ void CGameFramework::CreateSwapChain()
 	m_nWndClientWidth = rcClient.right - rcClient.left;
 	m_nWndClientHeight = rcClient.bottom - rcClient.top;
 
-#ifdef _WITH_CREATE_SWAPCHAIN_FOR_HWND
-	DXGI_SWAP_CHAIN_DESC1 dxgiSwapChainDesc;
-	::ZeroMemory(&dxgiSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC1));
-	dxgiSwapChainDesc.Width = m_nWndClientWidth;
-	dxgiSwapChainDesc.Height = m_nWndClientHeight;
-	dxgiSwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	dxgiSwapChainDesc.SampleDesc.Count = (m_bMsaa4xEnable) ? 4 : 1;
-	dxgiSwapChainDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
-	dxgiSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	dxgiSwapChainDesc.BufferCount = m_nSwapChainBuffers;
-	dxgiSwapChainDesc.Scaling = DXGI_SCALING_NONE;
-	dxgiSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-	dxgiSwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-#ifdef _WITH_ONLY_RESIZE_BACKBUFFERS
-	dxgiSwapChainDesc.Flags = 0;
-#else
-	dxgiSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-#endif
-
-	DXGI_SWAP_CHAIN_FULLSCREEN_DESC dxgiSwapChainFullScreenDesc;
-	::ZeroMemory(&dxgiSwapChainFullScreenDesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
-	dxgiSwapChainFullScreenDesc.RefreshRate.Numerator = 60;
-	dxgiSwapChainFullScreenDesc.RefreshRate.Denominator = 1;
-	dxgiSwapChainFullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	dxgiSwapChainFullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	dxgiSwapChainFullScreenDesc.Windowed = TRUE;
-
-	HRESULT hResult = m_pdxgiFactory->CreateSwapChainForHwnd(m_pd3dCommandQueue, m_hWnd, &dxgiSwapChainDesc, &dxgiSwapChainFullScreenDesc, NULL, (IDXGISwapChain1 **)&m_pdxgiSwapChain);
-#else
+//#ifdef _WITH_CREATE_SWAPCHAIN_FOR_HWND
 	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
 	::ZeroMemory(&dxgiSwapChainDesc, sizeof(dxgiSwapChainDesc));
 	dxgiSwapChainDesc.BufferCount = m_nSwapChainBuffers;
@@ -114,74 +106,69 @@ void CGameFramework::CreateSwapChain()
 	dxgiSwapChainDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
 	dxgiSwapChainDesc.Windowed = TRUE;
 #ifdef _WITH_ONLY_RESIZE_BACKBUFFERS
+	//¿¸√º»≠∏È ∏µÂø°º≠ πŸ≈¡»≠∏È¿« «ÿªÛµµ∏¶ πŸ≤Ÿ¡ˆ æ ∞Ì »ƒ∏Èπˆ∆€¿« ≈©±‚∏¶ πŸ≈¡»≠∏È ≈©±‚∑Œ ∫Ø∞Ê«—¥Ÿ.
 	dxgiSwapChainDesc.Flags = 0;
 #else
+	//¿¸√º»≠∏È ∏µÂø°º≠ πŸ≈¡»≠∏È¿« «ÿªÛµµ∏¶ Ω∫ø“√º¿Œ(»ƒ∏Èπˆ∆€)¿« ≈©±‚ø° ∏¬∞‘ ∫Ø∞Ê«—¥Ÿ.
 	dxgiSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 #endif
-
 	HRESULT hResult = m_pdxgiFactory->CreateSwapChain(m_pd3dCommandQueue, &dxgiSwapChainDesc, (IDXGISwapChain **)&m_pdxgiSwapChain);
-#endif
+	
+	m_pdxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
+	//°∞Alt+Enter°± ≈∞¿« µø¿€¿ª ∫Ò»∞º∫»≠«—¥Ÿ.
 
-	if (!m_pdxgiSwapChain)
-	{
-		MessageBox(NULL, L"Swap Chain Cannot be Created.", L"Error", MB_OK);
-		::PostQuitMessage(0);
-		return;
-	}
-
-	hResult = m_pdxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+	//Ω∫ø“√º¿Œ¿« «ˆ¿Á »ƒ∏Èπˆ∆€ ¿Œµ¶Ω∫∏¶ ¿˙¿Â«—¥Ÿ.
 }
 
 void CGameFramework::CreateDirect3DDevice()
 {
-	HRESULT hResult;
-
 #if defined(_DEBUG)
-	hResult = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void **)&m_pd3dDebugController);
+	D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void **)&m_pd3dDebugController);
 	m_pd3dDebugController->EnableDebugLayer();
 #endif
-
-	hResult = ::CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void **)&m_pdxgiFactory);
-
+	::CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void **)&m_pdxgiFactory);
+	//DXGI ∆—≈‰∏Æ∏¶ ª˝º∫«—¥Ÿ.
 	IDXGIAdapter1 *pd3dAdapter = NULL;
-
 	for (UINT i = 0; DXGI_ERROR_NOT_FOUND != m_pdxgiFactory->EnumAdapters1(i, &pd3dAdapter); i++)
 	{
 		DXGI_ADAPTER_DESC1 dxgiAdapterDesc;
 		pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
 		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
-		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void **)&m_pd3dDevice))) break;
+		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0,
+			_uuidof(ID3D12Device), (void **)&m_pd3dDevice))) break;
 	}
-
-	if (!m_pd3dDevice)
+	//∏µÁ «œµÂø˛æÓ æÓ¥≈Õ ¥Î«œø© ∆Øº∫ ∑π∫ß 12.0¿ª ¡ˆø¯«œ¥¬ «œµÂø˛æÓ µπŸ¿ÃΩ∫∏¶ ª˝º∫«—¥Ÿ.
+	if (!pd3dAdapter)
 	{
-		hResult = m_pdxgiFactory->EnumWarpAdapter(_uuidof(IDXGIAdapter1), (void **)&pd3dAdapter);
-		hResult = D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), (void **)&m_pd3dDevice);
+		m_pdxgiFactory->EnumWarpAdapter(_uuidof(IDXGIFactory4), (void **)&pd3dAdapter);
+		D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), (void**)&m_pd3dDevice);
 	}
-
-	if (!m_pd3dDevice)
-	{
-		MessageBox(NULL, L"Direct3D 12 Device Cannot be Created.", L"Error", MB_OK);
-		::PostQuitMessage(0);
-		return;
-	}
-
+	//∆Øº∫ ∑π∫ß 12.0¿ª ¡ˆø¯«œ¥¬ «œµÂø˛æÓ µπŸ¿ÃΩ∫∏¶ ª˝º∫«“ ºˆ æ¯¿∏∏È WARP µπŸ¿ÃΩ∫∏¶ ª˝º∫«—¥Ÿ.
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS d3dMsaaQualityLevels;
 	d3dMsaaQualityLevels.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	d3dMsaaQualityLevels.SampleCount = 4;
+	d3dMsaaQualityLevels.SampleCount = 4; //Msaa4x ¥Ÿ¡ﬂ ª˘«√∏µ
 	d3dMsaaQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 	d3dMsaaQualityLevels.NumQualityLevels = 0;
-	hResult = m_pd3dDevice->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &d3dMsaaQualityLevels, sizeof(D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS));
+	m_pd3dDevice->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &d3dMsaaQualityLevels, sizeof(D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS));
 	m_nMsaa4xQualityLevels = d3dMsaaQualityLevels.NumQualityLevels;
+	//µπŸ¿ÃΩ∫∞° ¡ˆø¯«œ¥¬ ¥Ÿ¡ﬂ ª˘«√¿« «∞¡˙ ºˆ¡ÿ¿ª »Æ¿Œ«—¥Ÿ.
 	m_bMsaa4xEnable = (m_nMsaa4xQualityLevels > 1) ? true : false;
-
-	hResult = m_pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void **)&m_pd3dFence);
-	for (UINT i = 0; i < m_nSwapChainBuffers; i++) m_nFenceValues[i] = 1;
+	//¥Ÿ¡ﬂ ª˘«√¿« «∞¡˙ ºˆ¡ÿ¿Ã 1∫∏¥Ÿ ≈©∏È ¥Ÿ¡ﬂ ª˘«√∏µ¿ª »∞º∫»≠«—¥Ÿ.
+	m_pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&m_pd3dFence);
+	//∆ÊΩ∫∏¶ ª˝º∫«œ∞Ì ∆ÊΩ∫ ∞™¿ª 0¿∏∑Œ º≥¡§«—¥Ÿ.
 	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-
-	::gnCbvSrvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
+	/*∆ÊΩ∫øÕ µø±‚»≠∏¶ ¿ß«— ¿Ã∫•∆Æ ∞¥√º∏¶ ª˝º∫«—¥Ÿ(¿Ã∫•∆Æ ∞¥√º¿« √ ±‚∞™¿ª FALSE¿Ã¥Ÿ). ¿Ã∫•∆Æ∞° Ω««‡µ«∏È(Signal) ¿Ã
+	∫•∆Æ¿« ∞™¿ª ¿⁄µø¿˚¿∏∑Œ FALSE∞° µ«µµ∑œ ª˝º∫«—¥Ÿ.*/
+	//m_d3dViewport.TopLeftX = 0;
+	//m_d3dViewport.TopLeftY = 0;
+	//m_d3dViewport.Width = static_cast<float>(m_nWndClientWidth);
+	//m_d3dViewport.Height = static_cast<float>(m_nWndClientHeight);
+	//m_d3dViewport.MinDepth = 0.0f;
+	//m_d3dViewport.MaxDepth = 1.0f;
+	////∫‰∆˜∆Æ∏¶ ¡÷ ¿©µµøÏ¿« ≈¨∂Û¿Ãæ∆Æ øµø™ ¿¸√º∑Œ º≥¡§«—¥Ÿ.
+	//m_d3dScissorRect = { 0, 0, m_nWndClientWidth, m_nWndClientHeight };
+	////ææ¿˙ ªÁ∞¢«¸¿ª ¡÷ ¿©µµøÏ¿« ≈¨∂Û¿Ãæ∆Æ øµø™ ¿¸√º∑Œ º≥¡§«—¥Ÿ.
 	if (pd3dAdapter) pd3dAdapter->Release();
 }
 
@@ -191,12 +178,18 @@ void CGameFramework::CreateCommandQueueAndList()
 	::ZeroMemory(&d3dCommandQueueDesc, sizeof(D3D12_COMMAND_QUEUE_DESC));
 	d3dCommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	d3dCommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
 	HRESULT hResult = m_pd3dDevice->CreateCommandQueue(&d3dCommandQueueDesc, _uuidof(ID3D12CommandQueue), (void **)&m_pd3dCommandQueue);
+	//¡˜¡¢(Direct) ∏Ì∑… ≈•∏¶ ª˝º∫«—¥Ÿ.
 
 	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void **)&m_pd3dCommandAllocator);
+	//¡˜¡¢(Direct) ∏Ì∑… «“¥Á¿⁄∏¶ ª˝º∫«—¥Ÿ.
 
-	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void **)&m_pd3dCommandList);
+	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList);
+	//¡˜¡¢(Direct) ∏Ì∑… ∏ÆΩ∫∆Æ∏¶ ª˝º∫«—¥Ÿ.
+
 	hResult = m_pd3dCommandList->Close();
+	//∏Ì∑… ∏ÆΩ∫∆Æ¥¬ ª˝º∫µ«∏È ø≠∏∞(Open) ªÛ≈¬¿Ãπ«∑Œ ¥›»˘(Closed) ªÛ≈¬∑Œ ∏∏µÁ¥Ÿ.
 }
 
 void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
@@ -208,21 +201,27 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
 	HRESULT hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void **)&m_pd3dRtvDescriptorHeap);
+	//∑ª¥ı ≈∏∞Ÿ º≠º˙¿⁄ »¸(º≠º˙¿⁄¿« ∞≥ºˆ¥¬ Ω∫ø“√º¿Œ πˆ∆€¿« ∞≥ºˆ)¿ª ª˝º∫«—¥Ÿ.
 	m_nRtvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	//∑ª¥ı ≈∏∞Ÿ º≠º˙¿⁄ »¸¿« ø¯º“¿« ≈©±‚∏¶ ¿˙¿Â«—¥Ÿ.
 
 	d3dDescriptorHeapDesc.NumDescriptors = 1;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void **)&m_pd3dDsvDescriptorHeap);
+	//±Ì¿Ã-Ω∫≈ŸΩ« º≠º˙¿⁄ »¸(º≠º˙¿⁄¿« ∞≥ºˆ¥¬ 1)¿ª ª˝º∫«—¥Ÿ.
 	m_nDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	//±Ì¿Ã-Ω∫≈ŸΩ« º≠º˙¿⁄ »¸¿« ø¯º“¿« ≈©±‚∏¶ ¿˙¿Â«—¥Ÿ.
 }
 
-void CGameFramework::CreateRenderTargetViews()
+//Ω∫ø“√º¿Œ¿« ∞¢ »ƒ∏È πˆ∆€ø° ¥Î«— ∑ª¥ı ≈∏∞Ÿ ∫‰∏¶ ª˝º∫«—¥Ÿ.
+void CGameFramework::CreateRenderTargetView()
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =	m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
 	for (UINT i = 0; i < m_nSwapChainBuffers; i++)
 	{
-		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void **)&m_ppd3dSwapChainBackBuffers[i]);
-		m_pd3dDevice->CreateRenderTargetView(m_ppd3dSwapChainBackBuffers[i], NULL, d3dRtvCPUDescriptorHandle);
+		HRESULT hResult = m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dRenderTargetBuffers[i]);
+		m_pd3dDevice->CreateRenderTargetView(m_ppd3dRenderTargetBuffers[i], NULL, d3dRtvCPUDescriptorHandle);
 		d3dRtvCPUDescriptorHandle.ptr += m_nRtvDescriptorIncrementSize;
 	}
 }
@@ -241,9 +240,9 @@ void CGameFramework::CreateDepthStencilView()
 	d3dResourceDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
 	d3dResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	d3dResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
 	D3D12_HEAP_PROPERTIES d3dHeapProperties;
 	::ZeroMemory(&d3dHeapProperties, sizeof(D3D12_HEAP_PROPERTIES));
+
 	d3dHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	d3dHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	d3dHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
@@ -254,172 +253,96 @@ void CGameFramework::CreateDepthStencilView()
 	d3dClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	d3dClearValue.DepthStencil.Depth = 1.0f;
 	d3dClearValue.DepthStencil.Stencil = 0;
+	m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void **)&m_pd3dDepthStencilBuffer);
+	//±Ì¿Ã-Ω∫≈ŸΩ« πˆ∆€∏¶ ª˝º∫«—¥Ÿ.
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void **)&m_pd3dDepthStencilBuffer);
-
-	D3D12_DEPTH_STENCIL_VIEW_DESC d3dDepthStencilViewDesc;
-	::ZeroMemory(&d3dDepthStencilViewDesc, sizeof(D3D12_DEPTH_STENCIL_VIEW_DESC));
-	d3dDepthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	d3dDepthStencilViewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	d3dDepthStencilViewDesc.Flags = D3D12_DSV_FLAG_NONE;
-
 	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, NULL, d3dDsvCPUDescriptorHandle);
-	//	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, &d3dDepthStencilViewDesc, d3dDsvCPUDescriptorHandle);
+	//±Ì¿Ã-Ω∫≈ŸΩ« πˆ∆€ ∫‰∏¶ ª˝º∫«—¥Ÿ.
 }
 
-void CGameFramework::OnResizeBackBuffers()
+void CGameFramework::BuildObjects()
 {
-	WaitForGpuComplete();
-
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+	
+	m_pScene = new CScene();
+	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 
-	for (int i = 0; i < m_nSwapChainBuffers; i++) if (m_ppd3dSwapChainBackBuffers[i]) m_ppd3dSwapChainBackBuffers[i]->Release();
-	if (m_pd3dDepthStencilBuffer) m_pd3dDepthStencilBuffer->Release();
-#ifdef _WITH_ONLY_RESIZE_BACKBUFFERS
-	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
-	m_pdxgiSwapChain->GetDesc(&dxgiSwapChainDesc);
-	m_pdxgiSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-	m_nSwapChainBufferIndex = 0;
-#else
-	//m_pdxgiSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
-	m_pdxgiSwapChain->GetDesc(&dxgiSwapChainDesc);
-	m_pdxgiSwapChain->ResizeBuffers(m_nSwapChainBuffers, m_nWndClientWidth, m_nWndClientHeight, dxgiSwapChainDesc.BufferDesc.Format, dxgiSwapChainDesc.Flags);
-	m_nSwapChainBufferIndex = 0;
-#endif
-	CreateRenderTargetViews();
-	CreateDepthStencilView();
+	My_ID = CHARATER_ID_7; //ø¯∑°¥¬ º≠πˆø°º≠ πﬁæ∆æﬂ«‘
 
+	//CAirplanePlayer *pAirplanePlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	CGamePlayer *pPlayer;
+	pPlayer = new CGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	// player ¿ßƒ° º≠πˆø°º≠ πﬁæ∆º≠ √ ±‚»≠ «ÿ¡‡æﬂ«‘
+	
+	m_pPlayer = pPlayer;
+	m_pCamera = m_pPlayer->GetCamera();
+	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//Ω√¿€«“∂ß 3¿Œƒ™ Ω√¿€¿∏∑ŒπŸ≤ﬁ.
+	
 	m_pd3dCommandList->Close();
-
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
-
 	WaitForGpuComplete();
+	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+	
+	m_GameTimer.Reset();
 }
 
-void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+void CGameFramework::ReleaseObjects()
 {
-	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
-	//switch Î¨∏ ÏïàÏóêÏÑú ÏÑúÎ≤ÑÏóê Îç∞Ïù¥ÌÑ∞ Ï†ÑÏÜ°Ìï† Îïå ÏÇ¨Ïö©Ìï† ÏΩîÎìú ÌïÑÏöî
+	if (m_pScene) m_pScene->ReleaseObjects();
+	if (m_pScene) delete m_pScene;
+}
+
+void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam,
+	LPARAM lParam)
+{
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
-		
-		break;
 	case WM_RBUTTONDOWN:
-	
+		//∏∂øÏΩ∫ ƒ∏√ƒ∏¶ «œ∞Ì «ˆ¿Á ∏∂øÏΩ∫ ¿ßƒ°∏¶ ∞°¡Æø¬¥Ÿ.
+		::SetCapture(hWnd);
+		::GetCursorPos(&m_ptOldCursorPos);
 		break;
-
 	case WM_LBUTTONUP:
-		
-		break;
 	case WM_RBUTTONUP:
-		
+		//∏∂øÏΩ∫ ƒ∏√ƒ∏¶ «ÿ¡¶«—¥Ÿ.
+		::ReleaseCapture();
 		break;
 	case WM_MOUSEMOVE:
-		
 		break;
 	default:
 		break;
 	}
 }
 
-void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM	wParam, LPARAM lParam)
 {
-	int key_buffer = wParam;
-	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 	switch (nMessageID)
 	{
-	case WM_KEYDOWN: {
-		if (wParam == VK_SHIFT) {
-		
-		}
-		if (wParam == VK_SPACE) {
-		
-		}
-
-		// char Ìòï keyÎì§ ÏûÖÎ†• Ï≤òÎ¶¨ 
-		switch (key_buffer) {
-		case 'w':
-		case 'W':
-			
-			break;
-		case 'a':
-		case 'A':
-			
-			break;
-		case 's':
-		case 'S':
-			
-			break;
-		case 'd':
-		case 'D':
-			
-			break;
-		case 'c':
-		case 'C':
-			
-			break;
-	}
-
-		break;
-	}
 	case WM_KEYUP:
-		// Shift 
-		if (wParam == VK_ESCAPE) {
-			exit(-1);
-		}
-		else if (wParam == VK_SHIFT) {
-		
-		}
-		else if (wParam == VK_SPACE) {
-			
-		}
-
-		switch (key_buffer) {
-		case 'w':
-		case 'W':
-
-			break;
-		case 'a':
-		case 'A':
-
-			break;
-		case 's':
-		case 'S':
-
-			break;
-		case 'd':
-		case 'D':
-
-			break;
-		case 'c':
-		case 'C':
-
-			break;
-		}
-		
-		
 		switch (wParam)
 		{
-		case VK_ESCAPE:
-			exit(-1);
-			break;
-		case VK_RETURN:
-			break;
+			
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
-		//	m_pCamera = m_pPlayer[my_client_id]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+			//m_pCamera[My_ID] = m_pPlayer[My_ID]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+			//if (m_pPlayer) m_pPlayer->ChangeCamera((wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			break;
-		case VK_F9:
+		case VK_ESCAPE:
+			::PostQuitMessage(0);
+			break;
+		case VK_RETURN:
+			break;
+		case VK_F8:
+			break;
+		case VK_F9:	// ¿©µµøÏ ∏µÂøÕ ¿¸√º»≠∏È ∏µÂ¿« ¿¸»Ø¿ª √≥∏Æ«—¥Ÿ.
 		{
 			BOOL bFullScreenState = FALSE;
 			m_pdxgiSwapChain->GetFullscreenState(&bFullScreenState, NULL);
 			m_pdxgiSwapChain->SetFullscreenState(!bFullScreenState, NULL);
-
 			DXGI_MODE_DESC dxgiTargetParameters;
 			dxgiTargetParameters.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			dxgiTargetParameters.Width = m_nWndClientWidth;
@@ -429,13 +352,9 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			dxgiTargetParameters.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 			dxgiTargetParameters.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 			m_pdxgiSwapChain->ResizeTarget(&dxgiTargetParameters);
-
 			OnResizeBackBuffers();
-
 			break;
 		}
-		case VK_F10:
-			break;
 		default:
 			break;
 		}
@@ -451,17 +370,17 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 	{
 	case WM_ACTIVATE:
 	{
-		if (LOWORD(wParam) == WA_INACTIVE)
+		/*if (LOWORD(wParam) == WA_INACTIVE)
 			m_GameTimer.Stop();
 		else
-			m_GameTimer.Start();
+			m_GameTimer.Start();*/
 		break;
 	}
 	case WM_SIZE:
 	{
 		m_nWndClientWidth = LOWORD(lParam);
 		m_nWndClientHeight = HIWORD(lParam);
-
+		//¿©µµøÏ¿« ≈©±‚∞° ∫Ø∞Êµ«∏È »ƒ∏Èπˆ∆€¿« ≈©±‚∏¶ ∫Ø∞Ê«—¥Ÿ.
 		OnResizeBackBuffers();
 		break;
 	}
@@ -480,152 +399,119 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 	return(0);
 }
 
-void CGameFramework::OnDestroy()
-{
-	ReleaseObjects();
-
-	::CloseHandle(m_hFenceEvent);
-
-#if defined(_DEBUG)
-	if (m_pd3dDebugController) m_pd3dDebugController->Release();
-#endif
-
-	if (m_pd3dDepthStencilBuffer) m_pd3dDepthStencilBuffer->Release();
-	if (m_pd3dDsvDescriptorHeap) m_pd3dDsvDescriptorHeap->Release();
-
-	for (int i = 0; i < m_nSwapChainBuffers; i++) if (m_ppd3dSwapChainBackBuffers[i]) m_ppd3dSwapChainBackBuffers[i]->Release();
-	if (m_pd3dRtvDescriptorHeap) m_pd3dRtvDescriptorHeap->Release();
-
-	if (m_pd3dCommandAllocator) m_pd3dCommandAllocator->Release();
-	if (m_pd3dCommandQueue) m_pd3dCommandQueue->Release();
-	if (m_pd3dCommandList) m_pd3dCommandList->Release();
-
-	if (m_pd3dFence) m_pd3dFence->Release();
-
-	m_pdxgiSwapChain->SetFullscreenState(TRUE, NULL);
-	if (m_pdxgiSwapChain) m_pdxgiSwapChain->Release();
-	if (m_pd3dDevice) m_pd3dDevice->Release();
-	if (m_pdxgiFactory) m_pdxgiFactory->Release();
-}
-
-void CGameFramework::BuildObjects()
-{
-	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
-
-	m_pScene = new CScene();
-	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
-
-	for (int i = 0; i < MAX_PLAYER_NUM; ++i)
-		m_pScene->m_pPlayer[i] = m_pPlayer[i] = new ModelPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
-	m_pCamera = m_pPlayer[0]->GetCamera();
-
-#ifdef _WITH_APACHE_MODEL
-	m_pPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, -300.0f));
-	m_pPlayer->Rotate(0.0f, -45.0f, 0.0f);
-#endif
-#ifdef _WITH_GUNSHIP_MODEL
-	for (int i = 0; i < 4; ++i)
-		m_pPlayer[i]->SetPosition(XMFLOAT3(30 * i, -100.0f, 0.0f));
-	//	m_pPlayer->Rotate(0.0f, 0.0f, 0.0f);
-#endif
-
-	m_pd3dCommandList->Close();
-	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
-	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
-
-	WaitForGpuComplete();
-
-	for (int i = 0; i < 4; ++i)
-		if (m_pPlayer[i]) m_pPlayer[i]->ReleaseUploadBuffers();
-	if (m_pScene) m_pScene->ReleaseUploadBuffers();
-
-	m_GameTimer.Reset();
-}
-
-void CGameFramework::ReleaseObjects()
-{
-	for (int i = 0; i < 4; ++i)
-		if (m_pPlayer[i]) delete m_pPlayer[i];
-
-	if (m_pScene) m_pScene->ReleaseObjects();
-	if (m_pScene) delete m_pScene;
-}
-
 void CGameFramework::ProcessInput()
 {
-	static UCHAR pKeysBuffer[256];
-	bool bProcessedByScene = false;
-	if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
-	if (!bProcessedByScene)
+	static UCHAR pKeyBuffer[256];
+	DWORD dwDirection = 0;
+	/*≈∞∫∏µÂ¿« ªÛ≈¬ ¡§∫∏∏¶ π›»Ø«—¥Ÿ. »≠ªÏ«• ≈∞(°Æ°Ê°Ø, °Æ°Á°Ø, °Æ°Ë°Ø, °Æ°È°Ø)∏¶ ¥©∏£∏È «√∑π¿ÃæÓ∏¶ ø¿∏•¬ /øﬁ¬ (∑Œƒ√ x-√‡), æ’/
+	µ⁄(∑Œƒ√ z-√‡)∑Œ ¿Ãµø«—¥Ÿ. °ÆPage Up°Ø∞˙ °ÆPage Down°Ø ≈∞∏¶ ¥©∏£∏È «√∑π¿ÃæÓ∏¶ ¿ß/æ∆∑°(∑Œƒ√ y-√‡)∑Œ ¿Ãµø«—¥Ÿ.*/
+	BOOL Key_A = FALSE;
+	BOOL Key_S = FALSE;
+	BOOL Key_D = FALSE;
+	BOOL Key_F = FALSE;
+	BOOL Key_LShift = FALSE;
+	BOOL Key_Space = FALSE;
+	if (::GetKeyboardState(pKeyBuffer))
 	{
-		DWORD dwDirection = 0;
-		// ÌîåÎ†àÏù¥Ïñ¥ ÏõÄÏßÅÏûÑ (Ï§ëÏöî)
-		//if (pKeysBuffer[0x57] & 0xF0) dwDirection |= DIR_FORWARD;
-		//if (pKeysBuffer[0x53] & 0xF0) dwDirection |= DIR_BACKWARD;
-		//if (pKeysBuffer[0x41] & 0xF0) dwDirection |= DIR_LEFT;
-		//if (pKeysBuffer[0x44] & 0xF0) dwDirection |= DIR_RIGHT;
-		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
-		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-		/*if (pKeysBuffer[VK_SPACE] & 0xF0) {	// Ï¥ùÏïåÎ∞úÏÇ¨
-			if (CShader::shootBullet == 0)
-				CShader::shootBullet = 1;
+		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
+		if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
+		if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
+		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
+		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+		if (pKeyBuffer['A'] & 0xF0) Key_A = TRUE;
+		if (pKeyBuffer['S'] & 0xF0) Key_S = TRUE;
+		if (pKeyBuffer['D'] & 0xF0) Key_D = TRUE;
+		if (pKeyBuffer['F'] & 0xF0) Key_F = TRUE;
+		if (pKeyBuffer[VK_LSHIFT & 0xF0]) Key_LShift = TRUE;
+		if (pKeyBuffer[VK_SPACE & 0xF0]) Key_Space = TRUE;
+
+
+	}
+	float rotation = 0.0f;
+	POINT ptCursorPos;
+	/*∏∂øÏΩ∫∏¶ ƒ∏√ƒ«ﬂ¿∏∏È ∏∂øÏΩ∫∞° æÛ∏∂∏∏≈≠ ¿Ãµø«œø¥¥¬ ∞°∏¶ ∞ËªÍ«—¥Ÿ. ∏∂øÏΩ∫ øﬁ¬  ∂«¥¬ ø¿∏•¬  πˆ∆∞¿Ã ¥≠∑Ø¡˙ ∂ß¿«
+	∏ﬁΩ√¡ˆ(WM_LBUTTONDOWN, WM_RBUTTONDOWN)∏¶ √≥∏Æ«“ ∂ß ∏∂øÏΩ∫∏¶ ƒ∏√ƒ«œø¥¥Ÿ. ±◊∑Øπ«∑Œ ∏∂øÏΩ∫∞° ƒ∏√ƒµ»
+	∞Õ¿∫ ∏∂øÏΩ∫ πˆ∆∞¿Ã ¥≠∑¡¡¯ ªÛ≈¬∏¶ ¿«πÃ«—¥Ÿ. ∏∂øÏΩ∫ πˆ∆∞¿Ã ¥≠∑¡¡¯ ªÛ≈¬ø°º≠ ∏∂øÏΩ∫∏¶ ¡¬øÏ ∂«¥¬ ªÛ«œ∑Œ øÚ¡˜¿Ã∏È «√
+	∑π¿ÃæÓ∏¶ x-√‡ ∂«¥¬ y-√‡¿∏∑Œ »∏¿¸«—¥Ÿ.*/
+	if (dwDirection != 0)
+	{
+		float Player_Yaw = m_pPlayer->GetYaw();
+		if (dwDirection & DIR_FORWARD)
+			;
+		if (dwDirection & DIR_BACKWARD)
+			;
+		if (dwDirection & DIR_LEFT)
+			;
+		if (dwDirection & DIR_RIGHT)
+			;
+
+		//rotation = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
+		
+	}
+	if (Key_A||Key_S) {
+
+		if (Key_A&&Key_S) {//µ—¥Ÿ ¥≠∏Æ∏È ∏∑±‚
+
 		}
-		else
-			CShader::shootBullet = 0;*/
-
-		float cxDelta = 0.0f, cyDelta = 0.0f;
-
-		POINT ptCursorPos;
-		if (GetCapture() == m_hWnd)
-		{
-			SetCursor(NULL);
-			GetCursorPos(&ptCursorPos);
-			cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
-			cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
-			SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+		else if (Key_A && !Key_S) { //æ‡∞¯∞› or ¡›±‚
+			//√Êµπ√º≈© (π´±‚ ø¿∫Í¡ß∆Æ∂˚) √Êµπ¿Ã∏È ¡›±‚
+									
+			//æ∆¥œ∏È æ‡∞¯∞›
+					
 		}
+		else if (!Key_A && Key_S) { //∞≠∞¯∞› or ¡›±‚
+			//√Êµπ√º≈© (π´±‚ ø¿∫Í¡ß∆Æ∂˚) √Êµπ¿Ã∏È ¡›±‚
 
-		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
-		{
-			
-				if (cxDelta || cyDelta)
-				{
-					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-
-						m_pPlayer[my_client_id]->Rotate(cyDelta, cxDelta, 0.0f);
-					else
-						m_pPlayer[my_client_id]->Rotate(cyDelta, 0.0f, -cxDelta);
-				}
-				if (dwDirection) {
-					for (int i = 0; i < MAX_PLAYER_NUM; ++i) {
-						// Ï§ëÏöî
-						m_pPlayer[i]->Move(dwDirection, WALK_SPEED * METER_PER_PIXEL * m_GameTimer.GetTimeElapsed(), false);
-					}
-				}
-			
+			//æ∆¥œ∏È ∞≠∞¯∞›
 		}
 	}
-	for (int i = 0; i < MAX_PLAYER_NUM; ++i) {
-		m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
+
+	if (Key_D) { //π´±‚ Ω∫≈≥
+		//π´±‚ π¯»£∞° WEAPON_EMPTY ∞° æ∆¥œ∏È Ω∫≈≥ªÁøÎ
+
 	}
+	if (Key_F) { //∞≠»≠ Ω∫≈≥
+	
+	}
+	if (Key_Space) { //¡°«¡
+
+	}
+	if (Key_LShift) { //±∏∏£±‚
+
+
+	}
+	//∏∂øÏΩ∫ ∂«¥¬ ≈∞ ¿‘∑¬¿Ã ¿÷¿∏∏È «√∑π¿ÃæÓ∏¶ ¿Ãµø«œ∞≈≥™(dwDirection) »∏¿¸«—¥Ÿ(cxDelta ∂«¥¬ cyDelta).
+	if ((dwDirection != 0) || (rotation != 0.0f))
+	{
+		
+		
+			m_pPlayer->Rotate(0.0f, rotation, 0.0f);
+
+			/*«√∑π¿ÃæÓ∏¶ dwDirection πÊ«‚¿∏∑Œ ¿Ãµø«—¥Ÿ(Ω«¡¶∑Œ¥¬ º”µµ ∫§≈Õ∏¶ ∫Ø∞Ê«—¥Ÿ). ¿Ãµø ∞≈∏Æ¥¬ Ω√∞£ø° ∫Ò∑ «œµµ∑œ «—¥Ÿ.
+			«√∑π¿ÃæÓ¿« ¿Ãµø º”∑¬¿∫ (50/√ )∑Œ ∞°¡§«—¥Ÿ.*/
+			if (dwDirection) m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
+	
+
+	}
+	//«√∑π¿ÃæÓ∏¶ Ω«¡¶∑Œ ¿Ãµø«œ∞Ì ƒ´∏ﬁ∂Û∏¶ ∞ªΩ≈«—¥Ÿ. ¡ﬂ∑¬∞˙ ∏∂¬˚∑¬¿« øµ«‚¿ª º”µµ ∫§≈Õø° ¿˚øÎ«—¥Ÿ.
+	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
-void CGameFramework::AnimateObjects(CCamera *pCamera)
+void CGameFramework::AnimateObjects()
 {
-	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
-	for (int i = 0; i < 4; ++i)
-		if (m_pPlayer) m_pPlayer[i]->Animate(fTimeElapsed);
-//	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed, pCamera);
-
+	if (m_pScene) m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::WaitForGpuComplete()
 {
-	const UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
+	UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
 	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFenceValue);
+	//GPU∞° ∆ÊΩ∫¿« ∞™¿ª º≥¡§«œ¥¬ ∏Ì∑…¿ª ∏Ì∑… ≈•ø° √ﬂ∞°«—¥Ÿ.
 
 	if (m_pd3dFence->GetCompletedValue() < nFenceValue)
 	{
+		//∆ÊΩ∫¿« «ˆ¿Á ∞™¿Ã º≥¡§«— ∞™∫∏¥Ÿ ¿€¿∏∏È ∆ÊΩ∫¿« «ˆ¿Á ∞™¿Ã º≥¡§«— ∞™¿Ã µ… ∂ß±Ó¡ˆ ±‚¥Ÿ∏∞¥Ÿ.
 		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
 		::WaitForSingleObject(m_hFenceEvent, INFINITE);
 	}
@@ -634,11 +520,8 @@ void CGameFramework::WaitForGpuComplete()
 void CGameFramework::MoveToNextFrame()
 {
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
-	//m_nSwapChainBufferIndex = (m_nSwapChainBufferIndex + 1) % m_nSwapChainBuffers;
-
 	UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
 	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFenceValue);
-
 	if (m_pd3dFence->GetCompletedValue() < nFenceValue)
 	{
 		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
@@ -647,97 +530,96 @@ void CGameFramework::MoveToNextFrame()
 }
 
 //#define _WITH_PLAYER_TOP
-
 void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
-
+	
 	ProcessInput();
-
-	AnimateObjects(m_pCamera);
-
+	
+	AnimateObjects();
+	
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
-
+	
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
 	d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	d3dResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	d3dResourceBarrier.Transition.pResource = m_ppd3dSwapChainBackBuffers[m_nSwapChainBufferIndex];
+	d3dResourceBarrier.Transition.pResource = m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex];
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex * m_nRtvDescriptorIncrementSize);
-
+	
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =	m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	d3dRtvCPUDescriptorHandle.ptr += (m_nSwapChainBufferIndex *	m_nRtvDescriptorIncrementSize);
+	
 	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
-	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-
+	//ø¯«œ¥¬ ªˆªÛ¿∏∑Œ ∑ª¥ı ≈∏∞Ÿ(∫‰)¿ª ¡ˆøÓ¥Ÿ.
+	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle,	pfClearColor/*Colors::Azure*/, 0, NULL);
+	
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle =	m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,	D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+	
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
+	
+	if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
 
-	m_pScene->Render(m_pd3dCommandList, m_pCamera);
-
-
+	//3¿Œƒ™ ƒ´∏ﬁ∂Û¿œ ∂ß «√∑π¿ÃæÓ∞° «◊ªÛ ∫∏¿Ãµµ∑œ ∑ª¥ı∏µ«—¥Ÿ.
 #ifdef _WITH_PLAYER_TOP
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+	//∑ª¥ı ≈∏∞Ÿ¿∫ ±◊¥Î∑Œ µŒ∞Ì ±Ì¿Ã πˆ∆€∏¶ 1.0¿∏∑Œ ¡ˆøÏ∞Ì «√∑π¿ÃæÓ∏¶ ∑ª¥ı∏µ«œ∏È «√∑π¿ÃæÓ¥¬ π´¡∂∞« ±◊∑¡¡˙ ∞Õ¿Ã¥Ÿ.
+	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,	D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
-	for (int i = 0; i < 4; ++i) {
-		m_pPlayer[i]->UpdateTransform(NULL);
-		m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
-	}
-
-
-	//m_pScene->m_ppUIShaders[0]->Render(m_pd3dCommandList, m_pCamera);
-	//
-	//if (m_pCamera->GetMode() == SPACESHIP_CAMERA)
-	//	m_pScene->m_ppUIShaders[1]->Render(m_pd3dCommandList, m_pCamera);// UIÎ†åÎçî Î∞îÍøîÏïºÌï®.
-	////printf("%f", playerHp);
-	//m_pScene->m_ppUIShaders[2]->Render(m_pd3dCommandList, m_pCamera, playerHp);
-	//m_pScene->m_ppUIShaders[3]->Render(m_pd3dCommandList, m_pCamera);//ÏïÑÏù¥ÌÖú Í≤ÄÏùÄÏÉâ
-	//for (int i = 0; i < 4; ++i) {
-	//	if (itemUI[i] == true)
-	//		m_pScene->m_ppUIShaders[i + 4]->Render(m_pd3dCommandList, m_pCamera);
-	//	if (itemUI[3] == true)
-	//		m_pScene->m_ppUIShaders[8]->Render(m_pd3dCommandList, m_pCamera);
-	//}
+	//3¿Œƒ™ ƒ´∏ﬁ∂Û¿œ ∂ß «√∑π¿ÃæÓ∏¶ ∑ª¥ı∏µ«—¥Ÿ.
+	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
-
+	
 	hResult = m_pd3dCommandList->Close();
-
+	
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
-
+	
 	WaitForGpuComplete();
-
-#ifdef _WITH_PRESENT_PARAMETERS
-	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
-	dxgiPresentParameters.DirtyRectsCount = 0;
-	dxgiPresentParameters.pDirtyRects = NULL;
-	dxgiPresentParameters.pScrollRect = NULL;
-	dxgiPresentParameters.pScrollOffset = NULL;
-	m_pdxgiSwapChain->Present1(1, 0, &dxgiPresentParameters);
-#else
-#ifdef _WITH_SYNCH_SWAPCHAIN
-	m_pdxgiSwapChain->Present(1, 0);
-#else
+	
 	m_pdxgiSwapChain->Present(0, 0);
-#endif
-#endif
-
-	//	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+	
 	MoveToNextFrame();
-
+	
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
-	//for(int i=0;i<50;++i)
-	//	printf("%d\t", m_pszFrameRate[i]);
 }
 
+void CGameFramework::OnResizeBackBuffers()
+{
+	WaitForGpuComplete();
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+	for (int i = 0; i < m_nSwapChainBuffers; i++) if (m_ppd3dRenderTargetBuffers[i])
+		m_ppd3dRenderTargetBuffers[i]->Release();
+	if (m_pd3dDepthStencilBuffer) m_pd3dDepthStencilBuffer->Release();
+#ifdef _WITH_ONLY_RESIZE_BACKBUFFERS
+	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
+	m_pdxgiSwapChain->GetDesc(&dxgiSwapChainDesc);
+	m_pdxgiSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	m_nSwapChainBufferIndex = 0;
+#else
+	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
+	m_pdxgiSwapChain->GetDesc(&dxgiSwapChainDesc);
+	m_pdxgiSwapChain->ResizeBuffers(m_nSwapChainBuffers, m_nWndClientWidth,
+		m_nWndClientHeight, dxgiSwapChainDesc.BufferDesc.Format, dxgiSwapChainDesc.Flags);
+	m_nSwapChainBufferIndex = 0;
+#endif
+	CreateRenderTargetView();
+	CreateDepthStencilView();
+	m_pd3dCommandList->Close();
+	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+	WaitForGpuComplete();
+}
+
+CGameFramework::~CGameFramework()
+{
+}

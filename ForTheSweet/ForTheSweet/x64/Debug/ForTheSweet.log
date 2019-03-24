@@ -1,0 +1,15 @@
+﻿  Camera.cpp
+  CGameFramework.cpp
+c:\users\hhg\documents\github\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(441): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+c:\users\hhg\documents\github\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(443): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+c:\users\hhg\documents\github\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(445): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+c:\users\hhg\documents\github\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(447): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+c:\users\hhg\documents\github\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(432): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+  ForTheSweet.cpp
+  Player.cpp
+  코드를 생성하고 있습니다...
+  LINK : C:\Users\HHG\Documents\GitHub\For_The_Sweet\ForTheSweet\x64\Debug\ForTheSweet.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
+Model.obj : error LNK2019: aiImportFile 외부 기호(참조 위치: "public: __cdecl LoadModel::LoadModel(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,bool)" (??0LoadModel@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_N@Z) 함수)에서 확인하지 못했습니다.
+Model.obj : error LNK2019: "public: __cdecl aiScene::~aiScene(void)" (??1aiScene@@QEAA@XZ) 외부 기호(참조 위치: "public: void * __cdecl aiScene::`scalar deleting destructor'(unsigned int)" (??_GaiScene@@QEAAPEAXI@Z) 함수)에서 확인하지 못했습니다.
+assimp-vc140-mt.lib : warning LNK4272: 'x86' 라이브러리 컴퓨터 종류가 'x64' 대상 컴퓨터 종류와 충돌합니다.
+C:\Users\HHG\Documents\GitHub\For_The_Sweet\ForTheSweet\x64\Debug\ForTheSweet.exe : fatal error LNK1120: 2개의 확인할 수 없는 외부 참조입니다.

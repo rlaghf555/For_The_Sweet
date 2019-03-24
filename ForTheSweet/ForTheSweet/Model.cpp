@@ -1,8 +1,7 @@
+#include "stdafx.h"
 #include "Model.h"
 
-ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,
-	mesh& meshData)
-	: MMesh(pd3dDevice, pd3dCommandList)
+ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, mesh& meshData) : MeshGeometry(pd3dDevice, pd3dCommandList)
 {
 	m_nVertices = (int)meshData.m_vertices.size();
 	m_nIndices = (int)meshData.m_indices.size();
@@ -12,16 +11,16 @@ ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCo
 	m_nSlot = 0;
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
+
 	//버텍스 버퍼
-	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, meshData.m_vertices.data(), m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
-	//D3DUtil::CreateDefaultBuffer(pd3dDevice, pd3dCommandList, meshData.m_vertices.data(), m_nStride * m_nVertices, m_pd3dVertexUploadBuffer);
+	m_pd3dVertexBuffer = D3DUtil::CreateDefaultBuffer(pd3dDevice, pd3dCommandList, meshData.m_vertices.data(), m_nStride * m_nVertices, m_pd3dVertexUploadBuffer);
+
 	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
 	m_d3dVertexBufferView.StrideInBytes = m_nStride;
 	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
 
 	//인덱스 버퍼
-	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, meshData.m_indices.data(), sizeof(UINT) * m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_pd3dIndexUploadBuffer);
-	//D3DUtil::CreateDefaultBuffer(pd3dDevice, pd3dCommandList, meshData.m_indices.data(), sizeof(int)*m_nIndices, m_pd3dIndexUploadBuffer);
+	m_pd3dIndexBuffer = D3DUtil::CreateDefaultBuffer(pd3dDevice, pd3dCommandList, meshData.m_indices.data(), sizeof(int)*m_nIndices, m_pd3dIndexUploadBuffer);
 
 	m_d3dIndexBufferView.BufferLocation = m_pd3dIndexBuffer->GetGPUVirtualAddress();
 	m_d3dIndexBufferView.Format = DXGI_FORMAT_R32_UINT;
@@ -30,38 +29,29 @@ ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCo
 
 LoadModel::LoadModel(const string& fileName, bool isStatic)
 {
-	/*
-	UINT flag = aiProcess_JoinIdenticalVertices |			// 동일한 꼭지점 결합, 인덱싱 최적화
-		aiProcess_ValidateDataStructure |					// 로더의 출력을 검증
-		aiProcess_ImproveCacheLocality |					// 출력 정점의 캐쉬위치를 개선
-		aiProcess_RemoveRedundantMaterials |				// 중복된 매터리얼 제거
-		aiProcess_GenUVCoords |								// 구형, 원통형, 상자 및 평면 매핑을 적절한 UV로 변환
-		aiProcess_TransformUVCoords |						// UV 변환 처리기 (스케일링, 변환...)
-		aiProcess_FindInstances |							// 인스턴스된 매쉬를 검색하여 하나의 마스터에 대한 참조로 제거
-		aiProcess_LimitBoneWeights |						// 정점당 뼈의 가중치를 최대 4개로 제한
-		aiProcess_OptimizeMeshes |							// 가능한 경우 작은 매쉬를 조인
-		aiProcess_GenSmoothNormals |						// 부드러운 노말벡터(법선벡터) 생성
-		aiProcess_SplitLargeMeshes |						// 거대한 하나의 매쉬를 하위매쉬들로 분활(나눔)
-		aiProcess_Triangulate |								// 3개 이상의 모서리를 가진 다각형 면을 삼각형으로 만듬(나눔)
-		aiProcess_ConvertToLeftHanded |						// D3D의 왼손좌표계로 변환
-		aiProcess_SortByPType;								// 단일타입의 프리미티브로 구성된 '깨끗한' 매쉬를 만듬
+	UINT flag = aiProcess_JoinIdenticalVertices |			// join identical vertices/ optimize indexing
+		aiProcess_ValidateDataStructure |						// perform a full validation of the loader's output
+		aiProcess_ImproveCacheLocality |					// improve the cache locality of the output vertices
+		aiProcess_RemoveRedundantMaterials |			// remove redundant materials
+		aiProcess_GenUVCoords |								// convert spherical, cylindrical, box and planar mapping to proper UVs
+		aiProcess_TransformUVCoords |						// pre-process UV transformations (scaling, translation ...)
+		aiProcess_FindInstances |								// search for instanced meshes and remove them by references to one master
+		aiProcess_LimitBoneWeights |							// limit bone weights to 4 per vertex
+		aiProcess_OptimizeMeshes |							// join small meshes, if possible;
+		aiProcess_GenSmoothNormals |						// generate smooth normal vectors if not existing
+		aiProcess_SplitLargeMeshes |							// split large, unrenderable meshes into sub-meshes
+		aiProcess_Triangulate |									// triangulate polygons with more than 3 edges
+		aiProcess_ConvertToLeftHanded |						// convert everything to D3D left handed space
+		aiProcess_SortByPType;									// make 'clean' meshes which consist of a single type of primitives
 
 	if (isStatic)
 		flag |= aiProcess_PreTransformVertices;			// preTransform Vertices (no bone & animation flag)
 
 	m_pScene = aiImportFile(fileName.c_str(), flag);
-	*/
-	Assimp::Importer importer;
-
-	m_pScene = importer.ReadFile(fileName,
-		aiProcess_Triangulate |
-		aiProcess_ConvertToLeftHanded);
-
 
 	if (m_pScene) {
 		m_meshes.resize(m_pScene->mNumMeshes);
 		m_numBones = 0;
-
 		InitScene();
 		m_ModelMeshes.resize(m_meshes.size());
 	}
@@ -131,10 +121,9 @@ inline void CalculateTangentArray(UINT vertexCount, vector<vertexDatas>& vertice
 		XMFLOAT3& t = tan1[a];
 
 		// Gram-Schmidt orthogonalize
-		float Dp =  Vector3::DotProduct(n, t);
-		XMFLOAT3 Sp = Vector3::ScalarProduct(n, Dp, false);
-		XMFLOAT3 Sub = Vector3::Subtract(t, Sp, false);
-		vertices[a].m_tan = Vector3::Normalize(Sub);
+		XMFLOAT3 SP_1 = Vector3::ScalarProduct(n, Vector3::DotProduct(n, t), false);
+		XMFLOAT3 SP_2 = Vector3::Subtract(t, SP_1, false);
+		vertices[a].m_tan = Vector3::Normalize(SP_2);
 
 		// Calculate handedness
 		//tangent[a].w = (Dot(Cross(n, t), tan2[a]) < 0.0F) ? -1.0F : 1.0F;
@@ -143,20 +132,21 @@ inline void CalculateTangentArray(UINT vertexCount, vector<vertexDatas>& vertice
 	delete[] tan1;
 }
 
-
 LoadModel::~LoadModel()
 {
 	m_meshes.clear();
 	delete m_pScene;
 }
 
+
 void LoadModel::InitScene()
 {
 	for (UINT i = 0; i < m_meshes.size(); ++i) {
 		const aiMesh* pMesh = m_pScene->mMeshes[i];
 		InitMesh(i, pMesh);
-		//if (pMesh->HasBones())
-		//	InitBones(i, pMesh);
+		
+		//if (pMesh->HasBones()) InitBones(i, pMesh);
+
 		m_numVertices += (UINT)m_meshes[i].m_vertices.size();
 	}
 	m_numBones = (UINT)m_Bones.size();
@@ -168,25 +158,27 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 	m_meshes[index].m_indices.reserve(pMesh->mNumFaces * 3);
 	//삼각형이므로 면을 이루는 꼭지점 3개
 
-	for (UINT i = 0; i < pMesh->mNumVertices; i++) {
-		XMFLOAT3 pos;
+	for (UINT i = 0; i < pMesh->mNumVertices; ++i) {
+		XMFLOAT3 zero_3(0.0f, 0.0f, 0.0f);
+		XMFLOAT3 pos(0.0f, 0.0f, 0.0f);
 		pos.x = pMesh->mVertices[i].x;
 		pos.y = pMesh->mVertices[i].y;
 		pos.z = pMesh->mVertices[i].z;
-		XMFLOAT3 normal;
+
+		XMFLOAT3 normal(0.0f, 0.0f, 0.0f); 
 		normal.x = pMesh->mNormals[i].x;
 		normal.y = pMesh->mNormals[i].y;
 		normal.z = pMesh->mNormals[i].z;
-		XMFLOAT2 tex;
-		if (pMesh->mTextureCoords[0]) {
+
+		XMFLOAT2 tex(0.0f, 0.0f);
+		if (pMesh->HasTextureCoords(0)) {
 			tex.x = pMesh->mTextureCoords[0][i].x;
 			tex.y = pMesh->mTextureCoords[0][i].y;
 		}
 		else
 			tex = XMFLOAT2(0.0f, 0.0f);
 		//tangent는 일단 0으로 초기화
-		XMFLOAT3 tmp = XMFLOAT3(0, 0, 0);
-		const vertexDatas data(pos, normal, tmp, tex, index);
+		const vertexDatas data(pos, normal, zero_3, tex, index);
 		m_meshes[index].m_vertices.push_back(data);
 	}
 
@@ -242,45 +234,4 @@ void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 			m_meshes[index].m_vertices[vertexID].AddBoneData(BoneIndex, weight);
 		}
 	}
-}
-*/
-MMesh::MMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
-{
-}
-
-MMesh::~MMesh()
-{
-}
-
-void MMesh::ReleaseUploadBuffers()
-{
-};
-void MMesh::Render(ID3D12GraphicsCommandList *pd3dCommandList)
-{
-	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);			// 입력 조립기 프리미티브 토폴로지 셋
-	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);	// m_nslot번째 슬롯부터 n개의 view를 통해 버퍼를 사용하게따
-	if (m_pd3dIndexBuffer)
-	{
-		pd3dCommandList->IASetIndexBuffer(&m_d3dIndexBufferView);
-		pd3dCommandList->DrawIndexedInstanced(m_nIndices, 1, 0, 0, 0);
-	}
-	else
-	{
-		pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
-	}
-}
-
-void MMesh::Render(ID3D12GraphicsCommandList * pd3dCommandList, UINT nInstanceCount)
-{
-	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);			// 입력 조립기 프리미티브 토폴로지 셋
-	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);	// m_nslot번째 슬롯부터 n개의 view를 통해 버퍼를 사용하게따
-	if (m_pd3dIndexBuffer)
-	{
-		pd3dCommandList->IASetIndexBuffer(&m_d3dIndexBufferView);
-		pd3dCommandList->DrawIndexedInstanced(m_nIndices, nInstanceCount, 0, 0, 0);
-	}
-	else
-	{
-		pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
-	}
-}
+}*/
