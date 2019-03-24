@@ -364,7 +364,7 @@ ModelPlayer::ModelPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd
 		for (UINT i = 0; i < m_nMeshes; i++)
 			m_ppMeshes[i] = nullptr;
 	}
-
+	lm->SetMeshes(pd3dDevice,pd3dCommandList);
 	for (UINT i = 0; i < m_nMeshes; i++) {
 		if (i > 0)
 			lm->SetTextureIndex(i, i);
