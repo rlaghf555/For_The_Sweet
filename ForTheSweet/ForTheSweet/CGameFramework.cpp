@@ -267,7 +267,7 @@ void CGameFramework::CreateDepthStencilView()
 void CGameFramework::LoadModels()
 {
 	//Character_Model = new LoadModel("police.fbx", false);
-	Character_Model = new LoadModel("main_character.FBX", false);
+	//Character_Model = new LoadModel("main_character.FBX", false);
 }
 
 void CGameFramework::BuildObjects()
@@ -279,13 +279,11 @@ void CGameFramework::BuildObjects()
 
 	My_ID = CHARATER_ID_7; //원래는 서버에서 받아야함
 
-	//CAirplanePlayer *pAirplanePlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
-	ModelPlayer *pPlayer;
-	//pPlayer = new CGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
-	pPlayer = new ModelPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), Character_Model);
+	//ModelPlayer *pPlayer;
+	//pPlayer = new ModelPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), Character_Model);
 	// player 위치 서버에서 받아서 초기화 해줘야함
 
-	m_pPlayer = pPlayer;
+	m_pPlayer = m_pScene->getplayer();//pPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
 	

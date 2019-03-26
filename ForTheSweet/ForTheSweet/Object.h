@@ -38,11 +38,12 @@ public:
 	void AddRef() { m_nReferences++; }
 	void Release() { if (--m_nReferences <= 0) delete this; }
 public:
-	XMFLOAT4X4 m_xmf4x4World;
-	CMesh *m_pMesh = NULL;
-	CShader *m_pShader = NULL;
+	XMFLOAT4X4					m_xmf4x4World;
+	CMesh						*m_pMesh = NULL;
+	CShader						*m_pShader = NULL;
 	vector<unique_ptr<MMesh>>	m_ppMeshes;
-	UINT m_nMeshes;
+	UINT						m_nMeshes;
+	BoundingOrientedBox			m_xmOOBB;
 public:
 	void ReleaseUploadBuffers();
 	virtual void SetMesh(CMesh *pMesh);

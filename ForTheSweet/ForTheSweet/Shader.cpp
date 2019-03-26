@@ -272,6 +272,8 @@ void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComma
 		Map_Object->SetPosition(Position.x,Position.y,Position.z);
 		m_ppObjects[0] = Map_Object;
 
+		//m_ppObjects[0]->GetPosition();
+
 		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 2000, 20, 1500);
 		m_ppObjects[0]->SetMesh(pCubeMesh);
 
@@ -458,11 +460,17 @@ void CPlayerObjectsShader::ReleaseObjects()
 	}
 }
 
+void CPlayerObjectsShader::check_underground() 
+{
+	
+}
+
 void CPlayerObjectsShader::AnimateObjects(float fTimeElapsed)
 {
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		m_ppPlayerObjects[j]->Animate(fTimeElapsed);
+		check_underground();
 	}
 }
 

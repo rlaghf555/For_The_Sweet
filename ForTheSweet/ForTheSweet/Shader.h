@@ -43,6 +43,8 @@ public:
 		XMFLOAT4X4 *pxmf4x4World);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+	XMFLOAT3 Pos_act;
+	XMFLOAT3 getPos() { return Pos_act; }
 protected:
 	ID3D12PipelineState * *m_ppd3dPipelineStates = NULL;
 	int m_nPipelineStates = 0;
@@ -84,12 +86,12 @@ protected:
 	CGameObject **m_ppObjects = NULL;
 	int m_nObjects = 0;
 };
+
 class CPlayerObjectsShader : public CObjectsShader {
 public:
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList, XMFLOAT3 Position);
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList, XMFLOAT3 Position, int Object_Kind);
+	virtual void check_underground();	//юс╫ц
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position);
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position, int Object_Kind);
 	virtual void AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	virtual void ReleaseUploadBuffers();
