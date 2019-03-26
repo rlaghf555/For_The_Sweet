@@ -88,6 +88,7 @@ public:
 	//프레임워크의 핵심(사용자 입력, 애니메이션, 렌더링)을 구성하는 함수이다.
 	void ProcessInput();
 	void AnimateObjects();
+	void CollisionProcess();
 	void FrameAdvance();
 
 	void WaitForGpuComplete();

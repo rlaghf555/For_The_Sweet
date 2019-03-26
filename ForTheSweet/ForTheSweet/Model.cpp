@@ -54,6 +54,7 @@ LoadModel::LoadModel(const string& fileName, bool isStatic)
 		m_meshes.resize(m_pScene->mNumMeshes);
 		m_numBones = 0;
 		InitScene();
+		
 		m_ModelMeshes.resize(m_meshes.size());
 	}
 }

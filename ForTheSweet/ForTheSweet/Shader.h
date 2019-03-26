@@ -44,6 +44,7 @@ public:
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	XMFLOAT3 Pos_act;
+	void setPos(XMFLOAT3 pos) { Pos_act = pos; }
 	XMFLOAT3 getPos() { return Pos_act; }
 protected:
 	ID3D12PipelineState * *m_ppd3dPipelineStates = NULL;

@@ -510,6 +510,11 @@ void CGameFramework::AnimateObjects()
 	if (m_pScene) m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
 }
 
+void CGameFramework::CollisionProcess()
+{
+	if (m_pScene) m_pScene->CollisionProcess();
+}
+
 void CGameFramework::WaitForGpuComplete()
 {
 	UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
@@ -542,7 +547,9 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(0.0f);
 	
 	ProcessInput();
-	
+
+	CollisionProcess();
+
 	AnimateObjects();
 	
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();

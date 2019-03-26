@@ -24,8 +24,8 @@ D3D12_RASTERIZER_DESC CShader::CreateRasterizerState()
 	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	
-	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
 
 	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
@@ -269,10 +269,9 @@ void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComma
 		CGameObject *Map_Object = NULL;
 
 		Map_Object = new CGameObject();
-		Map_Object->SetPosition(Position.x,Position.y,Position.z);
+		setPos(Position);
+		Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 		m_ppObjects[0] = Map_Object;
-
-		//m_ppObjects[0]->GetPosition();
 
 		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 2000, 20, 1500);
 		m_ppObjects[0]->SetMesh(pCubeMesh);
@@ -430,11 +429,11 @@ void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphic
 {
 	m_nObjects = 1;
 	m_ppPlayerObjects = new CPlayerObject*[m_nObjects];
-
+	setPos(Position);
 	CPlayerObject *pGameObject = NULL;
 
 	pGameObject = new CPlayerObject();
-	pGameObject->SetPosition(Position.x, Position.y, Position.z);
+	pGameObject->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 	m_ppPlayerObjects[0] = pGameObject;
 
 	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 50, 100, 30);

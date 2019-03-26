@@ -1,3 +1,11 @@
-﻿  Scene.cpp
-c:\users\hhg\documents\github\for_the_sweet\forthesweet\forthesweet\scene.cpp(50): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  ForTheSweet.vcxproj -> C:\Users\HHG\Documents\GitHub\For_The_Sweet\ForTheSweet\Debug\ForTheSweet.exe
+﻿  CGameFramework.cpp
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(448): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(450): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(452): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(454): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(439): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+  ForTheSweet.cpp
+  Scene.cpp
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\scene.cpp(50): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다...
+  ForTheSweet.vcxproj -> D:\졸작\For_The_Sweet\For_The_Sweet\ForTheSweet\Debug\ForTheSweet.exe

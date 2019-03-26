@@ -15,6 +15,7 @@ public:
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR *pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed);
+	void CollisionProcess();
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void ReleaseUploadBuffers();
 	//그래픽 루트 시그너쳐를 생성한다.
@@ -44,11 +45,3 @@ protected:
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;
 };
 
-class ModelPlayer : public CPlayer {
-private:
-	LoadModel *lm;
-public:
-	ModelPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, LoadModel *Character_Model);
-	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
-	virtual ~ModelPlayer();
-};

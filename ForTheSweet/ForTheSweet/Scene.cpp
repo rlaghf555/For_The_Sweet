@@ -124,15 +124,23 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 
 void CScene::AnimateObjects(float fTimeElapsed)
 {
-	//XMFLOAT4 a = XMFLOAT4(m_pMapShader[0].getPos().x, m_pMapShader[0].getPos().y, m_pMapShader[0].getPos().z, 1.f);
-	//if (m_pPlayer->m_xmOOBB.Intersects(XMLoadFloat4(&a))) {
-	//	XMFLOAT3 b = m_pPlayer->GetPosition();
-	//	b.z += 1;
-	//	m_pPlayer->SetPosition(b);
-	//}
-
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
 	for (int i = 0; i < m_nPlayerObjectShaders; i++) m_pPlayerObjectShaders[i].AnimateObjects(fTimeElapsed);
+}
+
+void CScene::CollisionProcess()
+{
+	/*
+	XMFLOAT4 a = XMFLOAT4(m_pMapShader[0].getPos().x, m_pMapShader[0].getPos().y, m_pMapShader[0].getPos().z, 1.f);
+	XMVECTOR k = XMLoadFloat4(&a);
+	//	PlaneIntersectionType intersectType = m_pPlayer->m_xmOOBB.Intersects(k);
+
+	for (int i = 0; i < m_nInstancingShaders; i++) {
+		m_pInstancingShaders[i].getPos();
+	}
+	for (int i = 0; i < m_nPlayerObjectShaders; i++) {
+		m_pPlayerObjectShaders[i].getPos();
+	}*/
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
@@ -151,67 +159,4 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	{
 		m_pPlayerObjectShaders[i].Render(pd3dCommandList, pCamera);
 	}
-}
-
-ModelPlayer::ModelPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, LoadModel *Character_Model)
-{
-	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
-	if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
-	lm = Character_Model;
-	m_nMeshes = lm->getNumMesh();
-	if (m_nMeshes > 0)
-	{
-		m_ppMeshes = vector<unique_ptr<MMesh>>(m_nMeshes);
-		for (UINT i = 0; i < m_nMeshes; i++)
-			m_ppMeshes[i] = nullptr;
-	}
-	lm->SetMeshes(pd3dDevice, pd3dCommandList);
-	for (UINT i = 0; i < m_nMeshes; i++) {
-		if (i > 0)
-			lm->SetTextureIndex(i, i);
-		SetMesh(i, lm->getMeshes()[i]);
-	}
-
-	//플레이어를 위한 셰이더 변수를 생성한다.
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
-	//플레이어의 위치를 설정한다.
-	XMFLOAT3 pposition = XMFLOAT3(0.0f, 0.0f, -50.0f);
-	SetPosition(pposition);
-}
-CCamera * ModelPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
-{
-	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
-	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
-
-	XMFLOAT3 ggravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	switch (nNewCameraMode)
-	{
-	case THIRD_PERSON_CAMERA:
-		//플레이어의 특성을 3인칭 카메라 모드에 맞게 변경한다. 지연 효과와 카메라 오프셋을 설정한다.
-		SetFriction(250.0f);
-		XMFLOAT3 ggravity = XMFLOAT3(0.0f, -250.0f, 0.0f);
-		SetGravity(ggravity);
-		SetMaxVelocityXZ(125.0f);
-		SetMaxVelocityY(400.0f);
-		m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
-		//3인칭 카메라의 지연 효과를 설정한다. 값을 0.25f 대신에 0.0f와 1.0f로 설정한 결과를 비교하기 바란다.
-		m_pCamera->SetTimeLag(0.25f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 200.0f, -500.0f));
-		m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-		break;
-	default:
-		break;
-	}
-	//플레이어를 시간의 경과에 따라 갱신(위치와 방향을 변경: 속도, 마찰력, 중력 등을 처리)한다.
-	Update(fTimeElapsed);
-	return(m_pCamera);
-}
-
-ModelPlayer::~ModelPlayer() {
-
 }
