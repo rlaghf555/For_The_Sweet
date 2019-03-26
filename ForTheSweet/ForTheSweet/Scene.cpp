@@ -37,11 +37,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
 
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+	/*
 	m_nMapShader = 1;
 	m_pMapShader = new CObjectsShader[m_nMapShader];
 	m_pMapShader[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pMapShader[0].BuildObjects(pd3dDevice, pd3dCommandList, XMFLOAT3(0, -10, 0), OBJECT_MAP);
-
+	*/
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 	m_nPlayerObjectShaders = 7;
 	m_pPlayerObjectShaders = new CPlayerObjectsShader[m_nPlayerObjectShaders];
@@ -52,6 +53,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	
 	Character_Model = new LoadModel("main_character.FBX", false);
 	m_pPlayer = new ModelPlayer(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, Character_Model);
+
+	Map_1_Model = new LoadModel("main_character.FBX", false);
+	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0,0,0));
 }
 
 void CScene::ReleaseObjects()
@@ -159,4 +163,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	{
 		m_pPlayerObjectShaders[i].Render(pd3dCommandList, pCamera);
 	}
+	if(Map)
+		Map->Render(pd3dCommandList, pCamera);
 }

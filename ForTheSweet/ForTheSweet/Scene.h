@@ -25,6 +25,8 @@ public:
 	ModelPlayer						*m_pPlayer = NULL;
 	ModelPlayer*					getplayer() { return m_pPlayer; }
 	LoadModel						*Character_Model;
+	LoadModel						*Map_1_Model;
+	CGameObject						*Map;
 protected:
 	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다.
 	//CGameObject * *m_ppObjects = NULL;

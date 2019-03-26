@@ -199,3 +199,26 @@ CPlayerObject::CPlayerObject()
 CPlayerObject::~CPlayerObject()
 {
 }
+
+CMapObject::CMapObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, LoadModel *Model, XMFLOAT3 Position)
+{
+	lm = Model;
+	m_nMeshes = lm->getNumMesh();
+	if (m_nMeshes > 0)
+	{
+		m_ppMeshes = vector<unique_ptr<MMesh>>(m_nMeshes);
+		for (UINT i = 0; i < m_nMeshes; i++)
+			m_ppMeshes[i] = nullptr;
+	}
+	lm->SetMeshes(pd3dDevice, pd3dCommandList);
+	for (UINT i = 0; i < m_nMeshes; i++) {
+		if (i > 0)
+			lm->SetTextureIndex(i, i);
+		SetMesh(i, lm->getMeshes()[i]);
+	}
+	SetPosition(Position);
+}
+
+CMapObject::~CMapObject()
+{
+}

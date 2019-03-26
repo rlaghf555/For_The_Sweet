@@ -1,6 +1,7 @@
 #pragma once
 #include "Mesh.h"
 #include "Camera.h"
+#include "Model.h"
 class CShader;
 
 class CGameObject
@@ -76,4 +77,10 @@ public:
 			xmf3RotationAxis;
 	}
 	virtual void Animate(float fTimeElapsed);
+};
+class CMapObject : public CGameObject {
+	LoadModel *lm;
+public:
+	CMapObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, LoadModel *Model, XMFLOAT3 Position);
+	virtual ~CMapObject();
 };
