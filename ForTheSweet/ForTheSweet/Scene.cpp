@@ -54,8 +54,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	Character_Model = new LoadModel("main_character.FBX", false);
 	m_pPlayer = new ModelPlayer(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, Character_Model);
 
-	Map_1_Model = new LoadModel("main_character.FBX", false);
+	Map_1_Model = new LoadModel("map_1.FBX", false);
 	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0,0,0));
+	XMFLOAT3 a = XMFLOAT3(1.f, 0.f, 0.f);
+	Map->Rotate(&a, 90.f);
 }
 
 void CScene::ReleaseObjects()
