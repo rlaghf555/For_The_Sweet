@@ -172,12 +172,12 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 		normal.z = pMesh->mNormals[i].z;
 
 		XMFLOAT2 tex(0.0f, 0.0f);
-		//if (pMesh->HasTextureCoords(0)) {
-		//	tex.x = pMesh->mTextureCoords[0][i].x;
-		//	tex.y = pMesh->mTextureCoords[0][i].y;
-		//}
-		//else
-		//	tex = XMFLOAT2(0.0f, 0.0f);
+		if (pMesh->HasTextureCoords(0)) {
+			tex.x = pMesh->mTextureCoords[0][i].x;
+			tex.y = pMesh->mTextureCoords[0][i].y;
+		}
+		else
+			tex = XMFLOAT2(0.0f, 0.0f);
 		//tangent는 일단 0으로 초기화
 		const vertexDatas data(pos, normal, zero_3, tex, index);
 		m_meshes[index].m_vertices.push_back(data);
