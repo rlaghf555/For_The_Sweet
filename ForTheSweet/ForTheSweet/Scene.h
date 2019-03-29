@@ -18,13 +18,14 @@ public:
 	void CollisionProcess();
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void ReleaseUploadBuffers();
+	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
 	ID3D12RootSignature *GetGraphicsRootSignature();
 
-	ModelPlayer						*m_pPlayer = NULL;
-	ModelPlayer*					getplayer() { return m_pPlayer; }
-	LoadModel						*Character_Model;
+	CPlayer						*m_pPlayer = NULL;
+	CPlayer*					getplayer() { return m_pPlayer; }
+	Model_Animation				*character_anim;
 	LoadModel						*Map_1_Model;
 	CGameObject						*Map;
 protected:

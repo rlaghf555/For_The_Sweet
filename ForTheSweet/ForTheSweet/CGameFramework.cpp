@@ -266,8 +266,12 @@ void CGameFramework::CreateDepthStencilView()
 
 void CGameFramework::LoadModels()
 {
-	//Character_Model = new LoadModel("police.fbx", false);
-	//Character_Model = new LoadModel("main_character.FBX", false);
+	vector<pair<string, float>> character_animation;
+	character_animation.emplace_back(make_pair("./resource/character/run.bip", 0));
+	character_animation.emplace_back(make_pair("./resource/character/stay.bip", 0));
+	character_animation.emplace_back(make_pair("./resource/character/walk.bip", 0));
+
+	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 }
 
 void CGameFramework::BuildObjects()
@@ -275,8 +279,10 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	
 	m_pScene = new CScene();
-	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
-
+	if (m_pScene) {
+		m_pScene->SetCharacter(Character_Model);
+		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	}
 	My_ID = CHARATER_ID_7; //원래는 서버에서 받아야함
 
 	//ModelPlayer *pPlayer;
@@ -285,7 +291,7 @@ void CGameFramework::BuildObjects()
 
 	m_pPlayer = m_pScene->getplayer();//pPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
-	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
+	//m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
 	
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };

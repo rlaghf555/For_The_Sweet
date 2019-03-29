@@ -10,8 +10,9 @@
 #include "Object.h"
 #include "Camera.h"
 #include "Model.h"
+#include "ModelObject.h"
 
-class CPlayer : public CGameObject
+class CPlayer : public ModelObject
 {
 protected:
 	//플레이어의 위치 벡터, x-축(Right), y-축(Up), z-축(Look) 벡터이다.
@@ -35,7 +36,7 @@ protected:
 	LPVOID m_pCameraUpdatedContext;	//카메라의 위치가 바뀔 때마다 호출되는 OnCameraUpdateCallback() 함수에서 사용하는 데이터이다.
 	CCamera *m_pCamera = NULL;		//플레이어에 현재 설정된 카메라이다.
 public:
-	CPlayer();
+	CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual ~CPlayer();
 
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
@@ -86,10 +87,8 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	
 	//카메라를 변경하기 위하여 호출하는 함수이다.
-	CCamera *OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode);
-	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed) {
-		return(NULL);
-	}
+	CCamera *OnChangeCamera(DWORD nNewCameraMode);
+	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	
 	//플레이어의 위치와 회전축으로부터 월드 변환 행렬을 생성하는 함수이다.
 	virtual void OnPrepareRender();
@@ -97,6 +96,7 @@ public:
 	//플레이어의 카메라가 3인칭 카메라일 때 플레이어(메쉬)를 렌더링한다.
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 };
+
 
 class CGamePlayer : public CPlayer
 {

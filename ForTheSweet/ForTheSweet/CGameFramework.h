@@ -2,7 +2,7 @@
 #include "Timer.h"
 #include "Scene.h"
 #include "Player.h"
-
+#include "Model_Animation.h"
 class CGameFramework
 {
 public:
@@ -53,7 +53,7 @@ private:
 	HANDLE m_hFenceEvent;
 	//펜스 인터페이스 포인터, 펜스의 값, 이벤트 핸들이다.
 
-	LoadModel *Character_Model;
+	Model_Animation *Character_Model;
 #if defined(_DEBUG)
 	ID3D12Debug *m_pd3dDebugController;
 

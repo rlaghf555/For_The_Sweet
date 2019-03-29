@@ -146,7 +146,7 @@ void LoadModel::InitScene()
 		const aiMesh* pMesh = m_pScene->mMeshes[i];
 		InitMesh(i, pMesh);
 		
-		//if (pMesh->HasBones()) InitBones(i, pMesh);
+		if (pMesh->HasBones()) InitBones(i, pMesh);
 
 		m_numVertices += (UINT)m_meshes[i].m_vertices.size();
 	}
@@ -197,7 +197,7 @@ void LoadModel::SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	for (UINT i = 0; i < m_ModelMeshes.size(); ++i) {
 		ModelMesh* tmp = new ModelMesh(pd3dDevice, pd3dCommandList, m_meshes[i]);
 		m_ModelMeshes[i] = tmp;
-	}
+	}	
 }
 
 void LoadModel::InitBones(UINT index, const aiMesh* pMesh)

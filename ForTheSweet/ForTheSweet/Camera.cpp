@@ -300,7 +300,6 @@ void CThirdPersonCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 	{
 		SetLookAt(xmf3LookAt);
 
-		/*
 		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
 		XMFLOAT3 xmf3Right = m_pPlayer->GetRightVector();
 		XMFLOAT3 xmf3Up = m_pPlayer->GetUpVector();
@@ -315,7 +314,7 @@ void CThirdPersonCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		//회전한 카메라의 위치는 플레이어의 위치에 회전한 카메라 오프셋 벡터를 더한 것이다.
 		XMFLOAT3 xmf3Position = Vector3::Add(m_pPlayer->GetPosition(), xmf3Offset);
 		//현재의 카메라의 위치에서 회전한 카메라의 위치까지의 방향과 거리를 나타내는 벡터이다.
-		XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, m_xmf3Position);
+		XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, m_xmf3Position,false);
 
 		float fLength = Vector3::Length(xmf3Direction);
 		xmf3Direction = Vector3::Normalize(xmf3Direction);
@@ -333,7 +332,7 @@ void CThirdPersonCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 			//카메라가 플레이어를 바라보도록 한다.
 			SetLookAt(xmf3LookAt);
 		}
-		*/
+		
 	}
 }
 

@@ -2,10 +2,10 @@
 #include "Player.h"
 #include "Shader.h"
 
-CPlayer::CPlayer()
+CPlayer::CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) : ModelObject(ma, pd3dDevice, pd3dCommandList)
 {
 	m_pCamera = NULL;
-	
+
 	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -24,6 +24,15 @@ CPlayer::CPlayer()
 	m_pPlayerUpdatedContext = NULL;
 	m_pCameraUpdatedContext = NULL;
 
+	//플레이어를 위한 셰이더 변수를 생성한다.
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CCamera *newcamera = new CCamera();
+	m_pCamera = new CThirdPersonCamera(newcamera);
+	//플레이어의 위치를 설정한다.
+	XMFLOAT3 pposition = XMFLOAT3(0.0f, 0.0f, -50.0f);
+	SetPosition(pposition);
+
 }
 
 CPlayer::~CPlayer()
@@ -31,6 +40,7 @@ CPlayer::~CPlayer()
 	ReleaseShaderVariables();
 
 	if (m_pCamera) delete m_pCamera;
+	ModelObject::~ModelObject();
 }
 
 void CPlayer::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList	*pd3dCommandList)
@@ -198,16 +208,15 @@ void CPlayer::Update(float fTimeElapsed)
 	변경할 수 있다.*/
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 	
-	DWORD nCameraMode = m_pCamera->GetMode();
 	
 	//플레이어의 위치가 변경되었으므로 3인칭 카메라를 갱신한다.
-	if (nCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position,
+	m_pCamera->Update(m_xmf3Position,
 		fTimeElapsed);
 	
 	//카메라의 위치가 변경될 때 추가로 수행할 작업을 수행한다.
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	//카메라가 3인칭 카메라이면 카메라가 변경된 플레이어 위치를 바라보도록 한다.
-	if (nCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+	m_pCamera->SetLookAt(m_xmf3Position);
 	//카메라의 카메라 변환 행렬을 다시 생성한다.
 	m_pCamera->RegenerateViewMatrix();
 	
@@ -223,7 +232,7 @@ void CPlayer::Update(float fTimeElapsed)
 
 /*카메라를 변경할 때 ChangeCamera() 함수에서 호출되는 함수이다. nCurrentCameraMode는 현재 카메라의 모드
 이고 nNewCameraMode는 새로 설정할 카메라 모드이다.*/
-CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
+CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode)
 {
 	//새로운 카메라의 모드에 따라 카메라를 새로 생성한다.
 	CCamera *pNewCamera = NULL;
@@ -277,7 +286,38 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 	//카메라 모드가 3인칭이면 플레이어 객체를 렌더링한다.
 	if (nCameraMode == THIRD_PERSON_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
 }
+CCamera *CPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
+{
+	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
+	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
 
+	XMFLOAT3 ggravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	switch (nNewCameraMode)
+	{
+	case THIRD_PERSON_CAMERA:
+		//플레이어의 특성을 3인칭 카메라 모드에 맞게 변경한다. 지연 효과와 카메라 오프셋을 설정한다.
+		SetFriction(250.0f);
+		XMFLOAT3 ggravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		SetGravity(ggravity);
+		SetMaxVelocityXZ(125.0f);
+		SetMaxVelocityY(400.0f);
+		m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA);
+		//3인칭 카메라의 지연 효과를 설정한다. 값을 0.25f 대신에 0.0f와 1.0f로 설정한 결과를 비교하기 바란다.
+		m_pCamera->SetTimeLag(0.25f);
+		m_pCamera->SetOffset(XMFLOAT3(0.0f, 300.f, -500.0f));
+		m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
+		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+		break;
+	default:
+		break;
+	}
+	//플레이어를 시간의 경과에 따라 갱신(위치와 방향을 변경: 속도, 마찰력, 중력 등을 처리)한다.
+	//Update(fTimeElapsed);
+	return(m_pCamera);
+}
+/*
 CGamePlayer::CGamePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature)
 {
 
@@ -315,9 +355,7 @@ void CGamePlayer::OnPrepareRender()
 	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.f), 0.0f, 0.0f);
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 }
-/*3인칭 카메라일 때 플레이어 메쉬를 로컬 x-축을 중심으로 +90도 회전하고 렌더링한다. 왜냐하면 비행기 모델 메쉬
-는 다음 그림과 같이 y-축 방향이 비행기의 앞쪽이 되도록 모델링이 되었기 때문이다. 그리고 이 메쉬를 카메라의 z-
-축 방향으로 향하도록 그릴 것이기 때문이다.*/
+
 
 //카메라를 변경할 때 호출되는 함수이다. nNewCameraMode는 새로 설정할 카메라 모드이다.
 CCamera *CGamePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
@@ -414,3 +452,4 @@ CCamera * ModelPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 ModelPlayer::~ModelPlayer() {
 
 }
+*/

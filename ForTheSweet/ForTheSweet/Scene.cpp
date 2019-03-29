@@ -54,8 +54,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_pMapShader = new CObjectsShader();
 	m_pMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	Character_Model = new LoadModel("main_character.FBX", false);
-	m_pPlayer = new ModelPlayer(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, Character_Model);
+//	Character_Model = new LoadModel("main_character.FBX", false);
+	m_pPlayer = new CPlayer(character_anim,pd3dDevice, pd3dCommandList);
 
 	Map_1_Model = new LoadModel("map_1.FBX", false);
 	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0,200,-150));
