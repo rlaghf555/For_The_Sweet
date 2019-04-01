@@ -499,7 +499,7 @@ void CGameFramework::ProcessInput()
 	{
 		
 		
-			m_pPlayer->Rotate(0.0f, rotation, 0.0f);
+			//m_pPlayer->Rotate(0.0f, rotation, 0.0f);
 
 			/*플레이어를 dwDirection 방향으로 이동한다(실제로는 속도 벡터를 변경한다). 이동 거리는 시간에 비례하도록 한다.
 			플레이어의 이동 속력은 (50/초)로 가정한다.*/

@@ -31,6 +31,7 @@ ModelObject::ModelObject(Model_Animation * ma, ID3D12Device * pd3dDevice, ID3D12
 	}
 	SetAnimations(m_NumofAnim, ma->getAnim());
 
+
 }
 
 ModelObject::~ModelObject()

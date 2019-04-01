@@ -98,7 +98,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 };
 
-
+/* 
 class CGamePlayer : public CPlayer
 {
 public:
@@ -117,3 +117,4 @@ public:
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual ~ModelPlayer();
 };
+*/
