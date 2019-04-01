@@ -8,8 +8,16 @@ ModelObject::ModelObject(Model_Animation * ma, ID3D12Device * pd3dDevice, ID3D12
 	m_NumofAnim = ma->getAnimCount();
 	m_AnimIndex = 0;
 	m_Animtime = 0.0f;
+	m_nMeshes = ma->getModel()->getNumMesh();
 
 	//매쉬 적용
+	if (m_nMeshes > 0)
+	{
+		m_ppMeshes = vector<unique_ptr<MMesh>>(m_nMeshes);
+		for (UINT i = 0; i < m_nMeshes; i++)
+			m_ppMeshes[i] = nullptr;
+	}
+	m_model->SetMeshes(pd3dDevice, pd3dCommandList);
 	for (UINT i = 0; i < m_nMeshes; ++i) {
 		if (i > 0)
 			m_model->SetTextureIndex(i, i);
@@ -22,6 +30,7 @@ ModelObject::ModelObject(Model_Animation * ma, ID3D12Device * pd3dDevice, ID3D12
 		XMStoreFloat4x4(&p, XMMatrixIdentity());
 	}
 	SetAnimations(m_NumofAnim, ma->getAnim());
+
 }
 
 ModelObject::~ModelObject()
@@ -48,6 +57,7 @@ void ModelObject::Animate(float fTime)
 	if (m_ani) {
 		if (m_AnimIndex < m_NumofAnim)
 			m_loopCheck = m_ani[m_AnimIndex]->BoneTransform(m_AnimIndex, fTime, m_Bones);
+		m_model->GetBones();
 	}
 }
 

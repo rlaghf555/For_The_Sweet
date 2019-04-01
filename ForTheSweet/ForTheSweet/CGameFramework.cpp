@@ -267,9 +267,9 @@ void CGameFramework::CreateDepthStencilView()
 void CGameFramework::LoadModels()
 {
 	vector<pair<string, float>> character_animation;
-	character_animation.emplace_back(make_pair("./resource/character/run.bip", 0));
-	character_animation.emplace_back(make_pair("./resource/character/stay.bip", 0));
-	character_animation.emplace_back(make_pair("./resource/character/walk.bip", 0));
+	character_animation.emplace_back(make_pair("./resource/character/main_character.FBX", 0));
+	//character_animation.emplace_back(make_pair("./resource/character/stay.bip", 0));
+	//character_animation.emplace_back(make_pair("./resource/character/walk.bip", 0));
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 }
@@ -459,7 +459,7 @@ void CGameFramework::ProcessInput()
 		if (dwDirection & DIR_RIGHT)
 			;
 
-		//rotation = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
+	//	rotation = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
 		
 	}
 	if (Key_A||Key_S) {
@@ -504,10 +504,10 @@ void CGameFramework::ProcessInput()
 			/*플레이어를 dwDirection 방향으로 이동한다(실제로는 속도 벡터를 변경한다). 이동 거리는 시간에 비례하도록 한다.
 			플레이어의 이동 속력은 (50/초)로 가정한다.*/
 			if (dwDirection) m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
-	
-
+		
 	}
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
+	//if(m_pCamera)
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 

@@ -1,22 +1,64 @@
 ﻿  stdafx.cpp
+  Animation.cpp
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\animation.cpp(33): warning C4244: '=': 'const double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\animation.cpp(67): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Camera.cpp
   CGameFramework.cpp
-d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(450): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
-d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(452): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
 d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(454): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
 d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(456): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
-d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(441): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
-  Camera.cpp
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(458): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(460): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(445): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(240): warning C4244: '초기화 중': '_Ty'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+          with
+          [
+              _Ty=int
+          ]
+          and
+          [
+              _Ty2=float
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 컴파일 중인 함수 템플릿 인스턴스화 'std::pair<std::string,float>::pair<const char*,int,0>(std::pair<const char *,int> &&) noexcept(false)'에 대한 참조를 확인하십시오.
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 컴파일 중인 함수 템플릿 인스턴스화 'std::pair<std::string,float>::pair<const char*,int,0>(std::pair<const char *,int> &&) noexcept(false)'에 대한 참조를 확인하십시오.
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\vector(900): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::pair<const char *,int>>(_Alloc &,_Objty *const ,std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
+          with
+          [
+              _Alloc=std::allocator<std::pair<std::string,float>>,
+              _Ty=std::pair<std::string,float>,
+              _Objty=std::pair<std::string,float>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\vector(902): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::pair<const char *,int>>(_Alloc &,_Objty *const ,std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
+          with
+          [
+              _Alloc=std::allocator<std::pair<std::string,float>>,
+              _Ty=std::pair<std::string,float>,
+              _Objty=std::pair<std::string,float>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\vector(916): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
+          with
+          [
+              _Ty=std::pair<std::string,float>
+          ]
+  d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(270): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
+          with
+          [
+              _Ty=std::pair<std::string,float>
+          ]
   ForTheSweet.cpp
   Mesh.cpp
   Model.cpp
+  ModelObject.cpp
+  Model_Animation.cpp
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\model_animation.cpp(16): warning C4267: '=': 'size_t'에서 'UINT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\model_animation.cpp(12): warning C4101: 'index' :참조되지 않은 지역 변수입니다.
   Object.cpp
   Player.cpp
   Scene.cpp
-d:\졸작\for_the_sweet\for_the_sweet\forthesweet\forthesweet\scene.cpp(50): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Shader.cpp
   Timer.cpp
   코드를 생성하고 있습니다...
-Model.obj : error LNK2019: aiImportFile 외부 기호(참조 위치: "public: __cdecl LoadModel::LoadModel(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,bool)" (??0LoadModel@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_N@Z) 함수)에서 확인하지 못했습니다.
+Animation.obj : error LNK2019: aiImportFile 외부 기호(참조 위치: "public: __cdecl LoadAnimation::LoadAnimation(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,float,float)" (??0LoadAnimation@@QEAA@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@MM@Z) 함수)에서 확인하지 못했습니다.
+Model.obj : error LNK2001: aiImportFile 외부 기호를 확인할 수 없습니다.
 Model.obj : error LNK2019: "public: __cdecl aiScene::~aiScene(void)" (??1aiScene@@QEAA@XZ) 외부 기호(참조 위치: "public: void * __cdecl aiScene::`scalar deleting destructor'(unsigned int)" (??_GaiScene@@QEAAPEAXI@Z) 함수)에서 확인하지 못했습니다.
 assimp-vc140-mt.lib : warning LNK4272: 'x86' 라이브러리 컴퓨터 종류가 'x64' 대상 컴퓨터 종류와 충돌합니다.
 D:\졸작\For_The_Sweet\For_The_Sweet\ForTheSweet\x64\Debug\ForTheSweet.exe : fatal error LNK1120: 2개의 확인할 수 없는 외부 참조입니다.

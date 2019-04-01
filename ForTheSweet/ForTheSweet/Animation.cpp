@@ -3,7 +3,7 @@
 #include "Animation.h"
 
 LoadAnimation::LoadAnimation(string filename, float trigger, float skip) :
-	animation_loof(false), next_index(0), m_animSpeed(1.0f)
+	animation_loof(true), next_index(0), m_animSpeed(1.0f)
 {
 	m_pScene = aiImportFile(filename.c_str(), (aiProcessPreset_TargetRealtime_Quality | aiProcess_ConvertToLeftHanded) & ~aiProcess_FindInvalidData);
 
