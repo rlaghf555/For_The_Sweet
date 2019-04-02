@@ -90,11 +90,22 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)source\physxextensions\src;$(ProjectDir)pxshared;$(ProjectDir)source\foundation\include;$(ProjectDir)source\geomutils\include;$(ProjectDir)source\geomuils\src;$(ProjectDir)source\geomutils\src\contact;$(ProjectDir)source\geomutils\src\common;$(ProjectDir)source\geomutils\src\convex;$(ProjectDir)source\geomutils\src\sweep;$(ProjectDir)source\geomutils\src\distance;$(ProjectDir)source\geomutils\src\gjk;$(ProjectDir)source\geomutils\src\intersection;$(ProjectDir)source\geomutils\src\mesh;$(ProjectDir)source\geomutils\src\hf;$(ProjectDir)source\geomutils\src\pcm;$(ProjectDir)source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <OmitFramePointers>true</OmitFramePointers>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(SolutionDir)Debug\PhysXPvdSDK_static_32.lib;$(SolutionDir)Debug\PhysXVehicle_static_32.lib;$(SolutionDir)Debug\PhysXCharacterKinematic_static_32.lib;$(SolutionDir)Debug\PhysXExtensions_static_32.lib;$(SolutionDir)Debug\PhysXCooking_32.lib;$(SolutionDir)Debug\PhysXCommon_32.lib;$(SolutionDir)Debug\PhysX_32.lib;$(SolutionDir)Debug\PhysXFoundation_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -104,6 +115,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)source\physxextensions\src;$(ProjectDir)pxshared\include;$(ProjectDir)source\foundation\include;$(ProjectDir)source\geomutils\include;$(ProjectDir)geomutils\src\contact;$(ProjectDir)geomutils\src\common;$(ProjectDir)source\geomutils\src\common;$(ProjectDir)source\geomutils\src\convex;$(ProjectDir)geomutils\src\sweep;$(ProjectDir)geomutils\src\distance;$(ProjectDir)geomutils\src\gjk;$(ProjectDir)geomutils\src\intersection;$(ProjectDir)geomutils\src\mesh;$(ProjectDir)geomutils\src\hf;$(ProjectDir)geomutils\src\pcm;$(ProjectDir)geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,6 +168,7 @@
     <ClInclude Include="ModelObject.h" />
     <ClInclude Include="Model_Animation.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Physx.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
@@ -174,6 +187,7 @@
     <ClCompile Include="ModelObject.cpp" />
     <ClCompile Include="Model_Animation.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Physx.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />

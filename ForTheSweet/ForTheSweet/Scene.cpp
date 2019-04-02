@@ -44,21 +44,21 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pMapShader[0].BuildObjects(pd3dDevice, pd3dCommandList, XMFLOAT3(0, -10, 0), OBJECT_MAP);
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 	*/
-	/*
-	m_nPlayerObjectShaders = 7;
+	
+	m_nPlayerObjectShaders = 1;
 	m_pPlayerObjectShaders = new CPlayerObjectsShader[m_nPlayerObjectShaders];
 	for (int i = 0; i < m_nPlayerObjectShaders; i++) {
 		m_pPlayerObjectShaders[i].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-		m_pPlayerObjectShaders[i].BuildObjects(pd3dDevice, pd3dCommandList,XMFLOAT3((i-3)*200,50,0));
-	}*/
+		m_pPlayerObjectShaders[i].BuildObjects(pd3dDevice, pd3dCommandList,XMFLOAT3(50,17.5,0));
+	}
 
 	m_pMapShader = new CObjectsShader();
 	m_pMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-//	Character_Model = new LoadModel("main_character.FBX", false);
-	m_pPlayer = new CPlayer(character_anim,pd3dDevice, pd3dCommandList);
+	//Character_Model = new LoadModel("main_character.FBX", false);
+	m_pPlayer = new CPlayer(character_anim, pd3dDevice, pd3dCommandList);
 
 	Map_1_Model = new LoadModel("map_1.FBX", false);
-	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0,200,-150));
+	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0, 0, 0));
 	XMFLOAT3 a = XMFLOAT3(1.f, 0.f, 0.f);
 	Map->Rotate(&a, 90.f);
 }

@@ -16,6 +16,9 @@
     <Filter Include="소스 파일\Model">
       <UniqueIdentifier>{0d416e9b-73e0-4ed2-a1b4-80ccffc1b491}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Physx">
+      <UniqueIdentifier>{c47dddea-9780-4703-a782-ee045fcb5b38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -66,6 +69,9 @@
     <ClInclude Include="ModelObject.h">
       <Filter>소스 파일\Model</Filter>
     </ClInclude>
+    <ClInclude Include="Physx.h">
+      <Filter>소스 파일\Physx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -95,9 +101,6 @@
     <ClCompile Include="Shader.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>소스 파일\Model</Filter>
     </ClCompile>
@@ -109,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="ModelObject.cpp">
       <Filter>소스 파일\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Physx.cpp">
+      <Filter>소스 파일\Physx</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

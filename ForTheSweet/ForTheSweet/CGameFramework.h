@@ -3,9 +3,14 @@
 #include "Scene.h"
 #include "Player.h"
 #include "Model_Animation.h"
+#include "Physx.h"
+
 class CGameFramework
 {
 public:
+	// Physx
+	CPhysx *m_pPhysx;
+
 	//플레이어 객체에 대한 포인터이다.
 	CPlayer * m_pPlayer;
 	CCamera * m_pCamera;

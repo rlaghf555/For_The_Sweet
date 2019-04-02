@@ -436,7 +436,7 @@ void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphic
 	pGameObject->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 	m_ppPlayerObjects[0] = pGameObject;
 
-	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 50, 100, 30);
+	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 35, 35, 35);
 
 	m_ppPlayerObjects[0]->SetMesh(pCubeMesh);
 	//인스턴싱을 위한 버퍼(Structured Buffer)를 생성한다.

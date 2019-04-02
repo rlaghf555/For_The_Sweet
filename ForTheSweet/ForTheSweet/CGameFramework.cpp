@@ -42,6 +42,8 @@ CGameFramework::CGameFramework()
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 	
 	Character_Model = NULL;
+
+	m_pPhysx = NULL;
 }
 
 //다음 함수는 응용 프로그램이 실행되어 주 윈도우가 생성되면 호출된다는 것에 유의하라.
@@ -293,6 +295,37 @@ void CGameFramework::BuildObjects()
 	m_pCamera = m_pPlayer->GetCamera();
 	//m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
 	
+	m_pPhysx = new CPhysx();
+	m_pPhysx->initPhysics();
+
+	if (m_pPhysx)
+	{
+		PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
+		m_pPhysx->m_Scene->addActor(*groundPlane);
+
+		m_pPhysx->m_PlayerManager = PxCreateControllerManager(*(m_pPhysx->m_Scene));
+
+		//PxBoxControllerDesc bdesc;
+		//bdesc.position = PxExtendedVec3(0, 0, 0);
+		//bdesc.material = m_pPhysx->m_Material;
+		//bdesc.halfHeight = 10.f;
+		//bdesc.halfSideExtent = 10.f;
+		//bdesc.halfForwardExtent = 10.f;
+
+		PxCapsuleControllerDesc desc;
+		desc.height = 15.f;
+		desc.radius = 10.f;
+		desc.position = PxExtendedVec3(0, 17.5, 0);
+		desc.material = m_pPhysx->m_Material;
+
+		m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
+
+		PxRigidDynamic* dynamic = PxCreateDynamic(*(m_pPhysx->m_Physics), PxTransform(PxVec3(50, 17.5, 0)), PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material), 1.0f);
+		dynamic->setAngularDamping(0.5f);
+		dynamic->setLinearVelocity(PxVec3(0, 0, 0));
+		m_pPhysx->m_Scene->addActor(*dynamic);
+	}
+
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
@@ -498,12 +531,16 @@ void CGameFramework::ProcessInput()
 	if ((dwDirection != 0) || (rotation != 0.0f))
 	{
 		
-		
 			//m_pPlayer->Rotate(0.0f, rotation, 0.0f);
 
 			/*플레이어를 dwDirection 방향으로 이동한다(실제로는 속도 벡터를 변경한다). 이동 거리는 시간에 비례하도록 한다.
 			플레이어의 이동 속력은 (50/초)로 가정한다.*/
-			if (dwDirection) m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
+
+		if (dwDirection)
+		{
+			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
+			m_pPhysx->move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed());
+		}
 		
 	}
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
@@ -554,6 +591,17 @@ void CGameFramework::FrameAdvance()
 	
 	ProcessInput();
 
+	m_pPhysx->m_Scene->simulate(1.f / 60.f);
+	m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
+
+	physx::PxExtendedVec3 playerPosition;
+	playerPosition = m_pPhysx->m_PlayerController->getPosition();
+	XMFLOAT3 position;
+	position.x = playerPosition.x;
+	position.y = playerPosition.y - 17.5f;
+	position.z = playerPosition.z;
+	m_pPlayer->SetPosition(position);
+
 	CollisionProcess();
 
 	AnimateObjects();
@@ -588,7 +636,7 @@ void CGameFramework::FrameAdvance()
 	//3인칭 카메라일 때 플레이어가 항상 보이도록 렌더링한다.
 #ifdef _WITH_PLAYER_TOP
 	//렌더 타겟은 그대로 두고 깊이 버퍼를 1.0으로 지우고 플레이어를 렌더링하면 플레이어는 무조건 그려질 것이다.
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,	D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+	//m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,	D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 	//3인칭 카메라일 때 플레이어를 렌더링한다.
 	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);

@@ -31,22 +31,22 @@ ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCo
 LoadModel::LoadModel(const string& fileName, bool isStatic)
 {
 	UINT flag = aiProcess_JoinIdenticalVertices |			// join identical vertices/ optimize indexing
-		aiProcess_ValidateDataStructure |						// perform a full validation of the loader's output
+		aiProcess_ValidateDataStructure |					// perform a full validation of the loader's output
 		aiProcess_ImproveCacheLocality |					// improve the cache locality of the output vertices
-		aiProcess_RemoveRedundantMaterials |			// remove redundant materials
+		aiProcess_RemoveRedundantMaterials |				// remove redundant materials
 		aiProcess_GenUVCoords |								// convert spherical, cylindrical, box and planar mapping to proper UVs
 		aiProcess_TransformUVCoords |						// pre-process UV transformations (scaling, translation ...)
-		aiProcess_FindInstances |								// search for instanced meshes and remove them by references to one master
-		aiProcess_LimitBoneWeights |							// limit bone weights to 4 per vertex
+		aiProcess_FindInstances |							// search for instanced meshes and remove them by references to one master
+		aiProcess_LimitBoneWeights |						// limit bone weights to 4 per vertex
 		aiProcess_OptimizeMeshes |							// join small meshes, if possible;
 		aiProcess_GenSmoothNormals |						// generate smooth normal vectors if not existing
-		aiProcess_SplitLargeMeshes |							// split large, unrenderable meshes into sub-meshes
-		aiProcess_Triangulate |									// triangulate polygons with more than 3 edges
+		aiProcess_SplitLargeMeshes |						// split large, unrenderable meshes into sub-meshes
+		aiProcess_Triangulate |								// triangulate polygons with more than 3 edges
 		aiProcess_ConvertToLeftHanded |						// convert everything to D3D left handed space
-		aiProcess_SortByPType;									// make 'clean' meshes which consist of a single type of primitives
+		aiProcess_SortByPType;								// make 'clean' meshes which consist of a single type of primitives
 
 	if (isStatic)
-		flag |= aiProcess_PreTransformVertices;			// preTransform Vertices (no bone & animation flag)
+		flag |= aiProcess_PreTransformVertices;				// preTransform Vertices (no bone & animation flag)
 
 	m_pScene = aiImportFile(fileName.c_str(), flag);
 
