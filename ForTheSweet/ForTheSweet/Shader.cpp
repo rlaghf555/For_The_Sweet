@@ -180,43 +180,6 @@ void CShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 	OnPrepareRender(pd3dCommandList);
 }
 
-CPlayerShader::CPlayerShader()
-{
-}
-CPlayerShader::~CPlayerShader()
-{
-}
-
-D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 2;
-	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-	return(d3dInputLayoutDesc);
-}
-
-D3D12_SHADER_BYTECODE CPlayerShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
-{
-	wchar_t filename[100] = L"Shaders.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "VSDiffused", "vs_5_1", ppd3dShaderBlob));
-}
-D3D12_SHADER_BYTECODE CPlayerShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
-{
-	wchar_t filename[100] = L"Shaders.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "PSDiffused", "ps_5_1", ppd3dShaderBlob));
-}
-
-void CPlayerShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGraphicsRootSignature)
-{
-	m_nPipelineStates = 1;
-	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
-	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
-}
-
 CObjectsShader::CObjectsShader()
 {
 }
@@ -425,8 +388,78 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCame
 	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects);
 }
 
-void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, XMFLOAT3 Position)
+D3D12_INPUT_LAYOUT_DESC CPlayerObjectsShader::CreateInputLayout()
 {
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+
+	//정점 정보를 위한 입력 원소이다.
+	//pd3dInputElementDescs[0] = { "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 0,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[1] = { "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[2] = { "TANGENT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[3] = { "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[4] = { "BORNINDEX",	0, DXGI_FORMAT_R32G32B32A32_UINT,	0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[5] = { "WEIGHT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 60, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[6] = { "TEXINDEX",	0, DXGI_FORMAT_R32_UINT,			0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+	return(d3dInputLayoutDesc);
+}
+
+D3D12_SHADER_BYTECODE CPlayerObjectsShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
+{
+	//wchar_t filename[100] = L"Model.hlsl";
+	//return(CShader::CompileShaderFromFile(filename, "VSDynamicModel", "vs_5_1", ppd3dShaderBlob));
+	wchar_t filename[100] = L"Shaders.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "VSDiffused", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CPlayerObjectsShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
+	//wchar_t filename[100] = L"Model.hlsl";
+	//return(CShader::CompileShaderFromFile(filename, "PSDynamicModel", "ps_5_1", ppd3dShaderBlob));
+	wchar_t filename[100] = L"Shaders.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSDiffused", "ps_5_1", ppd3dShaderBlob));
+}
+
+void CPlayerObjectsShader::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
+{
+	//m_BoneCB = make_unique<UploadBuffer<CB_DYNAMICOBJECT_INFO>>(pd3dDevice, m_nObjects, true);
+}
+
+void CPlayerObjectsShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	CB_DYNAMICOBJECT_INFO cBone;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		//cBone.m_xmf4x4World = m_ppObjects[i]->m_xmf4x4World;
+		XMStoreFloat4x4(&cBone.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World)));
+		cBone.m_nMaterial = 0;
+
+		memcpy(cBone.m_bone, m_bbObjects[i]->GetBoneData(), sizeof(XMFLOAT4X4) * m_bbObjects[i]->GetBoneNum());
+
+		m_BoneCB->CopyData(i, cBone);
+	}
+}
+
+void CPlayerObjectsShader::BuildObjects(Model_Animation* ma, ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, XMFLOAT3 Position)
+{
+	//m_nObjects = 1;
+	//m_bbObjects = vector<ModelObject*>(m_nObjects);
+	//
+	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	//
+	//CPlayer* tmp = new CPlayer(ma, pd3dDevice, pd3dCommandList);
+	//
+	//tmp->SetAnimations(globalModels->getAnimCount(modelIndex), globalModels->getAnim(modelIndex));
+	//tmp->SetPosition(XMFLOAT3(0, 0, 0));
+	//tmp->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+	//m_bbObjects[0] = tmp;
+
+	
 	m_nObjects = 1;
 	m_ppPlayerObjects = new CPlayerObject*[m_nObjects];
 	setPos(Position);
@@ -441,6 +474,7 @@ void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphic
 	m_ppPlayerObjects[0]->SetMesh(pCubeMesh);
 	//인스턴싱을 위한 버퍼(Structured Buffer)를 생성한다.
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	//*/
 }
 
 void CPlayerObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, XMFLOAT3 Position, int Object_Kind)
@@ -484,6 +518,9 @@ void CPlayerObjectsShader::ReleaseUploadBuffers()
 void CPlayerObjectsShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	CShader::Render(pd3dCommandList, pCamera);
-	for (int j = 0; j < m_nObjects; j++) { if (m_ppPlayerObjects[j]) { m_ppPlayerObjects[j]->Render(pd3dCommandList, pCamera); } }
+	for (int j = 0; j < m_nObjects; j++) { if (m_ppPlayerObjects[j]) {
+		//UpdateShaderVariables(pd3dCommandList);
+		m_ppPlayerObjects[j]->Render(pd3dCommandList, pCamera); } 
+	}
 
 }

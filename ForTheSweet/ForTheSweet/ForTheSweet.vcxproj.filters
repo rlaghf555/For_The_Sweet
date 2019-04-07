@@ -19,6 +19,9 @@
     <Filter Include="소스 파일\Physx">
       <UniqueIdentifier>{c47dddea-9780-4703-a782-ee045fcb5b38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Util">
+      <UniqueIdentifier>{1e0099af-5efa-408f-99b6-79a989428a58}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -72,6 +75,15 @@
     <ClInclude Include="Physx.h">
       <Filter>소스 파일\Physx</Filter>
     </ClInclude>
+    <ClInclude Include="D3DMath.h">
+      <Filter>소스 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DUtil.h">
+      <Filter>소스 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="UploadBuffer.h">
+      <Filter>소스 파일\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -119,6 +131,12 @@
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="D3DMath.cpp">
+      <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DUtil.cpp">
+      <Filter>소스 파일\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ForTheSweet.rc">
@@ -135,5 +153,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders.hlsl" />
+    <None Include="Model.hlsl" />
   </ItemGroup>
 </Project>

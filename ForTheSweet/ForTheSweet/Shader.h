@@ -1,6 +1,8 @@
 #pragma once
 #include "Object.h"
 #include "Camera.h"
+#include "UploadBuffer.h"
+#include "ModelObject.h"
 
 //게임 객체의 정보를 셰이더에게 넘겨주기 위한 구조체(상수 버퍼)이다.
 struct CB_GAMEOBJECT_INFO
@@ -51,19 +53,6 @@ protected:
 	int m_nPipelineStates = 0;
 };
 
-
-class CPlayerShader : public CShader
-{
-public:
-	CPlayerShader();
-	virtual ~CPlayerShader();
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
-	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
-		*pd3dGraphicsRootSignature);
-};
-
 //“CObjectsShader” 클래스는 게임 객체들을 포함하는 셰이더 객체이다.
 class CObjectsShader : public CShader
 {
@@ -84,20 +73,29 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 protected:
+	vector<ModelObject* >							m_bbObjects;
 	CGameObject **m_ppObjects = NULL;
 	int m_nObjects = 0;
 };
 
 class CPlayerObjectsShader : public CObjectsShader {
 public:
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	//virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature	*pd3dGraphicsRootSignature);
+	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList);
+
 	virtual void check_underground();	//임시
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position);
+	virtual void BuildObjects(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position);
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position, int Object_Kind);
 	virtual void AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 protected:
+	unique_ptr<UploadBuffer<CB_DYNAMICOBJECT_INFO>>	m_BoneCB = nullptr;	// 뼈정보
 	CPlayerObject **m_ppPlayerObjects = NULL;
 };
 

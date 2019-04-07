@@ -162,6 +162,8 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CGameFramework.h" />
+    <ClInclude Include="D3DMath.h" />
+    <ClInclude Include="D3DUtil.h" />
     <ClInclude Include="ForTheSweet.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
@@ -176,11 +178,14 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="UploadBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CGameFramework.cpp" />
+    <ClCompile Include="D3DMath.cpp" />
+    <ClCompile Include="D3DUtil.cpp" />
     <ClCompile Include="ForTheSweet.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -209,6 +214,11 @@
   <ItemGroup>
     <None Include="Shaders.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Model.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

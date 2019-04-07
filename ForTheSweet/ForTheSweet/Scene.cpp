@@ -49,11 +49,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pPlayerObjectShaders = new CPlayerObjectsShader[m_nPlayerObjectShaders];
 	for (int i = 0; i < m_nPlayerObjectShaders; i++) {
 		m_pPlayerObjectShaders[i].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-		m_pPlayerObjectShaders[i].BuildObjects(pd3dDevice, pd3dCommandList,XMFLOAT3(50,17.5,0));
+		m_pPlayerObjectShaders[i].BuildObjects(character_anim, pd3dDevice, pd3dCommandList,XMFLOAT3(50,17.5,0));
 	}
 
-	m_pMapShader = new CObjectsShader();
-	m_pMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	//m_pMapShader = new CObjectsShader();
+	//m_pMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	//Character_Model = new LoadModel("main_character.FBX", false);
 	m_pPlayer = new CPlayer(character_anim, pd3dDevice, pd3dCommandList);
 
