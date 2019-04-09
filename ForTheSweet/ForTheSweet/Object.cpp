@@ -27,6 +27,12 @@ void CGameObject::SetPosition(XMFLOAT3 xmf3Position)
 {
 	SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
+void CGameObject::SetScale(float value)
+{
+	m_xmf4x4World._11 *= value;
+	m_xmf4x4World._22 *= value;
+	m_xmf4x4World._33 *= value;
+}
 XMFLOAT3 CGameObject::GetPosition()
 {
 	return(XMFLOAT3(m_xmf4x4World._41, m_xmf4x4World._42, m_xmf4x4World._43));

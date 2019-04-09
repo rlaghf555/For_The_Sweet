@@ -56,6 +56,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//m_pMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	//Character_Model = new LoadModel("main_character.FBX", false);
 	m_pPlayer = new CPlayer(character_anim, pd3dDevice, pd3dCommandList);
+	m_pDModelShader = new DynamicModelShader(character_anim);
+	m_pDModelShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pDModelShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
 	Map_1_Model = new LoadModel("map_1.FBX", false);
 	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0, 0, 0));
@@ -135,6 +138,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
 	for (int i = 0; i < m_nPlayerObjectShaders; i++) m_pPlayerObjectShaders[i].AnimateObjects(fTimeElapsed);
+	m_pDModelShader->Animate(fTimeElapsed);
 }
 
 void CScene::CollisionProcess()
@@ -168,6 +172,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	{
 		m_pPlayerObjectShaders[i].Render(pd3dCommandList, pCamera);
 	}
+	if (m_pDModelShader)
+		m_pDModelShader->Render(pd3dCommandList, pCamera);
 	if(m_pMapShader)
 		m_pMapShader->Render(pd3dCommandList, pCamera);
 	if(Map)

@@ -26,6 +26,7 @@ public:
 	CPlayer						*m_pPlayer = NULL;
 	CPlayer*					getplayer() { return m_pPlayer; }
 	Model_Animation				*character_anim;
+	DynamicModelShader				 *m_pDModelShader = NULL;
 	LoadModel						*Map_1_Model;
 	CGameObject						*Map;
 protected:

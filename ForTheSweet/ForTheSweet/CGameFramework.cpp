@@ -274,6 +274,7 @@ void CGameFramework::LoadModels()
 	//character_animation.emplace_back(make_pair("./resource/character/walk.bip", 0));
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
+	//Character_Model->LodingModels(m_pd3dDevice, m_pd3dCommandList);
 }
 
 void CGameFramework::BuildObjects()

@@ -17,7 +17,7 @@ public:
 	void LodingModels(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	LoadModel* getModel() { return model; }
 	UINT getAnimCount() { return (UINT)animStack->size(); }
-	LoadAnimation** getAnim() { return animStack->data(); }
+	LoadAnimation** getAnim(UINT index) { return animStack[index].data(); }
 	wstring getMat(UINT index) {
 		return wstring(matList[index].begin(), matList[index].end());
 	}

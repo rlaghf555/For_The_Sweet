@@ -1,0 +1,29 @@
+﻿  stdafx.cpp
+  Animation.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\animation.cpp(33): warning C4244: '=': 'const double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\animation.cpp(67): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Camera.cpp
+  CGameFramework.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\physx.h(4): fatal error C1083: 포함 파일을 열 수 없습니다. 'PxPhysicsAPI.h': No such file or directory
+  D3DMath.cpp
+  D3DUtil.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\d3dutil.cpp(40): warning C4244: '인수': 'std::streamoff'에서 'SIZE_T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\d3dutil.cpp(81): warning C4244: '=': 'UINT64'에서 'LONG_PTR'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  ForTheSweet.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\physx.h(4): fatal error C1083: 포함 파일을 열 수 없습니다. 'PxPhysicsAPI.h': No such file or directory
+  Mesh.cpp
+  Model.cpp
+  ModelObject.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\modelobject.cpp(50): warning C4316: 'LoadAnimation': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+  Model_Animation.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\model_animation.cpp(20): warning C4316: 'LoadAnimation': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\model_animation.cpp(12): warning C4101: 'index' :참조되지 않은 지역 변수입니다.
+  Object.cpp
+  Physx.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\physx.h(4): fatal error C1083: 포함 파일을 열 수 없습니다. 'PxPhysicsAPI.h': No such file or directory
+  Player.cpp
+  Scene.cpp
+  Shader.cpp
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\shader.cpp(666): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\hol\desktop\졸업작품\for_the_sweet\forthesweet\forthesweet\shader.cpp(718): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Timer.cpp

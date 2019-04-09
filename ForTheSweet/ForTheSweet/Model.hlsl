@@ -1,3 +1,21 @@
+#define NUM_DIRECTION_LIGHTS 1
+
+cbuffer cbCameraInfo : register(b1)
+{
+	matrix gmtxView;
+	matrix gmtxProjection;
+	matrix gmtxInvProjection;
+	matrix gmtxShadowProjection[NUM_DIRECTION_LIGHTS];
+	float3 gvCameraPosition;
+};
+
+cbuffer cbAnimateInfo : register(b3)
+{
+	matrix      gmtxObject;
+	matrix      gBoneTransforms[96];
+	uint      gnMat;
+}
+
 struct VS_MODEL_INPUT
 {
 	float3 position : POSITION;
@@ -30,11 +48,11 @@ VS_MODEL_TEXTURED_OUTPUT VSDynamicModel(VS_MODEL_INPUT input)
 {
 	VS_MODEL_TEXTURED_OUTPUT output;
 
-	float3	posL = float3(0.0f, 0.0f, 0.0f);
-	float3	normalL = float3(0.0f, 0.0f, 0.0f);
-	float3	tanL = float3(0.0f, 0.0f, 0.0f);
-	float	weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	
+	float3   posL = float3(0.0f, 0.0f, 0.0f);
+	float3   normalL = float3(0.0f, 0.0f, 0.0f);
+	float3   tanL = float3(0.0f, 0.0f, 0.0f);
+	float   weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
 	weights[0] = input.weight.x;
 	weights[1] = input.weight.y;
 	weights[2] = input.weight.z;
@@ -53,14 +71,15 @@ VS_MODEL_TEXTURED_OUTPUT VSDynamicModel(VS_MODEL_INPUT input)
 	for (int j = 0; j < NUM_DIRECTION_LIGHTS; j++)
 		output.ShadowPosH[j] = mul(float4(output.positionW, 1.0f), gmtxShadowProjection[j]);
 	output.uv = input.uv;
-	
+
 	return(output);
 };
 
-PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input)	//, uint nPrimitiveID : SV_PrimitiveID)
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
 {
 	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
-	
+
+	/*
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
 	float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
 	input.normalW = normalize(input.normalW);
@@ -69,6 +88,6 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input)
 	output.nrmoutline = float4(input.normalW, 1.0f);
 	output.nrm = output.nrmoutline;
 	output.pos = float4(input.positionW, 1.0f);
-
+	*/
 	return (output);
 };

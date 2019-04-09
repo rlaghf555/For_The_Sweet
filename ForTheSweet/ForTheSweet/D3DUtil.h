@@ -24,7 +24,7 @@
 //#include "DDSTextureLoader12.h"
 #include "D3DMath.h"
 
-/*
+
 enum SRVRegisterNumber { 
 	SRVTexArray						= 0,
 	SRVInstanceData					= 1, 
@@ -89,19 +89,11 @@ enum RTVType {
 	RTV_HDR
 };
 
-enum MonType { 
-	MON_GOLEM	= 0, 
-	MON_GHOST	= 2, 
-	MON_RHINO	= 3, 
-	MON_ARM		= 4, 
-	MON_SKULL	= 5, 
-	MON_RICH	= 6, 
-	MON_MUTANT	= 7 
-};
-
-*/
-
+extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern const int gNumFrameResources;
+
+#define PSO_OBJECT					0
+#define PSO_SHADOWMAP				1
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
