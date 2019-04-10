@@ -85,7 +85,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input,
 	input.normalW = normalize(input.normalW);
 	*/
 
-	output.color = float4(0.5, 0.5, 0.5, 1);
+	output.color = float(1, 0, 0, 1);
 	output.nrmoutline = float4(0, 0, 0, 0);
 	output.nrm = output.nrmoutline;
 	output.pos = float4(input.positionW, 1.0f);

@@ -158,6 +158,8 @@ public:
 
 	virtual D3D12_INPUT_LAYOUT_DESC		CreateInputLayout(int index = 0);
 
+	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
+		*pd3dGraphicsRootSignature);
 	virtual void CreateCbvAndSrvDescriptorHeaps(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, int nShaderResourceViews, bool bIsGraphics = true);
 	virtual void CreateConstantBufferViews(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, ID3D12Resource * pd3dConstantBuffers, UINT nStride);
 	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
@@ -168,6 +170,7 @@ public:
 	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int index);
 
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int index);
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void ReleaseShaderVariables();

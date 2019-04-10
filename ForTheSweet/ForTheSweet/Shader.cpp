@@ -192,6 +192,7 @@ void CShader::ReleaseShaderVariables()
 
 void CShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList)
 {
+	
 	//파이프라인에 그래픽스 상태 객체를 설정한다.
 	pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[0]);
 }
@@ -422,6 +423,26 @@ CModelShader::~CModelShader()
 {
 }
 
+void CModelShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int index)
+{
+	if (m_RootSignature[index])
+		pd3dCommandList->SetGraphicsRootSignature(m_RootSignature[index].Get());
+
+	if (m_pPSO[index])
+		pd3dCommandList->SetPipelineState(m_pPSO[index].Get());
+
+	pd3dCommandList->SetDescriptorHeaps(1, m_CbvSrvDescriptorHeap.GetAddressOf());
+
+	UpdateShaderVariables(pd3dCommandList);
+}
+
+void CModelShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature*pd3dGraphicsRootSignature)
+{
+	m_nPipelineStates = 1;
+	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
+	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+}
+
 D3D12_INPUT_LAYOUT_DESC CModelShader::CreateInputLayout(int index)
 {
 	D3D12_INPUT_LAYOUT_DESC inputLayout;
@@ -519,7 +540,7 @@ void CModelShader::BuildPSO(ID3D12Device * pd3dDevice, UINT nRenderTargets, int 
 D3D12_SHADER_BYTECODE CModelShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
 {
 	wchar_t filename[100] = L"Model.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "VSDynamicModel", "vs_5_0", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(filename, "VSDynamicModel", "vs_5_1", ppd3dShaderBlob));
 	/*
 	D3D12_SHADER_BYTECODE byteCode;
 	::ZeroMemory(&byteCode, sizeof(D3D12_SHADER_BYTECODE));
@@ -537,7 +558,7 @@ D3D12_SHADER_BYTECODE CModelShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob
 {
 
 	wchar_t filename[100] = L"Model.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "PSDynamicModel", "ps_5_0", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(filename, "PSDynamicModel", "ps_5_1", ppd3dShaderBlob));
 	/*
 	D3D12_SHADER_BYTECODE byteCode;
 	::ZeroMemory(&byteCode, sizeof(D3D12_SHADER_BYTECODE));
@@ -652,7 +673,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
 {
-	//CShader::OnPrepareRender(pd3dCommandList);
+	CModelShader::OnPrepareRender(pd3dCommandList, PSO_OBJECT);
 	//CShader::Render(pd3dCommandList, pCamera);
 
 	//if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
@@ -660,7 +681,10 @@ void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera *
 	for (UINT j = 0; j < m_nObjects; j++)
 	{
 		if (m_bbObjects[j])
+		{
+			UpdateShaderVariables(pd3dCommandList);
 			m_bbObjects[j]->Render(pd3dCommandList, pCamera);
+		}
 	}
 }
 
@@ -919,10 +943,10 @@ void DynamicModelShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dC
 	CB_DYNAMICOBJECT_INFO cBone;
 	for (UINT i = 0; i < m_nObjects; ++i) {
 		//cBone.m_xmf4x4World = m_ppObjects[i]->m_xmf4x4World;
-		XMStoreFloat4x4(&cBone.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[i]->m_xmf4x4World)));
+		XMStoreFloat4x4(&cBone.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World)));
 		cBone.m_nMaterial = 0;
 
-		memcpy(cBone.m_bone, m_ppObjects[i]->GetBoneData(), sizeof(XMFLOAT4X4) * m_ppObjects[i]->GetBoneNum());
+		memcpy(cBone.m_bone, m_bbObjects[i]->GetBoneData(), sizeof(XMFLOAT4X4) * m_bbObjects[i]->GetBoneNum());
 
 		m_BoneCB->CopyData(i, cBone);
 	}
@@ -930,11 +954,8 @@ void DynamicModelShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dC
 
 void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
 {
-	
 	m_nPSO = 1;
 	CreatePipelineParts();
-
-
 
 	m_nObjects = 1;
 	m_bbObjects = new ModelObject*[m_nObjects];
@@ -965,7 +986,6 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	//tmp->SetPosition(XMFLOAT3(0, 0, 0));
 	player->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 	m_bbObjects[0] = player;
-
 }
 
 void DynamicModelShader::Animate(float fTimeElapsed)

@@ -59,7 +59,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 
 	m_pDModelShader = new DynamicModelShader(character_anim);
-	m_pDModelShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	//m_pDModelShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pDModelShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
 	Map_1_Model = new LoadModel("map_1.FBX", false);
