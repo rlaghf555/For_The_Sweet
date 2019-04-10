@@ -583,7 +583,7 @@ void CModelShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommand
 {
 	CB_GAMEOBJECT_INFO cBuffer;
 	for (UINT i = 0; i < m_nObjects; ++i) {
-		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[i]->m_xmf4x4World)));
+		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World)));
 		cBuffer.m_nMaterial = 0;
 		m_ObjectCB->CopyData(i, cBuffer);
 	}
@@ -627,7 +627,8 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	//m_PSByteCode[0] = CompiledShaders::Instance()->GetCompiledShader(L"Model.hlsl", nullptr, "PSStaticModel", "ps_5_0");
 
 	m_nObjects = 0;
-	m_ppObjects = vector<CGameObject*>(m_nObjects);
+	m_bbObjects = new ModelObject*[m_nObjects];
+	//m_ppObjects = vector<CGameObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -658,8 +659,8 @@ void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera *
 
 	for (UINT j = 0; j < m_nObjects; j++)
 	{
-		if (m_ppObjects[j])
-			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		if (m_bbObjects[j])
+			m_bbObjects[j]->Render(pd3dCommandList, pCamera);
 	}
 }
 
@@ -668,15 +669,15 @@ void CModelShader::Animate(float fTimeElapsed)
 	if (IsZero(fTimeElapsed))
 		return;
 	for (UINT i = 0; i < m_nObjects; ++i) {
-		if (m_ppObjects[i])
-			m_ppObjects[i]->Animate(fTimeElapsed);
+		if (m_bbObjects[i])
+			m_bbObjects[i]->Animate(fTimeElapsed);
 	}
 }
 
 void CModelShader::setScale(float scale)
 {
 	for (int i = 0; i < m_nObjects; ++i) {
-		m_ppObjects[i]->SetScale(scale);
+		m_bbObjects[i]->SetScale(scale);
 	}
 }
 
@@ -688,11 +689,11 @@ D3D12_INPUT_LAYOUT_DESC CPlayerObjectsShader::CreateInputLayout()
 
 	//정점 정보를 위한 입력 원소이다.
 	//pd3dInputElementDescs[0] = { "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 0,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	//pd3dInputElementDescs[1] = { "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	//pd3dInputElementDescs[2] = { "TANGENT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[1] = { "NORMAL",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[2] = { "TANGENT",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	//pd3dInputElementDescs[3] = { "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	//pd3dInputElementDescs[4] = { "BORNINDEX",	0, DXGI_FORMAT_R32G32B32A32_UINT,	0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	//pd3dInputElementDescs[5] = { "WEIGHT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 60, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[5] = { "WEIGHT",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 60, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	//pd3dInputElementDescs[6] = { "TEXINDEX",	0, DXGI_FORMAT_R32_UINT,			0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
@@ -933,8 +934,10 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	m_nPSO = 1;
 	CreatePipelineParts();
 
+
+
 	m_nObjects = 1;
-	m_ppObjects = vector<CGameObject*>(m_nObjects);
+	m_bbObjects = new ModelObject*[m_nObjects];
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 1);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -955,9 +958,13 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	*/
 	CPlayer* player = new CPlayer(model_anim, pd3dDevice, pd3dCommandList);
 	player->SetAnimations(model_anim->getAnimCount(), model_anim->getAnim(0));
+
+	//cout << "애니 갯수 : " << model_anim->getAnimCount() << endl;
+	//cout << "뼈 : " << model_anim-> << endl;
+
 	//tmp->SetPosition(XMFLOAT3(0, 0, 0));
 	player->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
-	m_ppObjects[0] = player;
+	m_bbObjects[0] = player;
 
 }
 

@@ -8,6 +8,7 @@
 struct CB_GAMEOBJECT_INFO
 {
 	XMFLOAT4X4 m_xmf4x4World;
+	XMFLOAT4X4		m_bone[22];
 	UINT		m_nMaterial = 0;
 };
 
@@ -91,10 +92,12 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 protected:
 	vector<CGameObject* >	m_ppModelObjects;
-	vector<ModelObject* >	m_bbObjects;
+	vector<ModelObject* >	m_bbModelObjects;
 	CGameObject **m_ppObjects = NULL;
+	ModelObject **m_bbObjects = NULL;
 	int m_nObjects = 0;
 };
+
 class CModelShader : public CObjectsShader {
 protected:
 	UINT				modelIndex;

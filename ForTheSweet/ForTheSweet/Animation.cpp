@@ -78,6 +78,9 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 		}
 		return LOOP_END; //애니메이션이 한 루프 끝남
 	}
+
+	cout << "현재 : " << now_time << ", " << "총 시간 : " << end_time << endl;
+
 	if (now_time > trigger_time - 1 && now_time < trigger_time + 1) {
 		return LOOP_TRIGGER;
 	}

@@ -202,6 +202,8 @@ void LoadModel::SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 {
+	cout << pMesh->mNumBones << endl;
+
 	for (UINT i = 0; i < pMesh->mNumBones; ++i) {
 		int BoneIndex = -1;
 		const aiBone* pBone = pMesh->mBones[i];

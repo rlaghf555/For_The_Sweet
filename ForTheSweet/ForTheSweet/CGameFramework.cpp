@@ -588,7 +588,7 @@ void CGameFramework::MoveToNextFrame()
 //#define _WITH_PLAYER_TOP
 void CGameFramework::FrameAdvance()
 {
-	m_GameTimer.Tick(0.0f);
+	m_GameTimer.Tick(60.0f);
 	
 	ProcessInput();
 

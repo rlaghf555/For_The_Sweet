@@ -10,7 +10,7 @@ Model_Animation::Model_Animation(string Model_filename , vector<pair<string, flo
 {
 	UINT animCount;
 	UINT index;
-	model = new LoadModel(Model_filename.c_str(), true);
+	model = new LoadModel(Model_filename.c_str(), false);
 	animStack = new vector<LoadAnimation*>; //애니메이션을 적재할 벡터 생성
 
 	animCount = Animation_filename->size();
