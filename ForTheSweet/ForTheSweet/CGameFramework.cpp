@@ -269,11 +269,11 @@ void CGameFramework::CreateDepthStencilView()
 void CGameFramework::LoadModels()
 {
 	vector<pair<string, float>> character_animation;
-	character_animation.emplace_back(make_pair("./resource/character/main_character.FBX", 0));
+	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));
 	//character_animation.emplace_back(make_pair("./resource/character/stay.bip", 0));
 	//character_animation.emplace_back(make_pair("./resource/character/walk.bip", 0));
 
-	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
+	Character_Model = new Model_Animation("./resource/character/weak_attack_3.FBX", &character_animation);
 	//Character_Model->LodingModels(m_pd3dDevice, m_pd3dCommandList);
 }
 
