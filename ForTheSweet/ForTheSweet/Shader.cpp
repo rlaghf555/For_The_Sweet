@@ -425,8 +425,8 @@ CModelShader::~CModelShader()
 
 void CModelShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int index)
 {
-	//if (m_RootSignature[index])
-	//	pd3dCommandList->SetGraphicsRootSignature(m_RootSignature[index].Get());
+	if (m_RootSignature[index])
+		pd3dCommandList->SetGraphicsRootSignature(m_RootSignature[index].Get());
 
 	if (m_pPSO[index])
 		pd3dCommandList->SetPipelineState(m_pPSO[index].Get());

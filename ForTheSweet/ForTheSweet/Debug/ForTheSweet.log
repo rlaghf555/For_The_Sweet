@@ -1,6 +1,2 @@
-﻿  Scene.cpp
-  Shader.cpp
-c:\users\kyh\desktop\test2\for_the_sweet\forthesweet\forthesweet\shader.cpp(705): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\kyh\desktop\test2\for_the_sweet\forthesweet\forthesweet\shader.cpp(757): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-  코드를 생성하고 있습니다...
+﻿  Camera.cpp
   ForTheSweet.vcxproj -> C:\Users\KYH\Desktop\test2\For_The_Sweet\ForTheSweet\Debug\ForTheSweet.exe
