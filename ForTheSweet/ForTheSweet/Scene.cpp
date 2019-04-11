@@ -36,7 +36,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//m_pInstancingShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	//m_pInstancingShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
 
-	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+	//m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 	/*
 	m_nMapShader = 1;
 	m_pMapShader = new CObjectsShader[m_nMapShader];
@@ -45,27 +45,109 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 	*/
 	
-	m_nPlayerObjectShaders = 1;
-	m_pPlayerObjectShaders = new CPlayerObjectsShader[m_nPlayerObjectShaders];
-	for (int i = 0; i < m_nPlayerObjectShaders; i++) {
-		m_pPlayerObjectShaders[i].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-		m_pPlayerObjectShaders[i].BuildObjects(character_anim, pd3dDevice, pd3dCommandList,XMFLOAT3(50,17.5,0));
-	}
+	//m_nPlayerObjectShaders = 1;
+	//m_pPlayerObjectShaders = new CPlayerObjectsShader[m_nPlayerObjectShaders];
+	//for (int i = 0; i < m_nPlayerObjectShaders; i++) {
+	//	m_pPlayerObjectShaders[i].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	//	m_pPlayerObjectShaders[i].BuildObjects(character_anim, pd3dDevice, pd3dCommandList,XMFLOAT3(50,17.5,0));
+	//}
 
 	//m_pMapShader = new CObjectsShader();
 	//m_pMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	//Character_Model = new LoadModel("main_character.FBX", false);
-	m_pPlayer = new CPlayer(character_anim, pd3dDevice, pd3dCommandList);
+
+	BuildRootSignature(pd3dDevice, pd3dCommandList);
+	//CreateShaderVariables(pDevice, pCommandList);
+
+	//m_pPlayer = new CPlayer(character_anim, pd3dDevice, pd3dCommandList);
 
 
 	m_pDModelShader = new DynamicModelShader(character_anim);
 	//m_pDModelShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_pDModelShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
-	Map_1_Model = new LoadModel("map_1.FBX", false);
-	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0, 0, 0));
-	XMFLOAT3 a = XMFLOAT3(1.f, 0.f, 0.f);
-	Map->Rotate(&a, 90.f);
+	m_pPlayer = m_pDModelShader->m_player;
+
+	//Map_1_Model = new LoadModel("map_1.FBX", false);
+	//Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0, 0, 0));
+	//XMFLOAT3 a = XMFLOAT3(1.f, 0.f, 0.f);
+	//Map->Rotate(&a, 90.f);
+}
+
+void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
+{
+	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[2];
+
+	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	pd3dDescriptorRanges[0].NumDescriptors = 1;
+	pd3dDescriptorRanges[0].BaseShaderRegister = 2; //Game Objects
+	pd3dDescriptorRanges[0].RegisterSpace = 0;
+	pd3dDescriptorRanges[0].OffsetInDescriptorsFromTableStart = 0;
+
+	pd3dDescriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	pd3dDescriptorRanges[1].NumDescriptors = 1;
+	pd3dDescriptorRanges[1].BaseShaderRegister = 0; //Texture2DArray
+	pd3dDescriptorRanges[1].RegisterSpace = 0;
+	pd3dDescriptorRanges[1].OffsetInDescriptorsFromTableStart = 0;
+
+	D3D12_ROOT_PARAMETER pd3dRootParameters[5];
+
+	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	pd3dRootParameters[0].Descriptor.ShaderRegister = CBVCameraInfo; //Camera
+	pd3dRootParameters[0].Descriptor.RegisterSpace = 0;
+	pd3dRootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	pd3dRootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[1].DescriptorTable.pDescriptorRanges = &pd3dDescriptorRanges[0]; //Game Objects
+	pd3dRootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	pd3dRootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	pd3dRootParameters[2].Descriptor.ShaderRegister = CBVMaterial; //Materials
+	pd3dRootParameters[2].Descriptor.RegisterSpace = 0;
+	pd3dRootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	pd3dRootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	pd3dRootParameters[3].Descriptor.ShaderRegister = CBVLights; //Lights
+	pd3dRootParameters[3].Descriptor.RegisterSpace = 0;
+	pd3dRootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	pd3dRootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[4].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[4].DescriptorTable.pDescriptorRanges = &pd3dDescriptorRanges[1]; //Texture2DArray
+	pd3dRootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	D3D12_STATIC_SAMPLER_DESC d3dSamplerDesc;
+	::ZeroMemory(&d3dSamplerDesc, sizeof(D3D12_STATIC_SAMPLER_DESC));
+	d3dSamplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	d3dSamplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	d3dSamplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	d3dSamplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	d3dSamplerDesc.MipLODBias = 0;
+	d3dSamplerDesc.MaxAnisotropy = 1;
+	d3dSamplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	d3dSamplerDesc.MinLOD = 0;
+	d3dSamplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+	d3dSamplerDesc.ShaderRegister = 0;
+	d3dSamplerDesc.RegisterSpace = 0;
+	d3dSamplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	D3D12_ROOT_SIGNATURE_FLAGS d3dRootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+	D3D12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc;
+	::ZeroMemory(&d3dRootSignatureDesc, sizeof(D3D12_ROOT_SIGNATURE_DESC));
+	d3dRootSignatureDesc.NumParameters = _countof(pd3dRootParameters);
+	d3dRootSignatureDesc.pParameters = pd3dRootParameters;
+	d3dRootSignatureDesc.NumStaticSamplers = 1;
+	d3dRootSignatureDesc.pStaticSamplers = &d3dSamplerDesc;
+	d3dRootSignatureDesc.Flags = d3dRootSignatureFlags;
+
+	ID3DBlob *pd3dSignatureBlob = NULL;
+	ID3DBlob *pd3dErrorBlob = NULL;
+	D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pd3dSignatureBlob, &pd3dErrorBlob);
+
+	ThrowIfFailed(pDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(), pd3dSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_pd3dGraphicsRootSignature)));
+	if (pd3dSignatureBlob) pd3dSignatureBlob->Release();
+	if (pd3dErrorBlob) pd3dErrorBlob->Release();
 }
 
 void CScene::ReleaseObjects()
@@ -160,24 +242,26 @@ void CScene::CollisionProcess()
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	//pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 //	for (int i = 0; i < m_nMapShader; i++) {
 //		m_pMapShader[i].Render(pd3dCommandList, pCamera);
 //	}
-	for (int i = 0; i < m_nInstancingShaders; i++)
-	{
-		m_pInstancingShaders[i].Render(pd3dCommandList, pCamera);
-	}
-	for (int i = 0; i < m_nPlayerObjectShaders; i++)
-	{
-		m_pPlayerObjectShaders[i].Render(pd3dCommandList, pCamera);
-	}
+	//for (int i = 0; i < m_nInstancingShaders; i++)
+	//{
+	//	m_pInstancingShaders[i].Render(pd3dCommandList, pCamera);
+	//}
+	//for (int i = 0; i < m_nPlayerObjectShaders; i++)
+	//{
+	//	m_pPlayerObjectShaders[i].Render(pd3dCommandList, pCamera);
+	//}
+
 	if (m_pDModelShader)
 		m_pDModelShader->Render(pd3dCommandList, pCamera);
-	if(m_pMapShader)
-		m_pMapShader->Render(pd3dCommandList, pCamera);
-	if(Map)
-		Map->Render(pd3dCommandList, pCamera);
+	//if(m_pMapShader)
+	//	m_pMapShader->Render(pd3dCommandList, pCamera);
+	//if(Map)
+	//	Map->Render(pd3dCommandList, pCamera);
 }

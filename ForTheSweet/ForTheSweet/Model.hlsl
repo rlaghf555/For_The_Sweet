@@ -1,13 +1,25 @@
 #define NUM_DIRECTION_LIGHTS 1
 
+//SamplerState gDefaultSamplerState : register(s0);
+
+cbuffer cbPerObject : register(b0)
+{
+	float4x4 gWorldViewProj;
+};
+
 cbuffer cbCameraInfo : register(b1)
 {
 	matrix gmtxView;
 	matrix gmtxProjection;
 	matrix gmtxInvProjection;
-	matrix gmtxShadowProjection[NUM_DIRECTION_LIGHTS];
 	float3 gvCameraPosition;
 };
+
+cbuffer cbObjectInfo : register(b2)
+{
+	matrix		gmtxGameObject : packoffset(c0);
+	uint			gnMaterial : packoffset(c4);
+}
 
 cbuffer cbAnimateInfo : register(b3)
 {
@@ -31,7 +43,6 @@ struct VS_MODEL_TEXTURED_OUTPUT
 {
 	float4 position : SV_POSITION;
 	float3 positionW : POSITION;
-	float4 ShadowPosH[NUM_DIRECTION_LIGHTS] : POSITION1;
 	float3 normalW : NORMAL;
 	float2 uv : TEXCOORD;
 };
@@ -68,8 +79,6 @@ VS_MODEL_TEXTURED_OUTPUT VSDynamicModel(VS_MODEL_INPUT input)
 	output.normalW = mul(normalL, (float3x3)gmtxObject);
 	output.positionW = (float3)mul(float4(posL, 1.0f), gmtxObject);
 	output.position = mul(mul(mul(float4(posL, 1.0f), gmtxObject), gmtxView), gmtxProjection);
-	for (int j = 0; j < NUM_DIRECTION_LIGHTS; j++)
-		output.ShadowPosH[j] = mul(float4(output.positionW, 1.0f), gmtxShadowProjection[j]);
 	output.uv = input.uv;
 
 	return(output);
@@ -79,14 +88,15 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input,
 {
 	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
 
-	/*
-	float3 uvw = float3(input.uv, nPrimitiveID / 2);
-	float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	
+	//float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	//float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	
 	input.normalW = normalize(input.normalW);
-	*/
+	
 
-	output.color = float(1, 0, 0, 1);
-	output.nrmoutline = float4(0, 0, 0, 0);
+	output.color = float4(1, 1, 1, 1);
+	output.nrmoutline = float4(input.normalW, 1.0f);
 	output.nrm = output.nrmoutline;
 	output.pos = float4(input.positionW, 1.0f);
 	

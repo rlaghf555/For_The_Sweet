@@ -248,7 +248,7 @@ void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComma
 {
 	if (Object_Kind == OBJECT_MAP) {
 		m_nObjects = 1;
-		m_ppObjects = new CGameObject*[m_nObjects];
+		m_ppObjects = vector<CGameObject*>(m_nObjects);
 
 		CGameObject *Map_Object = NULL;
 
@@ -267,14 +267,14 @@ void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComma
 
 void CObjectsShader::ReleaseObjects()
 {
-	if (m_ppObjects)
-	{
-		for (int j = 0; j < m_nObjects; j++)
-		{
-			if (m_ppObjects[j]) delete m_ppObjects[j];
-		}
-		delete[] m_ppObjects;
-	}
+	//if (m_ppObjects.size())
+	//{
+	//	for (int j = 0; j < m_nObjects; j++)
+	//	{
+	//		if (m_ppObjects[j]) delete m_ppObjects[j];
+	//	}
+	//	delete[] m_ppObjects;
+	//}
 }
 
 void CObjectsShader::AnimateObjects(float fTimeElapsed)
@@ -287,10 +287,10 @@ void CObjectsShader::AnimateObjects(float fTimeElapsed)
 
 void CObjectsShader::ReleaseUploadBuffers()
 {
-	if (m_ppObjects)
-	{
-		for (int j = 0; j < m_nObjects; j++) m_ppObjects[j]->ReleaseUploadBuffers();
-	}
+	//if (m_ppObjects)
+	//{
+	//	for (int j = 0; j < m_nObjects; j++) m_ppObjects[j]->ReleaseUploadBuffers();
+	//}
 }
 
 void CObjectsShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
@@ -374,7 +374,7 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 {
 	int xObjects = 1, yObjects = 1, zObjects = 1, i = 0;
 	m_nObjects = (xObjects * 2 + 1) * (yObjects * 2 + 1) * (zObjects * 2 + 1);
-	m_ppObjects = new CGameObject*[m_nObjects];
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
 	float fxPitch = 12.0f * 2.5f;
 	float fyPitch = 12.0f * 2.5f;
 	float fzPitch = 12.0f * 2.5f;
@@ -425,8 +425,8 @@ CModelShader::~CModelShader()
 
 void CModelShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int index)
 {
-	if (m_RootSignature[index])
-		pd3dCommandList->SetGraphicsRootSignature(m_RootSignature[index].Get());
+	//if (m_RootSignature[index])
+	//	pd3dCommandList->SetGraphicsRootSignature(m_RootSignature[index].Get());
 
 	if (m_pPSO[index])
 		pd3dCommandList->SetPipelineState(m_pPSO[index].Get());
@@ -647,11 +647,11 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	//m_VSByteCode[0] = CompiledShaders::Instance()->GetCompiledShader(L"Model.hlsl", nullptr, "VSStaticModel", "vs_5_0");
 	//m_PSByteCode[0] = CompiledShaders::Instance()->GetCompiledShader(L"Model.hlsl", nullptr, "PSStaticModel", "ps_5_0");
 
-	m_nObjects = 0;
-	m_bbObjects = new ModelObject*[m_nObjects];
+	m_nObjects = 1;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
 	//m_ppObjects = vector<CGameObject*>(m_nObjects);
 
-	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 1);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
 	CreateGraphicsRootSignature(pd3dDevice);
@@ -673,8 +673,8 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
 {
-	CModelShader::OnPrepareRender(pd3dCommandList, PSO_OBJECT);
-	//CShader::Render(pd3dCommandList, pCamera);
+	CModelShader::OnPrepareRender(pd3dCommandList, 0);
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 
 	//if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
 
@@ -682,8 +682,10 @@ void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera *
 	{
 		if (m_bbObjects[j])
 		{
-			UpdateShaderVariables(pd3dCommandList);
+			//UpdateShaderVariables(pd3dCommandList);
 			m_bbObjects[j]->Render(pd3dCommandList, pCamera);
+			XMFLOAT3 pos = m_bbObjects[j]->GetPosition();
+			cout << "캐릭터 위치 : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
 		}
 	}
 }
@@ -958,7 +960,7 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	CreatePipelineParts();
 
 	m_nObjects = 1;
-	m_bbObjects = new ModelObject*[m_nObjects];
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 1);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -986,6 +988,7 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	//tmp->SetPosition(XMFLOAT3(0, 0, 0));
 	player->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 	m_bbObjects[0] = player;
+	m_player = player;
 }
 
 void DynamicModelShader::Animate(float fTimeElapsed)

@@ -162,11 +162,13 @@ void CGameObject::OnPrepareRender()
 
 void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
-	OnPrepareRender();
+	//OnPrepareRender();
 	//객체의 정보를 셰이더 변수(상수 버퍼)로 복사한다.
 	UpdateShaderVariables(pd3dCommandList);
-	if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
-	if (m_pMesh) m_pMesh->Render(pd3dCommandList);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(1, m_d3dCbvGPUDescriptorHandle);
+
+	//if (m_pShader) m_pShader->Render(pd3dCommandList, pCamera);
+	//if (m_pMesh) m_pMesh->Render(pd3dCommandList);
 	if (!m_ppMeshes.empty())
 	{
 		for (UINT i = 0; i < m_nMeshes; i++)

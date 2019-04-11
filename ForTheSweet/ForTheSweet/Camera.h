@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UploadBuffer.h"
+
 //카메라의 종류(모드: Mode)를 나타내는 상수를 다음과 같이 선언한다.
 #define THIRD_PERSON_CAMERA 0x03
 
@@ -9,8 +11,10 @@ class CPlayer;
 
 struct VS_CB_CAMERA_INFO
 {
-	XMFLOAT4X4 m_xmf4x4View;
-	XMFLOAT4X4 m_xmf4x4Projection;
+	XMFLOAT4X4						m_xmf4x4View;
+	XMFLOAT4X4						m_xmf4x4Projection;
+	XMFLOAT4X4						m_xmf4x4InvProjection;
+	XMFLOAT3						m_xmf3Position;
 };
 
 class CCamera
@@ -57,11 +61,21 @@ protected:
 	D3D12_RECT m_d3dScissorRect;
 	//카메라를 가지고 있는 플레이어에 대한 포인터이다.
 	CPlayer *m_pPlayer = NULL;
+
+	ComPtr<ID3D12DescriptorHeap>				m_SrvDescriptorHeap = nullptr;
+	ComPtr<ID3D12RootSignature>					m_RootSignature = nullptr;
+	unique_ptr<UploadBuffer<VS_CB_CAMERA_INFO>>	m_ObjectCB = nullptr;
+	VS_CB_CAMERA_INFO							*m_pcbMappedCamera;
+
 public:
 	CCamera();
 	CCamera(CCamera *pCamera);
 	virtual ~CCamera();
 	//카메라의 정보를 셰이더 프로그램에게 전달하기 위한 상수 버퍼를 생성하고 갱신한다.
+	virtual void InitCamera(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
+	virtual void BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
+	virtual void BuildDescriptorHeaps(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
+
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 		*pd3dCommandList);
 	virtual void ReleaseShaderVariables();

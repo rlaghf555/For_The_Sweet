@@ -27,7 +27,7 @@ CCamera::CCamera(CCamera *pCamera)
 	if (pCamera)
 	{
 		//카메라가 이미 있으면 기존 카메라의 정보를 새로운 카메라에 복사한다.
-		*this = *pCamera;
+		//*this = *pCamera;
 	}
 	else
 	{
@@ -235,29 +235,96 @@ void CCamera::RegenerateViewMatrix()
 	m_xmf4x4View._42 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Up);
 	m_xmf4x4View._43 = -Vector3::DotProduct(m_xmf3Position, m_xmf3Look);
 	
-	m_xmf4x4InverseView._11 = m_xmf3Right.x; m_xmf4x4InverseView._12 = m_xmf3Right.y; m_xmf4x4InverseView._13 = m_xmf3Right.z;
-	m_xmf4x4InverseView._21 = m_xmf3Up.x; m_xmf4x4InverseView._22 = m_xmf3Up.y; m_xmf4x4InverseView._23 = m_xmf3Up.z;
-	m_xmf4x4InverseView._31 = m_xmf3Look.x; m_xmf4x4InverseView._32 = m_xmf3Look.y; m_xmf4x4InverseView._33 = m_xmf3Look.z;
-	m_xmf4x4InverseView._41 = m_xmf3Position.x; m_xmf4x4InverseView._42 = m_xmf3Position.y; m_xmf4x4InverseView._43 = m_xmf3Position.z;
+	//m_xmf4x4InverseView._11 = m_xmf3Right.x; m_xmf4x4InverseView._12 = m_xmf3Right.y; m_xmf4x4InverseView._13 = m_xmf3Right.z;
+	//m_xmf4x4InverseView._21 = m_xmf3Up.x; m_xmf4x4InverseView._22 = m_xmf3Up.y; m_xmf4x4InverseView._23 = m_xmf3Up.z;
+	//m_xmf4x4InverseView._31 = m_xmf3Look.x; m_xmf4x4InverseView._32 = m_xmf3Look.y; m_xmf4x4InverseView._33 = m_xmf3Look.z;
+	//m_xmf4x4InverseView._41 = m_xmf3Position.x; m_xmf4x4InverseView._42 = m_xmf3Position.y; m_xmf4x4InverseView._43 = m_xmf3Position.z;
+	//
+	//m_xmFrustumView.Transform(m_xmFrustumWorld, XMLoadFloat4x4(&m_xmf4x4InverseView));
+}
 
-	m_xmFrustumView.Transform(m_xmFrustumWorld, XMLoadFloat4x4(&m_xmf4x4InverseView));
+
+void CCamera::InitCamera(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
+{
+	BuildDescriptorHeaps(pDevice, pCommandList);
+	CreateShaderVariables(pDevice, pCommandList);
+	BuildRootSignature(pDevice, pCommandList);
+}
+
+void CCamera::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+
+	CD3DX12_DESCRIPTOR_RANGE cbvTable;
+	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+	slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pDevice->CreateRootSignature(
+		0,
+		serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(m_RootSignature.GetAddressOf())));
+}
+void CCamera::BuildDescriptorHeaps(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
+{
+	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
+	cbvHeapDesc.NumDescriptors = 1;
+	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	cbvHeapDesc.NodeMask = 0;
+	ThrowIfFailed(pDevice->CreateDescriptorHeap(&cbvHeapDesc,
+		IID_PPV_ARGS(&m_SrvDescriptorHeap)));
 }
 
 void CCamera::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList	*pd3dCommandList)
 {
+	m_ObjectCB = make_unique<UploadBuffer<VS_CB_CAMERA_INFO>>(pd3dDevice, 1, true);
+
+	UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(VS_CB_CAMERA_INFO));
 }
 
 void CCamera::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	XMFLOAT4X4 xmf4x4View;
-	XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
-	//루트 파라메터 인덱스 1의
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4View, 0);
-	
-	XMFLOAT4X4 xmf4x4Projection;
-	XMStoreFloat4x4(&xmf4x4Projection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Projection)));
+	//XMFLOAT4X4 xmf4x4View;
+	//XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
+	////루트 파라메터 인덱스 1의
+	//pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4View, 0);
+	//
+	//XMFLOAT4X4 xmf4x4Projection;
+	//XMStoreFloat4x4(&xmf4x4Projection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Projection)));
+	//
+	//pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4Projection, 16);
 
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4Projection, 16);
+	RegenerateViewMatrix();
+
+	VS_CB_CAMERA_INFO cameraConstant;
+	XMStoreFloat4x4(&cameraConstant.m_xmf4x4View, 
+		DirectX::XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
+	XMStoreFloat4x4(&cameraConstant.m_xmf4x4Projection,
+		DirectX::XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Projection)));
+	XMStoreFloat4x4(&cameraConstant.m_xmf4x4InvProjection, 
+		DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_xmf4x4View))));
+
+	//for (int i = 0; i < NUM_DIRECTION_LIGHTS; ++i)
+	//	XMStoreFloat4x4(&cameraConstant.m_xmf4x4ShadowProjection[i], XMLoadFloat4x4(&m_xmf4x4ShadowProjection[i]));
+	::memcpy(&cameraConstant.m_xmf3Position, &m_xmf3Position, sizeof(XMFLOAT3));
+
+	m_ObjectCB->CopyData(0, cameraConstant);
+	pd3dCommandList->SetGraphicsRootConstantBufferView(0, m_ObjectCB->Resource()->GetGPUVirtualAddress());
 }
 
 void CCamera::ReleaseShaderVariables()

@@ -23,13 +23,13 @@ CPlayer::CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCo
 	m_pCameraUpdatedContext = NULL;
 
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
-	if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	if (m_pCamera) m_pCamera->InitCamera(pd3dDevice, pd3dCommandList);
 
 
 	//플레이어를 위한 셰이더 변수를 생성한다.
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	//플레이어의 위치를 설정한다.
-	XMFLOAT3 pposition = XMFLOAT3(0.0f, 0.0f, -50.0f);
+	XMFLOAT3 pposition = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	SetPosition(pposition);
 	   
 }
@@ -45,7 +45,7 @@ CPlayer::~CPlayer()
 void CPlayer::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList	*pd3dCommandList)
 {
 	CGameObject::CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	//if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void CPlayer::ReleaseShaderVariables()

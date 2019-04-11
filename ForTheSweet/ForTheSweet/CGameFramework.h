@@ -14,7 +14,7 @@ public:
 
 	//플레이어 객체에 대한 포인터이다.
 	CPlayer * m_pPlayer;
-	CCamera * m_pCamera;
+	CCamera* m_pCamera;
 	int My_ID = -1;
 	int time = 0; 
 	//마지막으로 마우스 버튼을 클릭할 때의 마우스 커서의 위치이다.

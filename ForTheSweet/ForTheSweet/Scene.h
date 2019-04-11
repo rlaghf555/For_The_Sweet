@@ -2,6 +2,7 @@
 #include "Timer.h"
 #include "Shader.h"
 #include "Player.h"
+#include "Camera.h"
 
 class CScene
 {
@@ -12,6 +13,7 @@ public:
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	void BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR *pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed);
@@ -29,6 +31,8 @@ public:
 	DynamicModelShader				 *m_pDModelShader = NULL;
 	LoadModel						*Map_1_Model;
 	CGameObject						*Map;
+	unique_ptr<CCamera>			m_Camera = nullptr;
+
 protected:
 	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다.
 	//CGameObject * *m_ppObjects = NULL;

@@ -8,7 +8,7 @@
 struct CB_GAMEOBJECT_INFO
 {
 	XMFLOAT4X4 m_xmf4x4World;
-	XMFLOAT4X4		m_bone[22];
+	XMFLOAT4X4		m_bone[96];
 	UINT		m_nMaterial = 0;
 };
 
@@ -91,15 +91,17 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 protected:
-	vector<CGameObject* >	m_ppModelObjects;
-	vector<ModelObject* >	m_bbModelObjects;
-	CGameObject **m_ppObjects = NULL;
-	ModelObject **m_bbObjects = NULL;
+	vector<CGameObject* >	m_ppObjects;
+	vector<ModelObject* >	m_bbObjects;
+	//CGameObject **m_ppObjects = NULL;
+	//ModelObject **m_bbObjects = NULL;
 	int m_nObjects = 0;
 };
 
 class CModelShader : public CObjectsShader {
 protected:
+
+
 	UINT				modelIndex;
 	ComPtr<ID3D12RootSignature>*					m_RootSignature = nullptr;
 	ComPtr<ID3D12RootSignature>*					m_ComputeRootSignature = nullptr;
@@ -116,7 +118,7 @@ protected:
 	ComPtr<ID3DBlob>*								m_CSByteCode = nullptr;
 
 	vector<D3D12_INPUT_ELEMENT_DESC>				m_pInputElementDesc;
-	vector<CGameObject* >							m_ppObjects;
+	//vector<CGameObject* >							m_ppObjects;
 	//CMaterial										*m_pMaterial = NULL;
 
 	UINT											m_nObjects = 0;
@@ -184,7 +186,7 @@ public:
 	virtual void setPosition(XMFLOAT3* pos, UINT num) {}
 	virtual UINT getRemainObjects() { return 0; }
 	virtual CGameObject** getObjects(UINT& num) { return nullptr; }
-	virtual CGameObject** getObjects() { return m_ppModelObjects.data(); }
+	//virtual CGameObject** getObjects() { return m_bbObjects.data(); }
 
 	void setScale(float scale);
 };
@@ -237,6 +239,8 @@ protected:
 	//UploadBuffer<MATERIALS>*						m_MatCB = nullptr;
 
 public:
+	CPlayer* m_player;
+
 	DynamicModelShader(Model_Animation *ma);
 	~DynamicModelShader();
 
