@@ -40,34 +40,34 @@ void CPhysx::move(DWORD direction, float distance)
 	{
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 		XMFLOAT3 xmf3Direction = XMFLOAT3(0, 0, 0);
-		XMFLOAT3 Look = XMFLOAT3(0, 0, 0);
+		//XMFLOAT3 Look = XMFLOAT3(0, 0, 0);
 
 		if (direction & DIR_FORWARD) {
-			Look.z = -1.f;
-			xmf3Direction = Look;
+		//	Look.z = -1.f;
+		//	xmf3Direction = Look;
 			xmf3Direction.z = 1.f;
 			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
 		}
 		if (direction & DIR_BACKWARD) {
-			Look.z = 1.f;
-			xmf3Direction = Look;
+		//	Look.z = 1.f;
+		//	xmf3Direction = Look;
 			xmf3Direction.z = -1.f;
 			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
 		}
 		//화살표 키 ‘→’를 누르면 로컬 x-축 방향으로 이동한다. ‘←’를 누르면 반대 방향으로 이동한다.
 		if (direction & DIR_RIGHT) {
-			Look.x = -1.f;
-			xmf3Direction = Look;
+		//	Look.x = -1.f;
+		//	xmf3Direction = Look;
 			xmf3Direction.x = 1.f;
 			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
 		}
 		if (direction & DIR_LEFT) {
-			Look.x = 1.f;
-			xmf3Direction = Look;
+		//	Look.x = 1.f;
+		//	xmf3Direction = Look;
 			xmf3Direction.x = -1.f;
 			xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
 		}
-
+		
 		PxVec3 disp;
 		disp.x = xmf3Shift.x;
 		disp.y = xmf3Shift.y;

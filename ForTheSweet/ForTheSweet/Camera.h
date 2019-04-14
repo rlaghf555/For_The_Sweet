@@ -124,6 +124,7 @@ public:
 		m_xmf3Position.x += xmf3Shift.x;
 		m_xmf3Position.y += xmf3Shift.y; m_xmf3Position.z += xmf3Shift.z;
 	}
+
 	//카메라를 x-축, y-축, z-축으로 회전하는 가상함수이다.
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f) { }
 	//카메라의 이동, 회전에 따라 카메라의 정보를 갱신하는 가상함수이다.

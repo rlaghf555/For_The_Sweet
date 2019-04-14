@@ -63,6 +63,7 @@ void ModelObject::Animate(float fTime)
 		if (m_AnimIndex < m_NumofAnim) {
 			//cout << "본 움직였다\n";
 			m_loopCheck = m_ani[m_AnimIndex]->BoneTransform(m_AnimIndex, fTime, m_Bones);
+			
 		}
 		
 	}

@@ -53,9 +53,9 @@ public:
 	
 	/*플레이어의 위치를 xmf3Position 위치로 설정한다. xmf3Position 벡터에서 현재 플레이어의 위치 벡터를 빼면 현
 	재 플레이어의 위치에서 xmf3Position 방향으로의 벡터가 된다. 현재 플레이어의 위치에서 이 벡터 만큼 이동한다.*/
-	void SetPosition(XMFLOAT3& xmf3Position) {
-		Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false);
-	}
+	//virtual void SetPosition(XMFLOAT3& xmf3Position) {
+	//	Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false);
+//	}
 
 	XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
 	float GetYaw() { return(m_fYaw); }
@@ -66,16 +66,16 @@ public:
 	void SetCamera(CCamera *pCamera) { m_pCamera = pCamera; }
 	
 	//플레이어를 이동하는 함수이다.
-	void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
-	void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false);
-	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f);
+	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
+	virtual void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false);
+	//virtual void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f);
 	
 	//플레이어를 회전하는 함수이다.
 	void Rotate(float x, float y, float z);
 	
 	//플레이어의 위치와 회전 정보를 경과 시간에 따라 갱신하는 함수이다.
-	void Update(float fTimeElapsed);
-	
+	virtual void Update(float fTimeElapsed);
+	virtual void SetLook(XMFLOAT3& xmf3Look) { m_xmf3Look = xmf3Look; }
 	//플레이어의 위치가 바뀔 때마다 호출되는 함수와 그 함수에서 사용하는 정보를 설정하는 함수이다.
 	virtual void OnPlayerUpdateCallback(float fTimeElapsed) { }
 	void SetPlayerUpdatedContext(LPVOID pContext) { m_pPlayerUpdatedContext = pContext; }

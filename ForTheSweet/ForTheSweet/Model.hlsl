@@ -102,3 +102,36 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input,
 	
 	return (output);
 };
+
+/*
+VS_MODEL_TEXTURED_OUTPUT VSStaticModel(VS_MODEL_INPUT input)
+{
+	VS_MODEL_TEXTURED_OUTPUT output;
+
+	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
+	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
+	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	for (int i = 0; i < NUM_DIRECTION_LIGHTS; i++)
+		output.ShadowPosH[i] = mul(float4(output.positionW, 1.0f), gmtxShadowProjection[i]);
+
+	output.uv = input.uv;
+
+	return(output);
+};
+
+// nPrimitiveID : 삼각형의 정보 
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStaticModel(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
+{
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
+	float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	//float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	input.normalW = normalize(input.normalW);
+
+	output.color = float4(0,1,0,1);
+	output.nrmoutline = float4(input.normalW, 1.0f);
+	output.nrm = output.nrmoutline;
+	output.pos = float4(input.positionW, 1.f);
+	return (output);
+};
+*/

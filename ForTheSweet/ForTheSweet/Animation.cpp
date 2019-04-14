@@ -3,7 +3,7 @@
 #include "Animation.h"
 
 LoadAnimation::LoadAnimation(string filename, float trigger, float skip) :
-	animation_loof(true), next_index(0), m_animSpeed(1.0f)
+	animation_loop(true), next_index(0), m_animSpeed(1.0f)
 {
 	m_pScene = aiImportFile(filename.c_str(), (aiProcessPreset_TargetRealtime_Quality | aiProcess_ConvertToLeftHanded) & ~aiProcess_FindInvalidData);
 
@@ -73,7 +73,7 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 	now_time += m_animSpeed * fTime;
 	if (now_time > end_time) {
 		now_time = start_time;
-		if (!animation_loof) {
+		if (!animation_loop) {
 			index = next_index;
 		}
 		return LOOP_END; //애니메이션이 한 루프 끝남

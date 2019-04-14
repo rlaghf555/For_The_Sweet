@@ -22,7 +22,7 @@ private:
 	float										now_time;  //현재 프레임
 	float										posible_skip; //애니메이션을 강제 종료하고 다음 애니메이션 실행 가능한 프레임
 	
-	BOOL									animation_loof;  //애니메이션 루프 여부 (기본은 true)
+	BOOL									animation_loop;  //애니메이션 루프 여부 (기본은 true)
 	BOOL									stop_anim = false;
 	UINT										next_index;
 
@@ -37,12 +37,12 @@ public:
 		m_Bones = *bones;
 		m_NumBones = (UINT)m_Bones.size();
 	}
-	void DisableLoof(UINT index) {
-		animation_loof = false;
+	void DisableLoop(UINT index) {
+		animation_loop = false;
 		next_index = index;
 	}
-	void EnableLoof() {
-		animation_loof = true;
+	void EnableLoop() {
+		animation_loop = true;
 	}
 	void StopAnim(bool stop) { stop_anim = stop; }
 

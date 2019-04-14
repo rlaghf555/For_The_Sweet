@@ -231,6 +231,7 @@ protected:
 	ID3D12Resource * m_pd3dcbGameObjects = NULL;
 	VS_VB_INSTANCE *m_pcbMappedGameObjects = NULL;
 };
+
 class DynamicModelShader : public CModelShader
 {
 protected:
@@ -249,10 +250,27 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Animate(float fTimeElapsed);
-
+	virtual  CGameObject* getPlayer() { return m_player; }
 	virtual CGameObject* getObject(int index) { return m_ppObjects[index]; }
 	virtual CGameObject** getObjects(UINT& num) {
 		num = m_nObjects;
 		return m_ppObjects.data();
 	}
+};
+
+class PlayerShader : public DynamicModelShader
+{
+private:
+	CCamera * m_Camera;
+public:
+	PlayerShader(Model_Animation *ma);
+	~PlayerShader();
+
+	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Animate(float fTimeElapsed);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList);
+
+	virtual  CGameObject* getPlayer() { return m_bbObjects[0]; }
+
 };

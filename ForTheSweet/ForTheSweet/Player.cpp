@@ -104,6 +104,8 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 	}
 }
 
+
+
 void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 {
 	//bUpdateVelocity가 참이면 플레이어를 이동하지 않고 속도 벡터를 변경한다.
@@ -120,8 +122,9 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 		//m_pCamera->Move(const_cast<XMFLOAT3&>(xmf3Shift));
 
 		XMFLOAT3 bb = xmf3Shift;
-
+		XMFLOAT3 pos = m_xmf3Position;
 		m_pCamera->Move(bb);
+
 	}
 }
 
@@ -182,13 +185,9 @@ void CPlayer::Rotate(float x, float y, float z)
 //이 함수는 매 프레임마다 호출된다. 플레이어의 속도 벡터에 중력과 마찰력 등을 적용한다.
 void CPlayer::Update(float fTimeElapsed)
 {
-	//Animate(fTimeElapsed);
-	/*플레이어의 속도 벡터를 중력 벡터와 더한다. 중력 벡터에 fTimeElapsed를 곱하는 것은 중력을 시간에 비례하도록
-	적용한다는 의미이다.*/
+	/*
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
-	
-	/*플레이어의 속도 벡터의 XZ-성분의 크기를 구한다. 이것이 XZ-평면의 최대 속력보다 크면 속도 벡터의 x와 z-방향
-	성분을 조정한다.*/
+
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	
 	float fMaxVelocityXZ = m_fMaxVelocityXZ * fTimeElapsed;
@@ -197,8 +196,7 @@ void CPlayer::Update(float fTimeElapsed)
 		m_xmf3Velocity.x *= (fMaxVelocityXZ / fLength);
 		m_xmf3Velocity.z *= (fMaxVelocityXZ / fLength);
 	}
-	/*플레이어의 속도 벡터의 y-성분의 크기를 구한다. 이것이 y-축 방향의 최대 속력보다 크면 속도 벡터의 y-방향 성
-	분을 조정한다.*/
+
 	float fMaxVelocityY = m_fMaxVelocityY * fTimeElapsed;
 	fLength = sqrtf(m_xmf3Velocity.y * m_xmf3Velocity.y);
 	if (fLength > m_fMaxVelocityY) m_xmf3Velocity.y *= (fMaxVelocityY / fLength);
@@ -206,9 +204,7 @@ void CPlayer::Update(float fTimeElapsed)
 	//플레이어를 속도 벡터 만큼 실제로 이동한다(카메라도 이동될 것이다).
 	Move(m_xmf3Velocity, false);
 	
-	/*플레이어의 위치가 변경될 때 추가로 수행할 작업을 수행한다. 플레이어의 새로운 위치가 유효한 위치가 아닐 수도
-	있고 또는 플레이어의 충돌 검사 등을 수행할 필요가 있다. 이러한 상황에서 플레이어의 위치를 유효한 위치로 다시
-	변경할 수 있다.*/
+	
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 	
 	
@@ -223,14 +219,11 @@ void CPlayer::Update(float fTimeElapsed)
 	//카메라의 카메라 변환 행렬을 다시 생성한다.
 	m_pCamera->RegenerateViewMatrix();
 	
-	/*플레이어의 속도 벡터가 마찰력 때문에 감속이 되어야 한다면 감속 벡터를 생성한다. 속도 벡터의 반대 방향 벡터를
-	구하고 단위 벡터로 만든다. 마찰 계수를 시간에 비례하도록 하여 마찰력을 구한다. 단위 벡터에 마찰력을 곱하여 감
-	속 벡터를 구한다. 속도 벡터에 감속 벡터를 더하여 속도 벡터를 줄인다. 마찰력이 속력보다 크면 속력은 0이 될 것이
-	다.*/
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+	*/
 }
 
 /*카메라를 변경할 때 ChangeCamera() 함수에서 호출되는 함수이다. nCurrentCameraMode는 현재 카메라의 모드
@@ -285,6 +278,7 @@ void CPlayer::OnPrepareRender()
 
 void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
+	OnPrepareRender();
 	DWORD nCameraMode = (pCamera) ? pCamera->GetMode() : 0x00;
 	//카메라 모드가 3인칭이면 플레이어 객체를 렌더링한다.
 	if (nCameraMode == THIRD_PERSON_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
@@ -307,7 +301,7 @@ CCamera *CPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 		m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA);
 		//3인칭 카메라의 지연 효과를 설정한다. 값을 0.25f 대신에 0.0f와 1.0f로 설정한 결과를 비교하기 바란다.
 		m_pCamera->SetTimeLag(0.25f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 60.f, -100.0f));
+		m_pCamera->SetOffset(XMFLOAT3(0.0f, 100.f, -150.0f));
 		m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
 		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);

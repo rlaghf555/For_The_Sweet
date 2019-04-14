@@ -18,8 +18,8 @@ public:
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetRight();
 	//게임 객체의 위치를 설정한다.
-	void SetPosition(float x, float y, float z);
-	void SetPosition(XMFLOAT3 xmf3Position);
+	virtual void SetPosition(float x, float y, float z);
+	virtual void SetPosition(XMFLOAT3& xmf3Position);
 	void SetScale(float value);
 	//게임 객체를 로컬 x-축, y-축, z-축 방향으로 이동한다.
 	void MoveStrafe(float fDistance = 1.0f);
@@ -27,6 +27,12 @@ public:
 	void MoveForward(float fDistance = 1.0f);
 	//게임 객체를 회전(x-축, y-축, z-축)한다.
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
+	//virtual void SetAnimations(UINT num, LoadAnimation** tmp) {}
+	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false) {}
+	virtual void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false) {}
+	virtual void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) {}
+	virtual CCamera* GetCamera() { return nullptr; }
+	virtual void Update(float fTimeElapsed) {}
 	virtual XMFLOAT4X4* GetBoneData() { return nullptr; }
 	virtual int GetBoneNum() const { return 0; }
 public:

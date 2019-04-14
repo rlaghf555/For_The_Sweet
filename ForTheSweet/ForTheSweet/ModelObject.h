@@ -32,7 +32,9 @@ public:
 	UINT getAnimLoop() const { return m_loopCheck; }
 	virtual void Animate(float fTime);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = nullptr);
-
+	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false) {}
+	virtual void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false) {}
+	virtual void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) {}
 	virtual XMFLOAT4X4* GetBoneData() {
 		return m_Bones.data();
 	}
@@ -45,5 +47,7 @@ public:
 	void stopAnim(bool stop);
 
 	virtual int getAnimIndex() { return m_AnimIndex; }
-
+	float getAnimtime() { return m_ani[m_AnimIndex]->getAnimTime(); }
+	void SetAnimFrame(float ftime) { m_ani[m_AnimIndex]->SetAnimFrame(ftime); }
+	void DisableLoop() { m_ani[m_AnimIndex]->DisableLoop(0); }
 };

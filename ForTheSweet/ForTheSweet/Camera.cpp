@@ -27,7 +27,7 @@ CCamera::CCamera(CCamera *pCamera)
 	if (pCamera)
 	{
 		//카메라가 이미 있으면 기존 카메라의 정보를 새로운 카메라에 복사한다.
-		//*this = *pCamera;
+		//this = pCamera;
 	}
 	else
 	{

@@ -269,11 +269,16 @@ void CGameFramework::CreateDepthStencilView()
 void CGameFramework::LoadModels()
 {
 	vector<pair<string, float>> character_animation;
-	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));
+	character_animation.emplace_back(make_pair("./resource/character/stay.FBX", 0));			//Anim_Idle
+	character_animation.emplace_back(make_pair("./resource/character/walk.FBX", 0));			//Anim_Walk
+	character_animation.emplace_back(make_pair("./resource/character/weak_attack_1.FBX", 0));	//Anim_Weak_Attack1
+	character_animation.emplace_back(make_pair("./resource/character/weak_attack_2.FBX", 0));	//Anim_Weak_Attack2
+	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));	//Anim_Weak_Attack3
+
 	//character_animation.emplace_back(make_pair("./resource/character/stay.bip", 0));
 	//character_animation.emplace_back(make_pair("./resource/character/walk.bip", 0));
 
-	Character_Model = new Model_Animation("./resource/character/weak_attack_3.FBX", &character_animation);
+	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	//Character_Model->LodingModels(m_pd3dDevice, m_pd3dCommandList);
 }
 
@@ -481,37 +486,41 @@ void CGameFramework::ProcessInput()
 	메시지(WM_LBUTTONDOWN, WM_RBUTTONDOWN)를 처리할 때 마우스를 캡쳐하였다. 그러므로 마우스가 캡쳐된
 	것은 마우스 버튼이 눌려진 상태를 의미한다. 마우스 버튼이 눌려진 상태에서 마우스를 좌우 또는 상하로 움직이면 플
 	레이어를 x-축 또는 y-축으로 회전한다.*/
-	if (dwDirection != 0)
-	{
-		float Player_Yaw = m_pPlayer->GetYaw();
-		if (dwDirection & DIR_FORWARD)
-			;
-		if (dwDirection & DIR_BACKWARD)
-			;
-		if (dwDirection & DIR_LEFT)
-			;
-		if (dwDirection & DIR_RIGHT)
-			;
+	bool d_move = false;
 
-	//	rotation = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
-		
-	}
+	int Anim_Index = m_pPlayer->getAnimIndex();
+	float Anim_Time = m_pPlayer->getAnimtime();
+
 	if (Key_A||Key_S) {
 
 		if (Key_A&&Key_S) {//둘다 눌리면 막기
 
 		}
 		else if (Key_A && !Key_S) { //약공격 or 줍기
-			//충돌체크 (무기 오브젝트랑) 충돌이면 줍기
-									
+			//충돌체크 (무기 오브젝트랑) 충돌이면 줍기		
+
 			//아니면 약공격
-					
+			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+				m_pPlayer->ChangeAnimation(Anim_Weak_Attack1);
+				m_pPlayer->DisableLoop();
+			}
+			if (Anim_Index == Anim_Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+				m_pPlayer->ChangeAnimation(Anim_Weak_Attack2);
+				m_pPlayer->SetAnimFrame(Anim_Time);
+				m_pPlayer->DisableLoop();
+			}
+			if (Anim_Index == Anim_Weak_Attack2 && (Anim_Time > 25 && Anim_Time < 34)) {
+				m_pPlayer->ChangeAnimation(Anim_Weak_Attack3);
+				m_pPlayer->SetAnimFrame(Anim_Time);
+				m_pPlayer->DisableLoop();
+			}
 		}
 		else if (!Key_A && Key_S) { //강공격 or 줍기
 			//충돌체크 (무기 오브젝트랑) 충돌이면 줍기
 
 			//아니면 강공격
 		}
+		d_move = true;
 	}
 
 	if (Key_D) { //무기 스킬
@@ -521,6 +530,7 @@ void CGameFramework::ProcessInput()
 	if (Key_F) { //강화 스킬
 	
 	}
+	
 	if (Key_Space) { //점프
 
 	}
@@ -528,10 +538,25 @@ void CGameFramework::ProcessInput()
 
 
 	}
+	if (d_move) return;
+	if (dwDirection != 0)
+	{
+		//float Player_Yaw = m_pPlayer->GetYaw();
+		if (dwDirection & DIR_FORWARD)
+			m_pPlayer->ChangeAnimation(Anim_Walk);
+		if (dwDirection & DIR_BACKWARD)
+			m_pPlayer->ChangeAnimation(Anim_Walk);
+		if (dwDirection & DIR_LEFT)
+			m_pPlayer->ChangeAnimation(Anim_Walk);
+		if (dwDirection & DIR_RIGHT)
+			m_pPlayer->ChangeAnimation(Anim_Walk);	
+	}
+	else if(Anim_Index==Anim_Walk)
+	m_pPlayer->ChangeAnimation(Anim_Idle);
+
 	//마우스 또는 키 입력이 있으면 플레이어를 이동하거나(dwDirection) 회전한다(cxDelta 또는 cyDelta).
 	if ((dwDirection != 0) || (rotation != 0.0f))
-	{
-		
+	{		
 			//m_pPlayer->Rotate(0.0f, rotation, 0.0f);
 
 			/*플레이어를 dwDirection 방향으로 이동한다(실제로는 속도 벡터를 변경한다). 이동 거리는 시간에 비례하도록 한다.
@@ -541,12 +566,22 @@ void CGameFramework::ProcessInput()
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
 			m_pPhysx->move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed());
+			XMFLOAT3 Look = XMFLOAT3(0, 0, 0);
+			if (dwDirection & DIR_FORWARD) 
+				Look.z = -1.f;
+			if (dwDirection & DIR_BACKWARD)
+				Look.z = 1.f;
+			if (dwDirection & DIR_RIGHT)
+				Look.x = -1.f;
+			if (dwDirection & DIR_LEFT)
+				Look.x = 1.f;
+			m_pPlayer->SetLook(Look);
 		}
 		
 	}
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
 	//if(m_pCamera)
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::AnimateObjects()
@@ -601,8 +636,14 @@ void CGameFramework::FrameAdvance()
 	position.x = playerPosition.x;
 	position.y = playerPosition.y - 17.5f;
 	position.z = playerPosition.z;
+	m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+	m_pCamera->SetLookAt(position);
 	m_pPlayer->SetPosition(position);
-
+	
+	cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+	position = m_pCamera->GetPosition();
+	//cout << "카메라 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;;
+	
 	CollisionProcess();
 
 	AnimateObjects();

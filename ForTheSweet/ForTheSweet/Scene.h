@@ -21,6 +21,7 @@ public:
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void ReleaseUploadBuffers();
 	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }
+	CCamera* GetCamera() { return m_Camera.get(); }
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
 	ID3D12RootSignature *GetGraphicsRootSignature();
@@ -28,7 +29,7 @@ public:
 	CPlayer						*m_pPlayer = NULL;
 	CPlayer*					getplayer() { return m_pPlayer; }
 	Model_Animation				*character_anim;
-	DynamicModelShader				 *m_pDModelShader = NULL;
+	PlayerShader				 *m_pPlayerShader = NULL;
 	LoadModel						*Map_1_Model;
 	CGameObject						*Map;
 	unique_ptr<CCamera>			m_Camera = nullptr;

@@ -23,7 +23,7 @@ void CGameObject::SetPosition(float x, float y, float z)
 	m_xmf4x4World._42 = y;
 	m_xmf4x4World._43 = z;
 }
-void CGameObject::SetPosition(XMFLOAT3 xmf3Position)
+void CGameObject::SetPosition(XMFLOAT3& xmf3Position)
 {
 	SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
