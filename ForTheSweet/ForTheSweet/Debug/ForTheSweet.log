@@ -1,44 +1,8 @@
-﻿  CGameFramework.cpp
-c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(484): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
-c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(631): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
-c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(636): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(637): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(638): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(240): warning C4244: '초기화 중': '_Ty'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty=int
-          ]
-          and
-          [
-              _Ty2=float
-          ]
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 컴파일 중인 함수 템플릿 인스턴스화 'std::pair<std::string,float>::pair<const char*,int,0>(std::pair<const char *,int> &&) noexcept(false)'에 대한 참조를 확인하십시오.
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 컴파일 중인 함수 템플릿 인스턴스화 'std::pair<std::string,float>::pair<const char*,int,0>(std::pair<const char *,int> &&) noexcept(false)'에 대한 참조를 확인하십시오.
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\vector(900): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::pair<const char *,int>>(_Alloc &,_Objty *const ,std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
-          with
-          [
-              _Alloc=std::allocator<std::pair<std::string,float>>,
-              _Ty=std::pair<std::string,float>,
-              _Objty=std::pair<std::string,float>
-          ]
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\vector(902): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::pair<const char *,int>>(_Alloc &,_Objty *const ,std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
-          with
-          [
-              _Alloc=std::allocator<std::pair<std::string,float>>,
-              _Ty=std::pair<std::string,float>,
-              _Objty=std::pair<std::string,float>
-          ]
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\vector(916): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
-          with
-          [
-              _Ty=std::pair<std::string,float>
-          ]
-  c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(272): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
-          with
-          [
-              _Ty=std::pair<std::string,float>
-          ]
+﻿  Object.cpp
+  Shader.cpp
+c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\shader.cpp(705): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\shader.cpp(757): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  코드를 생성하고 있습니다...
 PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj)' 또는 'C:\Users\Hol\Desktop\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.

@@ -674,7 +674,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
 {
 	CModelShader::OnPrepareRender(pd3dCommandList, 0);
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	//pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 
 	//if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
 
@@ -867,7 +867,7 @@ void DynamicModelShader::CreateGraphicsRootSignature(ID3D12Device * pd3dDevice)
 
 	CD3DX12_DESCRIPTOR_RANGE pd3dDescriptorRanges[2];
 
-	pd3dDescriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, SRVTexture2D, 0, 0); // GameObject
+	pd3dDescriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, SRVAnimation, 0, 0); // GameObject
 	pd3dDescriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, SRVTexArray, 0, 0); // Texture
 
 	CD3DX12_ROOT_PARAMETER pd3dRootParameters[3];
@@ -980,7 +980,7 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	}
 	*/
 	CPlayer* player = new CPlayer(model_anim, pd3dDevice, pd3dCommandList);
-	player->SetAnimations(model_anim->getAnimCount(), model_anim->getAnim(0));
+	player->SetAnimations(model_anim->getAnimCount(), model_anim->getAnim(Anim_Idle));
 
 	//cout << "¾Ö´Ï °¹¼ö : " << model_anim->getAnimCount() << endl;
 	//cout << "»À : " << model_anim-> << endl;
@@ -1012,7 +1012,7 @@ void PlayerShader::CreateGraphicsRootSignature(ID3D12Device * pd3dDevice)
 
 	CD3DX12_DESCRIPTOR_RANGE pd3dDescriptorRanges[2];
 
-	pd3dDescriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, SRVTexture2D, 0, 0); // GameObject
+	pd3dDescriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, SRVAnimation, 0, 0); // GameObject
 	pd3dDescriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, SRVTexArray, 0, 0); // Texture
 
 	CD3DX12_ROOT_PARAMETER pd3dRootParameters[3];

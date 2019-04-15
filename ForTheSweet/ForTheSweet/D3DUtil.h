@@ -29,7 +29,7 @@ enum SRVRegisterNumber {
 	SRVTexArray						= 0,
 	SRVInstanceData					= 1, 
 	SRVTexArrayNorm					= 2, 
-	SRVTexture2D					= 3,
+	SRVAnimation					= 3,
 	SRVTexture2DNorm				= 4,
 	SRVInstanceEffectData			= 5,
 	SRVInstanceAnimationInfo		= 6,
