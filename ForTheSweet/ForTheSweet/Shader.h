@@ -7,8 +7,7 @@
 //게임 객체의 정보를 셰이더에게 넘겨주기 위한 구조체(상수 버퍼)이다.
 struct CB_GAMEOBJECT_INFO
 {
-	XMFLOAT4X4 m_xmf4x4World;
-	XMFLOAT4X4		m_bone[96];
+	XMFLOAT4X4	m_xmf4x4World;
 	UINT		m_nMaterial = 0;
 };
 
@@ -100,9 +99,7 @@ protected:
 
 class CModelShader : public CObjectsShader {
 protected:
-
-
-	UINT				modelIndex;
+	UINT											modelIndex;
 	ComPtr<ID3D12RootSignature>*					m_RootSignature = nullptr;
 	ComPtr<ID3D12RootSignature>*					m_ComputeRootSignature = nullptr;
 
@@ -153,8 +150,11 @@ protected:
 	DXGI_FORMAT										m_Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	unique_ptr<UploadBuffer<CB_GAMEOBJECT_INFO>>	m_ObjectCB = nullptr;
 	Model_Animation *model_anim;
+	LoadModel	*static_model;
 public:
+	CModelShader();
 	CModelShader(Model_Animation *ma);
+	CModelShader(LoadModel *ma);
 	CModelShader(UINT index);
 	~CModelShader();
 
@@ -189,6 +189,19 @@ public:
 	//virtual CGameObject** getObjects() { return m_bbObjects.data(); }
 
 	void setScale(float scale);
+};
+
+class WeaponShader : public CModelShader
+{
+protected:
+	LoadModel	*weapon_model;
+
+public:
+	WeaponShader();
+	WeaponShader(LoadModel *ma);
+	~WeaponShader();
+
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
 };
 
 class CPlayerObjectsShader : public CObjectsShader {
@@ -245,6 +258,8 @@ public:
 	DynamicModelShader(Model_Animation *ma);
 	~DynamicModelShader();
 
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);

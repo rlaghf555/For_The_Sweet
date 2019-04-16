@@ -21,10 +21,9 @@ protected:
 	UINT							m_NumofAnim;	//애니메이션 갯수
 	UINT							m_loopCheck = 0;
 
-
-
 public:
 	ModelObject(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	ModelObject(LoadModel* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual ~ModelObject();
 
 	virtual void SetAnimations(UINT num, LoadAnimation** tmp);

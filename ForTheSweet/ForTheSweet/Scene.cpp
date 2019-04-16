@@ -57,20 +57,16 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//Character_Model = new LoadModel("main_character.FBX", false);
 
 	BuildRootSignature(pd3dDevice, pd3dCommandList);
-	//CreateShaderVariables(pDevice, pCommandList);
 
-	//m_pPlayer = new CPlayer(character_anim, pd3dDevice, pd3dCommandList);
-
-	m_pPlayerShader = new PlayerShader(character_anim);
-	//m_pDModelShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	m_pPlayerShader = new PlayerShader(character_anim);	
 	m_pPlayerShader->BuildObjects(pd3dDevice, pd3dCommandList);
-
 	m_pPlayer = reinterpret_cast<CPlayer*>( m_pPlayerShader->getPlayer());
-	//m_Camera = m_pPlayer->getCamera();
-	Map_1_Model = new LoadModel("map_1.FBX", false);
-	Map = new CMapObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,Map_1_Model,XMFLOAT3(0, 0, 0));
-	//XMFLOAT3 a = XMFLOAT3(1.f, 0.f, 0.f);
-	//Map->Rotate(&a, 90.f);
+
+	m_MapShader = new CModelShader(Map_Model);
+	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList);
+
+	m_WeaponShader = new WeaponShader(weapon_Model);
+	m_WeaponShader->BuildObjects(pd3dDevice, pd3dCommandList);
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -158,23 +154,26 @@ void CScene::ReleaseObjects()
 		m_pInstancingShaders[i].ReleaseObjects();
 	}
 	if (m_pInstancingShaders) delete[] m_pInstancingShaders;
-	for (int i = 0; i < m_nPlayerObjectShaders; i++)
-	{
-		m_pPlayerObjectShaders[i].ReleaseShaderVariables();
-		m_pPlayerObjectShaders[i].ReleaseObjects();
-	}
-	if (m_pPlayerObjectShaders) delete[] m_pPlayerObjectShaders;
 	if (m_pPlayerShader) {
 		m_pPlayerShader->ReleaseShaderVariables();
 		m_pPlayerShader->ReleaseObjects();
 		delete m_pPlayerShader;
+	}
+	if (m_MapShader) {
+		m_MapShader->ReleaseShaderVariables();
+		m_MapShader->ReleaseObjects();
+		delete m_MapShader;
+	}
+	if (m_WeaponShader) {
+		m_WeaponShader->ReleaseShaderVariables();
+		m_WeaponShader->ReleaseObjects();
+		delete m_WeaponShader;
 	}
 }
 
 void CScene::ReleaseUploadBuffers()
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].ReleaseUploadBuffers();
-	for (int i = 0; i < m_nPlayerObjectShaders; i++) m_pPlayerObjectShaders[i].ReleaseUploadBuffers();
 }
 
 ID3D12RootSignature *CScene::GetGraphicsRootSignature()
@@ -225,7 +224,6 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
-	for (int i = 0; i < m_nPlayerObjectShaders; i++) m_pPlayerObjectShaders[i].AnimateObjects(fTimeElapsed);
 	m_pPlayerShader->Animate(fTimeElapsed);
 }
 
@@ -248,24 +246,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 {
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
-	//pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
-//	for (int i = 0; i < m_nMapShader; i++) {
-//		m_pMapShader[i].Render(pd3dCommandList, pCamera);
-//	}
-	//for (int i = 0; i < m_nInstancingShaders; i++)
-	//{
-	//	m_pInstancingShaders[i].Render(pd3dCommandList, pCamera);
-	//}
-	//for (int i = 0; i < m_nPlayerObjectShaders; i++)
-	//{
-	//	m_pPlayerObjectShaders[i].Render(pd3dCommandList, pCamera);
-	//}
 
-	if (m_pPlayerShader)
-		m_pPlayerShader->Render(pd3dCommandList, pCamera);
-	//if(m_pMapShader)
-	//	m_pMapShader->Render(pd3dCommandList, pCamera);
-	//if(Map)
-	//	Map->Render(pd3dCommandList, pCamera);
+	if (m_pPlayerShader) m_pPlayerShader->Render(pd3dCommandList, pCamera);
+	if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
+	if (m_WeaponShader) m_WeaponShader->Render(pd3dCommandList, pCamera);
 }

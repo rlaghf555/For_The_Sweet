@@ -275,11 +275,11 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/weak_attack_2.FBX", 0));	//Anim_Weak_Attack2
 	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));	//Anim_Weak_Attack3
 
-	//character_animation.emplace_back(make_pair("./resource/character/stay.bip", 0));
-	//character_animation.emplace_back(make_pair("./resource/character/walk.bip", 0));
-
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
-	//Character_Model->LodingModels(m_pd3dDevice, m_pd3dCommandList);
+	
+	Map_Model[0] = new LoadModel("./resource/map/map_1.FBX", true);
+
+	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);
 }
 
 void CGameFramework::BuildObjects()
@@ -289,6 +289,9 @@ void CGameFramework::BuildObjects()
 	m_pScene = new CScene();
 	if (m_pScene) {
 		m_pScene->SetCharacter(Character_Model);
+		m_pScene->SetMap(Map_Model[0]);
+		m_pScene->SetWeapon(weapon[0]);
+
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	}
 	My_ID = CHARATER_ID_7; //원래는 서버에서 받아야함
@@ -565,7 +568,7 @@ void CGameFramework::ProcessInput()
 		if (dwDirection)
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
-			m_pPhysx->move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed());
+			m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
 			XMFLOAT3 Look = XMFLOAT3(0, 0, 0);
 			if (dwDirection & DIR_FORWARD) 
 				Look.z = -1.f;
