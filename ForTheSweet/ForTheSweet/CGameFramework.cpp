@@ -277,9 +277,9 @@ void CGameFramework::LoadModels()
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
-	Map_Model[0] = new LoadModel("./resource/map/map_1.FBX", true);
+	Map_Model[0] = new LoadModel("./resource/map/map_1.FBX", true);			//M_Map_1
 
-	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);
+	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);		//M_Weapon_Lollipop
 }
 
 void CGameFramework::BuildObjects()
@@ -289,8 +289,8 @@ void CGameFramework::BuildObjects()
 	m_pScene = new CScene();
 	if (m_pScene) {
 		m_pScene->SetCharacter(Character_Model);
-		m_pScene->SetMap(Map_Model[0]);
-		m_pScene->SetWeapon(weapon[0]);
+		m_pScene->SetMap(Map_Model);
+		m_pScene->SetWeapon(weapon);
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	}

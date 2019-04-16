@@ -62,10 +62,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pPlayerShader->BuildObjects(pd3dDevice, pd3dCommandList);
 	m_pPlayer = reinterpret_cast<CPlayer*>( m_pPlayerShader->getPlayer());
 
-	m_MapShader = new CModelShader(Map_Model);
+	m_MapShader = new CModelShader(Map_Model[M_Map_1]);
 	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
-	m_WeaponShader = new WeaponShader(weapon_Model);
+	m_WeaponShader = new WeaponShader(weapon_Model[M_Weapon_Lollipop]);
 	m_WeaponShader->BuildObjects(pd3dDevice, pd3dCommandList);
 }
 

@@ -21,8 +21,8 @@ public:
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void ReleaseUploadBuffers();
 	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }
-	void SetMap(LoadModel *model_anim) { Map_Model = model_anim; }
-	void SetWeapon(LoadModel *model_anim) { weapon_Model = model_anim; }
+	void SetMap(LoadModel **mapmodel) { Map_Model = mapmodel; }
+	void SetWeapon(LoadModel **weaponmodel) { weapon_Model = weaponmodel; }
 	CCamera* GetCamera() { return m_Camera.get(); }
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
@@ -34,10 +34,10 @@ public:
 	PlayerShader				*m_pPlayerShader = NULL;
 
 	CModelShader				*m_MapShader = NULL;
-	LoadModel					*Map_Model;
+	LoadModel					**Map_Model;
 
 	WeaponShader				*m_WeaponShader = NULL;
-	LoadModel					*weapon_Model;
+	LoadModel					**weapon_Model;
 
 	unique_ptr<CCamera>			m_Camera = nullptr;
 

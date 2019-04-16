@@ -21,7 +21,7 @@
 #include <algorithm>
 #include "d3dx12.h"
 //#include "DDSTextureLoader.h"
-//#include "DDSTextureLoader12.h"
+#include "DDSTextureLoader12.h"
 #include "D3DMath.h"
 
 
@@ -182,7 +182,7 @@ public:
 
 	//static void CreateUnorderedAccessResource(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMUINT2& size, ComPtr<ID3D12Resource>& buffer, ComPtr<ID3D12Resource>& readbackBuffer, UINT type);
 
-	//static ComPtr<ID3D12Resource> CreateTextureResourceFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, const wchar_t *pszFileName,ID3D12Resource* ppd3dUploadBuffer, D3D12_RESOURCE_STATES d3dResourceStates);
+	static ComPtr<ID3D12Resource> CreateTextureResourceFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, const wchar_t *pszFileName,ID3D12Resource* ppd3dUploadBuffer, D3D12_RESOURCE_STATES d3dResourceStates);
 
 	//static void CalculateTangentArray(long vertexCount, const XMFLOAT3 *vertex, XMFLOAT3 *normal, const XMFLOAT2 *texcoord, long triangleCount, const UINT *indeies, XMFLOAT3 *tangent);
 };
