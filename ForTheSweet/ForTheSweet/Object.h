@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Texture.h"
 class CShader;
 
 class CGameObject
@@ -53,6 +54,8 @@ public:
 	UINT						m_nMeshes;
 	BoundingOrientedBox			m_xmOOBB;
 	D3D12_GPU_DESCRIPTOR_HANDLE					m_d3dCbvGPUDescriptorHandle;
+	CMaterial					*m_pMaterial;
+
 public:
 	void ReleaseUploadBuffers();
 	virtual void SetMesh(CMesh *pMesh);

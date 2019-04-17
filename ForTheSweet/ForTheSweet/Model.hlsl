@@ -1,6 +1,7 @@
 #define NUM_DIRECTION_LIGHTS 1
 
-//SamplerState gDefaultSamplerState : register(s0);
+Texture2DArray gBoxTextured : register(t0);
+SamplerState gDefaultSamplerState : register(s0);
 
 cbuffer cbPerObject : register(b0)
 {
@@ -89,13 +90,13 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input,
 	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
 
 	
-	//float3 uvw = float3(input.uv, nPrimitiveID / 2);
-	//float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	float3 uvw = float3(input.uv, nPrimitiveID / 2);
+	float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
 	
 	input.normalW = normalize(input.normalW);
 	
-
-	output.color = float4(1, 1, 1, 1);
+	output.color = cColor;
+	//output.color = float4(1, 1, 1, 1);
 	output.nrmoutline = float4(input.normalW, 1.0f);
 	output.nrm = output.nrmoutline;
 	output.pos = float4(input.positionW, 1.0f);

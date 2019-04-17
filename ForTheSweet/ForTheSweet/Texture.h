@@ -2,7 +2,8 @@
 #include "stdafx.h"
 //#include "Shader.h"
 
-class CShader;
+class CModelShader;
+
 #define RESOURCE_TEXTURE2D						0x01
 #define RESOURCE_TEXTURE2D_ARRAY			0x02	//[]
 #define RESOURCE_TEXTURE2DARRAY			0x03
@@ -79,12 +80,12 @@ public:
 
 	UINT					m_nReflection = 0;
 	unique_ptr<CTexture>	m_pTexture = nullptr;
-	CShader*				m_pShader = nullptr;
+	CModelShader*				m_pShader = nullptr;
 
 	void SetAlbedo(XMFLOAT4 xmf4Albedo) { m_xmf4Albedo = xmf4Albedo; }
 	void SetReflection(UINT nReflection) { m_nReflection = nReflection; }
 	void SetTexture(CTexture *pTexture);
-	void SetShader(CShader *pShader);
+	void SetShader(CModelShader *pShader);
 
 	void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	void ReleaseShaderVariables();

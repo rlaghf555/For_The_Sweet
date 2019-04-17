@@ -216,6 +216,8 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 	//깊이-스텐실 서술자 힙(서술자의 개수는 1)을 생성한다.
 	m_nDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	//깊이-스텐실 서술자 힙의 원소의 크기를 저장한다.
+
+	::gnCbvSrvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 //스왑체인의 각 후면 버퍼에 대한 렌더 타겟 뷰를 생성한다.
@@ -643,7 +645,7 @@ void CGameFramework::FrameAdvance()
 	m_pCamera->SetLookAt(position);
 	m_pPlayer->SetPosition(position);
 	
-	cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+	//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
 	position = m_pCamera->GetPosition();
 	//cout << "카메라 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;;
 	

@@ -4,6 +4,8 @@
 #include "UploadBuffer.h"
 #include "ModelObject.h"
 #include "Player.h"
+#include "Texture.h"
+
 //게임 객체의 정보를 셰이더에게 넘겨주기 위한 구조체(상수 버퍼)이다.
 struct CB_GAMEOBJECT_INFO
 {
@@ -116,7 +118,7 @@ protected:
 
 	vector<D3D12_INPUT_ELEMENT_DESC>				m_pInputElementDesc;
 	//vector<CGameObject* >							m_ppObjects;
-	//CMaterial										*m_pMaterial = NULL;
+	CMaterial										*m_pMaterial = NULL;
 
 	UINT											m_nObjects = 0;
 	UINT											m_nPSO = 1;
@@ -165,6 +167,9 @@ public:
 	virtual void CreateCbvAndSrvDescriptorHeaps(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, int nShaderResourceViews, bool bIsGraphics = true);
 	virtual void CreateConstantBufferViews(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, ID3D12Resource * pd3dConstantBuffers, UINT nStride);
 	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
+
+	void CreateShaderResourceViews(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CTexture * pTexture, UINT nRootParameterStartIndex, bool bAutoIncrement, bool bIsGraphics = true);
+
 	virtual void BuildPSO(ID3D12Device * pd3dDevice, UINT nRenderTargets = 1, int index = 0);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
