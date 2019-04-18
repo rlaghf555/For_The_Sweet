@@ -571,16 +571,29 @@ void CGameFramework::ProcessInput()
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
 			m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
-			XMFLOAT3 Look = XMFLOAT3(0, 0, 0);
-			if (dwDirection & DIR_FORWARD) 
+			
+			XMFLOAT3 Look = m_pPlayer->GetLook();
+			XMFLOAT3 Right = m_pPlayer->GetRight();
+			if (dwDirection & DIR_FORWARD) {
 				Look.z = -1.f;
-			if (dwDirection & DIR_BACKWARD)
+				Right.x = -1.f;
+			}
+			if (dwDirection & DIR_BACKWARD) {
 				Look.z = 1.f;
-			if (dwDirection & DIR_RIGHT)
+				Right.x = 1.f;
+			}
+			if (dwDirection & DIR_RIGHT) {
 				Look.x = -1.f;
-			if (dwDirection & DIR_LEFT)
+				Right.z = -1.f;
+			}
+			if (dwDirection & DIR_LEFT) {
 				Look.x = 1.f;
+				Right.z = 1.f;
+			}
+			Look = Vector3::Normalize(Look);
+			Right = Vector3::Normalize(Right);
 			m_pPlayer->SetLook(Look);
+			m_pPlayer->SetRight(Right);
 		}
 		
 	}

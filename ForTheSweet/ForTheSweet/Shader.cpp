@@ -1144,7 +1144,7 @@ void PlayerShader::CreateGraphicsRootSignature(ID3D12Device * pd3dDevice)
 
 void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
 {
-	m_nPSO = 2;
+	m_nPSO = 1;
 	CreatePipelineParts();
 
 	m_nObjects = 1;
@@ -1158,7 +1158,6 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	CreateGraphicsRootSignature(pd3dDevice);
 	BuildPSO(pd3dDevice, nRenderTargets);
 	
-	//if (globalModels->isMat(modelIndex)) {
 		CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth_1.dds", 0);
 		//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\body.dds", 0);
@@ -1169,7 +1168,6 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		m_pMaterial = new CMaterial();
 		m_pMaterial->SetTexture(pTexture);
 		m_pMaterial->SetReflection(1);
-	//}
 	
 	CPlayer* player = new CPlayer(model_anim, pd3dDevice, pd3dCommandList);
 	player->SetAnimations(model_anim->getAnimCount(), model_anim->getAnim(0));
