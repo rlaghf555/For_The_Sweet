@@ -94,7 +94,6 @@ void ModelObject::Animate(float fTime)
 			m_loopCheck = m_ani[m_AnimIndex]->BoneTransform(m_AnimIndex, fTime, m_Bones);
 			
 		}
-		
 	}
 }
 

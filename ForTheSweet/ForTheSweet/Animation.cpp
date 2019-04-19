@@ -74,7 +74,8 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 	if (now_time > end_time) {
 		now_time = start_time;
 		if (!animation_loop) {
-			index = next_index;
+			index = Anim_Idle;
+			animation_loop = true;
 		}
 		return LOOP_END; //애니메이션이 한 루프 끝남
 	}

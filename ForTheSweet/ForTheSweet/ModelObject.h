@@ -51,4 +51,5 @@ public:
 	float getAnimtime() { return m_ani[m_AnimIndex]->getAnimTime(); }
 	void SetAnimFrame(float ftime) { m_ani[m_AnimIndex]->SetAnimFrame(ftime); }
 	void DisableLoop() { m_ani[m_AnimIndex]->DisableLoop(0); }
+	void EnableLoop() { m_ani[m_AnimIndex]->EnableLoop(); }
 };

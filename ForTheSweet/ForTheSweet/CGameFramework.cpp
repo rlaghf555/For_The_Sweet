@@ -272,10 +272,22 @@ void CGameFramework::LoadModels()
 {
 	vector<pair<string, float>> character_animation;
 	character_animation.emplace_back(make_pair("./resource/character/stay.FBX", 0));			//Anim_Idle
+
 	character_animation.emplace_back(make_pair("./resource/character/walk.FBX", 0));			//Anim_Walk
+
 	character_animation.emplace_back(make_pair("./resource/character/weak_attack_1.FBX", 0));	//Anim_Weak_Attack1
 	character_animation.emplace_back(make_pair("./resource/character/weak_attack_2.FBX", 0));	//Anim_Weak_Attack2
 	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));	//Anim_Weak_Attack3
+
+	character_animation.emplace_back(make_pair("./resource/character/hard_attack1.FBX", 0));	//Anim_Hard_Attack1
+	character_animation.emplace_back(make_pair("./resource/character/hard_attack2.FBX", 0));	//Anim_Hard_Attack2
+
+	character_animation.emplace_back(make_pair("./resource/character/guard.FBX", 0));	//Anim_Guard
+
+	character_animation.emplace_back(make_pair("./resource/character/powerup.FBX", 0));	//Anim_PowerUp
+
+	character_animation.emplace_back(make_pair("./resource/character/jump.FBX", 0));	//Anim_PowerUp
+
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
@@ -480,8 +492,8 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer['S'] & 0xF0) Key_S = TRUE;
 		if (pKeyBuffer['D'] & 0xF0) Key_D = TRUE;
 		if (pKeyBuffer['F'] & 0xF0) Key_F = TRUE;
-		if (pKeyBuffer[VK_LSHIFT & 0xF0]) Key_LShift = TRUE;
-		if (pKeyBuffer[VK_SPACE & 0xF0]) Key_Space = TRUE;
+		if (pKeyBuffer[VK_LSHIFT] & 0xF0) Key_LShift = TRUE;
+		if (pKeyBuffer[VK_SPACE] & 0xF0) Key_Space = TRUE;
 
 
 	}
@@ -491,7 +503,6 @@ void CGameFramework::ProcessInput()
 	메시지(WM_LBUTTONDOWN, WM_RBUTTONDOWN)를 처리할 때 마우스를 캡쳐하였다. 그러므로 마우스가 캡쳐된
 	것은 마우스 버튼이 눌려진 상태를 의미한다. 마우스 버튼이 눌려진 상태에서 마우스를 좌우 또는 상하로 움직이면 플
 	레이어를 x-축 또는 y-축으로 회전한다.*/
-	bool d_move = false;
 
 	int Anim_Index = m_pPlayer->getAnimIndex();
 	float Anim_Time = m_pPlayer->getAnimtime();
@@ -499,7 +510,9 @@ void CGameFramework::ProcessInput()
 	if (Key_A||Key_S) {
 
 		if (Key_A&&Key_S) {//둘다 눌리면 막기
-
+			m_pPlayer->ChangeAnimation(Anim_Guard);
+			m_pPlayer->SetAnimFrame(10);
+			m_pPlayer->DisableLoop();
 		}
 		else if (Key_A && !Key_S) { //약공격 or 줍기
 			//충돌체크 (무기 오브젝트랑) 충돌이면 줍기		
@@ -524,8 +537,16 @@ void CGameFramework::ProcessInput()
 			//충돌체크 (무기 오브젝트랑) 충돌이면 줍기
 
 			//아니면 강공격
+			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+				m_pPlayer->ChangeAnimation(Anim_Hard_Attack1);
+				m_pPlayer->DisableLoop();
+			}
+			if (Anim_Index == Anim_Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+				m_pPlayer->ChangeAnimation(Anim_Hard_Attack2);
+				m_pPlayer->SetAnimFrame(Anim_Time);
+				m_pPlayer->DisableLoop();
+			}
 		}
-		d_move = true;
 	}
 
 	if (Key_D) { //무기 스킬
@@ -533,34 +554,45 @@ void CGameFramework::ProcessInput()
 
 	}
 	if (Key_F) { //강화 스킬
-	
+		if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {		//강화 게이지(?) 플래그가 있어야함
+			m_pPlayer->ChangeAnimation(Anim_PowerUp);
+			m_pPlayer->DisableLoop();
+
+		}
 	}
 	
 	if (Key_Space) { //점프
-
+		if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+			m_pPlayer->ChangeAnimation(Anim_Jump);
+			m_pPlayer->DisableLoop();
+		}
 	}
 	if (Key_LShift) { //구르기
 
 
 	}
-	if (d_move) return;
-	if (dwDirection != 0)
+	//if (d_move) return;
+	if (dwDirection)
 	{
-		//float Player_Yaw = m_pPlayer->GetYaw();
-		if (dwDirection & DIR_FORWARD)
-			m_pPlayer->ChangeAnimation(Anim_Walk);
-		if (dwDirection & DIR_BACKWARD)
-			m_pPlayer->ChangeAnimation(Anim_Walk);
-		if (dwDirection & DIR_LEFT)
-			m_pPlayer->ChangeAnimation(Anim_Walk);
-		if (dwDirection & DIR_RIGHT)
-			m_pPlayer->ChangeAnimation(Anim_Walk);	
+		if (Anim_Index) {
+			//float Player_Yaw = m_pPlayer->GetYaw();
+			if (dwDirection & DIR_FORWARD)
+				m_pPlayer->ChangeAnimation(Anim_Walk);
+			if (dwDirection & DIR_BACKWARD)
+				m_pPlayer->ChangeAnimation(Anim_Walk);
+			if (dwDirection & DIR_LEFT)
+				m_pPlayer->ChangeAnimation(Anim_Walk);
+			if (dwDirection & DIR_RIGHT)
+				m_pPlayer->ChangeAnimation(Anim_Walk);
+		}
 	}
-	else if(Anim_Index==Anim_Walk)
-	m_pPlayer->ChangeAnimation(Anim_Idle);
+	else if (Anim_Index == Anim_Walk) {
+		m_pPlayer->ChangeAnimation(Anim_Idle);
+		m_pPlayer->EnableLoop();
+	}
 
 	//마우스 또는 키 입력이 있으면 플레이어를 이동하거나(dwDirection) 회전한다(cxDelta 또는 cyDelta).
-	if ((dwDirection != 0) || (rotation != 0.0f))
+	//if ((dwDirection != 0) || (rotation != 0.0f))
 	{		
 			//m_pPlayer->Rotate(0.0f, rotation, 0.0f);
 
