@@ -75,7 +75,7 @@ public:
 	
 	//플레이어의 위치와 회전 정보를 경과 시간에 따라 갱신하는 함수이다.
 	virtual void Update(float fTimeElapsed);
-	virtual void SetLook(XMFLOAT3& xmf3Look) { m_xmf3Look = xmf3Look; }
+	virtual void SetLook(XMFLOAT3& xmf3Look);
 	virtual void SetRight(XMFLOAT3& xmf3Right){m_xmf3Right=xmf3Right;}
 	//플레이어의 위치가 바뀔 때마다 호출되는 함수와 그 함수에서 사용하는 정보를 설정하는 함수이다.
 	virtual void OnPlayerUpdateCallback(float fTimeElapsed) { }

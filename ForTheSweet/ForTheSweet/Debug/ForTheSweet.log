@@ -1,5 +1,5 @@
 ﻿  CGameFramework.cpp
-c:\users\hol\desktop\졸업작\forthesweet\forthesweet\cgameframework.cpp(501): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\졸업작\forthesweet\forthesweet\cgameframework.cpp(502): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
 c:\users\hol\desktop\졸업작\forthesweet\forthesweet\cgameframework.cpp(681): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
 c:\users\hol\desktop\졸업작\forthesweet\forthesweet\cgameframework.cpp(686): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸업작\forthesweet\forthesweet\cgameframework.cpp(687): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
@@ -39,6 +39,8 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=std::pair<std::string,float>
           ]
+  Player.cpp
+  코드를 생성하고 있습니다...
 PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\졸업작\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\졸업작\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj)' 또는 'C:\Users\Hol\Desktop\졸업작\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.

@@ -316,6 +316,7 @@ void CGameFramework::BuildObjects()
 
 	m_pPlayer = m_pScene->getplayer();//pPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
+
 	//m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
 	
 	m_pPhysx = new CPhysx();
@@ -574,7 +575,7 @@ void CGameFramework::ProcessInput()
 	//if (d_move) return;
 	if (dwDirection)
 	{
-		if (Anim_Index) {
+		if (Anim_Index==Anim_Idle) {
 			//float Player_Yaw = m_pPlayer->GetYaw();
 			if (dwDirection & DIR_FORWARD)
 				m_pPlayer->ChangeAnimation(Anim_Walk);
@@ -605,27 +606,26 @@ void CGameFramework::ProcessInput()
 			m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
 			
 			XMFLOAT3 Look = m_pPlayer->GetLook();
-			XMFLOAT3 Right = m_pPlayer->GetRight();
+			//XMFLOAT3 Right = m_pPlayer->GetRight();
 			if (dwDirection & DIR_FORWARD) {
 				Look.z = -1.f;
-				Right.x = -1.f;
+			//	Right.x = -1.f;
 			}
 			if (dwDirection & DIR_BACKWARD) {
 				Look.z = 1.f;
-				Right.x = 1.f;
+			//	Right.x = 1.f;
 			}
 			if (dwDirection & DIR_RIGHT) {
 				Look.x = -1.f;
-				Right.z = -1.f;
+			//	Right.z = -1.f;
 			}
 			if (dwDirection & DIR_LEFT) {
 				Look.x = 1.f;
-				Right.z = 1.f;
+			//	Right.z = 1.f;
 			}
 			Look = Vector3::Normalize(Look);
-			Right = Vector3::Normalize(Right);
-			m_pPlayer->SetLook(Look);
-			m_pPlayer->SetRight(Right);
+			//Right = Vector3::Normalize(Right);
+			m_pPlayer->SetLook(Look);		
 		}
 		
 	}
