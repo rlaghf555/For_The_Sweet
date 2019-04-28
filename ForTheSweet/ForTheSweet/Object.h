@@ -3,6 +3,8 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Texture.h"
+#include "Physx.h"
+
 class CShader;
 
 class CGameObject

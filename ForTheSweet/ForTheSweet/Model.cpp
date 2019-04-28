@@ -6,6 +6,8 @@ ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCo
 	m_nVertices = (int)meshData.m_vertices.size();
 	m_nIndices = (int)meshData.m_indices.size();
 
+	cout << "정점 개수 : " << m_nVertices << endl;
+
 	m_nStride = sizeof(vertexDatas);
 	m_nOffset = 0;
 	m_nSlot = 0;

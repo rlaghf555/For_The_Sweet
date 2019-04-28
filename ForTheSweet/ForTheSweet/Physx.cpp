@@ -32,6 +32,8 @@ void CPhysx::initPhysics()
 	m_Scene = m_Physics->createScene(sceneDesc);
 
 	m_Material = m_Physics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	m_Cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_Foundation, PxCookingParams(PxTolerancesScale()));
 }
 
 void CPhysx::move(DWORD direction, float distance)
@@ -78,3 +80,46 @@ void CPhysx::move(DWORD direction, float distance)
 	}
 }
 
+inline PxVec3* fromVertex(vertexDatas* vertex, int size)
+{
+	PxVec3* mem = new PxVec3[size];
+	for (int i = 0; i < size; ++i) {
+		mem[i] = PxVec3(vertex[i].m_pos.x, vertex[i].m_pos.y, vertex[i].m_pos.z);
+	}
+	return mem;
+}
+
+PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count) {
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count = meshes->m_vertices.size();
+	meshDesc.points.stride = sizeof(PxVec3);
+	meshDesc.points.data = fromVertex(meshes->m_vertices.data(), meshes->m_vertices.size());
+
+	meshDesc.triangles.count = meshes->m_indices.size() / 3;
+	meshDesc.triangles.stride = sizeof(int) * 3;
+	meshDesc.triangles.data = meshes->m_indices.data();
+
+	meshDesc.flags = PxMeshFlags(0);
+	PxCookingParams params = m_Cooking->getParams();
+	params.midphaseDesc = PxMeshMidPhase::eBVH33;
+	params.suppressTriangleMeshRemapTable = true;
+	params.meshPreprocessParams &= ~static_cast<PxMeshPreprocessingFlags>(PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH);
+	params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+	params.midphaseDesc.mBVH33Desc.meshCookingHint = PxMeshCookingHint::eCOOKING_PERFORMANCE;
+	params.midphaseDesc.mBVH33Desc.meshSizePerformanceTradeOff = 0.0f;
+	m_Cooking->setParams(params);
+
+	PxTriangleMesh* triMesh = nullptr;
+	//triMesh = gCooking->createTriangleMesh(meshDesc, gPhysics->getPhysicsInsertionCallback());
+
+	//PxU32 meshSize = 0;
+
+	PxDefaultMemoryOutputStream outBuffer;
+	m_Cooking->cookTriangleMesh(meshDesc, outBuffer);
+
+	PxDefaultMemoryInputData stream(outBuffer.getData(), outBuffer.getSize());
+	triMesh = m_Physics->createTriangleMesh(stream);
+	//meshSize = outBuffer.getSize();
+
+	return triMesh;
+}

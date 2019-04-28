@@ -301,12 +301,16 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	
 	m_pScene = new CScene();
+
+	m_pPhysx = new CPhysx();
+	m_pPhysx->initPhysics();
+
 	if (m_pScene) {
 		m_pScene->SetCharacter(Character_Model);
 		m_pScene->SetMap(Map_Model);
 		m_pScene->SetWeapon(weapon);
 
-		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 	}
 	My_ID = CHARATER_ID_7; //원래는 서버에서 받아야함
 
@@ -318,9 +322,6 @@ void CGameFramework::BuildObjects()
 	m_pCamera = m_pPlayer->GetCamera();
 
 	//m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
-	
-	m_pPhysx = new CPhysx();
-	m_pPhysx->initPhysics();
 
 	if (m_pPhysx)
 	{

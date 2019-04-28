@@ -5,6 +5,7 @@
 #include "ModelObject.h"
 #include "Player.h"
 #include "Texture.h"
+#include "Physx.h"
 
 //게임 객체의 정보를 셰이더에게 넘겨주기 위한 구조체(상수 버퍼)이다.
 struct CB_GAMEOBJECT_INFO
@@ -182,7 +183,7 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void ReleaseShaderVariables();
 	virtual void CreatePipelineParts();
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera);
 	//virtual void RenderToDepthBuffer(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera, XMFLOAT3& cameraPos, float offset);
 	virtual void Animate(float fTimeElapsed);

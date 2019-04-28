@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Player.h"
 #include "Camera.h"
+#include "Physx.h"
 
 class CScene
 {
@@ -12,7 +13,7 @@ public:
 	//씬에서 마우스와 키보드 메시지를 처리한다.
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, CPhysx* physx);
 	void BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR *pKeysBuffer);

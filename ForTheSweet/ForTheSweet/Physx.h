@@ -4,7 +4,10 @@
 #include "PxPhysicsAPI.h"
 
 #include "Physx.h"
+#include "Model.h"
+
 using namespace physx;
+
 class CPhysx {
 public:
 	// PxFoundation이 관리하는 Allocator, ErrorCallback
@@ -29,6 +32,9 @@ public:
 	// Player를 관리하는 manager가 생성할 controller
 	physx::PxController *m_PlayerController;
 
+	// 요리
+	physx::PxCooking* m_Cooking;
+
 	// Player 충돌 모형을 Capsule Or Box
 	//physx::PxCapsuleControllerDesc m_CapsuleDesc;
 	//physx::PxBoxControllerDesc m_BoxDesc;
@@ -39,5 +45,7 @@ public:
 
 	void initPhysics();
 	void move(DWORD direction, float distance);
+
+	PxTriangleMesh*	GetTriangleMesh(mesh* meshes, UINT count);
 };
 

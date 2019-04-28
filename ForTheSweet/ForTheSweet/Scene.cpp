@@ -26,7 +26,7 @@ bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 	return true;
 }
 
-void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
+void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, CPhysx* physx)
 {
 	//서버에서 오브젝트, 캐릭터 위치를 받는다.
 
@@ -63,7 +63,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pPlayer = reinterpret_cast<CPlayer*>( m_pPlayerShader->getPlayer());
 
 	m_MapShader = new CModelShader(Map_Model[M_Map_1]);
-	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
 	m_WeaponShader = new WeaponShader(weapon_Model[M_Weapon_Lollipop]);
 	m_WeaponShader->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -249,6 +249,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	if (m_pPlayerShader) m_pPlayerShader->Render(pd3dCommandList, pCamera);
-	if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
-	if (m_WeaponShader) m_WeaponShader->Render(pd3dCommandList, pCamera);
+	//if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
+	//if (m_WeaponShader) m_WeaponShader->Render(pd3dCommandList, pCamera);
 }

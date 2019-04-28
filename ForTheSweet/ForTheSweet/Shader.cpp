@@ -600,12 +600,16 @@ D3D12_SHADER_BYTECODE CModelShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlo
 {
 	wchar_t filename[100] = L"Model.hlsl";
 	return(CShader::CompileShaderFromFile(filename, "VSStaticModel", "vs_5_1", ppd3dShaderBlob));
+	//wchar_t filename[100] = L"Shaders.hlsl";
+	//return(CShader::CompileShaderFromFile(filename, "VSDiffused", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CModelShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
 {
 	wchar_t filename[100] = L"Model.hlsl";
 	return(CShader::CompileShaderFromFile(filename, "PSDynamicModel", "ps_5_1", ppd3dShaderBlob));
+	//wchar_t filename[100] = L"Shaders.hlsl";
+	//return(CShader::CompileShaderFromFile(filename, "PSDiffused", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC GetShaderResourceViewDesc(D3D12_RESOURCE_DESC d3dResourceDesc, UINT nTextureType)
@@ -798,7 +802,7 @@ void CModelShader::CreatePipelineParts()
 	}
 }
 
-void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
@@ -825,6 +829,21 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
+
+		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices());
+		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+
+		PxMeshScale PxScale;
+		PxScale.scale = scaleTmp;
+
+		PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+		XMFLOAT3 pos = map->GetPosition();
+		PxTransform location(pos.x, pos.y, pos.z);
+
+		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+
+		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+		physx->m_Scene->addActor(*m_Actor);
 	}
 }
 
