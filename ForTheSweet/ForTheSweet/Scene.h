@@ -40,6 +40,10 @@ public:
 	WeaponShader				*m_WeaponShader = NULL;
 	LoadModel					**weapon_Model;
 
+	MeshShader					*m_BackGroundShader = NULL;
+
+	WaveShader					*m_WavesShader = NULL;
+
 	unique_ptr<CCamera>			m_Camera = nullptr;
 
 protected:

@@ -1,6 +1,110 @@
 #include "stdafx.h"
 #include "Mesh.h"
 
+CreateQuad::CreateQuad(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, float x, float y, float w, float h, float depth) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	m_nVertices = 4;
+	m_nStride = sizeof(Vertex);
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	Vertex pVertices[4];
+	pVertices[0] = Vertex(x, y - h, depth, 0.f, 0.f, -1.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+	pVertices[1] = Vertex(x, y, depth, 0.f, 0.f, -1.f, 1.f, 0.f, 0.f, 0.f, 0.f);
+	pVertices[2] = Vertex(x + w, y, depth, 0.f, 0.f, -1.f, 1.f, 0.f, 0.f, 1.f, 0.f);
+	pVertices[3] = Vertex(x + w, y - h, depth, 0.f, 0.f, -1.f, 1.f, 0.f, 0.f, 1.f, 1.f);
+
+	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
+
+	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
+	m_d3dVertexBufferView.StrideInBytes = m_nStride;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+
+	m_nIndices = 6;
+
+	UINT pnIndices[6];
+	pnIndices[0] = 0;	pnIndices[1] = 1;	pnIndices[2] = 2;
+	pnIndices[3] = 0;	pnIndices[4] = 2;	pnIndices[5] = 3;
+
+	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pnIndices, sizeof(UINT) * m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_pd3dIndexUploadBuffer);
+	m_d3dIndexBufferView.BufferLocation = m_pd3dIndexBuffer->GetGPUVirtualAddress();
+	m_d3dIndexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	m_d3dIndexBufferView.SizeInBytes = sizeof(UINT) * m_nIndices;
+}
+
+CreateQuad::~CreateQuad(){}
+
+CreateGrid::~CreateGrid(){}
+
+CreateGrid::CreateGrid(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, float width, float depth, int m, int n) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	int vertexCount = m * n;
+	int faceCount = (m - 1)*(n - 1) * 2;
+	
+	float halfWidth = 0.5f * width;
+	float halfDepth = 0.5f * depth;
+
+	float dx = width / (n - 1);
+	float dz = depth / (m - 1);
+
+	float du = 1.0f / (n - 1);
+	float dv = 1.0f / (m - 1);
+
+	m_nVertices = vertexCount;
+	m_nStride = sizeof(Vertex);
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	Vertex *pVertices = new Vertex[m_nVertices];
+	
+	for (int i = 0; i < m; ++i)
+	{
+		float z = halfDepth - i * dz;
+		for (int j = 0; j < n; ++j)
+		{
+			float x = -halfWidth + j * dx;
+
+			pVertices[i*n + j].m_pos = XMFLOAT3(x, 0.0f, z);
+			pVertices[i*n + j].m_normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			pVertices[i*n + j].m_tan = XMFLOAT3(1.0f, 0.0f, 0.0f);
+			
+			pVertices[i*n + j].m_tex.x = j * du;
+			pVertices[i*n + j].m_tex.y = i * dv;
+		}
+	}
+
+	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
+
+	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
+	m_d3dVertexBufferView.StrideInBytes = m_nStride;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+
+	delete[] pVertices;
+
+	m_nIndices = (faceCount * 3);
+	UINT *pnIndices = new UINT[m_nIndices];
+	
+	int k = 0;
+	for (int i = 0; i < m - 1; ++i)
+	{
+		for (int j = 0; j < n - 1; ++j)
+		{
+			pnIndices[k] = i * n + j;
+			pnIndices[k + 1] = i * n + j + 1;
+			pnIndices[k + 2] = (i + 1)*n + j;
+
+			pnIndices[k + 3] = (i + 1)*n + j;
+			pnIndices[k + 4] = i * n + j + 1;
+			pnIndices[k + 5] = (i + 1)*n + j + 1;
+
+			k += 6; // next quad
+		}
+	}
+
+	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pnIndices, sizeof(UINT) * m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_pd3dIndexUploadBuffer);
+	m_d3dIndexBufferView.BufferLocation = m_pd3dIndexBuffer->GetGPUVirtualAddress();
+	m_d3dIndexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	m_d3dIndexBufferView.SizeInBytes = sizeof(UINT) * m_nIndices;
+}
+
 MMesh::MMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 }
@@ -66,8 +170,9 @@ void CMesh::ReleaseUploadBuffers()
 
 void CMesh::Render(ID3D12GraphicsCommandList *pd3dCommandList, UINT nInstances)
 {
-	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);
 	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);
+
 	if (m_pd3dIndexBuffer)
 	{
 		pd3dCommandList->IASetIndexBuffer(&m_d3dIndexBufferView);
@@ -92,9 +197,7 @@ CTriangleMesh::CTriangleMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 	pVertices[1] = CDiffusedVertex(XMFLOAT3(0.5f, -0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	pVertices[2] = CDiffusedVertex(XMFLOAT3(-0.5f, -0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)); //XMFLOAT4(Colors::Blue));
 	//삼각형 메쉬를 리소스(정점 버퍼)로 생성한다.
-	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices,
-		m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT,
-		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
+	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices,	m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
 	//정점 버퍼 뷰를 생성한다.
 	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
 	m_d3dVertexBufferView.StrideInBytes = m_nStride;
@@ -341,6 +444,7 @@ CAirplaneMeshDiffused::CAirplaneMeshDiffused(ID3D12Device *pd3dDevice, ID3D12Gra
 	//메쉬의 바운딩 박스(모델 좌표계)를 생성한다.
 	m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(fx, fy, fz), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 }
+
 CAirplaneMeshDiffused::~CAirplaneMeshDiffused()
 {
 }

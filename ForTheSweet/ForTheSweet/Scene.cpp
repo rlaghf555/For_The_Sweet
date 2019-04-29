@@ -67,6 +67,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_WeaponShader = new WeaponShader(weapon_Model[M_Weapon_Lollipop]);
 	m_WeaponShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	
+	m_BackGroundShader = new MeshShader();
+	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
+
+	m_WavesShader = new WaveShader();
+	m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList);
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -225,6 +231,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
 	m_pPlayerShader->Animate(fTimeElapsed);
+	m_WavesShader->Animate(fTimeElapsed);
 }
 
 void CScene::CollisionProcess()
@@ -249,6 +256,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	if (m_pPlayerShader) m_pPlayerShader->Render(pd3dCommandList, pCamera);
-	//if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
-	//if (m_WeaponShader) m_WeaponShader->Render(pd3dCommandList, pCamera);
+	if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
+	if (m_WeaponShader) m_WeaponShader->Render(pd3dCommandList, pCamera);
+	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
+	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 }

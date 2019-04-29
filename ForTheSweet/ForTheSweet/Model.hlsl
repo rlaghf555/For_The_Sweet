@@ -26,7 +26,7 @@ cbuffer cbAnimateInfo : register(b3)
 {
 	matrix      gmtxObject;
 	matrix      gBoneTransforms[96];
-	uint      gnMat;
+	uint        gnMat;
 }
 
 struct VS_MODEL_INPUT
@@ -117,6 +117,55 @@ VS_MODEL_TEXTURED_OUTPUT VSStaticModel(VS_MODEL_INPUT input)
        
 	return(output);
 };
+
+struct VS_INPUT
+{
+    float3 position : POSITION;
+    float3 normal : NORMAL;
+    float3 tan : TANGENT;
+    float2 uv : TEXCOORD;
+    uint texindex : TEXINDEX;
+};
+struct VS_OUTPUT
+{
+    float4 position : SV_POSITION;
+    float3 positionW : POSITION;
+    float3 normalW : NORMAL;
+    float2 uv : TEXCOORD;
+};
+
+VS_MODEL_TEXTURED_OUTPUT VSDiffused(VS_INPUT input)
+{
+    VS_MODEL_TEXTURED_OUTPUT output;
+    
+    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
+    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+    output.uv = input.uv;
+
+    return (output);
+}
+
+
+/*
+float4 PSDiffused(VS_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID) : SV_TARGET
+{
+    PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+    	
+    float3 uvw = float3(input.uv, nPrimitiveID / 2);
+    float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	
+    input.normalW = normalize(input.normalW);
+	
+    output.color = cColor;
+	//output.color = float4(1, 1, 1, 1);
+    output.nrmoutline = float4(input.normalW, 1.0f);
+    output.nrm = output.nrmoutline;
+    output.pos = float4(input.positionW, 1.0f);
+	
+    return (output);
+}*/
+
 /*
 // nPrimitiveID : 삼각형의 정보 
 PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSStaticModel(VS_TEXTURED_LIGHTING_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)

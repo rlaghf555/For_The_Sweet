@@ -4,24 +4,24 @@
 #include "Model_Animation.h"
 struct CB_DYNAMICOBJECT_INFO
 {
-	XMFLOAT4X4		m_xmf4x4World;
-	XMFLOAT4X4		m_bone[96];
-	UINT					m_nMaterial = 0;
+	XMFLOAT4X4					m_xmf4x4World;
+	XMFLOAT4X4					m_bone[96];
+	UINT						m_nMaterial = 0;
 };
 
 class ModelObject : public CGameObject
 {
 protected:
-	LoadModel *			m_model;			//모델 정보 (vertex, UV and ....)
-	LoadAnimation**		m_ani;				//애니메이션 정보 (multi animation)
+	LoadModel *					m_model;			//모델 정보 (vertex, UV and ....)
+	LoadAnimation**				m_ani;				//애니메이션 정보 (multi animation)
 
-	vector<XMFLOAT4X4>	m_Bones;			//뼈 정보 (최종 변환 정보)
-	float							m_Animtime;		//애니메이션 상대 시간
-	UINT							m_AnimIndex;		//현재 애니메이션
-	UINT							m_NumofAnim;	//애니메이션 갯수
-	UINT							m_loopCheck = 0;
+	vector<XMFLOAT4X4>			m_Bones;			//뼈 정보 (최종 변환 정보)
+	float						m_Animtime;			//애니메이션 상대 시간
+	UINT						m_AnimIndex;		//현재 애니메이션
+	UINT						m_NumofAnim;		//애니메이션 갯수
+	UINT						m_loopCheck = 0;
 
-	CMaterial*						m_pMaterial = NULL;
+	CMaterial*					m_pMaterial = NULL;
 
 public:
 	ModelObject(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
@@ -36,12 +36,8 @@ public:
 	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false) {}
 	virtual void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false) {}
 	virtual void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f) {}
-	virtual XMFLOAT4X4* GetBoneData() {
-		return m_Bones.data();
-	}
-	virtual int GetBoneNum() const {
-		return (int)m_Bones.size();
-	}
+	virtual XMFLOAT4X4* GetBoneData() { return m_Bones.data(); }
+	virtual int GetBoneNum() const { return (int)m_Bones.size(); }
 
 	void ChangeAnimation(UINT nextIndex);
 

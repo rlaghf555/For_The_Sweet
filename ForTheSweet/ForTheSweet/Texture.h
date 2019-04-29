@@ -77,6 +77,7 @@ public:
 	void Release() { if (--m_nReferences <= 0) delete this; }
 
 	XMFLOAT4	m_xmf4Albedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	XMFLOAT4X4 MatTransform = D3DMath::Identity4x4();
 
 	UINT					m_nReflection = 0;
 	unique_ptr<CTexture>	m_pTexture = nullptr;

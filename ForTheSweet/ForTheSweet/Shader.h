@@ -20,6 +20,7 @@ struct VS_VB_INSTANCE
 	XMFLOAT4X4 m_xmf4x4Transform;
 	XMFLOAT4 m_xmcColor;
 };
+
 class CompiledShaders
 {
 public:
@@ -79,24 +80,19 @@ class CObjectsShader : public CShader
 public:
 	CObjectsShader();
 	virtual ~CObjectsShader();
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList, XMFLOAT3 Position);
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList, XMFLOAT3 Position, int Object_Kind);
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position);
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position, int Object_Kind);
 	virtual void AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
-	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
-		*pd3dGraphicsRootSignature);
+	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature	*pd3dGraphicsRootSignature);
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 protected:
 	vector<CGameObject* >	m_ppObjects;
 	vector<ModelObject* >	m_bbObjects;
-	//CGameObject **m_ppObjects = NULL;
-	//ModelObject **m_bbObjects = NULL;
 	int m_nObjects = 0;
 };
 
@@ -163,8 +159,7 @@ public:
 
 	virtual D3D12_INPUT_LAYOUT_DESC		CreateInputLayout(int index = 0);
 
-	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
-		*pd3dGraphicsRootSignature);
+	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature	*pd3dGraphicsRootSignature);
 	virtual void CreateCbvAndSrvDescriptorHeaps(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, int nShaderResourceViews, bool bIsGraphics = true);
 	virtual void CreateConstantBufferViews(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, ID3D12Resource * pd3dConstantBuffers, UINT nStride);
 	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
@@ -197,6 +192,39 @@ public:
 	void setScale(float scale);
 };
 
+class MeshShader : public CModelShader
+{
+public:
+	MeshShader();
+	~MeshShader();
+
+	virtual D3D12_INPUT_LAYOUT_DESC		CreateInputLayout(int index = 0);
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	
+	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
+	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+	virtual void Animate(float fTimeElapsed);
+	virtual void setScale(float scale);
+};
+
+class WaveShader : public MeshShader
+{
+public:
+	WaveShader();
+	~WaveShader();
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Animate(float fTimeElapsed);
+};
+
 class WeaponShader : public CModelShader
 {
 protected:
@@ -209,6 +237,7 @@ public:
 
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
 };
+
 class CInstancingShader : public CObjectsShader
 {
 public:
