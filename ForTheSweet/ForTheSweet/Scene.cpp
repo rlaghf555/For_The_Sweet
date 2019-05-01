@@ -58,10 +58,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	BuildRootSignature(pd3dDevice, pd3dCommandList);
 
-	m_pPlayerShader = new PlayerShader(character_anim);	
-	m_pPlayerShader->BuildObjects(pd3dDevice, pd3dCommandList);
-	m_pPlayer = reinterpret_cast<CPlayer*>( m_pPlayerShader->getPlayer());
-
+	for (int i = 0; i < 8; ++i)
+	{
+		m_pPlayerShader[i] = new PlayerShader(character_anim);
+		m_pPlayerShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
+		m_pPlayer[i] = reinterpret_cast<CPlayer*>(m_pPlayerShader[i]->getPlayer());
+	}
 	m_MapShader = new CModelShader(Map_Model[M_Map_1]);
 	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
@@ -160,10 +162,13 @@ void CScene::ReleaseObjects()
 		m_pInstancingShaders[i].ReleaseObjects();
 	}
 	if (m_pInstancingShaders) delete[] m_pInstancingShaders;
-	if (m_pPlayerShader) {
-		m_pPlayerShader->ReleaseShaderVariables();
-		m_pPlayerShader->ReleaseObjects();
-		delete m_pPlayerShader;
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		if (m_pPlayerShader[i]) {
+			m_pPlayerShader[i]->ReleaseShaderVariables();
+			m_pPlayerShader[i]->ReleaseObjects();
+			delete m_pPlayerShader[i];
+		}
 	}
 	if (m_MapShader) {
 		m_MapShader->ReleaseShaderVariables();
@@ -230,7 +235,12 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
-	m_pPlayerShader->Animate(fTimeElapsed);
+
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+			if (m_pPlayer[i]->GetConnected())
+				m_pPlayerShader[i]->Animate(fTimeElapsed);
+	}
 	m_WavesShader->Animate(fTimeElapsed);
 }
 
@@ -255,7 +265,12 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
-	if (m_pPlayerShader) m_pPlayerShader->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		if (m_pPlayer[i]->GetConnected()) {
+			m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
 	if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
 	if (m_WeaponShader) m_WeaponShader->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);

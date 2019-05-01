@@ -8,6 +8,20 @@
 
 using namespace physx;
 
+class PlayerHitReport : public PxUserControllerHitReport {
+public:
+	void	onShapeHit(const PxControllerShapeHit &hit) {
+		cout << "ShapedHit!!!\n";
+	}
+	void 	onControllerHit(const PxControllersHit &hit) {
+		cout << "ControllerHit!!!\n";
+	}
+	void 	onObstacleHit(const PxControllerObstacleHit &hit) {
+		cout << "ObstacleHit!!!\n";
+	}
+
+};
+
 class CPhysx {
 public:
 	// PxFoundation이 관리하는 Allocator, ErrorCallback
@@ -35,6 +49,7 @@ public:
 	// 요리
 	physx::PxCooking* m_Cooking;
 
+	PlayerHitReport hitreport;
 	// Player 충돌 모형을 Capsule Or Box
 	//physx::PxCapsuleControllerDesc m_CapsuleDesc;
 	//physx::PxBoxControllerDesc m_BoxDesc;
@@ -48,4 +63,3 @@ public:
 
 	PxTriangleMesh*	GetTriangleMesh(mesh* meshes, UINT count);
 };
-

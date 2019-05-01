@@ -26,6 +26,7 @@ protected:
 	float m_fYaw;
 	float m_fRoll;
 
+	bool m_connected;
 	
 	XMFLOAT3 m_xmf3Velocity;		//플레이어의 이동 속도를 나타내는 벡터이다.
 	XMFLOAT3 m_xmf3Gravity;			//플레이어에 작용하는 중력을 나타내는 벡터이다.
@@ -44,7 +45,10 @@ public:
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
 	XMFLOAT3 GetUpVector() { return(m_xmf3Up); }
 	XMFLOAT3 GetRightVector() { return(m_xmf3Right); }
+	bool GetConnected() { return(m_connected); }
+	void SetConnected(bool connected) { m_connected = connected; }
 
+	void SetPosition(XMFLOAT3& pos) { m_xmf3Position = pos; }
 	void SetFriction(float fFriction) { m_fFriction = fFriction; }
 	void SetGravity(XMFLOAT3& xmf3Gravity) { m_xmf3Gravity = xmf3Gravity; }
 	void SetMaxVelocityXZ(float fMaxVelocity) { m_fMaxVelocityXZ = fMaxVelocity; }

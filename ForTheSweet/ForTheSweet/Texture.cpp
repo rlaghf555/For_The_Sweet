@@ -104,7 +104,7 @@ void CTexture::ReleaseShaderVariables()
 void CTexture::LoadTextureFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, const wchar_t *pszFileName, UINT nIndex)
 {
 	m_ppd3dTextures[nIndex] = D3DUtil::CreateTextureResourceFromFile(pd3dDevice, pd3dCommandList, pszFileName, m_ppd3dTextureUploadBuffers[nIndex].Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	cout << "Load Texture\n";
+	//cout << "Load Texture\n";
 }
 
 ComPtr<ID3D12Resource> CTexture::CreateTexture(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, UINT nWidth, UINT nHeight, DXGI_FORMAT dxgiFormat, D3D12_RESOURCE_FLAGS d3dResourceFlags, D3D12_RESOURCE_STATES d3dResourceStates, D3D12_CLEAR_VALUE *pd3dClearValue, UINT nIndex)

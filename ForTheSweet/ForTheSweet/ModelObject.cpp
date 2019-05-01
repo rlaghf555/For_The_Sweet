@@ -27,7 +27,7 @@ ModelObject::ModelObject(Model_Animation * ma, ID3D12Device * pd3dDevice, ID3D12
 
 	//뼈 정보 초기화
 	m_Bones.resize(m_model->GetBones()->size());
-	cout << "!! : " << m_model->GetBones()->size() << endl;
+	//cout << "!! : " << m_model->GetBones()->size() << endl;
 	for (auto& p : m_Bones) {
 		XMStoreFloat4x4(&p, XMMatrixIdentity());
 	}
@@ -59,7 +59,7 @@ ModelObject::ModelObject(LoadModel* ma, ID3D12Device *pd3dDevice, ID3D12Graphics
 
 	//뼈 정보 초기화
 	m_Bones.resize(m_model->GetBones()->size());
-	cout << "!! : " << m_model->GetBones()->size() << endl;
+	//cout << "!! : " << m_model->GetBones()->size() << endl;
 	for (auto& p : m_Bones) {
 		XMStoreFloat4x4(&p, XMMatrixIdentity());
 	}
@@ -82,7 +82,7 @@ void ModelObject::SetAnimations(UINT num, LoadAnimation ** tmp)
 			m_ani[i]->setBones(m_model->GetBones());
 		}
 
-		cout << m_model->GetBones()->size() << endl;
+		//cout << m_model->GetBones()->size() << endl;
 	}
 }
 
@@ -92,7 +92,7 @@ void ModelObject::Animate(float fTime)
 		if (m_AnimIndex < m_NumofAnim) {
 			//cout << "본 움직였다\n";
 			m_loopCheck = m_ani[m_AnimIndex]->BoneTransform(m_AnimIndex, fTime, m_Bones);
-			
+
 		}
 	}
 }

@@ -63,6 +63,17 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	BuildObjects();		//렌더링할 객체(게임 월드 객체)를 생성한다.
 
+	m_pSocket = new CSocket();
+	if (m_pSocket) {
+		m_pSocket->init();
+		if (m_pSocket->init())
+		{
+			m_pSocket->sendPacket(CS_CONNECT, 0, 0);
+			cout << "CONNECT 패킷 보냄\n";
+		}
+		else
+			return false;
+	}
 	return(true);
 }
 
@@ -220,6 +231,113 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 	::gnCbvSrvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
+void CGameFramework::recvCallBack()
+{
+	sc_packet_login p_login;
+	sc_packet_pos p_pos;
+	sc_packet_put_player p_put;
+	sc_packet_remove p_remove;
+
+	int retval;
+
+	//while(m_pSocket == NULL);
+
+	retval = recv(m_pSocket->clientSocket, m_pSocket->buf, MAX_PACKET_SIZE, 0);
+
+	if (retval == 0 || retval == SOCKET_ERROR)
+	{
+		closesocket(m_pSocket->clientSocket);
+	}
+
+	char *ptr = m_pSocket->buf;
+	//cout << "Packet Len : " << retval << endl;
+
+	while (retval > 0)
+	{
+		char size = ptr[0];
+		char type = ptr[1];
+
+		//cout << "size : " << int(size) << "type : " << int(type) << endl;
+
+		if (type == SC_LOGIN)
+		{
+			memcpy(&p_login, ptr, sizeof(p_login));
+
+			My_ID = p_login.id;
+			XMFLOAT3 position(p_login.x, p_login.y, p_login.z);
+			XMFLOAT3 look(p_login.vx, p_login.vy, p_login.vz);
+
+			m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
+			cout << "ID : " << My_ID << endl;
+			m_pCamera = m_pPlayer->GetCamera();
+
+			m_pScene->m_pPlayer[My_ID]->SetPosition(position);
+			//m_pScene->m_pPlayer[My_ID]->SetLook(look);
+			cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+			//m_pScene->m_pPlayer[My_ID]->SetLookVector(look);
+			m_pScene->m_pPlayer[My_ID]->SetConnected(true);
+
+			m_pCamera = m_pScene->m_pPlayer[My_ID]->GetCamera();
+			cout << "Client Login sucess\n";
+
+			ptr += sizeof(p_login);
+			retval -= sizeof(p_login);
+		}
+		if (type == SC_PUT_PLAYER)
+		{
+			memcpy(&p_put, ptr, sizeof(p_put));
+
+			XMFLOAT3 position(p_put.x, p_put.y, p_put.z);
+			XMFLOAT3 vel(p_put.vx, p_put.vy, p_put.vz);
+
+			cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+
+			m_pScene->m_pPlayer[p_put.id]->SetPosition(position);
+			m_pScene->m_pPlayer[p_put.id]->SetLook(vel);
+			//m_pScene->getplayer(p_put.id)->SetPosition(position);
+			//m_pScene->m_pPlayer[p_put.id]->SetLookVector(look);
+			m_pScene->m_pPlayer[p_put.id]->SetConnected(true);
+
+			ptr += sizeof(p_put);
+			retval -= sizeof(p_put);
+		}
+		if (type == SC_POS) {
+			memcpy(&p_pos, m_pSocket->buf, sizeof(p_pos));
+
+			XMFLOAT3 position(p_pos.x, p_pos.y, p_pos.z);
+			XMFLOAT3 look(p_pos.vx, p_pos.vy, p_pos.vz);
+
+			//m_pScene->m_pPlayer[p_pos.id]->SetPosition(position);
+			m_pScene->getplayer(p_pos.id)->SetPosition(position);
+			m_pScene->getplayer(p_pos.id)->SetLook(look);
+
+			//cout << "1[ID : " << p_pos.id << "]Pos 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+			//
+			//position = m_pScene->getplayer(p_pos.id)->GetPosition();
+			////m_pScene->m_pPlayer[p_pos.id]->SetLookVector(look);
+			////cout << position.x << "," << position.y << "," << position.z << "\n";
+			////m_pCamera = m_pScene->m_pPlayer[p_pos.id]->GetCamera();
+			//
+			//cout << "2[ID : " << p_pos.id << "]Pos 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+
+			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
+			ptr += sizeof(p_pos);
+			retval -= sizeof(p_pos);
+		}
+		if (type == SC_REMOVE) {
+			memcpy(&p_remove, m_pSocket->buf, sizeof(p_remove));
+
+			m_pScene->m_pPlayer[p_remove.id]->SetConnected(false);
+
+			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
+			ptr += sizeof(p_remove);
+			retval -= sizeof(p_remove);
+		}
+
+	}
+	memset(m_pSocket->buf, 0, sizeof(MAX_PACKET_SIZE));
+}
+
 //스왑체인의 각 후면 버퍼에 대한 렌더 타겟 뷰를 생성한다.
 void CGameFramework::CreateRenderTargetView()
 {
@@ -306,50 +424,15 @@ void CGameFramework::BuildObjects()
 	m_pPhysx->initPhysics();
 
 	if (m_pScene) {
+		//if (My_ID != -1)
+		//	m_pScene->SetMyID(My_ID);
 		m_pScene->SetCharacter(Character_Model);
 		m_pScene->SetMap(Map_Model);
 		m_pScene->SetWeapon(weapon);
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 	}
-	My_ID = CHARATER_ID_7; //원래는 서버에서 받아야함
-
-	//ModelPlayer *pPlayer;
-	//pPlayer = new ModelPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), Character_Model);
-	// player 위치 서버에서 받아서 초기화 해줘야함
-
-	m_pPlayer = m_pScene->getplayer();//pPlayer;
-	m_pCamera = m_pPlayer->GetCamera();
-
-	//m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03), m_GameTimer.GetTimeElapsed());	//시작할때 3인칭 시작으로바꿈.
-
-	if (m_pPhysx)
-	{
-		PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
-		m_pPhysx->m_Scene->addActor(*groundPlane);
-
-		m_pPhysx->m_PlayerManager = PxCreateControllerManager(*(m_pPhysx->m_Scene));
-
-		//PxBoxControllerDesc bdesc;
-		//bdesc.position = PxExtendedVec3(0, 0, 0);
-		//bdesc.material = m_pPhysx->m_Material;
-		//bdesc.halfHeight = 10.f;
-		//bdesc.halfSideExtent = 10.f;
-		//bdesc.halfForwardExtent = 10.f;
-
-		PxCapsuleControllerDesc desc;
-		desc.height = 15.f;
-		desc.radius = 10.f;
-		desc.position = PxExtendedVec3(0, 17.5, 0);
-		desc.material = m_pPhysx->m_Material;
-
-		m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
-
-		PxRigidDynamic* dynamic = PxCreateDynamic(*(m_pPhysx->m_Physics), PxTransform(PxVec3(50, 17.5, 0)), PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material), 1.0f);
-		dynamic->setAngularDamping(0.5f);
-		dynamic->setLinearVelocity(PxVec3(0, 0, 0));
-		m_pPhysx->m_Scene->addActor(*dynamic);
-	}
+	cout << "ID : " << My_ID << endl;
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -499,6 +582,11 @@ void CGameFramework::ProcessInput()
 
 
 	}
+
+	if (dwDirection != 0) {
+		m_pSocket->sendPacket(CS_MOVE, dwDirection, 0);
+	}
+	count = 0;
 	float rotation = 0.0f;
 	POINT ptCursorPos;
 	/*마우스를 캡쳐했으면 마우스가 얼마만큼 이동하였는 가를 계산한다. 마우스 왼쪽 또는 오른쪽 버튼이 눌러질 때의
@@ -600,7 +688,7 @@ void CGameFramework::ProcessInput()
 
 			/*플레이어를 dwDirection 방향으로 이동한다(실제로는 속도 벡터를 변경한다). 이동 거리는 시간에 비례하도록 한다.
 			플레이어의 이동 속력은 (50/초)로 가정한다.*/
-
+		/*
 		if (dwDirection)
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
@@ -628,7 +716,7 @@ void CGameFramework::ProcessInput()
 			//Right = Vector3::Normalize(Right);
 			m_pPlayer->SetLook(Look);		
 		}
-		
+		*/
 	}
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
 	//if(m_pCamera)
@@ -678,21 +766,21 @@ void CGameFramework::FrameAdvance()
 	
 	ProcessInput();
 
-	m_pPhysx->m_Scene->simulate(1.f / 60.f);
-	m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
+	//m_pPhysx->m_Scene->simulate(1.f / 60.f);
+	//m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
 
-	physx::PxExtendedVec3 playerPosition;
-	playerPosition = m_pPhysx->m_PlayerController->getPosition();
-	XMFLOAT3 position;
-	position.x = playerPosition.x;
-	position.y = playerPosition.y - 17.5f;
-	position.z = playerPosition.z;
+	//physx::PxExtendedVec3 playerPosition;
+	//playerPosition = m_pPhysx->m_PlayerController->getPosition();
+	XMFLOAT3 position = m_pPlayer->GetPosition();;
+	//position.x = playerPosition.x;
+	//position.y = playerPosition.y - 17.5f;
+	//position.z = playerPosition.z;
 	m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 	m_pCamera->SetLookAt(position);
 	m_pPlayer->SetPosition(position);
 	
 	//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
-	position = m_pCamera->GetPosition();
+	//position = m_pCamera->GetPosition();
 	//cout << "카메라 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;;
 	
 	CollisionProcess();

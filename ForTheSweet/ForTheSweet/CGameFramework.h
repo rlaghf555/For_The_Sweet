@@ -4,11 +4,15 @@
 #include "Player.h"
 #include "Model_Animation.h"
 #include "Physx.h"
-
+#include "Socket.h"
 
 class CGameFramework
 {
 public:
+	// Socket
+	CSocket *m_pSocket;
+	int count = 0;
+
 	// Physx
 	CPhysx *m_pPhysx;
 
@@ -16,7 +20,7 @@ public:
 	CPlayer * m_pPlayer;
 	CCamera* m_pCamera;
 	int My_ID = -1;
-	int time = 0; 
+	int time = 0;
 	//마지막으로 마우스 버튼을 클릭할 때의 마우스 커서의 위치이다.
 	POINT m_ptOldCursorPos;
 
@@ -66,8 +70,8 @@ private:
 	ID3D12Debug *m_pd3dDebugController;
 
 #endif
-//	D3D12_VIEWPORT m_d3dViewport;
-//	D3D12_RECT m_d3dScissorRect;		//뷰포트와 씨저 사각형이다.
+	//	D3D12_VIEWPORT m_d3dViewport;
+	//	D3D12_RECT m_d3dScissorRect;		//뷰포트와 씨저 사각형이다.
 
 public:
 	CGameFramework();
@@ -102,6 +106,8 @@ public:
 	void WaitForGpuComplete();
 	//CPU와 GPU를 동기화하는 함수이다.
 
+	// Socket
+	void recvCallBack();
 
 	void CreateRenderTargetView();
 	void CreateDepthStencilView();

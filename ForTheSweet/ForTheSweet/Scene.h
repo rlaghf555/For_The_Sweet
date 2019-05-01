@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Camera.h"
 #include "Physx.h"
+#include "Protocol.h"
 
 class CScene
 {
@@ -29,10 +30,10 @@ public:
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
 	ID3D12RootSignature *GetGraphicsRootSignature();
 
-	CPlayer						*m_pPlayer = NULL;
-	CPlayer*					getplayer() { return m_pPlayer; }
+	CPlayer						*m_pPlayer[MAX_USER];
+	CPlayer*					getplayer(char id) { return m_pPlayer[id]; }
 	Model_Animation				*character_anim;
-	PlayerShader				*m_pPlayerShader = NULL;
+	PlayerShader				*m_pPlayerShader[MAX_USER];
 
 	CModelShader				*m_MapShader = NULL;
 	LoadModel					**Map_Model;

@@ -1,4 +1,4 @@
- #include "stdafx.h"
+#include "stdafx.h"
 #include "Model.h"
 
 ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, mesh& meshData) : MMesh(pd3dDevice, pd3dCommandList)
@@ -6,7 +6,7 @@ ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCo
 	m_nVertices = (int)meshData.m_vertices.size();
 	m_nIndices = (int)meshData.m_indices.size();
 
-	cout << "정점 개수 : " << m_nVertices << endl;
+	//cout << "정점 개수 : " << m_nVertices << endl;
 
 	m_nStride = sizeof(vertexDatas);
 	m_nOffset = 0;
@@ -56,7 +56,7 @@ LoadModel::LoadModel(const string& fileName, bool isStatic)
 		m_meshes.resize(m_pScene->mNumMeshes);
 		m_numBones = 0;
 		InitScene();
-		
+
 		m_ModelMeshes.resize(m_meshes.size());
 	}
 }
@@ -147,7 +147,7 @@ void LoadModel::InitScene()
 	for (UINT i = 0; i < m_meshes.size(); ++i) {
 		const aiMesh* pMesh = m_pScene->mMeshes[i];
 		InitMesh(i, pMesh);
-		
+
 		if (pMesh->HasBones()) InitBones(i, pMesh);
 
 		m_numVertices += (UINT)m_meshes[i].m_vertices.size();
@@ -168,7 +168,7 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 		pos.y = pMesh->mVertices[i].y;
 		pos.z = pMesh->mVertices[i].z;
 
-		XMFLOAT3 normal(0.0f, 0.0f, 0.0f); 
+		XMFLOAT3 normal(0.0f, 0.0f, 0.0f);
 		normal.x = pMesh->mNormals[i].x;
 		normal.y = pMesh->mNormals[i].y;
 		normal.z = pMesh->mNormals[i].z;
@@ -199,12 +199,12 @@ void LoadModel::SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	for (UINT i = 0; i < m_ModelMeshes.size(); ++i) {
 		ModelMesh* tmp = new ModelMesh(pd3dDevice, pd3dCommandList, m_meshes[i]);
 		m_ModelMeshes[i] = tmp;
-	}	
+	}
 }
 
 void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 {
-	cout << pMesh->mNumBones << endl;
+	//cout << pMesh->mNumBones << endl;
 
 	for (UINT i = 0; i < pMesh->mNumBones; ++i) {
 		int BoneIndex = -1;
