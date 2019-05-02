@@ -38,7 +38,7 @@ public:
 	CModelShader				*m_MapShader = NULL;
 	LoadModel					**Map_Model;
 
-	WeaponShader				*m_WeaponShader = NULL;
+	WeaponShader				*m_WeaponShader[WEAPON_MAX_NUM];
 	LoadModel					**weapon_Model;
 
 	MeshShader					*m_BackGroundShader = NULL;

@@ -820,7 +820,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	BuildPSO(pd3dDevice, nRenderTargets);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_1.dds", 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map1.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -1109,7 +1109,7 @@ D3D12_SHADER_BYTECODE WaveShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
 D3D12_SHADER_BYTECODE WaveShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
 {
 	wchar_t filename[100] = L"Model.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "PSDynamicModel", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(filename, "PSWaveModel", "ps_5_1", ppd3dShaderBlob));
 }
 
 void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
@@ -1146,6 +1146,7 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 200, 200, 20, 20);	// Width(w, h), xycount(m, n)
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
+		m_ppObjects[i]->SetPosition(0, 0, 0);//20.f * i - 200,0,200
 	}
 }
 
@@ -1176,32 +1177,42 @@ WeaponShader::~WeaponShader()
 
 }
 
-void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 2;
+	m_nObjects = 20;
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
-
-	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
 
 	CreateGraphicsRootSignature(pd3dDevice);
 	BuildPSO(pd3dDevice, nRenderTargets);
 
-	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\lollipop.dds", 0);
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 2);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+	
+	CTexture *pTexture;
+	pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if (weapon_num == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\lollipop.dds", 0);
+	if (weapon_num == 1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\candy.dds", 0);
+	if (weapon_num == 2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\pepero.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
-	m_pMaterial = new CMaterial();
-	m_pMaterial->SetTexture(pTexture);
-	m_pMaterial->SetReflection(1);
+	XMFLOAT3 a = XMFLOAT3(0, 1, 0);
 
 	for (int i = 0; i < m_nObjects; i++) {
+		float b = D3DMath::RandF(-13, 13);
+		float c = D3DMath::RandF(-9, 9);
+		if (b > -2 && b < 2 || c > -2 && c < 2) { i -= 1; continue; }
+		
+		m_pMaterial = new CMaterial();
+		m_pMaterial->SetTexture(pTexture);
+		m_pMaterial->SetReflection(1);
+
 		ModelObject* weapon = new ModelObject(weapon_model, pd3dDevice, pd3dCommandList);
-		weapon->SetPosition(-75, 10 * i, 10);
+		weapon->SetPosition(b * 20, 10, c * 20);
+		weapon->Rotate(&a, D3DMath::RandF(0,4) * 90.f);
 		weapon->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = weapon;
 	}

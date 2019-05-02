@@ -67,8 +67,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_MapShader = new CModelShader(Map_Model[M_Map_1]);
 	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
-	m_WeaponShader = new WeaponShader(weapon_Model[M_Weapon_Lollipop]);
-	m_WeaponShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+		m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+	}
 	
 	m_BackGroundShader = new MeshShader();
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -175,10 +177,12 @@ void CScene::ReleaseObjects()
 		m_MapShader->ReleaseObjects();
 		delete m_MapShader;
 	}
-	if (m_WeaponShader) {
-		m_WeaponShader->ReleaseShaderVariables();
-		m_WeaponShader->ReleaseObjects();
-		delete m_WeaponShader;
+	for (int i = 0; i < WEAPON_MAX_NUM; ++i) {
+		if (m_WeaponShader[i]) {
+			m_WeaponShader[i]->ReleaseShaderVariables();
+			m_WeaponShader[i]->ReleaseObjects();
+			delete m_WeaponShader[i];
+		}
 	}
 }
 
@@ -272,7 +276,10 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		}
 	}
 	if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
-	if (m_WeaponShader) m_WeaponShader->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < WEAPON_MAX_NUM; ++i)
+	{
+		if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
+	}
 	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 }

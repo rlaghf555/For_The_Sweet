@@ -235,7 +235,7 @@ public:
 	WeaponShader(LoadModel *ma);
 	~WeaponShader();
 
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int nRenderTargets = 1, void * pContext = NULL);
 };
 
 class CInstancingShader : public CObjectsShader
