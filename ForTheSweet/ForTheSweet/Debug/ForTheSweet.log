@@ -2,11 +2,13 @@
   Animation.cpp
 c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\animation.cpp(35): warning C4244: '=': 'const double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\animation.cpp(69): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-  Camera.cpp
-c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\modelobject.h(57): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
   CGameFramework.cpp
 c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\modelobject.h(57): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(591): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(630): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(818): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
+c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(823): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(824): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(825): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(240): warning C4244: '초기화 중': '_Ty'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
@@ -37,11 +39,13 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=std::pair<std::string,float>
           ]
-  c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(392): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
+  c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(395): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
           with
           [
               _Ty=std::pair<std::string,float>
           ]
+  Camera.cpp
+c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\modelobject.h(57): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
   D3DMath.cpp
   D3DUtil.cpp
 c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\d3dutil.cpp(40): warning C4244: '인수': 'std::streamoff'에서 'SIZE_T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
@@ -78,6 +82,16 @@ c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\shader.cpp(120
 c:\users\hol\desktop\ㅈㅈ\for_the_sweet\forthesweet\forthesweet\modelobject.h(57): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
   Timer.cpp
   코드를 생성하고 있습니다...
+PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCharacterControllerCallbacks.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterControllerCallbacks.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCharacterControllerManager.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterControllerManager.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctController.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctObstacleContext.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctObstacleContext.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctSweptBox.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctSweptBox.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctSweptCapsule.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctSweptCapsule.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctSweptVolume.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctSweptVolume.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXExtensions_static_32.lib(ExtCpuWorkerThread.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtCpuWorkerThread.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXExtensions_static_32.lib(ExtDefaultCpuDispatcher.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtDefaultCpuDispatcher.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXExtensions_static_32.lib(ExtDefaultErrorCallback.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtDefaultErrorCallback.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
@@ -85,4 +99,5 @@ PhysXExtensions_static_32.lib(ExtDefaultSimulationFilterShader.obj) : warning LN
 PhysXExtensions_static_32.lib(ExtDefaultStreams.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtDefaultStreams.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXExtensions_static_32.lib(ExtRigidBodyExt.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtRigidBodyExt.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXExtensions_static_32.lib(ExtSimpleFactory.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtSimpleFactory.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtTriangleMeshExt.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtTriangleMeshExt.obj)' 또는 'C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
   ForTheSweet.vcxproj -> C:\Users\Hol\Desktop\ㅈㅈ\For_The_Sweet\ForTheSweet\Debug\ForTheSweet.exe

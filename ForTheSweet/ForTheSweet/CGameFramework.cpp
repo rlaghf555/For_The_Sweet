@@ -63,17 +63,20 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	BuildObjects();		//렌더링할 객체(게임 월드 객체)를 생성한다.
 
-	m_pSocket = new CSocket();
-	if (m_pSocket) {
-		m_pSocket->init();
-		if (m_pSocket->init())
-		{
-			m_pSocket->sendPacket(CS_CONNECT, 0, 0);
-			cout << "CONNECT 패킷 보냄\n";
+	if (SERVER_ON) {
+		m_pSocket = new CSocket();
+		if (m_pSocket) {
+			m_pSocket->init();
+			if (m_pSocket->init())
+			{
+				m_pSocket->sendPacket(CS_CONNECT, 0, 0);
+				cout << "CONNECT 패킷 보냄\n";
+			}
+			else
+				return false;
 		}
-		else
-			return false;
 	}
+
 	return(true);
 }
 
@@ -432,7 +435,43 @@ void CGameFramework::BuildObjects()
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 	}
-	cout << "ID : " << My_ID << endl;
+	if (!SERVER_ON) {
+		My_ID = 0;
+		m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
+		cout << "ID : " << My_ID << endl;
+		m_pCamera = m_pPlayer->GetCamera();
+		XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
+		m_pPlayer->SetPosition(pos);
+		m_pPlayer->SetPosition(pos);
+		m_pPlayer->SetConnected(true);
+		if (m_pPhysx)
+		{
+			PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
+			m_pPhysx->m_Scene->addActor(*groundPlane);
+
+			m_pPhysx->m_PlayerManager = PxCreateControllerManager(*(m_pPhysx->m_Scene));
+
+			//PxBoxControllerDesc bdesc;
+			//bdesc.position = PxExtendedVec3(0, 0, 0);
+			//bdesc.material = m_pPhysx->m_Material;
+			//bdesc.halfHeight = 10.f;
+			//bdesc.halfSideExtent = 10.f;
+			//bdesc.halfForwardExtent = 10.f;
+
+			PxCapsuleControllerDesc desc;
+			desc.height = 15.f;
+			desc.radius = 10.f;
+			desc.position = PxExtendedVec3(0, 17.5, 0);
+			desc.material = m_pPhysx->m_Material;
+
+			m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
+
+			PxRigidDynamic* dynamic = PxCreateDynamic(*(m_pPhysx->m_Physics), PxTransform(PxVec3(50, 17.5, 0)), PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material), 1.0f);
+			dynamic->setAngularDamping(0.5f);
+			dynamic->setLinearVelocity(PxVec3(0, 0, 0));
+			m_pPhysx->m_Scene->addActor(*dynamic);
+		}
+	}
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -583,7 +622,7 @@ void CGameFramework::ProcessInput()
 
 	}
 
-	if (dwDirection != 0) {
+	if (dwDirection != 0 && SERVER_ON) {
 		m_pSocket->sendPacket(CS_MOVE, dwDirection, 0);
 	}
 	count = 0;
@@ -681,15 +720,10 @@ void CGameFramework::ProcessInput()
 		m_pPlayer->EnableLoop();
 	}
 
-	//마우스 또는 키 입력이 있으면 플레이어를 이동하거나(dwDirection) 회전한다(cxDelta 또는 cyDelta).
-	//if ((dwDirection != 0) || (rotation != 0.0f))
-	{		
-			//m_pPlayer->Rotate(0.0f, rotation, 0.0f);
-
-			/*플레이어를 dwDirection 방향으로 이동한다(실제로는 속도 벡터를 변경한다). 이동 거리는 시간에 비례하도록 한다.
-			플레이어의 이동 속력은 (50/초)로 가정한다.*/
-		/*
-		if (dwDirection)
+			
+		
+		
+		if (!SERVER_ON && dwDirection)
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
 			m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
@@ -716,8 +750,8 @@ void CGameFramework::ProcessInput()
 			//Right = Vector3::Normalize(Right);
 			m_pPlayer->SetLook(Look);		
 		}
-		*/
-	}
+		
+	
 	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
 	//if(m_pCamera)
 	//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
@@ -765,23 +799,39 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(60.0f);
 	
 	ProcessInput();
+	if (SERVER_ON) {
+		//m_pPhysx->m_Scene->simulate(1.f / 60.f);
+		//m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
 
-	//m_pPhysx->m_Scene->simulate(1.f / 60.f);
-	//m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
+		//physx::PxExtendedVec3 playerPosition;
+		//playerPosition = m_pPhysx->m_PlayerController->getPosition();
+		XMFLOAT3 position = m_pPlayer->GetPosition();;
+		//position.x = playerPosition.x;
+		//position.y = playerPosition.y - 17.5f;
+		//position.z = playerPosition.z;
+		m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+		m_pCamera->SetLookAt(position);
+		m_pPlayer->SetPosition(position);
+	}
+	else {
+		m_pPhysx->m_Scene->simulate(1.f / 60.f);
+		m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
 
-	//physx::PxExtendedVec3 playerPosition;
-	//playerPosition = m_pPhysx->m_PlayerController->getPosition();
-	XMFLOAT3 position = m_pPlayer->GetPosition();;
-	//position.x = playerPosition.x;
-	//position.y = playerPosition.y - 17.5f;
-	//position.z = playerPosition.z;
-	m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
-	m_pCamera->SetLookAt(position);
-	m_pPlayer->SetPosition(position);
+		physx::PxExtendedVec3 playerPosition;
+		playerPosition = m_pPhysx->m_PlayerController->getPosition();
+		XMFLOAT3 position;
+		position.x = playerPosition.x;
+		position.y = playerPosition.y - 17.5f;
+		position.z = playerPosition.z;
+		m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+		m_pCamera->SetLookAt(position);
+		m_pPlayer->SetPosition(position);
+
+		//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+		position = m_pCamera->GetPosition();
+		//cout << "카메라 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;;
+	}
 	
-	//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
-	//position = m_pCamera->GetPosition();
-	//cout << "카메라 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;;
 	
 	CollisionProcess();
 
