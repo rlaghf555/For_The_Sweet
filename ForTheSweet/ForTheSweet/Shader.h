@@ -236,6 +236,7 @@ public:
 	~WeaponShader();
 
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int nRenderTargets = 1, void * pContext = NULL);
+	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 };
 
 class CInstancingShader : public CObjectsShader

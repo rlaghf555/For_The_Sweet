@@ -28,6 +28,7 @@ void CPhysx::initPhysics()
 	m_Dispatcher = PxDefaultCpuDispatcherCreate(1);
 	sceneDesc.cpuDispatcher = m_Dispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.simulationEventCallback = &m_Simulator;
 
 	m_Scene = m_Physics->createScene(sceneDesc);
 

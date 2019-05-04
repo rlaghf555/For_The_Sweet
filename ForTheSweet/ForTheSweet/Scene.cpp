@@ -67,7 +67,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_MapShader = new CModelShader(Map_Model[M_Map_1]);
 	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
-	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+	for(int i = 0; i < 1; i++) {
+	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
 		m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
 	}
@@ -240,11 +241,20 @@ void CScene::AnimateObjects(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
 
+	XMFLOAT4 hand_pos;
+
 	for (int i = 0; i < MAX_USER; ++i)
 	{
-			if (m_pPlayer[i]->GetConnected())
-				m_pPlayerShader[i]->Animate(fTimeElapsed);
+		if (m_pPlayer[i]->GetConnected()) {
+			m_pPlayerShader[i]->Animate(fTimeElapsed);
+			hand_pos = m_pPlayer[i]->GetHandPos();
+		}
 	}
+
+	XMFLOAT3 pos = XMFLOAT3(hand_pos.x, hand_pos.y, hand_pos.z);
+
+	m_WeaponShader[0]->getObject(0)->SetPosition(pos);
+
 	m_WavesShader->Animate(fTimeElapsed);
 }
 

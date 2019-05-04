@@ -17,6 +17,11 @@ void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandLi
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 }
 
+void CGameObject::SetWorld(XMFLOAT4X4 & xmf4x4World)
+{
+	m_xmf4x4World = xmf4x4World;
+}
+
 void CGameObject::SetPosition(float x, float y, float z)
 {
 	m_xmf4x4World._41 = x;

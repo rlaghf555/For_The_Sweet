@@ -61,6 +61,7 @@ public:
 
 public:
 	void ReleaseUploadBuffers();
+	virtual void SetWorld(XMFLOAT4X4& xmf4x4World);
 	virtual void SetMesh(CMesh *pMesh);
 	virtual void SetMesh(int nIndex, MMesh *pMesh);
 	virtual void SetShader(CShader *pShader);

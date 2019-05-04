@@ -860,6 +860,7 @@ void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera *
 	{
 		if (m_bbObjects[j])
 		{
+			//m_bbObjects[j]->G
 			m_bbObjects[j]->Render(pd3dCommandList, pCamera);
 		}
 	}
@@ -1182,7 +1183,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 20;
+	m_nObjects = 1;
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
 	CreateGraphicsRootSignature(pd3dDevice);
@@ -1211,8 +1212,9 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		m_pMaterial->SetReflection(1);
 
 		ModelObject* weapon = new ModelObject(weapon_model, pd3dDevice, pd3dCommandList);
-		weapon->SetPosition(b * 20, 10, c * 20);
-		weapon->Rotate(&a, D3DMath::RandF(0,4) * 90.f);
+		weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
+		//weapon->SetPosition(b * 20, 10, c * 20);
+		//weapon->Rotate(&a, D3DMath::RandF(0,4) * 90.f);
 		weapon->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = weapon;
 	}

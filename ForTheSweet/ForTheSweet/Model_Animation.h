@@ -9,7 +9,9 @@ protected:
 	vector<LoadAnimation*>* animStack;
 	vector<string>		matList;
 	vector<string>		normMatList;
+
 public:
+
 	Model_Animation();
 	Model_Animation(string Model_filename, vector<pair<string,float>>* Animation_filename);
 	~Model_Animation();

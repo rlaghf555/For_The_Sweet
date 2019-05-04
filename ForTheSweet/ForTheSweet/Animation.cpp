@@ -17,6 +17,7 @@ LoadAnimation::LoadAnimation(string filename, float trigger, float skip) :
 		end_time = (float)m_pAnim->mChannels[0]->mPositionKeys[m_pAnim->mChannels[0]->mNumPositionKeys - 1].mTime - 1.0f;
 		//프레임 종료 시점에서 1.0 만큼 빼줘야 프레임이 안겹침
 
+		//cout << filename << " start Time : " << start_time << endl;
 		//cout << filename << " end Time : " << end_time << endl;
 
 		if (IsZero(trigger))
@@ -33,6 +34,7 @@ LoadAnimation::LoadAnimation(string filename, float trigger, float skip) :
 
 		//m_animSpeed = (end_time - start_time) / m_pAnim->mChannels[0]->mNumPositionKeys;
 		m_animSpeed = m_pAnim->mTicksPerSecond;
+		//cout << m_animSpeed << endl;
 	}
 }
 
@@ -69,6 +71,47 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 	for (int i = 0; i < m_NumBones; ++i) {
 		//뼈의 최종변환을 반환
 		XMStoreFloat4x4(&transforms[i], m_Bones[i].second.FinalTransformation);
+
+		if (m_Bones[i].first == "Bip001 L Hand") {
+			//XMVECTOR tmp = p.second.BoneOffset.r[3];
+			//cout << "Left Hand BondeOffset: " << tmp.m128_f32[0] << "," << tmp.m128_f32[1] << "," << tmp.m128_f32[2] << endl;
+			//
+			//tmp = p.second.FinalTransformation.r[3];
+			//cout << "Left Hand FinalTransformation: " << tmp.m128_f32[0] << "," << tmp.m128_f32[1] << "," << tmp.m128_f32[2] << endl;
+
+			XMMATRIX tmp = m_Bones[i].second.FinalTransformation;
+
+			XMFLOAT4X4 tmp2; 
+			DirectX::XMStoreFloat4x4(&tmp2, tmp);
+
+			XMFLOAT4 pos = XMFLOAT4(0, 0, 0, 1);
+			float weights[4];
+
+			for (int j = 0; j < 4; j++) {
+				weights[j] = 0.25f;
+			}
+			
+			XMFLOAT4 temp = XMFLOAT4(33.7235756, 38.8664284, -3.53839922, 1);
+			XMFLOAT4 result = Matrix4x4::test(temp, tmp);
+			for (int j = 0; j < 4; j++)
+			{
+				pos.x += weights[j] * result.x;
+				pos.y += weights[j] * result.y;
+				pos.z += weights[j] * result.z;		
+			}
+			cout << "Left Hand Pos : " << pos.x << "," << pos.y << "," << pos.z << endl;
+
+			//tmp2._41 = pos.x;
+			//tmp2._42 = pos.y;
+			//tmp2._43 = pos.z;
+
+
+			//pos = Matrix4x4::test(pos, WORLDMATRIX);
+
+			m_handpos = pos;
+
+			int k = 0;
+		}
 	}
 
 	// 미리 정해진 프레임 내에서 애니메이션 수행
@@ -82,6 +125,7 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 		return LOOP_END; //애니메이션이 한 루프 끝남
 	}
 
+	//cout << m_animSpeed << ", " << fTime << endl;
 	//cout << "현재 : " << now_time << ", " << "총 시간 : " << end_time << endl;
 
 	if (now_time > trigger_time - 1 && now_time < trigger_time + 1) {
@@ -131,6 +175,15 @@ void LoadAnimation::ReadNodeHeirarchy(float AnimationTime, const aiNode * pNode,
 		if (p.first == pNode->mName.data) {
 			p.second.FinalTransformation =
 				m_GlobalInverse * GlobalTransformation * p.second.BoneOffset;
+
+			/*if (p.first == "Bip001 L Hand") {
+				XMVECTOR tmp = p.second.BoneOffset.r[3];
+				cout << "Left Hand BondeOffset: " << tmp.m128_f32[0] << "," << tmp.m128_f32[1] << "," << tmp.m128_f32[2] << endl;
+
+				tmp = p.second.FinalTransformation.r[3];
+				cout << "Left Hand FinalTransformation: " << tmp.m128_f32[0] << "," << tmp.m128_f32[1] << "," << tmp.m128_f32[2] << endl;
+			}*/
+
 			break;
 		}
 	}

@@ -92,7 +92,13 @@ void ModelObject::Animate(float fTime)
 		if (m_AnimIndex < m_NumofAnim) {
 			//cout << "본 움직였다\n";
 			m_loopCheck = m_ani[m_AnimIndex]->BoneTransform(m_AnimIndex, fTime, m_Bones);
+			
+			XMMATRIX tmp;
+			tmp = DirectX::XMLoadFloat4x4(&m_xmf4x4World);
 
+			XMFLOAT4 hand_pos = Matrix4x4::test(m_ani[m_AnimIndex]->getHandPos(), tmp);
+			
+			SetHandPos(hand_pos);
 		}
 	}
 }

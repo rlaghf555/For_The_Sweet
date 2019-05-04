@@ -15,6 +15,7 @@ private:
 
 	XMMATRIX								m_GlobalInverse; //모델 글로벌 매트릭스
 	XMMATRIX								m_grab; //모델 손 좌표 (for 무기)
+	XMFLOAT4								m_handpos;
 
 	float										start_time; //프레임 시작 시간
 	float										end_time;  //프레임 종료 시간
@@ -66,4 +67,6 @@ public:
 	void SetAnimFrame(float frame);
 
 	float getAnimTime() const { return now_time; }
+
+	XMFLOAT4 getHandPos() { return m_handpos; }
 };

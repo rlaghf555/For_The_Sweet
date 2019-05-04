@@ -23,6 +23,8 @@ protected:
 
 	CMaterial*						m_pMaterial = NULL;
 
+	XMFLOAT4						m_handpos;
+
 public:
 	ModelObject(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	ModelObject(LoadModel* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
@@ -59,4 +61,7 @@ public:
 			cout << "애니 타임 : " << m_ani[i]->getAnimTime() << endl;
 		}
 	}
+
+	void SetHandPos(XMFLOAT4 pos) { m_handpos = pos; }
+	XMFLOAT4 GetHandPos() { return m_handpos; }
 };

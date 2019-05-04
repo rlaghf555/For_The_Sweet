@@ -446,6 +446,7 @@ void CGameFramework::BuildObjects()
 		m_pPlayer->SetPosition(pos);
 		m_pPlayer->SetPosition(pos);
 		m_pPlayer->SetConnected(true);
+
 		if (m_pPhysx)
 		{
 			PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
@@ -468,10 +469,18 @@ void CGameFramework::BuildObjects()
 
 			m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
 
-			PxRigidDynamic* dynamic = PxCreateDynamic(*(m_pPhysx->m_Physics), PxTransform(PxVec3(50, 17.5, 0)), PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material), 1.0f);
-			dynamic->setAngularDamping(0.5f);
-			dynamic->setLinearVelocity(PxVec3(0, 0, 0));
-			m_pPhysx->m_Scene->addActor(*dynamic);
+			PxShape* boxshape = m_pPhysx->m_Physics->createShape(PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material));
+			boxshape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			boxshape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+
+			PxRigidStatic* box = m_pPhysx->m_Physics->createRigidStatic(PxTransform(PxVec3(50, 17.5, 0)));
+			box->attachShape(*boxshape);
+			m_pPhysx->m_Scene->addActor(*box);
+
+			//PxRigidStatic* box = PxCreateRigidStatic(*(m_pPhysx->m_Physics), PxTransform(PxVec3(50, 17.5, 0)), PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material), 1.0f);
+			//dynamic->setAngularDamping(0.5f);
+			//dynamic->setLinearVelocity(PxVec3(0, 0, 0));
+			
 		}
 	}
 
@@ -829,7 +838,7 @@ void CGameFramework::FrameAdvance()
 		m_pCamera->SetLookAt(position);
 		m_pPlayer->SetPosition(position);
 
-		//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+		cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
 		position = m_pCamera->GetPosition();
 		//cout << "카메라 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;;
 	}

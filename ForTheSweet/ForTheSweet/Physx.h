@@ -22,6 +22,40 @@ public:
 
 };
 
+class PhysSimulation : public PxSimulationEventCallback
+{
+private:
+	//void PlayerToEnemy(PxTriggerPair* trigger);
+	//void EnemyToPlayer(PxTriggerPair* trigger);
+	//
+	//GameObject* player = nullptr;
+public:
+	void onTrigger(PxTriggerPair* pairs, PxU32 count)
+	{
+		cout << "Trigger Count : " << count << endl;
+
+		for (PxU32 i = 0; i < count; ++i) {
+			if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+			{
+				PxTransform tmp = pairs[i].triggerActor->getGlobalPose();
+
+				cout << "Trigger Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
+
+				tmp = pairs[i].otherActor->getGlobalPose();
+				cout << "Other Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
+			}
+		}
+
+	} //트리거박스 충돌 체크
+	void onAdvance(const PxRigidBody*const*, const PxTransform*, const PxU32) {}
+	void onConstraintBreak(PxConstraintInfo*, PxU32) {}
+	void onWake(PxActor**, PxU32) {}
+	void onSleep(PxActor**, PxU32) {}
+	void onContact(const PxContactPairHeader&, const PxContactPair*, PxU32) { }
+
+	//void setPlayer(GameObject* object) { player = object; }
+};
+
 class CPhysx {
 public:
 	// PxFoundation이 관리하는 Allocator, ErrorCallback
@@ -50,6 +84,8 @@ public:
 	physx::PxCooking* m_Cooking;
 
 	PlayerHitReport hitreport;
+
+	PhysSimulation		m_Simulator;
 	// Player 충돌 모형을 Capsule Or Box
 	//physx::PxCapsuleControllerDesc m_CapsuleDesc;
 	//physx::PxBoxControllerDesc m_BoxDesc;
