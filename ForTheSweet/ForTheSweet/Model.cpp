@@ -32,23 +32,23 @@ ModelMesh::ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCo
 
 LoadModel::LoadModel(const string& fileName, bool isStatic)
 {
-	UINT flag = aiProcess_JoinIdenticalVertices |			// 동일한 꼭지점 결합, 인덱싱 최적화
-		aiProcess_ValidateDataStructure |					// 로더의 출력을 검증
-		aiProcess_ImproveCacheLocality |					// 출력 정점의 캐쉬위치를 개선
-		aiProcess_RemoveRedundantMaterials |				// 중복된 매터리얼 제거
-		aiProcess_GenUVCoords |								// 구형, 원통형, 상자 및 평면 매핑을 적절한 UV로 변환
-		aiProcess_TransformUVCoords |						// UV 변환 처리기 (스케일링, 변환...)
-		aiProcess_FindInstances |							// 인스턴스된 매쉬를 검색하여 하나의 마스터에 대한 참조로 제거
-		aiProcess_LimitBoneWeights |						// 정점당 뼈의 가중치를 최대 4개로 제한
-		aiProcess_OptimizeMeshes |							// 가능한 경우 작은 매쉬를 조인
-		aiProcess_GenSmoothNormals |						// 부드러운 노말벡터(법선벡터) 생성
-		aiProcess_SplitLargeMeshes |						// 거대한 하나의 매쉬를 하위매쉬들로 분활(나눔)
-		aiProcess_Triangulate |								// 3개 이상의 모서리를 가진 다각형 면을 삼각형으로 만듬(나눔)
-		aiProcess_ConvertToLeftHanded |						// D3D의 왼손좌표계로 변환
-		aiProcess_SortByPType;								// 단일타입의 프리미티브로 구성된 '깨끗한' 매쉬를 만듬
+	UINT flag = aiProcess_JoinIdenticalVertices |         // 동일한 꼭지점 결합, 인덱싱 최적화
+		aiProcess_ValidateDataStructure |               // 로더의 출력을 검증
+		aiProcess_ImproveCacheLocality |               // 출력 정점의 캐쉬위치를 개선
+		aiProcess_RemoveRedundantMaterials |            // 중복된 매터리얼 제거
+		aiProcess_GenUVCoords |                        // 구형, 원통형, 상자 및 평면 매핑을 적절한 UV로 변환
+		aiProcess_TransformUVCoords |                  // UV 변환 처리기 (스케일링, 변환...)
+		aiProcess_FindInstances |                     // 인스턴스된 매쉬를 검색하여 하나의 마스터에 대한 참조로 제거
+		aiProcess_LimitBoneWeights |                  // 정점당 뼈의 가중치를 최대 4개로 제한
+		aiProcess_OptimizeMeshes |                     // 가능한 경우 작은 매쉬를 조인
+		aiProcess_GenSmoothNormals |                  // 부드러운 노말벡터(법선벡터) 생성
+		aiProcess_SplitLargeMeshes |                  // 거대한 하나의 매쉬를 하위매쉬들로 분활(나눔)
+		aiProcess_Triangulate |                        // 3개 이상의 모서리를 가진 다각형 면을 삼각형으로 만듬(나눔)
+		aiProcess_ConvertToLeftHanded |                  // D3D의 왼손좌표계로 변환
+		aiProcess_SortByPType;                        // 단일타입의 프리미티브로 구성된 '깨끗한' 매쉬를 만듬
 
 	if (isStatic)
-		flag |= aiProcess_PreTransformVertices;				// 버텍스를 미리계산 (no bone & animation flag)
+		flag |= aiProcess_PreTransformVertices;            // 버텍스를 미리계산 (no bone & animation flag)
 
 	m_pScene = aiImportFile(fileName.c_str(), flag);
 
@@ -58,6 +58,9 @@ LoadModel::LoadModel(const string& fileName, bool isStatic)
 		InitScene();
 
 		m_ModelMeshes.resize(m_meshes.size());
+
+		//BoundingOrientedBox::CreateFromPoints(boundingbox, m_possize, m_pos, sizeof(XMFLOAT3));
+		//boundingbox.GetCorners(corners);
 	}
 }
 
@@ -160,13 +163,17 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 	m_meshes[index].m_vertices.reserve(pMesh->mNumVertices);
 	m_meshes[index].m_indices.reserve(pMesh->mNumFaces * 3);
 	//삼각형이므로 면을 이루는 꼭지점 3개
-
+	m_pos = new XMFLOAT3[pMesh->mNumVertices];
+	m_possize = pMesh->mNumVertices;
 	for (UINT i = 0; i < pMesh->mNumVertices; ++i) {
 		XMFLOAT3 zero_3(0.0f, 0.0f, 0.0f);
 		XMFLOAT3 pos(0.0f, 0.0f, 0.0f);
 		pos.x = pMesh->mVertices[i].x;
 		pos.y = pMesh->mVertices[i].y;
 		pos.z = pMesh->mVertices[i].z;
+
+		const XMFLOAT3 pos_p = pos;
+		m_pos[i] = pos_p;
 
 		XMFLOAT3 normal(0.0f, 0.0f, 0.0f);
 		normal.x = pMesh->mNormals[i].x;
@@ -238,11 +245,11 @@ void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 			m_meshes[index].m_vertices[vertexID].AddBoneData(BoneIndex, weight);
 
 			//if (i == 14) {
-			//	if (pBone->mName == aiString("Bip001 L Hand")) {
-			//		cout << pBone->mWeights->mVertexId << "," << pBone->mWeights->mWeight << endl;
-			//		XMFLOAT3 pos = m_meshes[index].m_vertices[vertexID].m_pos;
-			//		cout << pos.x << "," << pos.y << "," << pos.z << endl;
-			//	}
+			//   if (pBone->mName == aiString("Bip001 L Hand")) {
+			//      cout << pBone->mWeights->mVertexId << "," << pBone->mWeights->mWeight << endl;
+			//      XMFLOAT3 pos = m_meshes[index].m_vertices[vertexID].m_pos;
+			//      cout << pos.x << "," << pos.y << "," << pos.z << endl;
+			//   }
 			//}
 		}
 	}

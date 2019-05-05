@@ -90,12 +90,12 @@ D3D12_BLEND_DESC CShader::CreateBlendState()
 {
 	D3D12_BLEND_DESC d3dBlendDesc;
 	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
-	d3dBlendDesc.AlphaToCoverageEnable = FALSE;
+	d3dBlendDesc.AlphaToCoverageEnable = FALSE;			// FALSE
 	d3dBlendDesc.IndependentBlendEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].BlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;	// FALSE
 	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;	//D3D12_BLEND_ONE
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//D3D12_BLEND_ZERO
 	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -820,7 +820,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	BuildPSO(pd3dDevice, nRenderTargets);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map1.dds", 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_2.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -1144,8 +1144,8 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 		m_ppObjects[i] = Map_Object;
 
-		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 200, 200, 20, 20);	// Width(w, h), xycount(m, n)
-		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 1500, 1000, 20, 20);	// Width(w, h), xycount(m, n)
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 		m_ppObjects[i]->SetPosition(0, 0, 0);//20.f * i - 200,0,200
 	}
@@ -1163,6 +1163,84 @@ void WaveShader::Animate(float fTimeElapsed)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+CottonCloudShader::CottonCloudShader() {}
+
+CottonCloudShader::CottonCloudShader(LoadModel *ma) : CModelShader(ma) { cloud_model = ma; }
+
+CottonCloudShader::~CottonCloudShader() {}
+
+D3D12_SHADER_BYTECODE CottonCloudShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSCottonModel", "ps_5_1", ppd3dShaderBlob));
+}
+
+void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int kind, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 17;	//17
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if (kind == 0)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\cotton_candy_cloud_2.dds", 0);	//1400*788
+	if (kind == 1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\cotton_candy_cloud_1.dds", 0);	//1400*788
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		if (kind == 0) {
+			ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
+			if (i == 0)cloud->SetPosition(-30, 10, -160);
+			else if (i == 1)cloud->SetPosition(30, 10, -160);
+			else if (i == 2)cloud->SetPosition(-30, 10, -80);
+			else if (i == 3)cloud->SetPosition(30, 10, -80);
+			else if (i == 4)cloud->SetPosition(-30, 10, 160);
+			else if (i == 5)cloud->SetPosition(30, 10, 160);
+			else if (i == 6)cloud->SetPosition(-30, 10, 80);
+			else if (i == 7)cloud->SetPosition(30, 10, 80);
+			else if (i == 8) {
+				cloud->SetPosition(0, 10, -125);
+				cloud->SetScale(1.2f);
+			}
+			else if (i == 9) {
+				cloud->SetPosition(0, 10, 125);
+				cloud->SetScale(1.2f);
+			}
+			else cloud->SetPosition(30, 10, 80);
+			cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_bbObjects[i] = cloud;
+		}
+		else if (kind == 1) {
+			ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
+			cloud->SetScale(0.7f);
+			if (i == 10) cloud->SetPosition(-40, 8, -125);
+			else if (i == 11) cloud->SetPosition(40, 8, -125);
+			else if (i == 12) cloud->SetPosition(0, 8, -163);
+			else if (i == 13) cloud->SetPosition(0, 8, 70);
+			else if (i == 14) cloud->SetPosition(-40, 8, 125);
+			else if (i == 15) cloud->SetPosition(40, 8, 125);
+			else if (i == 16) cloud->SetPosition(0, 8, 163);
+			else cloud->SetPosition(0, 8, 163);
+
+			cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_bbObjects[i] = cloud;
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 WeaponShader::WeaponShader()
 {
 
@@ -1183,7 +1261,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 1;
+	m_nObjects = 30;
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
 	CreateGraphicsRootSignature(pd3dDevice);
@@ -1204,7 +1282,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	for (int i = 0; i < m_nObjects; i++) {
 		float b = D3DMath::RandF(-13, 13);
-		float c = D3DMath::RandF(-9, 9);
+		float c = D3DMath::RandF(-8, 8);
 		if (b > -2 && b < 2 || c > -2 && c < 2) { i -= 1; continue; }
 		
 		m_pMaterial = new CMaterial();
@@ -1477,7 +1555,7 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	BuildPSO(pd3dDevice, nRenderTargets);
 	
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth_1.dds", 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth_2.dds", 0);	//cloth_2
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\body.dds", 0);
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth.dds", 1);
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\eye.dds", 2);

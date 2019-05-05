@@ -239,6 +239,19 @@ public:
 	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 };
 
+class CottonCloudShader : public CModelShader
+{
+protected:
+	LoadModel	*cloud_model;
+public:
+	CottonCloudShader();
+	CottonCloudShader(LoadModel *ma);
+	~CottonCloudShader();
+
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int kind, int nRenderTargets = 1, void * pContext = NULL);
+};
+
 class CInstancingShader : public CObjectsShader
 {
 public:

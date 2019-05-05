@@ -118,6 +118,23 @@ VS_MODEL_TEXTURED_OUTPUT VSStaticModel(VS_MODEL_INPUT input)
 	return(output);
 };
 
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSCottonModel(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
+{
+    PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+    	
+    float3 uvw = float3(input.uv, nPrimitiveID / 2);
+    float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	
+    input.normalW = normalize(input.normalW);
+	
+    output.color = cColor;
+    output.nrmoutline = float4(input.normalW, 1.0f);
+    output.nrm = output.nrmoutline;
+    output.pos = float4(input.positionW, 1.0f);
+	
+    return (output);
+};
+
 PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWaveModel(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
 {
     PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;

@@ -64,22 +64,29 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_pPlayerShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
 		m_pPlayer[i] = reinterpret_cast<CPlayer*>(m_pPlayerShader[i]->getPlayer());
 	}
-	m_MapShader = new CModelShader(Map_Model[M_Map_1]);
-	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
-	for(int i = 0; i < 3; i++) {
-	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		m_WeaponShader[i] = new WeaponShader(weapon_Model[0]);
-		m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+	if (Map_SELECT == M_Map_1) {
+		m_MapShader = new CModelShader(Map_Model[M_Map_1]);
+		m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
+
+		for (int i = 0; i < 2; i++) {
+			m_CottonShader[i] = new CottonCloudShader(Map_Model[M_Map_1_cotton]);
+			m_CottonShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+		}
+
+		m_WavesShader = new WaveShader();
+		m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	}
+
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+		m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
 	}
 	
-	m_pPlayer[0]->SetWeapon(true, 0);
-
 	m_BackGroundShader = new MeshShader();
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
-	m_WavesShader = new WaveShader();
-	m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	m_pPlayer[0]->SetWeapon(true, 0);
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -179,6 +186,13 @@ void CScene::ReleaseObjects()
 		m_MapShader->ReleaseShaderVariables();
 		m_MapShader->ReleaseObjects();
 		delete m_MapShader;
+	}
+	for (int i = 0; i < 2; ++i) {
+		if (m_CottonShader[i]) {
+			m_CottonShader[i]->ReleaseShaderVariables();
+			m_CottonShader[i]->ReleaseObjects();
+			delete m_CottonShader[i];
+		}
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) {
 		if (m_WeaponShader[i]) {
@@ -320,17 +334,10 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
-	for (int i = 0; i < MAX_USER; ++i)
-	{
-		if (m_pPlayer[i]->GetConnected()) {
-			m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
-		}
-	}
+	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
 	if (m_MapShader) m_MapShader->Render(pd3dCommandList, pCamera);
-	for (int i = 0; i < WEAPON_MAX_NUM; ++i)
-	{
-		if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
-	}
+	for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "assimp/Importer.hpp"	// assimp 모델 import
+#include "assimp/Importer.hpp"   // assimp 모델 import
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
@@ -19,17 +19,17 @@ inline XMMATRIX aiMatrixToXMMatrix(const aiMatrix4x4& offset)
 
 struct vertexDatas
 {
-//#define BONES_PER_VERTEX 4
-	XMFLOAT3	m_pos;
-	XMFLOAT3	m_normal;
-	XMFLOAT3	m_tan;
-	XMFLOAT2	m_tex;
-	XMUINT4		m_bornIndex;
-	XMFLOAT3	m_weights;
-	UINT		m_nTextureNum = 0;
+	//#define BONES_PER_VERTEX 4
+	XMFLOAT3   m_pos;
+	XMFLOAT3   m_normal;
+	XMFLOAT3   m_tan;
+	XMFLOAT2   m_tex;
+	XMUINT4      m_bornIndex;
+	XMFLOAT3   m_weights;
+	UINT      m_nTextureNum = 0;
 
 	vertexDatas() {}
-	vertexDatas(XMFLOAT3& pos, XMFLOAT3& normal, XMFLOAT3& tan, XMFLOAT2& tex, UINT texindex) :	m_pos(pos), m_normal(normal), m_tan(tan), m_tex(tex), m_nTextureNum(texindex)
+	vertexDatas(XMFLOAT3& pos, XMFLOAT3& normal, XMFLOAT3& tan, XMFLOAT2& tex, UINT texindex) : m_pos(pos), m_normal(normal), m_tan(tan), m_tex(tex), m_nTextureNum(texindex)
 	{
 		m_weights = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		m_bornIndex = XMUINT4(0, 0, 0, 0);
@@ -56,9 +56,9 @@ struct vertexDatas
 
 struct mesh
 {
-	vector<vertexDatas>		m_vertices;
-	vector<int>				m_indices;
-	UINT					m_materialIndex;
+	vector<vertexDatas>      m_vertices;
+	vector<int>            m_indices;
+	UINT               m_materialIndex;
 
 	mesh() { m_materialIndex = 0; }
 	void SetMeshesTextureIndex(UINT index) {
@@ -69,7 +69,7 @@ struct mesh
 
 struct Bone
 {
-	XMMATRIX	BoneOffset;
+	XMMATRIX   BoneOffset;
 	XMMATRIX FinalTransformation;
 
 	Bone() {
@@ -88,13 +88,16 @@ public:
 class LoadModel
 {
 private:
-	const aiScene*					m_pScene;		//모델 정보
-	vector<mesh>					m_meshes;		//매쉬 정보
-	vector<ModelMesh*>				m_ModelMeshes;	//매쉬 정보 리소스(for 랜더링)
-	vector<pair<string, Bone>>		m_Bones;		//뼈 정보
-
-	UINT							m_numVertices;
-	UINT							m_numBones;
+	const aiScene*               m_pScene;      //모델 정보
+	vector<mesh>               m_meshes;      //매쉬 정보
+	vector<ModelMesh*>            m_ModelMeshes;   //매쉬 정보 리소스(for 랜더링)
+	vector<pair<string, Bone>>      m_Bones;      //뼈 정보
+	XMFLOAT3*                  m_pos;
+	UINT                     m_possize;
+	XMFLOAT3                  corners[8];
+	BoundingOrientedBox            boundingbox;
+	UINT                     m_numVertices;
+	UINT                     m_numBones;
 public:
 	LoadModel(const string& fileName, bool isStatic);
 	LoadModel(const LoadModel& T);
@@ -106,10 +109,10 @@ public:
 	void InitBones(UINT index, const aiMesh* pMesh);
 	void SetTextureIndex(UINT meshIndex, UINT textureIndex) { m_meshes[meshIndex].SetMeshesTextureIndex(textureIndex); };
 
-	ModelMesh**					getMeshes() { return m_ModelMeshes.data(); }
-	mesh*						getMesh(UINT index) { return &m_meshes[index]; }
-	UINT						getNumMesh() const { return (UINT)m_meshes.size(); }
+	ModelMesh**               getMeshes() { return m_ModelMeshes.data(); }
+	mesh*                  getMesh(UINT index) { return &m_meshes[index]; }
+	UINT                  getNumMesh() const { return (UINT)m_meshes.size(); }
 	vector<pair<string, Bone>>* GetBones() { return &m_Bones; }
-	UINT						getNumVertices() const { return m_numVertices; }
+	UINT                  getNumVertices() const { return m_numVertices; }
 
 };

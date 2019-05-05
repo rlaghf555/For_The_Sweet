@@ -39,6 +39,8 @@ public:
 	CModelShader				*m_MapShader = NULL;
 	LoadModel					**Map_Model;
 
+	CottonCloudShader			*m_CottonShader[2];
+
 	WeaponShader				*m_WeaponShader[WEAPON_MAX_NUM];
 	LoadModel					**weapon_Model;
 
