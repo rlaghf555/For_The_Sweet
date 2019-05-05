@@ -54,7 +54,8 @@ public:
 	CShader						*m_pShader = NULL;
 	vector<unique_ptr<MMesh>>	m_ppMeshes;
 	UINT						m_nMeshes;
-	BoundingOrientedBox			m_xmOOBB;
+	BoundingOrientedBox				boundingbox;
+	XMFLOAT3*						corners;
 	D3D12_GPU_DESCRIPTOR_HANDLE					m_d3dCbvGPUDescriptorHandle;
 	CMaterial					*m_pMaterial;
 	int m_nRootIndex;

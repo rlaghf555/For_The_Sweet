@@ -1272,8 +1272,8 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 testBox::testBox() {}
 testBox::~testBox() {}
 
-/*
-D3D12_RASTERIZER_DESC testBox::CreateRasterizerState()
+
+D3D12_RASTERIZER_DESC testBox::CreateRasterizerState(int index)
 {
 	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
 	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
@@ -1299,9 +1299,8 @@ D3D12_RASTERIZER_DESC testBox::CreateRasterizerState()
 	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 	return(d3dRasterizerDesc);
 }
-}*/
 
-void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, BoundingOrientedBox& bb, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
@@ -1319,13 +1318,20 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 	for (int i = 0; i < m_nObjects; i++) {
 		CGameObject *test_Object = NULL;
 		test_Object = new CGameObject();
-		test_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
+		test_Object->SetPosition(bb.Center.x, bb.Center.y, bb.Center.z);
 		m_ppObjects[i] = test_Object;
 
-		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 100, 100, 100);	// pos(x, y), Width(w, h), depth
+		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, bb.Extents.x, bb.Extents.y, bb.Extents.z);	// pos(x, y), Width(w, h), depth
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
+		m_ppObjects[i]->Rotate(0, 0, 90);
+		//m_ppObjects[i]->SetScale(0.7f);
 	}
+}
+
+void testBox::SetPosition(BoundingOrientedBox & bb)
+{
+	m_ppObjects[0]->SetPosition(bb.Center.x, bb.Center.y+17.5, bb.Center.z);
 }
 
 //////////////////////////////////////////////////////////////////////////////////

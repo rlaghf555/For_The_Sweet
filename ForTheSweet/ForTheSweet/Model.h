@@ -94,7 +94,7 @@ private:
 	vector<pair<string, Bone>>      m_Bones;      //»À Á¤º¸
 	XMFLOAT3*                  m_pos;
 	UINT                     m_possize;
-	XMFLOAT3                  corners[8];
+	XMFLOAT3*                  corners;
 	BoundingOrientedBox            boundingbox;
 	UINT                     m_numVertices;
 	UINT                     m_numBones;
@@ -114,5 +114,6 @@ public:
 	UINT                  getNumMesh() const { return (UINT)m_meshes.size(); }
 	vector<pair<string, Bone>>* GetBones() { return &m_Bones; }
 	UINT                  getNumVertices() const { return m_numVertices; }
+	BoundingOrientedBox getBoudingBox() const { return boundingbox; }
 
 };

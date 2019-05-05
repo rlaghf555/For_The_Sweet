@@ -86,10 +86,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_BackGroundShader = new MeshShader();
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
-	m_pPlayer[0]->SetWeapon(true, 0);
-
+	//m_pPlayer[0]->SetWeapon(true, 0);
+	
 	bounding_box_test = new testBox();
-	bounding_box_test->BuildObjects(pd3dDevice, pd3dCommandList);
+	bounding_box_test->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[0]->boundingbox);
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -270,7 +270,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			}
 		}
 	}
-	   	 	
+	XMFLOAT3 pl_pos = m_pPlayer[0]->GetPosition();
+	m_pPlayer[0]->boundingbox.Center = pl_pos;
+	bounding_box_test->SetPosition(m_pPlayer[0]->boundingbox);
+
 	m_WavesShader->Animate(fTimeElapsed);
 }
 

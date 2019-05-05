@@ -58,10 +58,15 @@ LoadModel::LoadModel(const string& fileName, bool isStatic)
 		InitScene();
 
 		m_ModelMeshes.resize(m_meshes.size());
+		if (strcmp(fileName.c_str(), "./resource/map/map_1.FBX") != 0) {
+			BoundingOrientedBox::CreateFromPoints(boundingbox, m_possize, m_pos, sizeof(XMFLOAT3));
+			//corners = new XMFLOAT3[8];
+			//boundingbox.GetCorners(corners);
 
-		//BoundingOrientedBox::CreateFromPoints(boundingbox, m_possize, m_pos, sizeof(XMFLOAT3));
-		//boundingbox.GetCorners(corners);
+		}
+		delete[] m_pos;
 	}
+
 }
 
 LoadModel::LoadModel(const LoadModel & T)
@@ -72,6 +77,7 @@ LoadModel::LoadModel(const LoadModel & T)
 
 	m_numVertices = T.m_numVertices;
 	m_numBones = T.m_numBones;
+	boundingbox = T.boundingbox;
 }
 
 inline void CalculateTangentArray(UINT vertexCount, vector<vertexDatas>& vertices, long triangleCount, vector<int>& indeies)

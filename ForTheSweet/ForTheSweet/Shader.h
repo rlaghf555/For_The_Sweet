@@ -230,8 +230,9 @@ class testBox : public MeshShader
 public:
 	testBox();
 	~testBox();
-
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, BoundingOrientedBox& bb, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void SetPosition(BoundingOrientedBox& bb);
 };
 
 class WeaponShader : public CModelShader
