@@ -220,7 +220,8 @@ public:
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
-
+	
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Animate(float fTimeElapsed);
 };
@@ -257,7 +258,8 @@ public:
 	CottonCloudShader();
 	CottonCloudShader(LoadModel *ma);
 	~CottonCloudShader();
-
+	
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int kind, int nRenderTargets = 1, void * pContext = NULL);
 };

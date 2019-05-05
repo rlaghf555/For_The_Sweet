@@ -128,6 +128,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSCottonModel(VS_MODEL_TEXTURED_OUTPUT input, 
     input.normalW = normalize(input.normalW);
 	
     output.color = cColor;
+    output.color.a = 0.7f;
     output.nrmoutline = float4(input.normalW, 1.0f);
     output.nrm = output.nrmoutline;
     output.pos = float4(input.positionW, 1.0f);
@@ -146,7 +147,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWaveModel(VS_MODEL_TEXTURED_OUTPUT input, ui
     input.normalW = normalize(input.normalW);
 	
     output.color = cColor;
-    output.color.w = 0.2f;
+    output.color.w = 0.9f;
 	//output.color = float4(1, 1, 1, 1);
     output.nrmoutline = float4(input.normalW, 1.0f);
     output.nrm = output.nrmoutline;
