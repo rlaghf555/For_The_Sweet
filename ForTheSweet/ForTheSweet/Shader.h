@@ -225,6 +225,15 @@ public:
 	virtual void Animate(float fTimeElapsed);
 };
 
+class testBox : public MeshShader
+{
+public:
+	testBox();
+	~testBox();
+
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+};
+
 class WeaponShader : public CModelShader
 {
 protected:

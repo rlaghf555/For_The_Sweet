@@ -183,7 +183,6 @@ VS_MODEL_TEXTURED_OUTPUT VSDiffused(VS_INPUT input)
     return (output);
 }
 
-
 /*
 float4 PSDiffused(VS_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID) : SV_TARGET
 {

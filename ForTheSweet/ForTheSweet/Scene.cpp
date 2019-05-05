@@ -87,6 +87,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
 	m_pPlayer[0]->SetWeapon(true, 0);
+
+	bounding_box_test = new testBox();
+	bounding_box_test->BuildObjects(pd3dDevice, pd3dCommandList);
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -340,4 +343,5 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
+	if (bounding_box_test) bounding_box_test->Render(pd3dCommandList, pCamera);
 }

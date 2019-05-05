@@ -428,7 +428,8 @@ void CGameFramework::LoadModels()
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
 	Map_Model[0] = new LoadModel("./resource/map/map_1.FBX", true);			// M_Map_1
-	Map_Model[1] = new LoadModel("./resource/map/cotton_candy_cloud.FBX", true);		// cotton_candy
+	Map_Model[1] = new LoadModel("./resource/map/cotton_1.FBX", true);		// cotton_candy
+	//cotton_candy_cloud
 
 	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);		// M_Weapon_Lollipop
 	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);			// M_Weapon_chupachupse
@@ -662,7 +663,7 @@ void CGameFramework::ProcessInput()
 
 	int Anim_Index = m_pPlayer->getAnimIndex();
 	float Anim_Time = m_pPlayer->getAnimtime();
-
+	
 	if (m_pPlayer->Get_Weapon_grab()) {
 		if (Key_A || Key_S) {
 
@@ -761,6 +762,7 @@ void CGameFramework::ProcessInput()
 		if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
 			m_pPlayer->ChangeAnimation(Anim_Jump);
 			m_pPlayer->DisableLoop();
+			m_pPlayer->SetWeapon(false, 0);
 		}
 	}
 	if (Key_LShift) { //±¸¸£±â

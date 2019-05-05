@@ -1180,7 +1180,7 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 17;	//17
+	m_nObjects = 16;	//17
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
@@ -1200,7 +1200,34 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 	m_pMaterial->SetReflection(1);
 
 	for (int i = 0; i < m_nObjects; i++) {
-		if (kind == 0) {
+		ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
+		if (i < 17) {
+			if (kind == 0) {
+				if (i % 4 == 0 || i % 4 == 2) cloud->SetPosition(i % 4 * 30 - 45, 10, -75 + (-30 * (int)(i / 4)));
+				else cloud->SetPosition(-45, 10, -75);
+			}
+			else if (kind == 1) {
+				if (i % 4 == 1 || i % 4 == 3) cloud->SetPosition(i % 4 * 30 - 45, 10, -75 + (-30 * (int)(i / 4)));
+				else cloud->SetPosition(30 - 45, 10, -75 + -30);
+			}
+		}
+		else {
+			if (kind == 0) {
+				if (i % 4 == 1 || i % 4 == 3) cloud->SetPosition(i % 4 * 30 - 45, 10, 75 + (30 * (int)(i / 4)));
+				else cloud->SetPosition(-45, 10, -75);
+			}
+			else if (kind == 1) {
+				if (i % 4 == 0 || i % 4 == 2) cloud->SetPosition(i % 4 * 30 - 45, 10, 75 + (30 * (int)(i / 4)));
+				else cloud->SetPosition(30 - 45, 10, -75 + -30);
+			}
+		}
+
+		cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_bbObjects[i] = cloud;
+	}
+
+		/*
+		for (int i = 0; i < m_nObjects; i++) {if (kind == 0) {
 			ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
 			if (i == 0)cloud->SetPosition(-30, 10, -160);
 			else if (i == 1)cloud->SetPosition(30, 10, -160);
@@ -1237,10 +1264,71 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 			cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 			m_bbObjects[i] = cloud;
 		}
-	}
+	}*/
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+testBox::testBox() {}
+testBox::~testBox() {}
+
+/*
+D3D12_RASTERIZER_DESC testBox::CreateRasterizerState()
+{
+	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
+	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
+
+	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+
+	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
+	d3dRasterizerDesc.DepthBias = 0;
+	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
+	d3dRasterizerDesc.SlopeScaledDepthBias = 0.0f;
+
+	d3dRasterizerDesc.DepthClipEnable = TRUE;
+	//d3dRasterizerDesc.DepthClipEnable = FALSE;
+
+	d3dRasterizerDesc.MultisampleEnable = FALSE;
+	d3dRasterizerDesc.AntialiasedLineEnable = FALSE;
+	d3dRasterizerDesc.ForcedSampleCount = 0;
+	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+	return(d3dRasterizerDesc);
+}
+}*/
+
+void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 1;
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+	
+	for (int i = 0; i < m_nObjects; i++) {
+		CGameObject *test_Object = NULL;
+		test_Object = new CGameObject();
+		test_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
+		m_ppObjects[i] = test_Object;
+
+		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 100, 100, 100);	// pos(x, y), Width(w, h), depth
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_ppObjects[i]->SetMesh(pCubeMesh);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 WeaponShader::WeaponShader()
 {
 
