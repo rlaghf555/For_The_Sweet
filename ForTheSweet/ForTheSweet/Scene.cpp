@@ -58,7 +58,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	BuildRootSignature(pd3dDevice, pd3dCommandList);
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < MAX_USER; ++i)
 	{
 		m_pPlayerShader[i] = new PlayerShader(character_anim);
 		m_pPlayerShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -67,12 +67,14 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_MapShader = new CModelShader(Map_Model[M_Map_1]);
 	m_MapShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
-	for(int i = 0; i < 1; i++) {
+	for(int i = 0; i < 3; i++) {
 	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
-		m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+		m_WeaponShader[i] = new WeaponShader(weapon_Model[0]);
+		m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
 	}
 	
+	m_pPlayer[0]->SetWeapon(true, 0);
+
 	m_BackGroundShader = new MeshShader();
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
@@ -241,21 +243,60 @@ void CScene::AnimateObjects(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
 
-	XMFLOAT4 hand_pos;
 
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (m_pPlayer[i]->GetConnected()) {
 			m_pPlayerShader[i]->Animate(fTimeElapsed);
-			hand_pos = m_pPlayer[i]->GetHandPos();
+			if (m_pPlayer[i]->Get_Weapon_grab()) {
+				AnimateWeapon(i);				
+			}
 		}
 	}
+	   	 	
+	m_WavesShader->Animate(fTimeElapsed);
+}
+
+void CScene::AnimateWeapon(int i)
+{
+	XMFLOAT4 hand_pos;
+
+	hand_pos = m_pPlayer[i]->GetHandPos();
+
+	XMFLOAT4X4 bone = m_pPlayer[i]->GetBoneData()[14];
+
+	XMFLOAT3 bone_right = XMFLOAT3(bone._11, bone._12, bone._13);
+	bone_right = Vector3::Normalize(bone_right);
+
+	XMFLOAT3 bone_up = XMFLOAT3(bone._21, bone._22, bone._23);
+	bone_up = Vector3::Normalize(bone_up);
+
+	XMFLOAT3 bone_look = XMFLOAT3(bone._31, bone._32, bone._33);
+	bone_look = Vector3::Normalize(bone_look);
+
+	bone._11 = bone_right.x; bone._12 = bone_right.y; bone._13 = bone_right.z;
+	bone._21 = bone_up.x; bone._22 = bone_up.y; bone._23 = bone_up.z;
+	bone._31 = bone_look.x; bone._32 = bone_look.y; bone._33 = bone_look.z;
+
+
+	XMFLOAT3 player_look = m_pPlayer[i]->GetLook();
+	XMFLOAT3 player_up = m_pPlayer[i]->GetUp();
+	XMFLOAT3 player_right = m_pPlayer[i]->GetRight();
+
+	XMFLOAT4X4 player = Matrix4x4::Identity();
+	player._11 = player_right.x; player._12 = player_right.y; player._13 = player_right.z;
+	player._21 = player_up.x; player._22 = player_up.y; player._23 = player_up.z;
+	player._31 = -player_look.x; player._32 = -player_look.y; player._33 = -player_look.z;
+
+	bone = Matrix4x4::Multiply(bone, player);
 
 	XMFLOAT3 pos = XMFLOAT3(hand_pos.x, hand_pos.y, hand_pos.z);
-
-	m_WeaponShader[0]->getObject(0)->SetPosition(pos);
-
-	m_WavesShader->Animate(fTimeElapsed);
+	int weapon_index = m_pPlayer[i]->Get_Weapon_index();
+	 
+	m_WeaponShader[weapon_index]->getObject(0)->SetWorld(bone);
+	m_WeaponShader[weapon_index]->getObject(0)->SetPosition(pos);
+	m_WeaponShader[weapon_index]->getObject(0)->Rotate(0, 0, 90);
+	m_WeaponShader[weapon_index]->getObject(0)->Rotate(0, -70, 0);
 }
 
 void CScene::CollisionProcess()

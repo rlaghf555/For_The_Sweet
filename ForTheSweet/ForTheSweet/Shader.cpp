@@ -1213,8 +1213,8 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 		ModelObject* weapon = new ModelObject(weapon_model, pd3dDevice, pd3dCommandList);
 		weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
-		//weapon->SetPosition(b * 20, 10, c * 20);
-		//weapon->Rotate(&a, D3DMath::RandF(0,4) * 90.f);
+		weapon->SetPosition(b * 20, 10, c * 20);
+		weapon->Rotate(&a, D3DMath::Rand(0,4) * 90.f);
 		weapon->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = weapon;
 	}

@@ -27,7 +27,8 @@ protected:
 	float m_fRoll;
 
 	bool m_connected;
-	
+	bool weapon_grab = false;
+	int weapon_index = -1;
 	XMFLOAT3 m_xmf3Velocity;		//플레이어의 이동 속도를 나타내는 벡터이다.
 	XMFLOAT3 m_xmf3Gravity;			//플레이어에 작용하는 중력을 나타내는 벡터이다.
 	float m_fMaxVelocityXZ;			//xz-평면에서 (한 프레임 동안) 플레이어의 이동 속력의 최대값을 나타낸다.
@@ -54,12 +55,10 @@ public:
 	void SetMaxVelocityXZ(float fMaxVelocity) { m_fMaxVelocityXZ = fMaxVelocity; }
 	void SetMaxVelocityY(float fMaxVelocity) { m_fMaxVelocityY = fMaxVelocity; }
 	void SetVelocity(XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
-	
-	/*플레이어의 위치를 xmf3Position 위치로 설정한다. xmf3Position 벡터에서 현재 플레이어의 위치 벡터를 빼면 현
-	재 플레이어의 위치에서 xmf3Position 방향으로의 벡터가 된다. 현재 플레이어의 위치에서 이 벡터 만큼 이동한다.*/
-	//virtual void SetPosition(XMFLOAT3& xmf3Position) {
-	//	Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false);
-//	}
+	void SetWeapon(bool grab, int Weapon_Index) { weapon_grab = grab; weapon_index = Weapon_Index; }
+
+	bool Get_Weapon_grab() { return weapon_grab; }
+	int Get_Weapon_index() { return weapon_index; }
 
 	XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
 	float GetYaw() { return(m_fYaw); }

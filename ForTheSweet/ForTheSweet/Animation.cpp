@@ -79,22 +79,23 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 			//tmp = p.second.FinalTransformation.r[3];
 			//cout << "Left Hand FinalTransformation: " << tmp.m128_f32[0] << "," << tmp.m128_f32[1] << "," << tmp.m128_f32[2] << endl;
 
-			XMMATRIX tmp = m_Bones[i].second.FinalTransformation;
-
-			XMFLOAT4X4 tmp2; 
-			DirectX::XMStoreFloat4x4(&tmp2, tmp);
+			XMMATRIX tmp[2];
+			tmp[0] = m_Bones[14].second.FinalTransformation;
+			tmp[1] = m_Bones[16].second.FinalTransformation;
 
 			XMFLOAT4 pos = XMFLOAT4(0, 0, 0, 1);
-			float weights[4];
+			float weights[2] = {0.25f, 0.75f};
 
-			for (int j = 0; j < 4; j++) {
-				weights[j] = 0.25f;
-			}
+			//for (int j = 0; j < 4; j++) {
+			//	weights[j] = 0.25f;
+			//}
 			
-			XMFLOAT4 temp = XMFLOAT4(33.7235756, 38.8664284, -3.53839922, 1);
-			XMFLOAT4 result = Matrix4x4::test(temp, tmp);
-			for (int j = 0; j < 4; j++)
+		//	XMFLOAT4 temp = XMFLOAT4(33.7235756, 38.8664284, -3.53839922, 1);
+			XMFLOAT4 temp = XMFLOAT4(31.7235756, 35.8664284, -3.53839922, 1);
+			XMFLOAT4 result;
+			for (int j = 0; j < 2; j++)
 			{
+				result = Matrix4x4::test(temp, tmp[j]);
 				pos.x += weights[j] * result.x;
 				pos.y += weights[j] * result.y;
 				pos.z += weights[j] * result.z;		
@@ -105,10 +106,9 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 			//tmp2._42 = pos.y;
 			//tmp2._43 = pos.z;
 
-
 			//pos = Matrix4x4::test(pos, WORLDMATRIX);
 
-			m_handpos = pos;
+			m_handpos = XMFLOAT4(pos.x, pos.y, pos.z, 1);
 
 			int k = 0;
 		}

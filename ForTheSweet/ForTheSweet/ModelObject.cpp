@@ -96,9 +96,9 @@ void ModelObject::Animate(float fTime)
 			XMMATRIX tmp;
 			tmp = DirectX::XMLoadFloat4x4(&m_xmf4x4World);
 
-			XMFLOAT4 hand_pos = Matrix4x4::test(m_ani[m_AnimIndex]->getHandPos(), tmp);
+			XMFLOAT4 hand_pos = Matrix4x4::test2(m_ani[m_AnimIndex]->getHandPos(), tmp);
 			
-			SetHandPos(hand_pos);
+ 			SetHandPos(hand_pos);
 		}
 	}
 }

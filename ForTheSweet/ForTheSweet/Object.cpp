@@ -22,6 +22,21 @@ void CGameObject::SetWorld(XMFLOAT4X4 & xmf4x4World)
 	m_xmf4x4World = xmf4x4World;
 }
 
+void CGameObject::SetWorld(XMFLOAT3 & xmf3Look, XMFLOAT3 & xmf3Up, XMFLOAT3 & xmf3Right)
+{
+	m_xmf4x4World._11 = xmf3Right.x;
+	m_xmf4x4World._12 = xmf3Right.y;
+	m_xmf4x4World._13 = xmf3Right.z;
+
+	m_xmf4x4World._21 = xmf3Up.x;
+	m_xmf4x4World._22 = xmf3Up.y;
+	m_xmf4x4World._23 = xmf3Up.z;
+
+	m_xmf4x4World._31 = xmf3Look.x;
+	m_xmf4x4World._32 = xmf3Look.y;
+	m_xmf4x4World._33 = xmf3Look.z;
+}
+
 void CGameObject::SetPosition(float x, float y, float z)
 {
 	m_xmf4x4World._41 = x;

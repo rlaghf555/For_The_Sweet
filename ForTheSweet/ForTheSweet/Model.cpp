@@ -237,11 +237,13 @@ void LoadModel::InitBones(UINT index, const aiMesh* pMesh)
 			float weight = pBone->mWeights[b].mWeight;
 			m_meshes[index].m_vertices[vertexID].AddBoneData(BoneIndex, weight);
 
-			if (pBone->mName == aiString("Bip001 L Hand")) {
-				//cout << pBone->mWeights->mVertexId << "," << pBone->mWeights->mWeight << endl;
-				XMFLOAT3 pos = m_meshes[index].m_vertices[vertexID].m_pos;
-				//cout << pos.x << "," << pos.y << "," << pos.z << endl;
-			}
+			//if (i == 14) {
+			//	if (pBone->mName == aiString("Bip001 L Hand")) {
+			//		cout << pBone->mWeights->mVertexId << "," << pBone->mWeights->mWeight << endl;
+			//		XMFLOAT3 pos = m_meshes[index].m_vertices[vertexID].m_pos;
+			//		cout << pos.x << "," << pos.y << "," << pos.z << endl;
+			//	}
+			//}
 		}
 	}
 }

@@ -336,6 +336,18 @@ void CGameFramework::recvCallBack()
 			ptr += sizeof(p_remove);
 			retval -= sizeof(p_remove);
 		}
+		/*
+		if(type == SC_WEAPON){
+			memcpy(&p_weapon, m_pSocket->buf, sizeof(p_weapon));
+
+			m_pScene->m_Player[p_weapon.playerindex]->SetWeapon(p_weapon.grab, p_weapon.weaponindex);
+
+			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
+			ptr += sizeof(p_weapon);
+			retval -= sizeof(p_weapon);
+		}
+
+		*/
 
 	}
 	memset(m_pSocket->buf, 0, sizeof(MAX_PACKET_SIZE));
@@ -402,12 +414,15 @@ void CGameFramework::LoadModels()
 
 	character_animation.emplace_back(make_pair("./resource/character/hard_attack1.FBX", 0));	//Anim_Hard_Attack1
 	character_animation.emplace_back(make_pair("./resource/character/hard_attack2.FBX", 0));	//Anim_Hard_Attack2
-
+	
 	character_animation.emplace_back(make_pair("./resource/character/guard.FBX", 0));	//Anim_Guard
 
 	character_animation.emplace_back(make_pair("./resource/character/powerup.FBX", 0));	//Anim_PowerUp
 
 	character_animation.emplace_back(make_pair("./resource/character/jump.FBX", 0));	//Anim_PowerUp
+
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_1.FBX", 0));	//Anim_Lollipop_Attack1
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_2.FBX", 0));	//Anim_Lollipop_Attack2
 
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
@@ -647,7 +662,50 @@ void CGameFramework::ProcessInput()
 	int Anim_Index = m_pPlayer->getAnimIndex();
 	float Anim_Time = m_pPlayer->getAnimtime();
 
-	if (Key_A||Key_S) {
+	if (m_pPlayer->Get_Weapon_grab()) {
+		if (Key_A || Key_S) {
+
+			if (Key_A&&Key_S) {//둘다 눌리면 막기
+				m_pPlayer->ChangeAnimation(Anim_Guard);
+				m_pPlayer->SetAnimFrame(10);
+				m_pPlayer->DisableLoop();
+			}
+			else if (Key_A && !Key_S) { //약공격 or 줍기
+				//충돌체크 (무기 오브젝트랑) 충돌이면 줍기		
+
+				//아니면 약공격
+				if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+					m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
+					m_pPlayer->DisableLoop();
+				}
+				if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+					m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
+					m_pPlayer->SetAnimFrame(Anim_Time);
+					m_pPlayer->DisableLoop();
+				}
+			}
+			else if (!Key_A && Key_S) { //강공격 or 줍기
+				//충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+				//아니면 강공격
+				if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+					m_pPlayer->ChangeAnimation(Anim_Hard_Attack1);
+					m_pPlayer->DisableLoop();
+				}
+				if (Anim_Index == Anim_Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+					m_pPlayer->ChangeAnimation(Anim_Hard_Attack2);
+					m_pPlayer->SetAnimFrame(Anim_Time);
+					m_pPlayer->DisableLoop();
+				}
+			}
+		}
+
+		if (Key_D) { //무기 스킬
+		//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
+		}
+	}
+	else {
+		if (Key_A || Key_S) {
 
 		if (Key_A&&Key_S) {//둘다 눌리면 막기
 			m_pPlayer->ChangeAnimation(Anim_Guard);
@@ -688,11 +746,8 @@ void CGameFramework::ProcessInput()
 			}
 		}
 	}
-
-	if (Key_D) { //무기 스킬
-		//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
-
 	}
+	
 	if (Key_F) { //강화 스킬
 		if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {		//강화 게이지(?) 플래그가 있어야함
 			m_pPlayer->ChangeAnimation(Anim_PowerUp);
