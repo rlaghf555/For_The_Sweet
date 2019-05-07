@@ -86,10 +86,19 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_BackGroundShader = new MeshShader();
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
-	//m_pPlayer[0]->SetWeapon(true, 0);
+	m_pPlayer[0]->SetWeapon(true, 0);
 	
-	bounding_box_test = new testBox();
-	bounding_box_test->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[0]->boundingbox);
+	for (int i = 0; i < MAX_USER; i++) {
+		bounding_box_test[i] = new testBox();
+		bounding_box_test[i]->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[i],OBJECT_PLAYER);
+	}
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < 30; j++) {
+			weapon_box[i][j] = new testBox();
+			weapon_box[i][j]->BuildObjects(pd3dDevice, pd3dCommandList, m_WeaponShader[i]->getObject(j), i);
+		}
+	}
+
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -204,6 +213,22 @@ void CScene::ReleaseObjects()
 			delete m_WeaponShader[i];
 		}
 	}
+	for (int i = 0; i < WEAPON_MAX_NUM; ++i) {
+		for (int j = 0; j < 30; ++j) {
+			if (weapon_box[i][j]) {
+				weapon_box[i][j]->ReleaseShaderVariables();
+				weapon_box[i][j]->ReleaseObjects();
+				delete weapon_box[i][j];
+			}
+		}
+	}
+	for (int i = 0; i < MAX_USER; ++i) {
+		if (bounding_box_test[i]) {
+			bounding_box_test[i]->ReleaseShaderVariables();
+			bounding_box_test[i]->ReleaseObjects();
+			delete bounding_box_test[i];
+		}
+	}
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -258,7 +283,7 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 
 void CScene::AnimateObjects(float fTimeElapsed)
 {
-	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
+	//for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
 
 
 	for (int i = 0; i < MAX_USER; ++i)
@@ -268,11 +293,15 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			if (m_pPlayer[i]->Get_Weapon_grab()) {
 				AnimateWeapon(i);				
 			}
+			XMFLOAT3 tmp= m_pPlayer[i]->GetPosition();
+			
+			bounding_box_test[i]->getObjects()->m_xmf4x4World = m_pPlayer[i]->m_xmf4x4World;
 		}
 	}
-	XMFLOAT3 pl_pos = m_pPlayer[0]->GetPosition();
-	m_pPlayer[0]->boundingbox.Center = pl_pos;
-	bounding_box_test->SetPosition(m_pPlayer[0]->boundingbox);
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {	
+		for (int j = 0; j < 30; j++)
+		weapon_box[i][j]->getObjects()->m_xmf4x4World= m_WeaponShader[i]->getObject(j)->m_xmf4x4World;
+	}
 
 	m_WavesShader->Animate(fTimeElapsed);
 }
@@ -315,8 +344,8 @@ void CScene::AnimateWeapon(int i)
 	 
 	m_WeaponShader[weapon_index]->getObject(0)->SetWorld(bone);
 	m_WeaponShader[weapon_index]->getObject(0)->SetPosition(pos);
-	m_WeaponShader[weapon_index]->getObject(0)->Rotate(0, 0, 90);
-	m_WeaponShader[weapon_index]->getObject(0)->Rotate(0, -70, 0);
+//	m_WeaponShader[weapon_index]->getObject(0)->Rotate(0, 0, 90);
+	m_WeaponShader[weapon_index]->getObject(0)->Rotate(70, 0, 0);
 }
 
 void CScene::CollisionProcess()
@@ -346,5 +375,11 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
-	if (bounding_box_test) bounding_box_test->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < 30; j++) {
+			if (weapon_box[i][j])
+				weapon_box[i][j]->Render(pd3dCommandList, pCamera);
+		}
+	}
+	for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
 }

@@ -10,7 +10,6 @@ ModelObject::ModelObject(Model_Animation * ma, ID3D12Device * pd3dDevice, ID3D12
 	m_Animtime = 0.0f;
 	m_nMeshes = ma->getModel()->getNumMesh();
 	boundingbox = m_model->getBoudingBox();
-	boundingbox.Center.y;
 
 
 	//매쉬 적용`
@@ -44,7 +43,7 @@ ModelObject::ModelObject(LoadModel* ma, ID3D12Device *pd3dDevice, ID3D12Graphics
 	m_AnimIndex = 0;
 	m_Animtime = 0.0f;
 	m_nMeshes = ma->getNumMesh();
-
+	boundingbox = m_model->getBoudingBox();
 	//매쉬 적용
 	if (m_nMeshes > 0)
 	{

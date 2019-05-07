@@ -226,15 +226,7 @@ public:
 	virtual void Animate(float fTimeElapsed);
 };
 
-class testBox : public MeshShader
-{
-public:
-	testBox();
-	~testBox();
-	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, BoundingOrientedBox& bb, int nRenderTargets = 1, void * pContext = NULL);
-	virtual void SetPosition(BoundingOrientedBox& bb);
-};
+
 
 class WeaponShader : public CModelShader
 {
@@ -327,4 +319,17 @@ public:
 
 	virtual  CGameObject* getPlayer() { return m_bbObjects[0]; }
 
+};
+
+class testBox : public MeshShader
+{
+public:
+	testBox();
+	~testBox();
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int type,int nRenderTargets = 1, void * pContext = NULL);
+	//virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void SetPosition(XMFLOAT3& pos);
+	virtual void Rotate(float x, float y, float z);
+	virtual CGameObject* getObjects() { return m_ppObjects[0]; }
 };

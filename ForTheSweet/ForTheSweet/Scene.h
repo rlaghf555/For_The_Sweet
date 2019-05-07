@@ -44,8 +44,8 @@ public:
 	WeaponShader				*m_WeaponShader[WEAPON_MAX_NUM];
 	LoadModel					**weapon_Model;
 
-	testBox						*bounding_box_test;
-
+	testBox						*bounding_box_test[MAX_USER];
+	testBox						*weapon_box[WEAPON_MAX_NUM][30];
 	MeshShader					*m_BackGroundShader = NULL;
 
 	WaveShader					*m_WavesShader = NULL;

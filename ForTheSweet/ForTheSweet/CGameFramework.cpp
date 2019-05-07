@@ -423,6 +423,8 @@ void CGameFramework::LoadModels()
 
 	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_1.FBX", 0));	//Anim_Lollipop_Attack1
 	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_2.FBX", 0));	//Anim_Lollipop_Attack2
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_guard.FBX", 0));	//Anim_Lollipop_Guard
+
 
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
@@ -668,7 +670,7 @@ void CGameFramework::ProcessInput()
 		if (Key_A || Key_S) {
 
 			if (Key_A&&Key_S) {//둘다 눌리면 막기
-				m_pPlayer->ChangeAnimation(Anim_Guard);
+				m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
 				m_pPlayer->SetAnimFrame(10);
 				m_pPlayer->DisableLoop();
 			}

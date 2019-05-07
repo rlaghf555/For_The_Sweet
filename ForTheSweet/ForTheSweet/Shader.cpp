@@ -1338,7 +1338,7 @@ D3D12_RASTERIZER_DESC testBox::CreateRasterizerState(int index)
 	return(d3dRasterizerDesc);
 }
 
-void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, BoundingOrientedBox& bb, int nRenderTargets, void * pContext)
+void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int type, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
@@ -1352,24 +1352,46 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 
 	CreateGraphicsRootSignature(pd3dDevice);
 	BuildPSO(pd3dDevice, nRenderTargets);
-	
 	for (int i = 0; i < m_nObjects; i++) {
 		CGameObject *test_Object = NULL;
 		test_Object = new CGameObject();
-		test_Object->SetPosition(bb.Center.x, bb.Center.y, bb.Center.z);
+		//BoundingOrientedBox bb = mo->boundingbox;
+		XMFLOAT3 pos = mo->GetPosition();
+		test_Object->SetPosition(pos);
 		m_ppObjects[i] = test_Object;
-
-		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, bb.Extents.x, bb.Extents.y, bb.Extents.z);	// pos(x, y), Width(w, h), depth
-		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i]->SetMesh(pCubeMesh);
-		m_ppObjects[i]->Rotate(0, 0, 90);
-		//m_ppObjects[i]->SetScale(0.7f);
+		if (type == OBJECT_PLAYER) {
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 15, 35, 15);	// pos(x, y), Width(w, h), depth
+			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_ppObjects[i]->SetMesh(pCubeMesh);
+			//m_ppObjects[i]->Rotate(0, 0, 90);
+			//m_ppObjects[i]->SetScale(0.7f);
+		}
+		if (type == M_Weapon_Lollipop) {
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 30, 15);	// pos(x, y), Width(w, h), depth
+			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_ppObjects[i]->SetMesh(pCubeMesh);
+		}
+		if (type == M_Weapon_chupachupse) {
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 25, 10);	// pos(x, y), Width(w, h), depth
+			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_ppObjects[i]->SetMesh(pCubeMesh);
+		}	
+		if (type == M_Weapon_pepero) {
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 45, 5);	// pos(x, y), Width(w, h), depth
+			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_ppObjects[i]->SetMesh(pCubeMesh);
+		}
 	}
 }
 
-void testBox::SetPosition(BoundingOrientedBox & bb)
+void testBox::SetPosition(XMFLOAT3& pos)
 {
-	m_ppObjects[0]->SetPosition(bb.Center.x, bb.Center.y+17.5, bb.Center.z);
+	m_ppObjects[0]->SetPosition(pos);
+}
+
+void testBox::Rotate(float x, float y, float z)
+{
+	m_ppObjects[0]->Rotate(x, y, z);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -1410,7 +1432,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	if (weapon_num == 2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\pepero.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
-	XMFLOAT3 a = XMFLOAT3(0, 1, 0);
+	XMFLOAT3 a = XMFLOAT3(1, 0, 0);
 
 	for (int i = 0; i < m_nObjects; i++) {
 		float b = D3DMath::RandF(-13, 13);
@@ -1424,6 +1446,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		ModelObject* weapon = new ModelObject(weapon_model, pd3dDevice, pd3dCommandList);
 		weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
 		weapon->SetPosition(b * 20, 10, c * 20);
+		weapon->Rotate(0, 0, 90);
 		weapon->Rotate(&a, D3DMath::Rand(0,4) * 90.f);
 		weapon->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = weapon;
