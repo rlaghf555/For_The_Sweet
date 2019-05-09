@@ -412,12 +412,12 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/weak_attack_2.FBX", 0));	//Anim_Weak_Attack2
 	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));	//Anim_Weak_Attack3
 
-	character_animation.emplace_back(make_pair("./resource/character/hard_attack1.FBX", 0));	//Anim_Hard_Attack1
-	character_animation.emplace_back(make_pair("./resource/character/hard_attack2.FBX", 0));	//Anim_Hard_Attack2
+	character_animation.emplace_back(make_pair("./resource/character/hard_attack_1.FBX", 0));	//Anim_Hard_Attack1
+	character_animation.emplace_back(make_pair("./resource/character/hard_attack_2.FBX", 0));	//Anim_Hard_Attack2
 	
 	character_animation.emplace_back(make_pair("./resource/character/guard.FBX", 0));	//Anim_Guard
 
-	character_animation.emplace_back(make_pair("./resource/character/powerup.FBX", 0));	//Anim_PowerUp
+	character_animation.emplace_back(make_pair("./resource/character/power_up.FBX", 0));	//Anim_PowerUp
 
 	character_animation.emplace_back(make_pair("./resource/character/jump.FBX", 0));	//Anim_PowerUp
 
@@ -802,19 +802,19 @@ void CGameFramework::ProcessInput()
 			XMFLOAT3 Look = m_pPlayer->GetLook();
 			//XMFLOAT3 Right = m_pPlayer->GetRight();
 			if (dwDirection & DIR_FORWARD) {
-				Look.z = -1.f;
+				Look.z = 1.f;
 			//	Right.x = -1.f;
 			}
 			if (dwDirection & DIR_BACKWARD) {
-				Look.z = 1.f;
+				Look.z = -1.f;
 			//	Right.x = 1.f;
 			}
 			if (dwDirection & DIR_RIGHT) {
-				Look.x = -1.f;
+				Look.x = 1.f;
 			//	Right.z = -1.f;
 			}
 			if (dwDirection & DIR_LEFT) {
-				Look.x = 1.f;
+				Look.x = -1.f;
 			//	Right.z = 1.f;
 			}
 			Look = Vector3::Normalize(Look);

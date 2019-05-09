@@ -333,9 +333,14 @@ void CScene::AnimateWeapon(int i)
 	XMFLOAT3 player_right = m_pPlayer[i]->GetRight();
 
 	XMFLOAT4X4 player = Matrix4x4::Identity();
-	player._11 = player_right.x; player._12 = player_right.y; player._13 = player_right.z;
+	if (m_pPlayer[i]->getAnimIndex() != Anim_Lollipop_Guard) {
+		player._11 = -player_right.x; player._12 = -player_right.y; player._13 = -player_right.z;
+	}
+	else
+		player._11 = player_right.x; player._12 = player_right.y; player._13 = player_right.z;
+
 	player._21 = player_up.x; player._22 = player_up.y; player._23 = player_up.z;
-	player._31 = -player_look.x; player._32 = -player_look.y; player._33 = -player_look.z;
+	player._31 = player_look.x; player._32 = player_look.y; player._33 = player_look.z;
 
 	bone = Matrix4x4::Multiply(bone, player);
 
@@ -345,7 +350,8 @@ void CScene::AnimateWeapon(int i)
 	m_WeaponShader[weapon_index]->getObject(0)->SetWorld(bone);
 	m_WeaponShader[weapon_index]->getObject(0)->SetPosition(pos);
 //	m_WeaponShader[weapon_index]->getObject(0)->Rotate(0, 0, 90);
-	m_WeaponShader[weapon_index]->getObject(0)->Rotate(70, 0, 0);
+	m_WeaponShader[weapon_index]->getObject(0)->Rotate(-70, 0, 0);
+
 }
 
 void CScene::CollisionProcess()

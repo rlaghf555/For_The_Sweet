@@ -1,8 +1,4 @@
-﻿  Animation.cpp
-c:\users\hol\desktop\손\for_the_sweet\forthesweet\forthesweet\animation.cpp(36): warning C4244: '=': 'const double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\손\for_the_sweet\forthesweet\forthesweet\animation.cpp(71): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\hol\desktop\손\for_the_sweet\forthesweet\forthesweet\animation.cpp(94): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-  CGameFramework.cpp
+﻿  CGameFramework.cpp
 c:\users\hol\desktop\손\for_the_sweet\forthesweet\forthesweet\modelobject.h(59): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
 c:\users\hol\desktop\손\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(660): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
 c:\users\hol\desktop\손\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(889): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
@@ -44,7 +40,6 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=std::pair<std::string,float>
           ]
-  코드를 생성하고 있습니다...
 PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\손\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\손\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj)' 또는 'C:\Users\Hol\Desktop\손\For_The_Sweet\ForTheSweet\Debug\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
