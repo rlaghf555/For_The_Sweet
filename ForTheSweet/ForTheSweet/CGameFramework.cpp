@@ -66,10 +66,9 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	if (SERVER_ON) {
 		m_pSocket = new CSocket();
 		if (m_pSocket) {
-			m_pSocket->init();
 			if (m_pSocket->init())
 			{
-				m_pSocket->sendPacket(CS_CONNECT, 0, 0);
+				m_pSocket->sendPacket(CS_CONNECT, 0, 0, 0);
 				cout << "CONNECT 패킷 보냄\n";
 			}
 			else
@@ -240,6 +239,7 @@ void CGameFramework::recvCallBack()
 	sc_packet_pos p_pos;
 	sc_packet_put_player p_put;
 	sc_packet_remove p_remove;
+	sc_packet_anim p_anim;
 
 	int retval;
 
@@ -267,18 +267,27 @@ void CGameFramework::recvCallBack()
 			memcpy(&p_login, ptr, sizeof(p_login));
 
 			My_ID = p_login.id;
-			XMFLOAT3 position(p_login.x, p_login.y, p_login.z);
-			XMFLOAT3 look(p_login.vx, p_login.vy, p_login.vz);
+			XMFLOAT3 pos(p_login.x, p_login.y, p_login.z);
+			XMFLOAT3 vel(p_login.vx, p_login.vy, p_login.vz);
 
 			m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
 			cout << "ID : " << My_ID << endl;
 			m_pCamera = m_pPlayer->GetCamera();
 
-			m_pScene->m_pPlayer[My_ID]->SetPosition(position);
-			//m_pScene->m_pPlayer[My_ID]->SetLook(look);
-			cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
-			//m_pScene->m_pPlayer[My_ID]->SetLookVector(look);
+			m_pScene->getplayer(My_ID)->SetPosition(pos);
+			m_pScene->getplayer(My_ID)->SetVelocity(vel);
+			PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
+			m_pScene->getplayer(My_ID)->SetPhysController(m_pPhysx, m_pScene->getplayer(My_ID)->getCollisionCallback(), &ControllerPos);
+			m_pScene->getplayer(My_ID)->ChangeAnimation(Anim_Idle);
+			//m_pScene->getplayer(My_ID)->SetAnimFrame(0.0f);
+			m_pScene->getplayer(My_ID)->EnableLoop();
+
 			m_pScene->m_pPlayer[My_ID]->SetConnected(true);
+			//m_pScene->getplayer(My_ID)->SetLook(XMFLOAT3(0, 0, 1));
+			//m_pScene->m_pPlayer[My_ID]->SetLook(look);
+			//cout << "캐릭터 위치 : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
+			//m_pScene->m_pPlayer[My_ID]->SetLookVector(look);
+			//m_pScene->m_pPlayer[My_ID]->SetConnected(true);
 
 			m_pCamera = m_pScene->m_pPlayer[My_ID]->GetCamera();
 			cout << "Client Login sucess\n";
@@ -290,29 +299,49 @@ void CGameFramework::recvCallBack()
 		{
 			memcpy(&p_put, ptr, sizeof(p_put));
 
-			XMFLOAT3 position(p_put.x, p_put.y, p_put.z);
+			XMFLOAT3 pos(p_put.x, p_put.y, p_put.z);
 			XMFLOAT3 vel(p_put.vx, p_put.vy, p_put.vz);
 
-			cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+			cout << "Put Player : " << int(p_put.id) << endl;
 
-			m_pScene->m_pPlayer[p_put.id]->SetPosition(position);
-			m_pScene->m_pPlayer[p_put.id]->SetLook(vel);
-			//m_pScene->getplayer(p_put.id)->SetPosition(position);
-			//m_pScene->m_pPlayer[p_put.id]->SetLookVector(look);
+			m_pScene->getplayer(p_put.id)->SetPosition(pos);
+			m_pScene->getplayer(p_put.id)->SetVelocity(vel);
+			PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
+			m_pScene->getplayer(p_put.id)->SetPhysController(m_pPhysx, m_pScene->getplayer(p_put.id)->getCollisionCallback(), &ControllerPos);
+			m_pScene->getplayer(p_put.id)->ChangeAnimation(p_put.ani_index);
+			m_pScene->getplayer(p_put.id)->SetAnimFrame(p_put.ani_frame);
+			if (p_put.ani_index == Anim_Idle) {
+				m_pScene->getplayer(p_put.id)->EnableLoop();
+			}
+			else {
+				m_pScene->getplayer(p_put.id)->DisableLoop();
+			}
 			m_pScene->m_pPlayer[p_put.id]->SetConnected(true);
 
 			ptr += sizeof(p_put);
 			retval -= sizeof(p_put);
 		}
-		if (type == SC_POS) {
+		if (type == SC_POS)
+		{
 			memcpy(&p_pos, m_pSocket->buf, sizeof(p_pos));
 
-			XMFLOAT3 position(p_pos.x, p_pos.y, p_pos.z);
-			XMFLOAT3 look(p_pos.vx, p_pos.vy, p_pos.vz);
+			XMFLOAT3 pos(p_pos.x, p_pos.y, p_pos.z);
+			XMFLOAT3 vel(p_pos.vx, p_pos.vy, p_pos.vz);
 
 			//m_pScene->m_pPlayer[p_pos.id]->SetPosition(position);
-			m_pScene->getplayer(p_pos.id)->SetPosition(position);
-			m_pScene->getplayer(p_pos.id)->SetLook(look);
+			m_pScene->getplayer(p_pos.id)->SetPosition(pos);
+			m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
+			m_pScene->getplayer(p_pos.id)->SetLook(vel);
+			m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
+			m_pScene->getplayer(p_pos.id)->SetAnimFrame(p_pos.ani_frame);
+			if (p_pos.ani_index == Anim_Idle) {
+				m_pScene->getplayer(p_pos.id)->EnableLoop();
+			}
+			else {
+				m_pScene->getplayer(p_pos.id)->DisableLoop();
+			}
+
+			//cout << int(p_pos.id) << "Vel : " << vel.x << "," << vel.y << "," << vel.z << endl;
 
 			//cout << "1[ID : " << p_pos.id << "]Pos 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
 			//
@@ -335,6 +364,19 @@ void CGameFramework::recvCallBack()
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_remove);
 			retval -= sizeof(p_remove);
+		}
+		if (type == SC_ANIM) {
+			memcpy(&p_anim, m_pSocket->buf, sizeof(p_anim));
+
+			cout << int(p_anim.ani_index) << endl;
+
+			m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
+			m_pScene->getplayer(p_anim.id)->SetAnimFrame(p_anim.ani_frame);
+			m_pScene->getplayer(p_anim.id)->DisableLoop();
+			//if (p_anim.ani_index == Anim_Idle)	m_pScene->getplayer(p_anim.id)->EnableLoop();
+			//else m_pScene->getplayer(p_anim.id)->DisableLoop();
+			ptr += sizeof(p_anim);
+			retval -= sizeof(p_anim);
 		}
 		/*
 		if(type == SC_WEAPON){
@@ -425,6 +467,7 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_2.FBX", 0));	//Anim_Lollipop_Attack2
 	character_animation.emplace_back(make_pair("./resource/character/lollipop_guard.FBX", 0));	//Anim_Lollipop_Guard
 
+	character_animation.emplace_back(make_pair("./resource/character/small_react.FBX", 0));			//small_react
 
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
@@ -463,15 +506,20 @@ void CGameFramework::BuildObjects()
 		m_pCamera = m_pPlayer->GetCamera();
 		XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
 		m_pPlayer->SetPosition(pos);
-		m_pPlayer->SetPosition(pos);
+		PxVec3 triggerPos = PxVec3(0 + 10 + 5, 17.5, 0);
+		m_pPlayer->m_AttackTrigger = m_pPhysx->getTrigger(triggerPos, XMFLOAT3(10, 10, 10));
+		m_pPhysx->registerPlayer(m_pPlayer, 0);
 		m_pPlayer->SetConnected(true);
+
+		pos = XMFLOAT3(100, 10, 0);
+		m_pScene->getplayer(1)->SetPosition(pos);
+		m_pPhysx->registerPlayer(m_pScene->getplayer(1), 1);
+		m_pScene->getplayer(1)->SetConnected(true);
 
 		if (m_pPhysx)
 		{
 			PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
 			m_pPhysx->m_Scene->addActor(*groundPlane);
-
-			m_pPhysx->m_PlayerManager = PxCreateControllerManager(*(m_pPhysx->m_Scene));
 
 			//PxBoxControllerDesc bdesc;
 			//bdesc.position = PxExtendedVec3(0, 0, 0);
@@ -480,26 +528,33 @@ void CGameFramework::BuildObjects()
 			//bdesc.halfSideExtent = 10.f;
 			//bdesc.halfForwardExtent = 10.f;
 
-			PxCapsuleControllerDesc desc;
-			desc.height = 15.f;
-			desc.radius = 10.f;
-			desc.position = PxExtendedVec3(0, 17.5, 0);
-			desc.material = m_pPhysx->m_Material;
+			//PxCapsuleControllerDesc desc;
+			//desc.height = 15.f;
+			//desc.radius = 10.f;
+			//desc.position = PxExtendedVec3(0, 17.5, 0);
+			//desc.material = m_pPhysx->m_Material;
+			PxExtendedVec3 position = PxExtendedVec3(0, 17.5, 0);
 
-			m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
+			m_pPlayer->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pPlayer->getCollisionCallback());
 
-			PxShape* boxshape = m_pPhysx->m_Physics->createShape(PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material));
-			boxshape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-			boxshape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+			position = PxExtendedVec3(100, 27.5, 0);
 
-			PxRigidStatic* box = m_pPhysx->m_Physics->createRigidStatic(PxTransform(PxVec3(50, 17.5, 0)));
-			box->attachShape(*boxshape);
-			m_pPhysx->m_Scene->addActor(*box);
+			m_pScene->m_pPlayer[1]->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pScene->m_pPlayer[1]->getCollisionCallback());
+
+			//m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
+
+			//PxShape* boxshape = m_pPhysx->m_Physics->createShape(PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material));
+			//boxshape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			//boxshape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+			//
+			//PxRigidStatic* box = m_pPhysx->m_Physics->createRigidStatic(PxTransform(PxVec3(50, 17.5, 0)));
+			//box->attachShape(*boxshape);
+			//m_pPhysx->m_Scene->addActor(*box);
 
 			//PxRigidStatic* box = PxCreateRigidStatic(*(m_pPhysx->m_Physics), PxTransform(PxVec3(50, 17.5, 0)), PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material), 1.0f);
 			//dynamic->setAngularDamping(0.5f);
 			//dynamic->setLinearVelocity(PxVec3(0, 0, 0));
-			
+
 		}
 	}
 
@@ -621,7 +676,6 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 	}
 	return(0);
 }
-
 void CGameFramework::ProcessInput()
 {
 	static UCHAR pKeyBuffer[256];
@@ -634,203 +688,378 @@ void CGameFramework::ProcessInput()
 	BOOL Key_F = FALSE;
 	BOOL Key_LShift = FALSE;
 	BOOL Key_Space = FALSE;
-	if (::GetKeyboardState(pKeyBuffer))
+
+	// 0x0000 : 이전에 누른적이 없고, 호출 시점에도 눌려있지 않은 상태
+	// 0x0001 : 이전에 누른적이 있고, 호출 시점에도 눌려있지 않은 상태
+	// 0x8000 : 이전에 누른적이 없고, 호출 시점에도 눌려있는 상태
+	// 0x8001 : 이전에 누른적이 있고, 호출 시점에도 눌려있는 상태
+
+	if (SERVER_ON)
 	{
-		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
-		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
-		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-		if (pKeyBuffer['A'] & 0xF0) Key_A = TRUE;
-		if (pKeyBuffer['S'] & 0xF0) Key_S = TRUE;
-		if (pKeyBuffer['D'] & 0xF0) Key_D = TRUE;
-		if (pKeyBuffer['F'] & 0xF0) Key_F = TRUE;
-		if (pKeyBuffer[VK_LSHIFT] & 0xF0) Key_LShift = TRUE;
-		if (pKeyBuffer[VK_SPACE] & 0xF0) Key_Space = TRUE;
-
-
-	}
-
-	if (dwDirection != 0 && SERVER_ON) {
-		m_pSocket->sendPacket(CS_MOVE, dwDirection, 0);
-	}
-	count = 0;
-	float rotation = 0.0f;
-	POINT ptCursorPos;
-	/*마우스를 캡쳐했으면 마우스가 얼마만큼 이동하였는 가를 계산한다. 마우스 왼쪽 또는 오른쪽 버튼이 눌러질 때의
-	메시지(WM_LBUTTONDOWN, WM_RBUTTONDOWN)를 처리할 때 마우스를 캡쳐하였다. 그러므로 마우스가 캡쳐된
-	것은 마우스 버튼이 눌려진 상태를 의미한다. 마우스 버튼이 눌려진 상태에서 마우스를 좌우 또는 상하로 움직이면 플
-	레이어를 x-축 또는 y-축으로 회전한다.*/
-
-	int Anim_Index = m_pPlayer->getAnimIndex();
-	float Anim_Time = m_pPlayer->getAnimtime();
-	
-	if (m_pPlayer->Get_Weapon_grab()) {
-		if (Key_A || Key_S) {
-
-			if (Key_A&&Key_S) {//둘다 눌리면 막기
-				m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
-				m_pPlayer->SetAnimFrame(10);
-				m_pPlayer->DisableLoop();
+		if (::GetFocus())
+		{
+			if (::GetAsyncKeyState(VK_UP) & 0x8000 && !state[0]) {
+				cout << "UP DOWN\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_UP, 1, 0);
+				state[0] = true;
 			}
-			else if (Key_A && !Key_S) { //약공격 or 줍기
-				//충돌체크 (무기 오브젝트랑) 충돌이면 줍기		
+			if (::GetAsyncKeyState(VK_DOWN) & 0x8000 && !state[1]) {
+				cout << "DOWN DOWN\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 1, 0);
+				state[1] = true;
+			}
+			if (::GetAsyncKeyState(VK_LEFT) & 0x8000 && !state[2]) {
+				cout << "LEFT DOWN\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 1, 0);
+				state[2] = true;
+			}
+			if (::GetAsyncKeyState(VK_RIGHT) & 0x8000 && !state[3]) {
+				cout << "RIGHT DOWN\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 1, 0);
+				state[3] = true;
+			}
 
-				//아니면 약공격
-				if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-					m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
-					m_pPlayer->DisableLoop();
-				}
-				if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-					m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
-					m_pPlayer->SetAnimFrame(Anim_Time);
-					m_pPlayer->DisableLoop();
-				}
+			if (::GetAsyncKeyState(VK_UP) == 0 && state[0]) {
+				cout << "UP UP\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_UP, 0, 0);
+				state[0] = false;
 			}
-			else if (!Key_A && Key_S) { //강공격 or 줍기
-				//충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+			if (::GetAsyncKeyState(VK_DOWN) == 0 && state[1]) {
+				cout << "DOWN UP\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 0, 0);
+				state[1] = false;
+			}
+			if (::GetAsyncKeyState(VK_LEFT) == 0 && state[2]) {
+				cout << "LEFT UP\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 0, 0);
+				state[2] = false;
+			}
+			if (::GetAsyncKeyState(VK_RIGHT) == 0 && state[3]) {
+				cout << "RIGHT UP\n";
+				m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
+				state[3] = false;
+			}
 
-				//아니면 강공격
-				if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-					m_pPlayer->ChangeAnimation(Anim_Hard_Attack1);
-					m_pPlayer->DisableLoop();
-				}
-				if (Anim_Index == Anim_Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-					m_pPlayer->ChangeAnimation(Anim_Hard_Attack2);
-					m_pPlayer->SetAnimFrame(Anim_Time);
-					m_pPlayer->DisableLoop();
-				}
+			if (::GetAsyncKeyState(0x41) & 0x8000 && !attackstate) {
+				cout << "약공격 Send\n";
+				m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
+				attackstate = true;
 			}
-		}
+			if (::GetAsyncKeyState(0x41) == 0 && attackstate) {
+				//cout << "RIGHT UP\n";
+				//m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
+				attackstate = false;
+			}
 
-		if (Key_D) { //무기 스킬
-		//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
-		}
-	}
-	else {
-		if (Key_A || Key_S) {
+			if (::GetAsyncKeyState(0x53) & 0x8000 && !attackstate2) {
+				cout << "강공격 Send\n";
+				m_pSocket->sendPacket(CS_ATTACK, CS_HARD, 0, 0);
+				attackstate2 = true;
+			}
+			if (::GetAsyncKeyState(0x53) == 0 && attackstate2) {
+				//cout << "RIGHT UP\n";
+				//m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
+				attackstate2 = false;
+			}
 
-		if (Key_A&&Key_S) {//둘다 눌리면 막기
-			m_pPlayer->ChangeAnimation(Anim_Guard);
-			m_pPlayer->SetAnimFrame(10);
-			m_pPlayer->DisableLoop();
-		}
-		else if (Key_A && !Key_S) { //약공격 or 줍기
-			//충돌체크 (무기 오브젝트랑) 충돌이면 줍기		
-
-			//아니면 약공격
-			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-				m_pPlayer->ChangeAnimation(Anim_Weak_Attack1);
-				m_pPlayer->DisableLoop();
-			}
-			if (Anim_Index == Anim_Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-				m_pPlayer->ChangeAnimation(Anim_Weak_Attack2);
-				m_pPlayer->SetAnimFrame(Anim_Time);
-				m_pPlayer->DisableLoop();
-			}
-			if (Anim_Index == Anim_Weak_Attack2 && (Anim_Time > 25 && Anim_Time < 34)) {
-				m_pPlayer->ChangeAnimation(Anim_Weak_Attack3);
-				m_pPlayer->SetAnimFrame(Anim_Time);
-				m_pPlayer->DisableLoop();
-			}
-		}
-		else if (!Key_A && Key_S) { //강공격 or 줍기
-			//충돌체크 (무기 오브젝트랑) 충돌이면 줍기
-
-			//아니면 강공격
-			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-				m_pPlayer->ChangeAnimation(Anim_Hard_Attack1);
-				m_pPlayer->DisableLoop();
-			}
-			if (Anim_Index == Anim_Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-				m_pPlayer->ChangeAnimation(Anim_Hard_Attack2);
-				m_pPlayer->SetAnimFrame(Anim_Time);
-				m_pPlayer->DisableLoop();
-			}
+			//if (::GetKeyboardState(pKeyBuffer))
+			//{
+			//	if (pKeyBuffer['A'] & 0xF0) Key_A = TRUE;
+			//	if (pKeyBuffer['S'] & 0xF0) Key_S = TRUE;
+			//	if (pKeyBuffer['D'] & 0xF0) Key_D = TRUE;
+			//	if (pKeyBuffer['F'] & 0xF0) Key_F = TRUE;
+			//	if (pKeyBuffer[VK_LSHIFT] & 0xF0) Key_LShift = TRUE;
+			//	if (pKeyBuffer[VK_SPACE] & 0xF0) Key_Space = TRUE;
+			//
+			//	if (Key_A || Key_S) {
+			//
+			//		if (Key_A&&Key_S) {
+			//			cout << "막기 Send\n";
+			//			m_pSocket->sendPacket(CS_ATTACK, CS_GUARD, 0, 0);
+			//		}
+			//		else if (Key_A && !Key_S) { //약공격 or 줍기
+			//			cout << "약공격 Send\n";
+			//			m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
+			//		}
+			//		else if (!Key_A && Key_S) { //강공격 or 줍기
+			//			cout << "강공격 Send\n";
+			//			m_pSocket->sendPacket(CS_ATTACK, CS_HARD, 0, 0);
+			//		}
+			//	}
+			//}
 		}
 	}
-	}
-	
-	if (Key_F) { //강화 스킬
-		if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {		//강화 게이지(?) 플래그가 있어야함
-			m_pPlayer->ChangeAnimation(Anim_PowerUp);
-			m_pPlayer->DisableLoop();
 
-		}
-	}
-	
-	if (Key_Space) { //점프
-		if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-			m_pPlayer->ChangeAnimation(Anim_Jump);
-			m_pPlayer->DisableLoop();
-			m_pPlayer->SetWeapon(false, 0);
-		}
-	}
-	if (Key_LShift) { //구르기
-
-
-	}
-	//if (d_move) return;
-	if (dwDirection)
+	else
 	{
-		if (Anim_Index==Anim_Idle) {
-			//float Player_Yaw = m_pPlayer->GetYaw();
-			if (dwDirection & DIR_FORWARD)
-				m_pPlayer->ChangeAnimation(Anim_Walk);
-			if (dwDirection & DIR_BACKWARD)
-				m_pPlayer->ChangeAnimation(Anim_Walk);
-			if (dwDirection & DIR_LEFT)
-				m_pPlayer->ChangeAnimation(Anim_Walk);
-			if (dwDirection & DIR_RIGHT)
-				m_pPlayer->ChangeAnimation(Anim_Walk);
-		}
-	}
-	else if (Anim_Index == Anim_Walk) {
-		m_pPlayer->ChangeAnimation(Anim_Idle);
-		m_pPlayer->EnableLoop();
-	}
+		if (::GetKeyboardState(pKeyBuffer))
+		{
+			if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
+			if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
+			if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
+			if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+			if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
+			if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+			if (pKeyBuffer['A'] & 0xF0) Key_A = TRUE;
+			if (pKeyBuffer['S'] & 0xF0) Key_S = TRUE;
+			if (pKeyBuffer['D'] & 0xF0) Key_D = TRUE;
+			if (pKeyBuffer['F'] & 0xF0) Key_F = TRUE;
+			if (pKeyBuffer[VK_LSHIFT] & 0xF0) Key_LShift = TRUE;
+			if (pKeyBuffer[VK_SPACE] & 0xF0) Key_Space = TRUE;
 
-			
-		
-		
+
+		}
+
+		float rotation = 0.0f;
+		POINT ptCursorPos;
+		/*마우스를 캡쳐했으면 마우스가 얼마만큼 이동하였는 가를 계산한다. 마우스 왼쪽 또는 오른쪽 버튼이 눌러질 때의
+		메시지(WM_LBUTTONDOWN, WM_RBUTTONDOWN)를 처리할 때 마우스를 캡쳐하였다. 그러므로 마우스가 캡쳐된
+		것은 마우스 버튼이 눌려진 상태를 의미한다. 마우스 버튼이 눌려진 상태에서 마우스를 좌우 또는 상하로 움직이면 플
+		레이어를 x-축 또는 y-축으로 회전한다.*/
+
+		int Anim_Index = m_pPlayer->getAnimIndex();
+		float Anim_Time = m_pPlayer->getAnimtime();
+
+		if (m_pPlayer->Get_Weapon_grab()) {
+			if (Key_A || Key_S) {
+
+				if (Key_A&&Key_S) {//둘다 눌리면 막기
+					m_pPlayer->ChangeAnimation(Anim_Guard);
+					m_pPlayer->SetAnimFrame(10);
+					m_pPlayer->DisableLoop();
+				}
+				else if (Key_A && !Key_S) { //약공격 or 줍기
+				   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
+
+				   //아니면 약공격
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
+						m_pPlayer->DisableLoop();
+					}
+					if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
+						m_pPlayer->SetAnimFrame(Anim_Time);
+						m_pPlayer->DisableLoop();
+					}
+				}
+				else if (!Key_A && Key_S) { //강공격 or 줍기
+				   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+				   //아니면 강공격
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Hard_Attack1);
+						m_pPlayer->DisableLoop();
+					}
+					if (Anim_Index == Anim_Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+						m_pPlayer->ChangeAnimation(Anim_Hard_Attack2);
+						m_pPlayer->SetAnimFrame(Anim_Time);
+						m_pPlayer->DisableLoop();
+					}
+				}
+			}
+
+			if (Key_D) { //무기 스킬
+			//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
+			}
+		}
+		else {
+			if (Key_A || Key_S) {
+
+				if (Key_A&&Key_S) {//둘다 눌리면 막기
+					m_pPlayer->ChangeAnimation(Anim_Guard);
+					m_pPlayer->SetAnimFrame(10);
+					m_pPlayer->DisableLoop();
+				}
+				else if (Key_A && !Key_S) { //약공격 or 줍기
+				   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
+
+				   //아니면 약공격
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Weak_Attack1);
+						m_pPlayer->DisableLoop();
+					}
+					if (Anim_Index == Anim_Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+						m_pPlayer->ChangeAnimation(Anim_Weak_Attack2);
+						m_pPlayer->SetAnimFrame(Anim_Time);
+						m_pPlayer->DisableLoop();
+					}
+					if (Anim_Index == Anim_Weak_Attack2 && (Anim_Time > 25 && Anim_Time < 34)) {
+						m_pPlayer->ChangeAnimation(Anim_Weak_Attack3);
+						m_pPlayer->SetAnimFrame(Anim_Time);
+						m_pPlayer->DisableLoop();
+					}
+				}
+				else if (!Key_A && Key_S) { //강공격 or 줍기
+				   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+				   //아니면 강공격
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Hard_Attack1);
+						m_pPlayer->DisableLoop();
+					}
+					if (Anim_Index == Anim_Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+						m_pPlayer->ChangeAnimation(Anim_Hard_Attack2);
+						m_pPlayer->SetAnimFrame(Anim_Time);
+						m_pPlayer->DisableLoop();
+					}
+				}
+			}
+		}
+
+		if (Key_F) { //강화 스킬
+			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {      //강화 게이지(?) 플래그가 있어야함
+				m_pPlayer->ChangeAnimation(Anim_PowerUp);
+				m_pPlayer->DisableLoop();
+
+			}
+		}
+
+		if (Key_Space) { //점프
+			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+				m_pPlayer->ChangeAnimation(Anim_Jump);
+				m_pPlayer->DisableLoop();
+				m_pPlayer->SetWeapon(false, 0);
+			}
+		}
+		if (Key_LShift) { //구르기
+
+
+		}
+		//if (d_move) return;
+		if (dwDirection)
+		{
+			if (Anim_Index == Anim_Idle) {
+				//float Player_Yaw = m_pPlayer->GetYaw();
+				if (dwDirection & DIR_FORWARD)
+					m_pPlayer->ChangeAnimation(Anim_Walk);
+				if (dwDirection & DIR_BACKWARD)
+					m_pPlayer->ChangeAnimation(Anim_Walk);
+				if (dwDirection & DIR_LEFT)
+					m_pPlayer->ChangeAnimation(Anim_Walk);
+				if (dwDirection & DIR_RIGHT)
+					m_pPlayer->ChangeAnimation(Anim_Walk);
+			}
+		}
+		else if (Anim_Index == Anim_Walk) {
+			m_pPlayer->ChangeAnimation(Anim_Idle);
+			m_pPlayer->EnableLoop();
+		}
+
+
+
+
 		if (!SERVER_ON && dwDirection)
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
-			m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
-			
+			//m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
+			XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
+			XMFLOAT3 xmf3Direction = XMFLOAT3(0, 0, 0);
+			float distance = 20.0f * m_GameTimer.GetTimeElapsed();
+			//XMFLOAT3 Look = XMFLOAT3(0, 0, 0);
+
+			if (dwDirection & DIR_FORWARD) {
+				//	Look.z = -1.f;
+				//	xmf3Direction = Look;
+				xmf3Direction.z = 1.f;
+				xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
+			}
+			if (dwDirection & DIR_BACKWARD) {
+				//	Look.z = 1.f;
+				//	xmf3Direction = Look;
+				xmf3Direction.z = -1.f;
+				xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
+			}
+			//화살표 키 ‘→’를 누르면 로컬 x-축 방향으로 이동한다. ‘←’를 누르면 반대 방향으로 이동한다.
+			if (dwDirection & DIR_RIGHT) {
+				//	Look.x = -1.f;
+				//	xmf3Direction = Look;
+				xmf3Direction.x = 1.f;
+				xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
+			}
+			if (dwDirection & DIR_LEFT) {
+				//	Look.x = 1.f;
+				//	xmf3Direction = Look;
+				xmf3Direction.x = -1.f;
+				xmf3Shift = Vector3::Add(xmf3Shift, xmf3Direction, distance);
+			}
+
+			PxVec3 disp;
+			disp.x = xmf3Shift.x;
+			disp.y = xmf3Shift.y;
+			disp.z = xmf3Shift.z;
+
+			PxControllerFilters filters;
+			m_pPlayer->m_PlayerController->move(disp, 0, 1 / 60, filters);
+
+			PxExtendedVec3 pos = m_pPlayer->m_PlayerController->getPosition();
+			pos.x += 15;
+			m_pPlayer->m_AttackTrigger->setGlobalPose(PxTransform(pos.x, pos.y, pos.z));
+
 			XMFLOAT3 Look = m_pPlayer->GetLook();
 			//XMFLOAT3 Right = m_pPlayer->GetRight();
 			if (dwDirection & DIR_FORWARD) {
 				Look.z = 1.f;
-			//	Right.x = -1.f;
+				//   Right.x = -1.f;
 			}
 			if (dwDirection & DIR_BACKWARD) {
 				Look.z = -1.f;
-			//	Right.x = 1.f;
+				//   Right.x = 1.f;
 			}
 			if (dwDirection & DIR_RIGHT) {
 				Look.x = 1.f;
-			//	Right.z = -1.f;
+				//   Right.z = -1.f;
 			}
 			if (dwDirection & DIR_LEFT) {
 				Look.x = -1.f;
-			//	Right.z = 1.f;
+				//   Right.z = 1.f;
 			}
 			Look = Vector3::Normalize(Look);
 			//Right = Vector3::Normalize(Right);
-			m_pPlayer->SetLook(Look);		
+			m_pPlayer->SetLook(Look);
 		}
-		
-	
-	//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
-	//if(m_pCamera)
-	//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+
+
+		//플레이어를 실제로 이동하고 카메라를 갱신한다. 중력과 마찰력의 영향을 속도 벡터에 적용한다.
+		//if(m_pCamera)
+		//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	}
 }
 
 void CGameFramework::AnimateObjects()
 {
 	if (m_pScene) m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
+}
+
+void CGameFramework::UpdateProcess()
+{
+	if (SERVER_ON)
+	{
+		//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
+		//m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (m_pScene->m_pPlayer[i]->GetConnected())
+			{
+				PxExtendedVec3 position;
+				XMFLOAT3 pos = m_pScene->m_pPlayer[i]->GetPosition();
+				position.x = pos.x;
+				position.y = pos.y + 17.5;
+				position.z = pos.z;
+				m_pScene->m_pPlayer[i]->m_PlayerController->setPosition(position);
+
+				PxVec3 disp;
+				XMFLOAT3 xmf_disp = m_pScene->m_pPlayer[i]->GetVelocity();
+				//cout << "Vel : " << xmf_disp.x << ", " << xmf_disp.y << ", " << xmf_disp.z << endl;
+				disp.x = 20.0f * m_GameTimer.GetTimeElapsed() * xmf_disp.x;
+				disp.y = 20.0f * m_GameTimer.GetTimeElapsed() * xmf_disp.y;
+				disp.z = 20.0f * m_GameTimer.GetTimeElapsed() * xmf_disp.z;
+
+				PxControllerFilters filters;
+				m_pScene->m_pPlayer[i]->m_PlayerController->move(disp, 0.001, 1 / 60, filters);
+				//dwDirection, 20.0f * m_GameTimer.GetTimeElapsed()
+			}
+		}
+	}
 }
 
 void CGameFramework::CollisionProcess()
@@ -870,26 +1099,51 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(60.0f);
 	
 	ProcessInput();
+	UpdateProcess();
+
 	if (SERVER_ON) {
-		//m_pPhysx->m_Scene->simulate(1.f / 60.f);
-		//m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
+		m_pPhysx->m_Scene->simulate(1.f / 60.f);
+		m_pPhysx->m_Scene->fetchResults(true);
 
 		//physx::PxExtendedVec3 playerPosition;
 		//playerPosition = m_pPhysx->m_PlayerController->getPosition();
-		XMFLOAT3 position = m_pPlayer->GetPosition();;
+		//XMFLOAT3 position = m_pPlayer->GetPosition();;
 		//position.x = playerPosition.x;
 		//position.y = playerPosition.y - 17.5f;
 		//position.z = playerPosition.z;
+		//m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+		//m_pCamera->SetLookAt(position);
+		//m_pPlayer->SetPosition(position);
+		for (int i = 0; i < MAX_USER; i++)
+		{
+			if (m_pScene->m_pPlayer[i]->GetConnected())
+			{
+				PxExtendedVec3 playerPosition = m_pScene->m_pPlayer[i]->m_PlayerController->getPosition();
+				XMFLOAT3 position;
+				position.x = playerPosition.x;
+				position.y = playerPosition.y - 17.5f;
+				position.z = playerPosition.z;
+				//m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+				//m_pCamera->SetLookAt(position);
+				m_pScene->m_pPlayer[i]->SetPosition(position);
+			}
+		}
+		XMFLOAT3 position;
+		position.x = m_pPlayer->GetPosition().x;
+		position.y = m_pPlayer->GetPosition().y;
+		position.z = m_pPlayer->GetPosition().z;
 		m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 		m_pCamera->SetLookAt(position);
-		m_pPlayer->SetPosition(position);
+
+		//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+
 	}
 	else {
 		m_pPhysx->m_Scene->simulate(1.f / 60.f);
 		m_pPhysx->m_Scene->fetchResults(1.f / 60.f);
 
 		physx::PxExtendedVec3 playerPosition;
-		playerPosition = m_pPhysx->m_PlayerController->getPosition();
+		playerPosition = m_pPlayer->m_PlayerController->getPosition();
 		XMFLOAT3 position;
 		position.x = playerPosition.x;
 		position.y = playerPosition.y - 17.5f;
@@ -898,13 +1152,19 @@ void CGameFramework::FrameAdvance()
 		m_pCamera->SetLookAt(position);
 		m_pPlayer->SetPosition(position);
 
-		cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
-		position = m_pCamera->GetPosition();
+		//cout << "0 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+
+		playerPosition = m_pScene->m_pPlayer[1]->m_PlayerController->getPosition();
+		position.x = playerPosition.x;
+		position.y = playerPosition.y - 17.5f;
+		position.z = playerPosition.z;
+		//cout << "1 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+		//position = m_pCamera->GetPosition();
 		//cout << "카메라 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;;
 	}
 	
 	
-	CollisionProcess();
+	//CollisionProcess();
 
 	AnimateObjects();
 	

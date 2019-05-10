@@ -11,6 +11,22 @@
 #include "Camera.h"
 #include "Model.h"
 #include "ModelObject.h"
+#include "PxPhysicsAPI.h"
+
+using namespace physx;
+
+class PlayerHitReport : public PxUserControllerHitReport {
+public:
+	void	onShapeHit(const PxControllerShapeHit &hit) {
+		cout << "ShapedHit!!!\n";
+	}
+	void 	onControllerHit(const PxControllersHit &hit) {
+		cout << "ControllerHit!!!\n";
+	}
+	void 	onObstacleHit(const PxControllerObstacleHit &hit) {
+		cout << "ObstacleHit!!!\n";
+	}
+};
 
 class CPlayer : public ModelObject
 {
@@ -39,8 +55,21 @@ protected:
 	CCamera *m_pCamera = NULL;		//플레이어에 현재 설정된 카메라이다.
 	Model_Animation *character;
 public:
+	PxCapsuleController *m_PlayerController;
+	PxControllerFilters	 m_ControllerFilter;
+	PlayerHitReport m_HitReport;
+	PxRigidActor* m_AttackTrigger;
+
+public:
 	CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual ~CPlayer();
+	// Physx
+	void SetPhysController(CPhysx* physx, PxUserControllerHitReport* callback, PxExtendedVec3* pos);
+	void move();
+	PlayerHitReport* getCollisionCallback() { return &m_HitReport; }
+	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
+	PxRigidActor* getTrigger() { return m_AttackTrigger; }
+
 
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }

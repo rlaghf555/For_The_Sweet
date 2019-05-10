@@ -86,7 +86,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_BackGroundShader = new MeshShader();
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
-	m_pPlayer[0]->SetWeapon(true, 0);
+	//m_pPlayer[0]->SetWeapon(true, 0);
 	
 	for (int i = 0; i < MAX_USER; i++) {
 		bounding_box_test[i] = new testBox();

@@ -1,8 +1,41 @@
 #include "stdafx.h"
 #include "Physx.h"
+#include "Player.h"
+
+void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
+{
+	//cout << "Trigger Count : " << count << endl;
+
+	for (PxU32 i = 0; i < count; ++i) {
+		if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+		{
+			//PxTransform tmp = pairs[i].triggerActor->getGlobalPose();
+
+			//cout << "Trigger Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
+			//
+			//tmp = pairs[i].otherActor->getGlobalPose();
+			//cout << "Other Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
+
+			for (int j = 0; j < 8; ++j)
+			{
+				if (player[j] != NULL) {
+					cout << j << endl;
+					if (pairs[i].otherActor == player[j]->getControllerActor())
+					{
+						//cout << j << " Player Hitted\n";
+						player[j]->ChangeAnimation(Anim_Small_React);
+						player[j]->DisableLoop();
+					}
+				}
+			}
+		}
+	}
+
+} //트리거박스 충돌 체크
 
 CPhysx::CPhysx()
 {
+
 
 	m_Foundation = NULL;
 	m_Physics = NULL;
@@ -35,6 +68,8 @@ void CPhysx::initPhysics()
 	m_Material = m_Physics->createMaterial(0.5f, 0.5f, 0.6f);
 
 	m_Cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_Foundation, PxCookingParams(PxTolerancesScale()));
+
+	m_PlayerManager = PxCreateControllerManager(*(m_Scene));
 }
 
 void CPhysx::move(DWORD direction, float distance)
@@ -148,4 +183,45 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count) {
 	//meshSize = outBuffer.getSize();
 
 	return triMesh;
+}
+
+PxCapsuleController* CPhysx::getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback)
+{
+	PxCapsuleControllerDesc capsuleDesc;
+	capsuleDesc.height = 15; //Height of capsule
+	capsuleDesc.radius = 10; //Radius of casule
+	capsuleDesc.position = pos; //Initial position of capsule
+	capsuleDesc.material = m_Physics->createMaterial(1.0f, 1.0f, 1.0f); //Material for capsule shape
+	//capsuleDesc.density = 1.0f; //Desity of capsule shape
+	//capsuleDesc.contactOffset = 1.0f; //외부 물체와 상호작용하는 크기 (지정한 충돌캡슐보다 조금 더 크게 형성위해)
+	//capsuleDesc.slopeLimit = cosf(XMConvertToRadians(1.0f)); //경사 허용도(degree) 0에 가까울수록 경사를 못올라감
+	//capsuleDesc.stepOffset = 0.0f;	//자연스러운 이동 (약간의 고저에 부딫혔을 때 이동가능 여부)
+													//stepoffset보다 큰 높이에 부딛치면 멈춤
+	//capsuleDesc.maxJumpHeight = 2.0f; //최대 점프 높이
+	//capsuleDesc.climbingMode = PxCapsuleClimbingMode::eCONSTRAINED;
+	//capsuleDesc.invisibleWallHeight = 0.0f;
+
+	//충돌 콜백 함수
+	capsuleDesc.reportCallback = collisionCallback;
+
+	PxCapsuleController* controller = static_cast<PxCapsuleController*>(m_PlayerManager->createController(capsuleDesc));
+
+	return controller;
+}
+
+PxRigidStatic * CPhysx::getTrigger(PxVec3 & t, XMFLOAT3 size)
+{
+	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);	//시물레이션 off
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
+
+	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t));
+	staticActor->attachShape(*shape);
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
 }

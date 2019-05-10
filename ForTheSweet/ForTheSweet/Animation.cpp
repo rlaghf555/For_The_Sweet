@@ -100,7 +100,7 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 				pos.y += weights[j] * result.y;
 				pos.z += weights[j] * result.z;		
 			}
-			cout << "Left Hand Pos : " << pos.x << "," << pos.y << "," << pos.z << endl;
+			//cout << "Left Hand Pos : " << pos.x << "," << pos.y << "," << pos.z << endl;
 
 			//tmp2._41 = pos.x;
 			//tmp2._42 = pos.y;

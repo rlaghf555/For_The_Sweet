@@ -60,6 +60,24 @@ void CPlayer::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 	CGameObject::UpdateShaderVariables(pd3dCommandList);
 }
 
+void CPlayer::SetPhysController(CPhysx* physx, PxUserControllerHitReport* callback, PxExtendedVec3* pos)
+{
+	m_PlayerController = physx->getCapsuleController(*pos, callback);
+}
+
+void CPlayer::move()
+{
+	if (m_PlayerController)
+	{
+		PxVec3 disp;
+		disp.x = m_xmf3Velocity.x;
+		disp.y = m_xmf3Velocity.y;
+		disp.z = m_xmf3Velocity.z;
+
+		m_PlayerController->move(disp, 0, 1 / 60, m_ControllerFilter);
+	}
+}
+
 /*플레이어의 위치를 변경하는 함수이다. 플레이어의 위치는 기본적으로 사용자가 플레이어를 이동하기 위한 키보드를
 누를 때 변경된다. 플레이어의 이동 방향(dwDirection)에 따라 플레이어를 fDistance 만큼 이동한다.*/
 void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
@@ -229,6 +247,8 @@ void CPlayer::Update(float fTimeElapsed)
 
 void CPlayer::SetLook(XMFLOAT3 & xmf3Look)
 {
+	if (xmf3Look.x == 0 && xmf3Look.y == 0 && xmf3Look.z == 0)
+		return;
 	m_xmf3Look = xmf3Look;
 	m_xmf3Look.y = 0.0f;
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);

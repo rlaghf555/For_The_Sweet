@@ -10,8 +10,11 @@ class CGameFramework
 {
 public:
 	// Socket
+	bool state[4] = { false, false, false, false };
 	CSocket *m_pSocket;
-	int count = 0;
+	//float cooltime = 0.f;
+	bool attackstate = false;
+	bool attackstate2 = false;
 
 	// Physx
 	CPhysx *m_pPhysx;
@@ -100,6 +103,7 @@ public:
 	//프레임워크의 핵심(사용자 입력, 애니메이션, 렌더링)을 구성하는 함수이다.
 	void ProcessInput();
 	void AnimateObjects();
+	void UpdateProcess();
 	void CollisionProcess();
 	void FrameAdvance();
 
