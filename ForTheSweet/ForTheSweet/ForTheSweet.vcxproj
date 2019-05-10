@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)source\physxextensions\src;$(ProjectDir)pxshared;$(ProjectDir)source\foundation\include;$(ProjectDir)source\geomutils\include;$(ProjectDir)source\geomuils\src;$(ProjectDir)source\geomutils\src\contact;$(ProjectDir)source\geomutils\src\common;$(ProjectDir)source\geomutils\src\convex;$(ProjectDir)source\geomutils\src\sweep;$(ProjectDir)source\geomutils\src\distance;$(ProjectDir)source\geomutils\src\gjk;$(ProjectDir)source\geomutils\src\intersection;$(ProjectDir)source\geomutils\src\mesh;$(ProjectDir)source\geomutils\src\hf;$(ProjectDir)source\geomutils\src\pcm;$(ProjectDir)source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Physx\include;$(ProjectDir)Physx\source\physxextensions\src;$(ProjectDir)Physx\pxshared;$(ProjectDir)Physx\source\foundation\include;$(ProjectDir)Physx\source\geomutils\include;$(ProjectDir)Physx\source\geomuils\src;$(ProjectDir)Physx\source\geomutils\src\contact;$(ProjectDir)Physx\source\geomutils\src\common;$(ProjectDir)Physx\source\geomutils\src\convex;$(ProjectDir)Physx\source\geomutils\src\sweep;$(ProjectDir)Physx\source\geomutils\src\distance;$(ProjectDir)Physx\source\geomutils\src\gjk;$(ProjectDir)Physx\source\geomutils\src\intersection;$(ProjectDir)Physx\source\geomutils\src\mesh;$(ProjectDir)Physx\source\geomutils\src\hf;$(ProjectDir)Physx\source\geomutils\src\pcm;$(ProjectDir)Physx\source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
@@ -130,14 +130,17 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)Physx\include;$(ProjectDir)Physx\source\physxextensions\src;$(ProjectDir)Physx\pxshared;$(ProjectDir)Physx\source\foundation\include;$(ProjectDir)Physx\source\geomutils\include;$(ProjectDir)Physx\source\geomuils\src;$(ProjectDir)Physx\source\geomutils\src\contact;$(ProjectDir)Physx\source\geomutils\src\common;$(ProjectDir)Physx\source\geomutils\src\convex;$(ProjectDir)Physx\source\geomutils\src\sweep;$(ProjectDir)Physx\source\geomutils\src\distance;$(ProjectDir)Physx\source\geomutils\src\gjk;$(ProjectDir)Physx\source\geomutils\src\intersection;$(ProjectDir)Physx\source\geomutils\src\mesh;$(ProjectDir)Physx\source\geomutils\src\hf;$(ProjectDir)Physx\source\geomutils\src\pcm;$(ProjectDir)Physx\source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(SolutionDir)Release\PhysXPvdSDK_static_32.lib;$(SolutionDir)Release\PhysXVehicle_static_32.lib;$(SolutionDir)Release\PhysXCharacterKinematic_static_32.lib;$(SolutionDir)Release\PhysXExtensions_static_32.lib;$(SolutionDir)Release\PhysXCooking_32.lib;$(SolutionDir)Release\PhysXCommon_32.lib;$(SolutionDir)Release\PhysX_32.lib;$(SolutionDir)Release\PhysXFoundation_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
