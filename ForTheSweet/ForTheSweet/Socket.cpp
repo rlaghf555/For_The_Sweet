@@ -32,7 +32,7 @@ bool CSocket::init()
 	ZeroMemory(&serverAddr, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
 	//serveraddr.sin_addr.s_addr = inet_addr(serverip);
-	serverAddr.sin_addr.s_addr = inet_addr("59.14.252.224");
+	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	serverAddr.sin_port = htons(SERVER_PORT);
 	if (connect(clientSocket, (SOCKADDR *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
