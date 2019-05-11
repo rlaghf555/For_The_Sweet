@@ -39,7 +39,10 @@ bool CSocket::init()
 	serverAddr.sin_family = AF_INET;
 	//serveraddr.sin_addr.s_addr = inet_addr(serverip);
 	//serverAddr.sin_addr.s_addr = inet_addr("218.37.39.194");
-	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	char addr[30];
+	cout << "ipÁÖ¼Ò:";
+	cin >> addr;
+	serverAddr.sin_addr.s_addr = inet_addr(addr);
 	serverAddr.sin_port = htons(SERVER_PORT);
 	if (connect(clientSocket, (SOCKADDR *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{

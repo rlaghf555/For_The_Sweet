@@ -237,7 +237,8 @@ public:
 	WeaponShader();
 	WeaponShader(LoadModel *ma);
 	~WeaponShader();
-
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
+//	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int nRenderTargets = 1, void * pContext = NULL);
 	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 };
