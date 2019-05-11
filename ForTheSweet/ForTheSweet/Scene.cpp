@@ -354,19 +354,21 @@ void CScene::AnimateWeapon(int i)
 
 }
 
-void CScene::CollisionProcess()
+void CScene::CollisionProcess(int index)
 {
-	/*
-	XMFLOAT4 a = XMFLOAT4(m_pMapShader[0].getPos().x, m_pMapShader[0].getPos().y, m_pMapShader[0].getPos().z, 1.f);
-	XMVECTOR k = XMLoadFloat4(&a);
-	//	PlaneIntersectionType intersectType = m_pPlayer->m_xmOOBB.Intersects(k);
-
-	for (int i = 0; i < m_nInstancingShaders; i++) {
-		m_pInstancingShaders[i].getPos();
+	bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < 30; j++) {
+			if (m_WeaponShader[i]->getObject(j)) {
+				weapon_box[i][j]->bounding.Center = m_WeaponShader[i]->getObject(j)->GetPosition();
+				XMMATRIX tmp = XMLoadFloat4x4(&m_WeaponShader[i]->getObject(j)->m_xmf4x4World);
+				bool result = weapon_box[i][j]->bounding.Intersects(bounding_box_test[index]->bounding);
+				if (result) {
+					cout << "player "<<index<< "---"<<"무기 종류: " << i << ", 무기 번호: " << j << endl;
+				}
+			}
+		}
 	}
-	for (int i = 0; i < m_nPlayerObjectShaders; i++) {
-		m_pPlayerObjectShaders[i].getPos();
-	}*/
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)

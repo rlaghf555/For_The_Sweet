@@ -1361,23 +1361,33 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 		m_ppObjects[i] = test_Object;
 		if (type == OBJECT_PLAYER) {
 			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 15, 35, 15);	// pos(x, y), Width(w, h), depth
+			bounding.Extents.x = 15; bounding.Extents.y = 35; bounding.Extents.z = 15;
 			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 			m_ppObjects[i]->SetMesh(pCubeMesh);
 			//m_ppObjects[i]->Rotate(0, 0, 90);
 			//m_ppObjects[i]->SetScale(0.7f);
 		}
 		if (type == M_Weapon_Lollipop) {
-			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 30, 15);	// pos(x, y), Width(w, h), depth
+		//	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 30, 15);	// pos(x, y), Width(w, h), depth
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 10, 10);	// pos(x, y), Width(w, h), depth
+			bounding.Extents.x = 5; bounding.Extents.y = 5; bounding.Extents.z = 5;
+
 			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 			m_ppObjects[i]->SetMesh(pCubeMesh);
 		}
 		if (type == M_Weapon_chupachupse) {
-			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 25, 10);	// pos(x, y), Width(w, h), depth
+		//	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 25, 10);	// pos(x, y), Width(w, h), depth
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 10, 10);	// pos(x, y), Width(w, h), depth
+			bounding.Extents.x = 5; bounding.Extents.y = 5; bounding.Extents.z = 5;
+
 			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 			m_ppObjects[i]->SetMesh(pCubeMesh);
 		}	
 		if (type == M_Weapon_pepero) {
-			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 45, 5);	// pos(x, y), Width(w, h), depth
+		//	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 45, 5);	// pos(x, y), Width(w, h), depth
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 10, 10);	// pos(x, y), Width(w, h), depth
+			bounding.Extents.x = 5; bounding.Extents.y = 5; bounding.Extents.z = 5;
+
 			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 			m_ppObjects[i]->SetMesh(pCubeMesh);
 		}

@@ -1129,7 +1129,12 @@ void CGameFramework::UpdateProcess()
 
 void CGameFramework::CollisionProcess()
 {
-	if (m_pScene) m_pScene->CollisionProcess();
+	if (m_pScene) {
+		for (int i = 0; i < MAX_USER; i++) {
+		if (m_pScene->m_pPlayer[0]->GetConnected())
+			m_pScene->CollisionProcess(0);
+		}
+	}
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -1233,7 +1238,7 @@ void CGameFramework::FrameAdvance()
 	}
 	
 	
-	//CollisionProcess();
+	CollisionProcess();
 
 	AnimateObjects();
 	

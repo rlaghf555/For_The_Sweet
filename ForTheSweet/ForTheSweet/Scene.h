@@ -20,7 +20,7 @@ public:
 	bool ProcessInput(UCHAR *pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed);
 	void AnimateWeapon(int i);
-	void CollisionProcess();
+	void CollisionProcess(int index);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void ReleaseUploadBuffers();
 	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }

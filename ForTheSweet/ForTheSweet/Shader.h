@@ -324,6 +324,7 @@ public:
 class testBox : public MeshShader
 {
 public:
+	BoundingOrientedBox bounding;
 	testBox();
 	~testBox();
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
