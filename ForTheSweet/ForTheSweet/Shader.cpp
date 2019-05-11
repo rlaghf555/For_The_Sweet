@@ -1218,7 +1218,7 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 16;	//17
+	m_nObjects = 32;	//17
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
@@ -1236,73 +1236,32 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
-
 	for (int i = 0; i < m_nObjects; i++) {
 		ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
-		if (i < 17) {
+		if (i < 16) {
 			if (kind == 0) {
-				if (i % 4 == 0 || i % 4 == 2) cloud->SetPosition(i % 4 * 30 - 45, 10, -75 + (-30 * (int)(i / 4)));
+				if (i % 2 == 0) cloud->SetPosition(i % 4 * 30 - 45, 10, -75 + (-30 * (int)(i / 4)));
 				else cloud->SetPosition(-45, 10, -75);
 			}
 			else if (kind == 1) {
-				if (i % 4 == 1 || i % 4 == 3) cloud->SetPosition(i % 4 * 30 - 45, 10, -75 + (-30 * (int)(i / 4)));
+				if (i % 2 == 1) cloud->SetPosition(i % 4 * 30 - 45, 10, -75 + (-30 * (int)(i / 4)));
 				else cloud->SetPosition(30 - 45, 10, -75 + -30);
 			}
 		}
 		else {
 			if (kind == 0) {
-				if (i % 4 == 1 || i % 4 == 3) cloud->SetPosition(i % 4 * 30 - 45, 10, 75 + (30 * (int)(i / 4)));
-				else cloud->SetPosition(-45, 10, -75);
+				if (i % 2 == 0) cloud->SetPosition(i % 4 * 30 - 45, 10, 75 + (30 * (int)(i / 4 - 4)));
+				else cloud->SetPosition(-45, 10, 75);
 			}
 			else if (kind == 1) {
-				if (i % 4 == 0 || i % 4 == 2) cloud->SetPosition(i % 4 * 30 - 45, 10, 75 + (30 * (int)(i / 4)));
-				else cloud->SetPosition(30 - 45, 10, -75 + -30);
+				if (i % 2 == 1) cloud->SetPosition(i % 4 * 30 - 45, 10, 75 + (30 * (int)(i / 4 - 4)));
+				else cloud->SetPosition(30 - 45, 10, 75);
 			}
 		}
 
 		cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = cloud;
 	}
-
-		/*
-		for (int i = 0; i < m_nObjects; i++) {if (kind == 0) {
-			ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
-			if (i == 0)cloud->SetPosition(-30, 10, -160);
-			else if (i == 1)cloud->SetPosition(30, 10, -160);
-			else if (i == 2)cloud->SetPosition(-30, 10, -80);
-			else if (i == 3)cloud->SetPosition(30, 10, -80);
-			else if (i == 4)cloud->SetPosition(-30, 10, 160);
-			else if (i == 5)cloud->SetPosition(30, 10, 160);
-			else if (i == 6)cloud->SetPosition(-30, 10, 80);
-			else if (i == 7)cloud->SetPosition(30, 10, 80);
-			else if (i == 8) {
-				cloud->SetPosition(0, 10, -125);
-				cloud->SetScale(1.2f);
-			}
-			else if (i == 9) {
-				cloud->SetPosition(0, 10, 125);
-				cloud->SetScale(1.2f);
-			}
-			else cloud->SetPosition(30, 10, 80);
-			cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-			m_bbObjects[i] = cloud;
-		}
-		else if (kind == 1) {
-			ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
-			cloud->SetScale(0.7f);
-			if (i == 10) cloud->SetPosition(-40, 8, -125);
-			else if (i == 11) cloud->SetPosition(40, 8, -125);
-			else if (i == 12) cloud->SetPosition(0, 8, -163);
-			else if (i == 13) cloud->SetPosition(0, 8, 70);
-			else if (i == 14) cloud->SetPosition(-40, 8, 125);
-			else if (i == 15) cloud->SetPosition(40, 8, 125);
-			else if (i == 16) cloud->SetPosition(0, 8, 163);
-			else cloud->SetPosition(0, 8, 163);
-
-			cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-			m_bbObjects[i] = cloud;
-		}
-	}*/
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1720,7 +1679,7 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	BuildPSO(pd3dDevice, nRenderTargets);
 	
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth_2.dds", 0);	//cloth_2
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth_1.dds", 0);	//cloth_2
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\body.dds", 0);
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth.dds", 1);
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\eye.dds", 2);

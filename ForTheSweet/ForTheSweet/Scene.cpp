@@ -288,14 +288,16 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	for (int i = 0; i < MAX_USER; ++i)
 	{
-		if (m_pPlayer[i]->GetConnected()) {
-			m_pPlayerShader[i]->Animate(fTimeElapsed);
-			if (m_pPlayer[i]->Get_Weapon_grab()) {
-				AnimateWeapon(i);				
+		if (m_pPlayer[i]) {
+			if (m_pPlayer[i]->GetConnected()) {
+				m_pPlayerShader[i]->Animate(fTimeElapsed);
+				if (m_pPlayer[i]->Get_Weapon_grab()) {
+					AnimateWeapon(i);
+				}
+				XMFLOAT3 tmp = m_pPlayer[i]->GetPosition();
+
+				bounding_box_test[i]->getObjects()->m_xmf4x4World = m_pPlayer[i]->m_xmf4x4World;
 			}
-			XMFLOAT3 tmp= m_pPlayer[i]->GetPosition();
-			
-			bounding_box_test[i]->getObjects()->m_xmf4x4World = m_pPlayer[i]->m_xmf4x4World;
 		}
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {	
@@ -345,12 +347,13 @@ void CScene::AnimateWeapon(int i)
 	bone = Matrix4x4::Multiply(bone, player);
 
 	XMFLOAT3 pos = XMFLOAT3(hand_pos.x, hand_pos.y, hand_pos.z);
+	int weapon_type = m_pPlayer[i]->Get_Weapon_type();
 	int weapon_index = m_pPlayer[i]->Get_Weapon_index();
 	 
-	m_WeaponShader[weapon_index]->getObject(0)->SetWorld(bone);
-	m_WeaponShader[weapon_index]->getObject(0)->SetPosition(pos);
-//	m_WeaponShader[weapon_index]->getObject(0)->Rotate(0, 0, 90);
-	m_WeaponShader[weapon_index]->getObject(0)->Rotate(-70, 0, 0);
+	m_WeaponShader[weapon_type]->getObject(weapon_index)->SetWorld(bone);
+	m_WeaponShader[weapon_type]->getObject(weapon_index)->SetPosition(pos);
+//	m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 0, 90);
+	m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 
 }
 
@@ -364,11 +367,14 @@ void CScene::CollisionProcess(int index)
 				XMMATRIX tmp = XMLoadFloat4x4(&m_WeaponShader[i]->getObject(j)->m_xmf4x4World);
 				bool result = weapon_box[i][j]->bounding.Intersects(bounding_box_test[index]->bounding);
 				if (result) {
+					m_pPlayer[index]->SetWeapon(false, i, j);
 					cout << "player "<<index<< "---"<<"무기 종류: " << i << ", 무기 번호: " << j << endl;
+					return;
 				}
 			}
 		}
 	}
+	m_pPlayer[index]->SetWeapon(false, -1, -1);
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)

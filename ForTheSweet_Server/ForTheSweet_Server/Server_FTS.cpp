@@ -14,8 +14,8 @@
 #define MAX_BUFFER 1024
 
 PxVec3 PlayerInitPosition[8] = {
-	PxVec3(0, 10.1, 100), PxVec3(50, 10.1, 100), PxVec3(-50, 10.1, 100), PxVec3(100, 10.1, 100), PxVec3(-100, 10.1, 100),
-	PxVec3(150, 10.1, 100), PxVec3(-150, 10.1, 100), PxVec3(200, 10.1, 100)
+   PxVec3(0, 10.1, 100), PxVec3(50, 10.1, 100), PxVec3(-50, 10.1, 100), PxVec3(100, 10.1, 100), PxVec3(-100, 10.1, 100),
+   PxVec3(150, 10.1, 100), PxVec3(-150, 10.1, 100), PxVec3(200, 10.1, 100)
 };
 
 HANDLE g_iocp;
@@ -215,25 +215,25 @@ void process_packet(char key, char *buffer)
 		if (p_move->key == CS_UP && p_move->state == 0) {  // forward
 			clients[key].playerinfo->m_Vel.z = 0.f;
 		}
-		if (p_move->key == CS_DOWN && p_move->state == 0) {	// backward
+		if (p_move->key == CS_DOWN && p_move->state == 0) {   // backward
 			clients[key].playerinfo->m_Vel.z = 0.f;
 		}
-		if (p_move->key == CS_LEFT && p_move->state == 0) {	// left
+		if (p_move->key == CS_LEFT && p_move->state == 0) {   // left
 			clients[key].playerinfo->m_Vel.x = 0.f;
 		}
-		if (p_move->key == CS_RIGHT && p_move->state == 0) {	// right
+		if (p_move->key == CS_RIGHT && p_move->state == 0) {   // right
 			clients[key].playerinfo->m_Vel.x = 0.f;
 		}
 		if (p_move->key == CS_UP && p_move->state == 1) {  // forward
 			clients[key].playerinfo->m_Vel.z = 1.f;
 		}
-		if (p_move->key == CS_DOWN && p_move->state == 1) {	// backward
+		if (p_move->key == CS_DOWN && p_move->state == 1) {   // backward
 			clients[key].playerinfo->m_Vel.z = -1.f;
 		}
-		if (p_move->key == CS_LEFT && p_move->state == 1) {	// left
+		if (p_move->key == CS_LEFT && p_move->state == 1) {   // left
 			clients[key].playerinfo->m_Vel.x = -1.f;
 		}
-		if (p_move->key == CS_RIGHT && p_move->state == 1) {	// right
+		if (p_move->key == CS_RIGHT && p_move->state == 1) {   // right
 			clients[key].playerinfo->m_Vel.x = 1.f;
 		}
 
@@ -247,7 +247,7 @@ void process_packet(char key, char *buffer)
 		}
 		clients[key].playerinfo->m_AniFrame = 0.0f;
 
-		cout << "[" << int(key) << "] Clients Move => " << clients[key].playerinfo->m_Vel.x << "," 
+		cout << "[" << int(key) << "] Clients Move => " << clients[key].playerinfo->m_Vel.x << ","
 			<< clients[key].playerinfo->m_Vel.y << "," << clients[key].playerinfo->m_Vel.z << "\n";
 
 		sc_packet_pos p_pos;
@@ -287,7 +287,7 @@ void process_packet(char key, char *buffer)
 			clients[key].playerinfo->jumpstart();
 		}
 
-		if (p_anim->key == CS_GUARD) {								// 예외처리 필수!
+		if (p_anim->key == CS_GUARD) {                        // 예외처리 필수!
 			clients[key].playerinfo->setAniIndex(Anim::Guard);
 			clients[key].playerinfo->setAniFrame(10.0f);
 			clients[key].playerinfo->setAniLoop(false);
@@ -321,7 +321,7 @@ void process_packet(char key, char *buffer)
 				clients[key].playerinfo->setAniLoop(false);
 			}
 		}
-		
+
 		sc_packet_anim p_anim2;
 		p_anim2.type = SC_ANIM;
 		p_anim2.size = sizeof(sc_packet_anim);
@@ -364,9 +364,9 @@ void worker_thread()
 					if (i != key)
 						sendPacket(i, &p_remove);
 					else {
+						clients[i].connected = false;
 						clients[i].playerinfo->m_PlayerController->release();
 						clients[i].playerinfo->m_AttackTrigger->release();
-						clients[i].connected = false;
 					}
 			}
 			continue;
@@ -385,9 +385,9 @@ void worker_thread()
 					if (i != key)
 						sendPacket(i, &p_remove);
 					else {
+						clients[i].connected = false;
 						clients[i].playerinfo->m_PlayerController->release();
 						clients[i].playerinfo->m_AttackTrigger->release();
-						clients[i].connected = false;
 					}
 			}
 			continue;
@@ -533,50 +533,53 @@ void clientInputProcess()
 	{
 		if (clients[i].connected == true)
 		{
-			clients[i].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
+			if (clients[i].playerinfo->m_AttackTrigger)
+			{
+				clients[i].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
 
-			int Ani_Index = clients[i].playerinfo->m_AniIndex;
-			float Anim_Time = clients[i].playerinfo->m_AniFrame;
+				int Ani_Index = clients[i].playerinfo->m_AniIndex;
+				float Anim_Time = clients[i].playerinfo->m_AniFrame;
 
-			if (Ani_Index == Anim::Weak_Attack1 || Ani_Index == Anim::Weak_Attack2 || Ani_Index == Anim::Weak_Attack3) {
-				if ((Anim_Time > 10 && Anim_Time < 15) || (Anim_Time > 22 && Anim_Time < 27) || (Anim_Time > 32 && Anim_Time < 37))
-				{
-					PxTransform triggerpos(PxVec3(0, 0, 0));
-					PxExtendedVec3 playerpos = clients[i].playerinfo->m_PlayerController->getPosition();
-					PxVec3 look = clients[i].playerinfo->m_Look;
-					triggerpos.p.x = playerpos.x + (look.x * 10);
-					triggerpos.p.y = playerpos.y + (look.y * 10);
-					triggerpos.p.z = playerpos.z + (look.z * 10);
+				if (Ani_Index == Anim::Weak_Attack1 || Ani_Index == Anim::Weak_Attack2 || Ani_Index == Anim::Weak_Attack3) {
+					if ((Anim_Time > 10 && Anim_Time < 15) || (Anim_Time > 22 && Anim_Time < 27) || (Anim_Time > 32 && Anim_Time < 37))
+					{
+						PxTransform triggerpos(PxVec3(0, 0, 0));
+						PxExtendedVec3 playerpos = clients[i].playerinfo->m_PlayerController->getPosition();
+						PxVec3 look = clients[i].playerinfo->m_Look;
+						triggerpos.p.x = playerpos.x + (look.x * 10);
+						triggerpos.p.y = playerpos.y + (look.y * 10);
+						triggerpos.p.z = playerpos.z + (look.z * 10);
 
-					cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
-					//cout << "Ani time : " << Anim_Time << endl;
-					//cout << "Trigger Pos : " << triggerpos.p.x << ", " << triggerpos.p.y << ", " << triggerpos.p.z << endl;
-					clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
+						//cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
+						//cout << "Ani time : " << Anim_Time << endl;
+						//cout << "Trigger Pos : " << triggerpos.p.x << ", " << triggerpos.p.y << ", " << triggerpos.p.z << endl;
+						clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
+					}
 				}
-			}
 
-			float jumpheight;
-			jumpheight = clients[i].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
+				float jumpheight;
+				jumpheight = clients[i].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
 
-			if (jumpheight == 0.0f) {
-				jumpheight = -9.81 * gGameTimer.GetTimeElapsed();
-			}
+				if (jumpheight == 0.0f) {
+					jumpheight = -9.81 * gGameTimer.GetTimeElapsed();
+				}
 
-			PxVec3 direction = clients[i].playerinfo->m_Vel;
-			//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
-			float elapsedTime = gGameTimer.GetTimeElapsed();
+				PxVec3 direction = clients[i].playerinfo->m_Vel;
+				//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
+				float elapsedTime = gGameTimer.GetTimeElapsed();
 
-			PxVec3 distance = direction * elapsedTime * 20.f;
-			distance.y += jumpheight;
+				PxVec3 distance = direction * elapsedTime * 20.f;
+				distance.y += jumpheight;
 
-			PxControllerFilters filters;
-			if (clients[i].playerinfo->m_PlayerController) {
-				const PxU32 flags = clients[i].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
+				PxControllerFilters filters;
+				if (clients[i].playerinfo->m_PlayerController) {
+					const PxU32 flags = clients[i].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
 
-				if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
-				{
-					//cout << "충돌\n";
-					clients[i].playerinfo->m_Jump.stopJump();
+					if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+					{
+						//cout << "충돌\n";
+						clients[i].playerinfo->m_Jump.stopJump();
+					}
 				}
 			}
 		}
@@ -642,7 +645,7 @@ void broadcastPosPacket()
 			p_pos.ani_frame = clients[i].playerinfo->m_AniFrame;
 			p_pos.type = SC_POS;
 			p_pos.size = sizeof(sc_packet_pos);
-			
+
 			for (char j = 0; j < MAX_USER; ++j)
 			{
 				if (clients[j].connected == true)
@@ -735,7 +738,7 @@ void aniLoad()
 	ifstream in("ani.txt");
 	int i;
 	float f;
-	
+
 	while (in) {
 		in >> i;
 		in >> f;
@@ -746,7 +749,7 @@ void aniLoad()
 
 	//for (auto d : aniInfo)
 	//{
-	//	cout << d.first << " : " << d.second << endl;
+	//   cout << d.first << " : " << d.second << endl;
 	//}
 }
 
