@@ -18,6 +18,8 @@ PxVec3 PlayerInitPosition[8] = {
    PxVec3(150, 10.1, 100), PxVec3(-150, 10.1, 100), PxVec3(200, 10.1, 100)
 };
 
+char Weapon[MAX_WEAPON_TYPE][MAX_WEAPON_NUM];
+
 HANDLE g_iocp;
 
 CPhysx *gPhysx;
@@ -129,6 +131,9 @@ void sendPacket(char key, void *ptr)
 
 void process_packet(char key, char *buffer)
 {
+	char Anim_Index;
+	float Anim_Time;
+
 	switch (buffer[1]) {
 	case CS_CONNECT:
 		cout << "[" << int(key) << "] Clients Login\n";
@@ -211,7 +216,6 @@ void process_packet(char key, char *buffer)
 		cs_packet_move *p_move;
 		p_move = reinterpret_cast<cs_packet_move*>(buffer);
 
-
 		if (p_move->key == CS_UP && p_move->state == 0) {  // forward
 			clients[key].playerinfo->m_Vel.z = 0.f;
 		}
@@ -273,12 +277,12 @@ void process_packet(char key, char *buffer)
 		}
 		break;
 
-	case CS_ATTACK:
+	case CS_ATTACK: 
 		cs_packet_anim *p_anim;
 		p_anim = reinterpret_cast<cs_packet_anim*>(buffer);
 
-		char Anim_Index = clients[key].playerinfo->m_AniIndex;
-		float Anim_Time = clients[key].playerinfo->m_AniFrame;
+		Anim_Index = clients[key].playerinfo->m_AniIndex;
+		Anim_Time = clients[key].playerinfo->m_AniFrame;
 
 		if (p_anim->key == CS_JUMP) {
 			clients[key].playerinfo->setAniIndex(Anim::Jump);
@@ -293,32 +297,56 @@ void process_packet(char key, char *buffer)
 			clients[key].playerinfo->setAniLoop(false);
 		}
 		if (p_anim->key == CS_WEAK) {
-			if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
-				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
-				clients[key].playerinfo->setAniFrame(0.0f);
-				clients[key].playerinfo->setAniLoop(false);
+			if (clients[key].playerinfo->weapon_type == -1) {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
+					clients[key].playerinfo->setAniFrame(0.0f);
+					clients[key].playerinfo->setAniLoop(false);
+				}
+				if (Anim_Index == Anim::Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
+					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
+					clients[key].playerinfo->setAniFrame(Anim_Time);
+					clients[key].playerinfo->setAniLoop(false);
+				}
+				if (Anim_Index == Anim::Weak_Attack2 && (Anim_Time > 20 && Anim_Time < 25)) {
+					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
+					clients[key].playerinfo->setAniFrame(Anim_Time);
+					clients[key].playerinfo->setAniLoop(false);
+				}
 			}
-			if (Anim_Index == Anim::Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
-				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
-				clients[key].playerinfo->setAniFrame(Anim_Time);
-				clients[key].playerinfo->setAniLoop(false);
-			}
-			if (Anim_Index == Anim::Weak_Attack2 && (Anim_Time > 20 && Anim_Time < 25)) {
-				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
-				clients[key].playerinfo->setAniFrame(Anim_Time);
-				clients[key].playerinfo->setAniLoop(false);
+			else {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack1);
+					clients[key].playerinfo->setAniFrame(0.0f);
+					clients[key].playerinfo->setAniLoop(false);
+				}
+				if (Anim_Index == Anim::Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
+					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack2);
+					clients[key].playerinfo->setAniFrame(Anim_Time);
+					clients[key].playerinfo->setAniLoop(false);
+				}
+
 			}
 		}
 		if (p_anim->key == CS_HARD) {
-			if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
-				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
-				clients[key].playerinfo->setAniFrame(0.0f);
-				clients[key].playerinfo->setAniLoop(false);
+			if (clients[key].playerinfo->weapon_type == -1) {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
+					clients[key].playerinfo->setAniFrame(0.0f);
+					clients[key].playerinfo->setAniLoop(false);
+				}
+				if (Anim_Index == Anim::Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
+					clients[key].playerinfo->setAniFrame(Anim_Time);
+					clients[key].playerinfo->setAniLoop(false);
+				}
 			}
-			if (Anim_Index == Anim::Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
-				clients[key].playerinfo->setAniFrame(Anim_Time);
-				clients[key].playerinfo->setAniLoop(false);
+			else {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Hard_Attack);
+					clients[key].playerinfo->setAniFrame(0.0f);
+					clients[key].playerinfo->setAniLoop(false);
+				}
 			}
 		}
 
@@ -333,6 +361,32 @@ void process_packet(char key, char *buffer)
 		{
 			if (clients[i].connected)
 				sendPacket(i, &p_anim2);
+		}
+		break;
+
+	case CS_WEAPON:
+		cs_packet_weapon *p_weapon;
+		p_weapon = reinterpret_cast<cs_packet_weapon*>(buffer);
+
+		clients[key].playerinfo->weapon_type = p_weapon->weapon_type;
+		clients[key].playerinfo->weapon_index = p_weapon->weapon_index;
+		clients[key].playerinfo->setAniIndex(Anim::Pick_Up);
+		clients[key].playerinfo->setAniFrame(0.0f);
+		clients[key].playerinfo->setAniLoop(false);
+
+		cout << int(key) << " Player Weapon Success : " << int(p_weapon->weapon_type) << ", " << int(p_weapon->weapon_index) << endl;;
+
+		sc_packet_anim p_anim3;
+		p_anim3.type = SC_ANIM;
+		p_anim3.size = sizeof(sc_packet_anim);
+		p_anim3.id = key;
+		p_anim3.ani_index = clients[key].playerinfo->m_AniIndex;
+		p_anim3.ani_frame = clients[key].playerinfo->m_AniFrame;
+
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (clients[i].connected)
+				sendPacket(i, &p_anim3);
 		}
 		break;
 	}
@@ -533,29 +587,86 @@ void clientInputProcess()
 	{
 		if (clients[i].connected == true)
 		{
+			int Ani_Index = clients[i].playerinfo->m_AniIndex;
+			float Anim_Time = clients[i].playerinfo->m_AniFrame;
+
+			if (Ani_Index == Anim::Pick_Up) {
+				if (Anim_Time > 20.f) {
+					char weapon_type = clients[i].playerinfo->weapon_type;
+					char weapon_index = clients[i].playerinfo->weapon_index;
+
+					if (Weapon[weapon_type][weapon_index] == -1)
+					{
+						Weapon[weapon_type][weapon_index] = i;
+
+						sc_packet_weapon p_weapon2;
+						p_weapon2.type = SC_WEAPON;
+						p_weapon2.size = sizeof(sc_packet_weapon);
+						p_weapon2.id = i;
+						p_weapon2.weapon_type = weapon_type;
+						p_weapon2.weapon_index = weapon_index;
+						p_weapon2.weapon_success = 1;
+
+						for (int i = 0; i < MAX_USER; ++i)
+						{
+							if (clients[i].connected == true)
+							{
+								sendPacket(i, &p_weapon2);
+							}
+						}
+					}
+				}
+			}
+
 			if (clients[i].playerinfo->m_AttackTrigger)
 			{
 				clients[i].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
 
-				int Ani_Index = clients[i].playerinfo->m_AniIndex;
-				float Anim_Time = clients[i].playerinfo->m_AniFrame;
+				PxTransform triggerpos(PxVec3(0, 0, 0));
+				PxExtendedVec3 playerpos = clients[i].playerinfo->m_PlayerController->getPosition();
+				PxVec3 look = clients[i].playerinfo->m_Look;
 
 				if (Ani_Index == Anim::Weak_Attack1 || Ani_Index == Anim::Weak_Attack2 || Ani_Index == Anim::Weak_Attack3) {
 					if ((Anim_Time > 10 && Anim_Time < 15) || (Anim_Time > 22 && Anim_Time < 27) || (Anim_Time > 32 && Anim_Time < 37))
 					{
-						PxTransform triggerpos(PxVec3(0, 0, 0));
-						PxExtendedVec3 playerpos = clients[i].playerinfo->m_PlayerController->getPosition();
-						PxVec3 look = clients[i].playerinfo->m_Look;
 						triggerpos.p.x = playerpos.x + (look.x * 10);
 						triggerpos.p.y = playerpos.y + (look.y * 10);
 						triggerpos.p.z = playerpos.z + (look.z * 10);
 
-						//cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
-						//cout << "Ani time : " << Anim_Time << endl;
-						//cout << "Trigger Pos : " << triggerpos.p.x << ", " << triggerpos.p.y << ", " << triggerpos.p.z << endl;
 						clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
 					}
 				}
+				else if (Ani_Index == Anim::Hard_Attack1 || Ani_Index == Anim::Hard_Attack2) {
+					if ((Anim_Time > 14 && Anim_Time < 19) || (Anim_Time > 28 && Anim_Time < 33))
+					{
+						triggerpos.p.x = playerpos.x + (look.x * 10);
+						triggerpos.p.y = playerpos.y + (look.y * 10);
+						triggerpos.p.z = playerpos.z + (look.z * 10);
+
+						clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
+					}
+				}
+				else if (Ani_Index == Anim::Lollipop_Attack1 || Ani_Index == Anim::Lollipop_Attack2) {
+					if ((Anim_Time > 13 && Anim_Time < 18) || (Anim_Time > 28 && Anim_Time < 33))
+					{
+						triggerpos.p.x = playerpos.x + (look.x * 10);
+						triggerpos.p.y = playerpos.y + (look.y * 10);
+						triggerpos.p.z = playerpos.z + (look.z * 10);
+
+						clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
+					}
+				}
+				else if (Ani_Index == Anim::Lollipop_Hard_Attack) {
+					if (Anim_Time > 13 && Anim_Time < 18)
+					{
+						triggerpos.p.x = playerpos.x + (look.x * 10);
+						triggerpos.p.y = playerpos.y + (look.y * 10);
+						triggerpos.p.z = playerpos.z + (look.z * 10);
+
+						clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
+					}
+				}
+				
 
 				float jumpheight;
 				jumpheight = clients[i].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
@@ -760,6 +871,10 @@ int main()
 
 	mapLoad();
 	aniLoad();
+
+	for (int i = 0; i < MAX_WEAPON_TYPE; ++i)
+		for (int j = 0; j < MAX_WEAPON_NUM; ++j)
+			Weapon[i][j] = -1;
 
 	for (int i = 0; i < MAX_USER; ++i)
 	{

@@ -8,6 +8,26 @@ using namespace physx;
 
 static PxF32 gJumpGravity = -80.0f;
 
+#define Anim_Idle 0
+#define Anim_Walk 1
+#define Anim_Weak_Attack1 2
+#define Anim_Weak_Attack2 3
+#define Anim_Weak_Attack3 4
+#define Anim_Hard_Attack1 5
+#define Anim_Hard_Attack2 6
+#define Anim_Guard 7
+#define Anim_PowerUp 8
+#define Anim_Jump 9
+
+#define Anim_Lollipop_Attack1 10
+#define Anim_Lollipop_Attack2 11
+#define Anim_Lollipop_Guard 12
+#define Anim_Lollipop_Hard_Attack 13
+#define Anim_Lollipop_Skill 14
+
+#define Anim_Small_React 15
+#define Anim_Pick_up 16
+
 enum Anim {
 	Idle,
 	Walk,
@@ -22,7 +42,10 @@ enum Anim {
 	Lollipop_Attack1,
 	Lollipop_Attack2,
 	Lollipop_Guard,
-	Small_React
+	Lollipop_Hard_Attack,
+	Lollipop_Skill,
+	Small_React,
+	Pick_Up
 };
 
 class PlayerHitReport : public PxUserControllerHitReport {
@@ -92,5 +115,9 @@ public:
 
 	char m_AniIndex;
 	float m_AniFrame;
+
+	char weapon_type = -1;
+	char weapon_index = -1;
+	bool weapon_send = false;
 };
 

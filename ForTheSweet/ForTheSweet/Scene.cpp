@@ -368,7 +368,7 @@ void CScene::CollisionProcess(int index)
 				bool result = weapon_box[i][j]->bounding.Intersects(bounding_box_test[index]->bounding);
 				if (result) {
 					m_pPlayer[index]->SetWeapon(false, i, j);
-					cout << "player "<<index<< "---"<<"무기 종류: " << i << ", 무기 번호: " << j << endl;
+					//cout << "player "<<index<< "---"<<"무기 종류: " << i << ", 무기 번호: " << j << endl;
 					return;
 				}
 			}

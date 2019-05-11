@@ -8,6 +8,7 @@ constexpr int CS_CONNECT = 1;
 constexpr int CS_DISCONNECT = 2;
 constexpr int CS_MOVE = 3;
 constexpr int CS_ATTACK = 4;
+constexpr int CS_WEAPON = 5;
 
 constexpr int CS_UP = 10;
 constexpr int CS_DOWN = 11;
@@ -24,6 +25,7 @@ constexpr int SC_POS = 2;
 constexpr int SC_PUT_PLAYER = 3;
 constexpr int SC_REMOVE = 4;
 constexpr int SC_ANIM = 5;
+constexpr int SC_WEAPON = 6;
 
 
 #pragma pack(push, 1)
@@ -49,6 +51,13 @@ struct cs_packet_anim {
 	char size;
 	char type;
 	char key;
+};
+
+struct cs_packet_weapon {
+	char size;
+	char type;
+	char weapon_type;
+	char weapon_index;
 };
 
 struct sc_packet_login {
@@ -85,6 +94,15 @@ struct sc_packet_anim {
 	char id;
 	char ani_index;
 	float ani_frame;
+};
+
+struct sc_packet_weapon {
+	char size;
+	char type;
+	char id;
+	char weapon_type;
+	char weapon_index;
+	char weapon_success;
 };
 
 struct sc_packet_remove {

@@ -38,7 +38,8 @@ bool CSocket::init()
 	ZeroMemory(&serverAddr, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
 	//serveraddr.sin_addr.s_addr = inet_addr(serverip);
-	serverAddr.sin_addr.s_addr = inet_addr("218.37.39.194");
+	//serverAddr.sin_addr.s_addr = inet_addr("218.37.39.194");
+	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	serverAddr.sin_port = htons(SERVER_PORT);
 	if (connect(clientSocket, (SOCKADDR *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
@@ -83,6 +84,15 @@ void CSocket::sendPacket(char type, char key, char state, char id)
 		p_anim.size = sizeof(cs_packet_anim);
 		p_anim.key = key;
 		send(clientSocket, (char *)&p_anim, sizeof(cs_packet_anim), 0);
+		break;
+
+	case CS_WEAPON:
+		cs_packet_weapon p_weapon;
+		p_weapon.type = CS_WEAPON;
+		p_weapon.size = sizeof(cs_packet_weapon);
+		p_weapon.weapon_type = key;
+		p_weapon.weapon_index = state;
+		send(clientSocket, (char *)&p_weapon, sizeof(cs_packet_weapon), 0);
 		break;
 	}
 }

@@ -242,6 +242,7 @@ void CGameFramework::recvCallBack()
 	sc_packet_put_player p_put;
 	sc_packet_remove p_remove;
 	sc_packet_anim p_anim;
+	sc_packet_weapon p_weapon;
 
 	int retval;
 
@@ -344,18 +345,6 @@ void CGameFramework::recvCallBack()
 				m_pScene->getplayer(p_pos.id)->DisableLoop();
 			}
 
-			//cout << int(p_pos.id) << "Vel : " << vel.x << "," << vel.y << "," << vel.z << endl;
-
-			//cout << "1[ID : " << p_pos.id << "]Pos 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
-			//
-			//position = m_pScene->getplayer(p_pos.id)->GetPosition();
-			////m_pScene->m_pPlayer[p_pos.id]->SetLookVector(look);
-			////cout << position.x << "," << position.y << "," << position.z << "\n";
-			////m_pCamera = m_pScene->m_pPlayer[p_pos.id]->GetCamera();
-			//
-			//cout << "2[ID : " << p_pos.id << "]Pos 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
-
-			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_pos);
 			retval -= sizeof(p_pos);
 		}
@@ -364,6 +353,7 @@ void CGameFramework::recvCallBack()
 
 			m_pScene->m_pPlayer[p_remove.id]->SetConnected(false);
 			m_pScene->m_pPlayer[p_remove.id]->m_PlayerController->release();
+			m_pScene->m_pPlayer[p_remove.id]->m_AttackTrigger->release();
 
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_remove);
@@ -387,19 +377,18 @@ void CGameFramework::recvCallBack()
 			ptr += sizeof(p_anim);
 			retval -= sizeof(p_anim);
 		}
-		/*
-		if(type == SC_WEAPON){
+
+		if(type == SC_WEAPON)
+		{
 			memcpy(&p_weapon, m_pSocket->buf, sizeof(p_weapon));
 
-			m_pScene->m_Player[p_weapon.playerindex]->SetWeapon(p_weapon.grab, p_weapon.weapontype ,p_weapon.weaponindex);
+			m_pScene->m_pPlayer[p_weapon.id]->SetWeapon(true, p_weapon.weapon_type ,p_weapon.weapon_index);
 
+			cout << p_weapon.id << " Player Weapon Success\n";
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_weapon);
 			retval -= sizeof(p_weapon);
 		}
-
-		*/
-
 	}
 	memset(m_pSocket->buf, 0, sizeof(MAX_PACKET_SIZE));
 }
@@ -706,12 +695,11 @@ void CGameFramework::ProcessInput()
 
 	// 0x0000 : 이전에 누른적이 없고, 호출 시점에도 눌려있지 않은 상태
 	// 0x0001 : 이전에 누른적이 있고, 호출 시점에도 눌려있지 않은 상태
-	// 0x8000 : 이전에 누른적이 없고, 호출 시점에도 눌려있는 상태
+	// 0x8000 : 이전에 누른적이 없고, 호출 시점에는 눌려있는 상태
 	// 0x8001 : 이전에 누른적이 있고, 호출 시점에도 눌려있는 상태
 
 	if (SERVER_ON)
 	{
-	
 		if (::GetFocus())
 		{
 			if (::GetAsyncKeyState(VK_UP) & 0x8000 && !state[0]) {
@@ -759,10 +747,25 @@ void CGameFramework::ProcessInput()
 			if (::GetAsyncKeyState(0x41) & 0x8000 && !attackstate) {
 				int type = m_pPlayer->Get_Weapon_type();	//무기 종류
 				int index = m_pPlayer->Get_Weapon_index();  //무기 번호
-				//if(type != -1 && index != -1)
-				//m_pSocket->sendPacket(CS_WEAPON,asdfasgadfhadfhgadfhadfh)
-				cout << "약공격 Send\n";
-				m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
+
+				cout << type << ", " << index << endl;
+
+				if (!m_pPlayer->Get_Weapon_grab())
+				{
+					if (type != -1 && index != -1) {
+						cout << "무기줍기 Send\n";
+						m_pSocket->sendPacket(CS_WEAPON, type, index, 0);
+					}
+					else
+					{
+						cout << "무기 X 약공격 Send\n";
+						m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
+					}
+				}
+				else {
+					cout << "무기 O 약공격 Send\n";
+					m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
+				}
 				attackstate = true;
 			}
 			if (::GetAsyncKeyState(0x41) == 0 && attackstate) {
@@ -1160,9 +1163,13 @@ void CGameFramework::UpdateProcess()
 void CGameFramework::CollisionProcess()
 {
 	if (m_pScene) {
-		if (m_pScene->m_pPlayer[My_ID]->GetConnected()) {
-		if(!m_pScene->m_pPlayer[My_ID]->Get_Weapon_grab())
-			m_pScene->CollisionProcess(My_ID);
+		if (My_ID != -1) {
+			if (m_pScene->m_pPlayer[My_ID]) {
+				if (m_pScene->m_pPlayer[My_ID]->GetConnected()) {
+					if (!m_pScene->m_pPlayer[My_ID]->Get_Weapon_grab())
+						m_pScene->CollisionProcess(My_ID);
+				}
+			}
 		}
 	}
 }
