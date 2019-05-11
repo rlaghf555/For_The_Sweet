@@ -2,6 +2,9 @@
 #include "header.h"
 #include "PxPhysicsAPI.h"
 #include "Util.h"
+#include "Protocol.h"
+
+class CPlayer;
 
 using namespace physx;
 
@@ -12,30 +15,17 @@ private:
 	//void EnemyToPlayer(PxTriggerPair* trigger);
 	//
 	//GameObject* player = nullptr;
+	CPlayer* player[8];
+
 public:
-	void onTrigger(PxTriggerPair* pairs, PxU32 count)
-	{
-		cout << "Trigger Count : " << count << endl;
-
-		for (PxU32 i = 0; i < count; ++i) {
-			if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
-			{
-				PxTransform tmp = pairs[i].triggerActor->getGlobalPose();
-
-				cout << "Trigger Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
-
-				tmp = pairs[i].otherActor->getGlobalPose();
-				cout << "Other Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
-			}
-		}
-
-	} //트리거박스 충돌 체크
+	void onTrigger(PxTriggerPair* pairs, PxU32 count);
 	void onAdvance(const PxRigidBody*const*, const PxTransform*, const PxU32) {}
 	void onConstraintBreak(PxConstraintInfo*, PxU32) {}
 	void onWake(PxActor**, PxU32) {}
 	void onSleep(PxActor**, PxU32) {}
 	void onContact(const PxContactPairHeader&, const PxContactPair*, PxU32) { }
 
+	void setPlayer(CPlayer* pl, int index) { player[index] = pl; }
 	//void setPlayer(GameObject* object) { player = object; }
 };
 
@@ -83,6 +73,9 @@ public:
 
 	PxTriangleMesh*	GetTriangleMesh(vector<PxVec3> ver, vector<int> index);
 	PxCapsuleController* getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback);
+	PxRigidStatic* getTrigger(PxVec3& t, PxVec3 size);
+
+	void registerPlayer(CPlayer* player, int index) { m_Simulator.setPlayer(player, index); }
 };
 
 inline PxExtendedVec3 PXtoPXEx(const PxVec3& pos) {

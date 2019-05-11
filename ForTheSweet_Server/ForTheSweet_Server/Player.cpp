@@ -1,6 +1,35 @@
 #include "Player.h"
 
+CJump::CJump() :
+	mV0(0.0f),
+	mJumpTime(0.0f),
+	mJump(false)
+{
+}
 
+void CJump::startJump(PxF32 v0)
+{
+	if (mJump)	return;
+	mJumpTime = 0.0f;
+	mV0 = v0;
+	mJump = true;
+}
+
+void CJump::stopJump()
+{
+	if (!mJump)	return;
+	mJump = false;
+}
+
+PxF32 CJump::getHeight(PxF32 elapsedTime)
+{
+	if (!mJump)	return 0.0f;
+
+	mJumpTime += elapsedTime;
+	const PxF32 h = gJumpGravity * mJumpTime*mJumpTime + mV0 * mJumpTime;
+	return h * elapsedTime;
+	//return -1.0f;
+}
 
 CPlayer::CPlayer()
 {
@@ -18,6 +47,11 @@ void CPlayer::setPosition(PxVec3 pos)
 void CPlayer::setVelocity(PxVec3 vel)
 {
 	m_Vel = vel;
+}
+
+void CPlayer::setLook(PxVec3 look)
+{
+	m_Look = look;
 }
 
 void CPlayer::setAniIndex(char index)
@@ -50,7 +84,7 @@ void CPlayer::animate(float fTime)
 	if (m_AniFrame > m_AniInfo[m_AniIndex].second) {
 		m_AniFrame = 0.0f;
 		if (!m_AniLoop) {
-			m_AniIndex = Anim_Idle;
+			m_AniIndex = Anim::Idle;
 			m_AniLoop = true;
 		}
 	}
@@ -95,7 +129,14 @@ void CPlayer::move(int direction, float distance)
 	}
 }
 
+
 void CPlayer::setPlayerController(CPhysx *physx)
 {
 	m_PlayerController = physx->getCapsuleController(m_Pos, CH_CAPSULE_HEIGHT, CH_CAPSULE_RADIUS, m_HitReport);
+}
+
+void CPlayer::setTrigger(CPhysx *physx)
+{
+	PxVec3 pos(100, 100, 100);
+	m_AttackTrigger = physx->getTrigger(pos, PxVec3(5, 5, 5));
 }

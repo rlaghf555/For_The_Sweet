@@ -14,8 +14,8 @@
 #define MAX_BUFFER 1024
 
 PxVec3 PlayerInitPosition[8] = {
-	PxVec3(0, 10.1, 0), PxVec3(50, 10.1, 0), PxVec3(-50, 10.1, 0), PxVec3(100, 10.1, 0), PxVec3(-100, 10.1, 0),
-	PxVec3(150, 10.1, 0), PxVec3(-150, 10.1, 0), PxVec3(200, 10.1, 0)
+	PxVec3(0, 10.1, 100), PxVec3(50, 10.1, 100), PxVec3(-50, 10.1, 100), PxVec3(100, 10.1, 100), PxVec3(-100, 10.1, 100),
+	PxVec3(150, 10.1, 100), PxVec3(-150, 10.1, 100), PxVec3(200, 10.1, 100)
 };
 
 HANDLE g_iocp;
@@ -151,27 +151,28 @@ void process_packet(char key, char *buffer)
 		p_put.vx = 0.f;
 		p_put.vy = 0.f;
 		p_put.vz = 0.f;
-		p_put.ani_index = Anim_Idle;
+		p_put.ani_index = Anim::Idle;
 		p_put.ani_frame = 0.0f;
 		p_put.type = SC_PUT_PLAYER;
 		p_put.size = sizeof(sc_packet_put_player);
 
 		clients[key].playerinfo->setPosition(PlayerInitPosition[key]);
 		clients[key].playerinfo->setVelocity(PxVec3(0, 0, 0));
+		clients[key].playerinfo->setLook(PxVec3(0, 0, 1));
 		clients[key].playerinfo->setPlayerController(gPhysx);
+		clients[key].playerinfo->setTrigger(gPhysx);
+		gPhysx->registerPlayer(clients[key].playerinfo, key);
 		clients[key].connected = true;
+
+		cout << "Login Packet Send\n";
+		sendPacket(key, &p_login);
 
 		// 자신(key)과 다른 클라에게 자기 위치 정보 Send
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			if (clients[i].connected)
 			{
-				if (i == key)
-				{
-					cout << "Login Packet Send\n";
-					sendPacket(i, &p_login);
-				}
-				else
+				if (i != key)
 				{
 					cout << "Put Packet Send\n";
 					sendPacket(i, &p_put);
@@ -236,11 +237,14 @@ void process_packet(char key, char *buffer)
 			clients[key].playerinfo->m_Vel.x = 1.f;
 		}
 
-		clients[key].playerinfo->m_Vel = Normalize(clients[key].playerinfo->m_Vel);
-		if(clients[key].playerinfo->m_Vel.x == 0.0f && clients[key].playerinfo->m_Vel.z == 0.0f)
-			clients[key].playerinfo->m_AniIndex = Anim_Idle;
-		else
-			clients[key].playerinfo->m_AniIndex = Anim_Walk;
+		clients[key].playerinfo->setVelocity(Normalize(clients[key].playerinfo->m_Vel));
+		if (clients[key].playerinfo->m_Vel.x == 0.0f && clients[key].playerinfo->m_Vel.z == 0.0f) {
+			clients[key].playerinfo->m_AniIndex = Anim::Idle;
+		}
+		else {
+			clients[key].playerinfo->m_AniIndex = Anim::Walk;
+			clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
+		}
 		clients[key].playerinfo->m_AniFrame = 0.0f;
 
 		cout << "[" << int(key) << "] Clients Move => " << clients[key].playerinfo->m_Vel.x << "," 
@@ -276,36 +280,43 @@ void process_packet(char key, char *buffer)
 		char Anim_Index = clients[key].playerinfo->m_AniIndex;
 		float Anim_Time = clients[key].playerinfo->m_AniFrame;
 
+		if (p_anim->key == CS_JUMP) {
+			clients[key].playerinfo->setAniIndex(Anim::Jump);
+			clients[key].playerinfo->setAniFrame(0.0f);
+			clients[key].playerinfo->setAniLoop(false);
+			clients[key].playerinfo->jumpstart();
+		}
+
 		if (p_anim->key == CS_GUARD) {								// 예외처리 필수!
-			clients[key].playerinfo->setAniIndex(Anim_Guard);
+			clients[key].playerinfo->setAniIndex(Anim::Guard);
 			clients[key].playerinfo->setAniFrame(10.0f);
 			clients[key].playerinfo->setAniLoop(false);
 		}
 		if (p_anim->key == CS_WEAK) {
-			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-				clients[key].playerinfo->setAniIndex(Anim_Weak_Attack1);
+			if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
 				clients[key].playerinfo->setAniFrame(0.0f);
 				clients[key].playerinfo->setAniLoop(false);
 			}
-			if (Anim_Index == Anim_Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-				clients[key].playerinfo->setAniIndex(Anim_Weak_Attack2);
+			if (Anim_Index == Anim::Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
+				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
 				clients[key].playerinfo->setAniFrame(Anim_Time);
 				clients[key].playerinfo->setAniLoop(false);
 			}
-			if (Anim_Index == Anim_Weak_Attack2 && (Anim_Time > 25 && Anim_Time < 34)) {
-				clients[key].playerinfo->setAniIndex(Anim_Weak_Attack3);
+			if (Anim_Index == Anim::Weak_Attack2 && (Anim_Time > 20 && Anim_Time < 25)) {
+				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
 				clients[key].playerinfo->setAniFrame(Anim_Time);
 				clients[key].playerinfo->setAniLoop(false);
 			}
 		}
 		if (p_anim->key == CS_HARD) {
-			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-				clients[key].playerinfo->setAniIndex(Anim_Hard_Attack1);
+			if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
 				clients[key].playerinfo->setAniFrame(0.0f);
 				clients[key].playerinfo->setAniLoop(false);
 			}
-			if (Anim_Index == Anim_Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-				clients[key].playerinfo->setAniIndex(Anim_Hard_Attack2);
+			if (Anim_Index == Anim::Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
 				clients[key].playerinfo->setAniFrame(Anim_Time);
 				clients[key].playerinfo->setAniLoop(false);
 			}
@@ -352,8 +363,11 @@ void worker_thread()
 				if (clients[i].connected)
 					if (i != key)
 						sendPacket(i, &p_remove);
-					else
+					else {
+						clients[i].playerinfo->m_PlayerController->release();
+						clients[i].playerinfo->m_AttackTrigger->release();
 						clients[i].connected = false;
+					}
 			}
 			continue;
 		}
@@ -370,14 +384,17 @@ void worker_thread()
 				if (clients[i].connected)
 					if (i != key)
 						sendPacket(i, &p_remove);
-					else
+					else {
+						clients[i].playerinfo->m_PlayerController->release();
+						clients[i].playerinfo->m_AttackTrigger->release();
 						clients[i].connected = false;
+					}
 			}
 			continue;
 		}
 
 		if (true == over_ex->is_recv) {
-			cout << int(key) << endl;
+			//cout << int(key) << endl;
 
 			// 패킷 조립
 			int rest = io_byte;
@@ -497,8 +514,6 @@ void do_accept()
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSocket), g_iocp, new_id, 0);
 
 		clients[new_id].connected = true;
-		clients[new_id].playerinfo = new CPlayer();
-		clients[new_id].playerinfo->setAniInfo(aniInfo);
 
 		do_recv(new_id);
 	}
@@ -518,15 +533,51 @@ void clientInputProcess()
 	{
 		if (clients[i].connected == true)
 		{
+			clients[i].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
+
+			int Ani_Index = clients[i].playerinfo->m_AniIndex;
+			float Anim_Time = clients[i].playerinfo->m_AniFrame;
+
+			if (Ani_Index == Anim::Weak_Attack1 || Ani_Index == Anim::Weak_Attack2 || Ani_Index == Anim::Weak_Attack3) {
+				if ((Anim_Time > 10 && Anim_Time < 15) || (Anim_Time > 22 && Anim_Time < 27) || (Anim_Time > 32 && Anim_Time < 37))
+				{
+					PxTransform triggerpos(PxVec3(0, 0, 0));
+					PxExtendedVec3 playerpos = clients[i].playerinfo->m_PlayerController->getPosition();
+					PxVec3 look = clients[i].playerinfo->m_Look;
+					triggerpos.p.x = playerpos.x + (look.x * 10);
+					triggerpos.p.y = playerpos.y + (look.y * 10);
+					triggerpos.p.z = playerpos.z + (look.z * 10);
+
+					cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
+					//cout << "Ani time : " << Anim_Time << endl;
+					//cout << "Trigger Pos : " << triggerpos.p.x << ", " << triggerpos.p.y << ", " << triggerpos.p.z << endl;
+					clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
+				}
+			}
+
+			float jumpheight;
+			jumpheight = clients[i].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
+
+			if (jumpheight == 0.0f) {
+				jumpheight = -9.81 * gGameTimer.GetTimeElapsed();
+			}
+
 			PxVec3 direction = clients[i].playerinfo->m_Vel;
 			//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
 			float elapsedTime = gGameTimer.GetTimeElapsed();
 
 			PxVec3 distance = direction * elapsedTime * 20.f;
+			distance.y += jumpheight;
 
 			PxControllerFilters filters;
 			if (clients[i].playerinfo->m_PlayerController) {
-				clients[i].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
+				const PxU32 flags = clients[i].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
+
+				if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+				{
+					//cout << "충돌\n";
+					clients[i].playerinfo->m_Jump.stopJump();
+				}
 			}
 		}
 	}
@@ -538,6 +589,24 @@ void clientUpdateProcess(float fTime)
 	{
 		if (clients[i].connected == true)
 		{
+			if (clients[i].playerinfo->hitted) {
+
+				sc_packet_anim p_anim;
+				p_anim.type = SC_ANIM;
+				p_anim.size = sizeof(sc_packet_anim);
+				p_anim.id = i;
+				p_anim.ani_index = clients[i].playerinfo->m_AniIndex;
+				p_anim.ani_frame = clients[i].playerinfo->m_AniFrame;
+
+				for (int j = 0; j < MAX_USER; ++j)
+				{
+					if (clients[j].connected)
+						sendPacket(j, &p_anim);
+				}
+
+				clients[i].playerinfo->hitted = false;
+			}
+
 			clients[i].playerinfo->animate(fTime);
 
 			if (clients[i].playerinfo->m_PlayerController) {
@@ -692,6 +761,8 @@ int main()
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		clients[i].connected = false;
+		clients[i].playerinfo = new CPlayer();
+		clients[i].playerinfo->setAniInfo(aniInfo);
 	}
 
 	vector<thread> worker_threads;

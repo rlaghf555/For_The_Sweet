@@ -15,6 +15,7 @@ public:
 	//float cooltime = 0.f;
 	bool attackstate = false;
 	bool attackstate2 = false;
+	bool jumpstate = false;
 
 	// Physx
 	CPhysx *m_pPhysx;

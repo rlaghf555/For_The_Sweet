@@ -113,7 +113,8 @@ void ModelObject::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * 
 void ModelObject::ChangeAnimation(UINT nextIndex)
 {
 	if (nextIndex == m_AnimIndex)
-		return;
+		if(nextIndex != Anim_Small_React)
+			return;
 
 	m_ani[m_AnimIndex]->ResetAnimation();
 	//m_loopCheck = 0;

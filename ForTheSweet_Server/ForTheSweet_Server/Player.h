@@ -1,34 +1,56 @@
 #pragma once
 
+#include "header.h"
 #include "Physx.h"
+#include "Util.h"
 
-#define Anim_Idle 0
-#define Anim_Walk 1
-#define Anim_Weak_Attack1 2
-#define Anim_Weak_Attack2 3
-#define Anim_Weak_Attack3 4
-#define Anim_Hard_Attack1 5
-#define Anim_Hard_Attack2 6
-#define Anim_Guard 7
-#define Anim_PowerUp 8
-#define Anim_Jump 9
+using namespace physx;
 
-#define Anim_Lollipop_Attack1 10
-#define Anim_Lollipop_Attack2 11
-#define Anim_Lollipop_Guard 12
+static PxF32 gJumpGravity = -80.0f;
+
+enum Anim {
+	Idle,
+	Walk,
+	Weak_Attack1,
+	Weak_Attack2,
+	Weak_Attack3,
+	Hard_Attack1,
+	Hard_Attack2,
+	Guard,
+	PowerUp,
+	Jump,
+	Lollipop_Attack1,
+	Lollipop_Attack2,
+	Lollipop_Guard,
+	Small_React
+};
 
 class PlayerHitReport : public PxUserControllerHitReport {
 public:
 	void	onShapeHit(const PxControllerShapeHit &hit) {
-		cout << "ShapedHit!!!\n";
+		//cout << "ShapedHit!!!\n";
 	}
 	void 	onControllerHit(const PxControllersHit &hit) {
-		cout << "ControllerHit!!!\n";
+		//cout << "ControllerHit!!!\n";
 	}
 	void 	onObstacleHit(const PxControllerObstacleHit &hit) {
-		cout << "ObstacleHit!!!\n";
+		//cout << "ObstacleHit!!!\n";
 	}
 
+};
+
+class CJump
+{
+public:
+	CJump();
+
+	PxF32		mV0;
+	PxF32		mJumpTime;
+	bool			mJump;
+
+	void			startJump(PxF32 v0);
+	void			stopJump();
+	PxF32		getHeight(PxF32 elapsedTime);
 };
 
 class CPlayer
@@ -41,19 +63,29 @@ public:
 	void animate(float eTime);
 
 	void setPlayerController(CPhysx *physx);
+	void setTrigger(CPhysx *physx);
 	void setPosition(PxVec3 pos);
 	void setVelocity(PxVec3 vel);
+	void setLook(PxVec3 look);
 	void setAniIndex(char index);
 	void setAniFrame(float frame);
 	void setAniLoop(bool loop);
 	void setAniInfo(vector<pair<int, float>> aniInfo);
+	void jumpstart() { m_Jump.startJump(70); }
+
+	PxRigidActor* getTrigger() { return m_AttackTrigger; }
+	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
 
 public:
 	PxVec3 m_Pos;
 	PxVec3 m_Vel;
+	PxVec3 m_Look;
 
 	PxCapsuleController *m_PlayerController;
 	PlayerHitReport *m_HitReport;
+	PxRigidActor* m_AttackTrigger;
+	CJump m_Jump;
+	bool hitted = false;
 
 	vector<pair<int, float>> m_AniInfo;
 	bool m_AniLoop;

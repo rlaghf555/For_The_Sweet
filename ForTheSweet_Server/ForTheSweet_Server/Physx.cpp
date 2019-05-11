@@ -1,5 +1,37 @@
 #include <vector>
 #include "Physx.h"
+#include "Player.h"
+
+void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
+{
+	for (PxU32 i = 0; i < count; ++i) {
+		if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+		{
+			//PxTransform tmp = pairs[i].triggerActor->getGlobalPose();
+			//cout << "Trigger Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
+			//
+			//tmp = pairs[i].otherActor->getGlobalPose();
+			//cout << "Other Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
+
+			for (int j = 0; j < 8; ++j)
+			{
+				if (player[j] != NULL) {
+					cout << j << endl;
+					if (pairs[i].triggerActor != player[j]->m_AttackTrigger)
+					{
+						if (pairs[i].otherActor == player[j]->getControllerActor()) {
+							cout << j << " Player Hitted\n";
+							player[j]->setAniIndex(Anim::Small_React);
+							player[j]->setAniFrame(0.0f);
+							player[j]->setAniLoop(false);
+							player[j]->hitted = true;
+						}
+					}
+				}
+			}
+		}
+	}
+} //트리거박스 충돌 체크
 
 CPhysx::CPhysx() 
 {
@@ -28,6 +60,7 @@ void CPhysx::initPhysics()
 	m_Dispatcher = PxDefaultCpuDispatcherCreate(1);
 	sceneDesc.cpuDispatcher = m_Dispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.simulationEventCallback = &m_Simulator;
 
 	m_Scene = m_Physics->createScene(sceneDesc);
 
@@ -100,4 +133,21 @@ PxCapsuleController* CPhysx::getCapsuleController(PxVec3 pos, float height, floa
 	PxCapsuleController* controller = static_cast<PxCapsuleController*>(m_PlayerManager->createController(capsuleDesc));
 
 	return controller;
+}
+
+PxRigidStatic* CPhysx::getTrigger(PxVec3& t, PxVec3 size)
+{
+	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);	//시물레이션 off
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
+
+	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t));
+	staticActor->attachShape(*shape);
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
 }

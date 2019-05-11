@@ -19,8 +19,12 @@ public:
 public:
 	CSocket();
 	~CSocket();
+	
+	void Release();
+
 	bool init();
 	void sendPacket(char type, char key, char state, char id);
 	void recvCallBack();
+	
 };
 

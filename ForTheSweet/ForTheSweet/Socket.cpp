@@ -10,7 +10,13 @@ CSocket::CSocket()
 
 CSocket::~CSocket()
 {
-	//closesocket(clientSocket);
+	closesocket(clientSocket);
+}
+
+void CSocket::Release()
+{
+	if (clientSocket) closesocket(clientSocket);
+	WSACleanup();
 }
 
 bool CSocket::init()

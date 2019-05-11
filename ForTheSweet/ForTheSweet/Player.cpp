@@ -2,6 +2,37 @@
 #include "Player.h"
 #include "Shader.h"
 
+Jump::Jump() :
+	mV0(0.0f),
+	mJumpTime(0.0f),
+	mJump(false)
+{
+}
+
+void Jump::startJump(PxF32 v0)
+{
+	if (mJump)	return;
+	mJumpTime = 0.0f;
+	mV0 = v0;
+	mJump = true;
+}
+
+void Jump::stopJump()
+{
+	if (!mJump)	return;
+	mJump = false;
+}
+
+PxF32 Jump::getHeight(PxF32 elapsedTime)
+{
+	if (!mJump)	return 0.0f;
+
+	mJumpTime += elapsedTime;
+	const PxF32 h = gJumpGravity * mJumpTime*mJumpTime + mV0 * mJumpTime;
+	return h * elapsedTime;
+	//return -1.0f;
+}
+
 CPlayer::CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) : ModelObject(ma, pd3dDevice, pd3dCommandList)
 {
 	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -31,8 +62,7 @@ CPlayer::CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCo
 	//플레이어의 위치를 설정한다.
 	XMFLOAT3 pposition = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	SetPosition(pposition);
-	SetLook(m_xmf3Look);
-	   
+	SetLook(m_xmf3Look);  
 }
 
 CPlayer::~CPlayer()

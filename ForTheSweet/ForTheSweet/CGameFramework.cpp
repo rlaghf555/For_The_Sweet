@@ -81,6 +81,8 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 void CGameFramework::OnDestroy()
 {
+	if (m_pSocket) m_pSocket->Release();
+
 	ReleaseObjects();
 	::CloseHandle(m_hFenceEvent);
 #if defined(_DEBUG)
@@ -269,6 +271,7 @@ void CGameFramework::recvCallBack()
 			My_ID = p_login.id;
 			XMFLOAT3 pos(p_login.x, p_login.y, p_login.z);
 			XMFLOAT3 vel(p_login.vx, p_login.vy, p_login.vz);
+			//XMFLOAT3 look(0, 0, 1);
 
 			m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
 			cout << "ID : " << My_ID << endl;
@@ -276,6 +279,7 @@ void CGameFramework::recvCallBack()
 
 			m_pScene->getplayer(My_ID)->SetPosition(pos);
 			m_pScene->getplayer(My_ID)->SetVelocity(vel);
+			//m_pScene->getplayer(My_ID)->SetLook(look);
 			PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
 			m_pScene->getplayer(My_ID)->SetPhysController(m_pPhysx, m_pScene->getplayer(My_ID)->getCollisionCallback(), &ControllerPos);
 			m_pScene->getplayer(My_ID)->ChangeAnimation(Anim_Idle);
@@ -360,6 +364,7 @@ void CGameFramework::recvCallBack()
 			memcpy(&p_remove, m_pSocket->buf, sizeof(p_remove));
 
 			m_pScene->m_pPlayer[p_remove.id]->SetConnected(false);
+			m_pScene->m_pPlayer[p_remove.id]->m_PlayerController->release();
 
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_remove);
@@ -373,6 +378,10 @@ void CGameFramework::recvCallBack()
 			m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
 			m_pScene->getplayer(p_anim.id)->SetAnimFrame(p_anim.ani_frame);
 			m_pScene->getplayer(p_anim.id)->DisableLoop();
+
+			if (m_pScene->getplayer(p_anim.id)->getAnimIndex() == Anim_Jump) {
+				m_pScene->getplayer(p_anim.id)->jumpstart();
+			}
 			//if (p_anim.ani_index == Anim_Idle)	m_pScene->getplayer(p_anim.id)->EnableLoop();
 			//else m_pScene->getplayer(p_anim.id)->DisableLoop();
 			ptr += sizeof(p_anim);
@@ -506,8 +515,8 @@ void CGameFramework::BuildObjects()
 		m_pCamera = m_pPlayer->GetCamera();
 		XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
 		m_pPlayer->SetPosition(pos);
-		PxVec3 triggerPos = PxVec3(0 + 10 + 5, 17.5, 0);
-		m_pPlayer->m_AttackTrigger = m_pPhysx->getTrigger(triggerPos, XMFLOAT3(10, 10, 10));
+		PxVec3 triggerPos = PxVec3(100, 100, 100);
+		m_pPlayer->m_AttackTrigger = m_pPhysx->getTrigger(triggerPos, XMFLOAT3(5, 5, 5));
 		m_pPhysx->registerPlayer(m_pPlayer, 0);
 		m_pPlayer->SetConnected(true);
 
@@ -676,6 +685,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 	}
 	return(0);
 }
+
 void CGameFramework::ProcessInput()
 {
 	static UCHAR pKeyBuffer[256];
@@ -762,6 +772,18 @@ void CGameFramework::ProcessInput()
 				attackstate2 = false;
 			}
 
+			if (::GetAsyncKeyState(VK_SPACE) & 0x8000 && !jumpstate) {
+				cout << "점프 Send\n";
+				if(m_pPlayer->m_Jump.mJump == false)
+					m_pSocket->sendPacket(CS_ATTACK, CS_JUMP, 0, 0);
+				jumpstate = true;
+			}
+			if (::GetAsyncKeyState(VK_SPACE) == 0 && jumpstate) {
+				//cout << "RIGHT UP\n";
+				//m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
+				jumpstate = false;
+			}
+
 			//if (::GetKeyboardState(pKeyBuffer))
 			//{
 			//	if (pKeyBuffer['A'] & 0xF0) Key_A = TRUE;
@@ -819,6 +841,10 @@ void CGameFramework::ProcessInput()
 
 		int Anim_Index = m_pPlayer->getAnimIndex();
 		float Anim_Time = m_pPlayer->getAnimtime();
+
+		cout << Anim_Index << " , " << Anim_Time << endl;
+
+		m_pPlayer->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
 
 		if (m_pPlayer->Get_Weapon_grab()) {
 			if (Key_A || Key_S) {
@@ -878,12 +904,12 @@ void CGameFramework::ProcessInput()
 						m_pPlayer->ChangeAnimation(Anim_Weak_Attack1);
 						m_pPlayer->DisableLoop();
 					}
-					if (Anim_Index == Anim_Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+					if (Anim_Index == Anim_Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
 						m_pPlayer->ChangeAnimation(Anim_Weak_Attack2);
 						m_pPlayer->SetAnimFrame(Anim_Time);
 						m_pPlayer->DisableLoop();
 					}
-					if (Anim_Index == Anim_Weak_Attack2 && (Anim_Time > 25 && Anim_Time < 34)) {
+					if (Anim_Index == Anim_Weak_Attack2 && (Anim_Time > 20 && Anim_Time < 25)) {
 						m_pPlayer->ChangeAnimation(Anim_Weak_Attack3);
 						m_pPlayer->SetAnimFrame(Anim_Time);
 						m_pPlayer->DisableLoop();
@@ -904,6 +930,22 @@ void CGameFramework::ProcessInput()
 					}
 				}
 			}
+
+			if (Anim_Index == Anim_Weak_Attack1 || Anim_Index == Anim_Weak_Attack2 || Anim_Index == Anim_Weak_Attack3) {
+				if ((Anim_Time > 10 && Anim_Time < 15) || (Anim_Time > 22 && Anim_Time < 27) || (Anim_Time > 32 && Anim_Time < 37))
+				{
+					PxTransform triggerpos(PxVec3(0, 0, 0));
+					PxExtendedVec3 playerpos = m_pPlayer->m_PlayerController->getPosition();
+					XMFLOAT3 look = m_pPlayer->GetLookVector();
+					triggerpos.p.x = playerpos.x + (look.x * 10);
+					triggerpos.p.y = playerpos.y + (look.y * 10);
+					triggerpos.p.z = playerpos.z + (look.z * 10);
+
+					//cout << "Ani time : " << Anim_Time << endl;
+					//cout << "Trigger Pos : " << triggerpos.p.x << ", " << triggerpos.p.y << ", " << triggerpos.p.z << endl;
+					m_pPlayer->m_AttackTrigger->setGlobalPose(triggerpos);
+				}
+			}
 		}
 
 		if (Key_F) { //강화 스킬
@@ -918,7 +960,8 @@ void CGameFramework::ProcessInput()
 			if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
 				m_pPlayer->ChangeAnimation(Anim_Jump);
 				m_pPlayer->DisableLoop();
-				m_pPlayer->SetWeapon(false, 0);
+				m_pPlayer->jumpstart();
+				//m_pPlayer->SetWeapon(false, 0);
 			}
 		}
 		if (Key_LShift) { //구르기
@@ -948,7 +991,7 @@ void CGameFramework::ProcessInput()
 
 
 
-		if (!SERVER_ON && dwDirection)
+		if (!SERVER_ON)
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
 			//m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
@@ -988,12 +1031,19 @@ void CGameFramework::ProcessInput()
 			disp.y = xmf3Shift.y;
 			disp.z = xmf3Shift.z;
 
-			PxControllerFilters filters;
-			m_pPlayer->m_PlayerController->move(disp, 0, 1 / 60, filters);
+			float jumpheight;
+			jumpheight = m_pPlayer->m_Jump.getHeight(m_GameTimer.GetTimeElapsed());
+			//cout << "점프 : " << jumpheight << endl;
+			disp.y += jumpheight;
 
-			PxExtendedVec3 pos = m_pPlayer->m_PlayerController->getPosition();
-			pos.x += 15;
-			m_pPlayer->m_AttackTrigger->setGlobalPose(PxTransform(pos.x, pos.y, pos.z));
+			PxControllerFilters filters;
+
+			const PxU32 flags = m_pPlayer->m_PlayerController->move(disp, 0, 1 / 60, filters);
+			if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+			{
+				//cout << "충돌\n";
+				m_pPlayer->m_Jump.stopJump();
+			}
 
 			XMFLOAT3 Look = m_pPlayer->GetLook();
 			//XMFLOAT3 Right = m_pPlayer->GetRight();
@@ -1047,6 +1097,13 @@ void CGameFramework::UpdateProcess()
 				position.z = pos.z;
 				m_pScene->m_pPlayer[i]->m_PlayerController->setPosition(position);
 
+				float jumpheight;
+				jumpheight = m_pScene->m_pPlayer[i]->m_Jump.getHeight(m_GameTimer.GetTimeElapsed());
+
+				if (jumpheight == 0.0f) {
+					jumpheight = -9.81 * m_GameTimer.GetTimeElapsed();
+				}
+
 				PxVec3 disp;
 				XMFLOAT3 xmf_disp = m_pScene->m_pPlayer[i]->GetVelocity();
 				//cout << "Vel : " << xmf_disp.x << ", " << xmf_disp.y << ", " << xmf_disp.z << endl;
@@ -1054,8 +1111,16 @@ void CGameFramework::UpdateProcess()
 				disp.y = 20.0f * m_GameTimer.GetTimeElapsed() * xmf_disp.y;
 				disp.z = 20.0f * m_GameTimer.GetTimeElapsed() * xmf_disp.z;
 
+				disp.y += jumpheight;
+
 				PxControllerFilters filters;
-				m_pScene->m_pPlayer[i]->m_PlayerController->move(disp, 0.001, 1 / 60, filters);
+				const PxU32 flags = m_pScene->m_pPlayer[i]->m_PlayerController->move(disp, 0.001, 1 / 60, filters);
+				if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+				{
+					//cout << "충돌\n";
+					m_pScene->m_pPlayer[i]->m_Jump.stopJump();
+				}
+
 				//dwDirection, 20.0f * m_GameTimer.GetTimeElapsed()
 			}
 		}
@@ -1128,12 +1193,16 @@ void CGameFramework::FrameAdvance()
 				m_pScene->m_pPlayer[i]->SetPosition(position);
 			}
 		}
-		XMFLOAT3 position;
-		position.x = m_pPlayer->GetPosition().x;
-		position.y = m_pPlayer->GetPosition().y;
-		position.z = m_pPlayer->GetPosition().z;
-		m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
-		m_pCamera->SetLookAt(position);
+
+		if (m_pPlayer->GetConnected())
+		{
+			XMFLOAT3 position;
+			position.x = m_pPlayer->GetPosition().x;
+			position.y = m_pPlayer->GetPosition().y;
+			position.z = m_pPlayer->GetPosition().z;
+			m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+			m_pCamera->SetLookAt(position);
+		}
 
 		//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
 

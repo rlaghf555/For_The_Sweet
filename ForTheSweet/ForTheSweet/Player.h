@@ -15,17 +15,33 @@
 
 using namespace physx;
 
+static PxF32 gJumpGravity = -80.0f;
+
 class PlayerHitReport : public PxUserControllerHitReport {
 public:
 	void	onShapeHit(const PxControllerShapeHit &hit) {
-		cout << "ShapedHit!!!\n";
+		//cout << "ShapedHit!!!\n";
 	}
 	void 	onControllerHit(const PxControllersHit &hit) {
-		cout << "ControllerHit!!!\n";
+		//cout << "ControllerHit!!!\n";
 	}
 	void 	onObstacleHit(const PxControllerObstacleHit &hit) {
-		cout << "ObstacleHit!!!\n";
+		//cout << "ObstacleHit!!!\n";
 	}
+};
+
+class Jump
+{
+public:
+	Jump();
+
+	PxF32		mV0;
+	PxF32		mJumpTime;
+	bool			mJump;
+
+	void			startJump(PxF32 v0);
+	void			stopJump();
+	PxF32		getHeight(PxF32 elapsedTime);
 };
 
 class CPlayer : public ModelObject
@@ -60,6 +76,8 @@ public:
 	PlayerHitReport m_HitReport;
 	PxRigidActor* m_AttackTrigger;
 
+	Jump m_Jump;
+
 public:
 	CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual ~CPlayer();
@@ -69,6 +87,7 @@ public:
 	PlayerHitReport* getCollisionCallback() { return &m_HitReport; }
 	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
+	void jumpstart() { m_Jump.startJump(70); }
 
 
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }

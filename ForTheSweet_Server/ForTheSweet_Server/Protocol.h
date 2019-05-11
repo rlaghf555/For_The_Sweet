@@ -17,6 +17,7 @@ constexpr int CS_RIGHT = 13;
 constexpr int CS_GUARD = 14;
 constexpr int CS_WEAK = 15;
 constexpr int CS_HARD = 16;
+constexpr int CS_JUMP = 17;
 
 constexpr int SC_LOGIN = 1;
 constexpr int SC_POS = 2;
