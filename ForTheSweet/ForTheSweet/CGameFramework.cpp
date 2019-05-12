@@ -335,6 +335,7 @@ void CGameFramework::recvCallBack()
 			//m_pScene->m_pPlayer[p_pos.id]->SetPosition(position);
 			m_pScene->getplayer(p_pos.id)->SetPosition(pos);
 			m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
+
 			m_pScene->getplayer(p_pos.id)->SetLook(vel);
 			m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
 			m_pScene->getplayer(p_pos.id)->SetAnimFrame(p_pos.ani_frame);
@@ -353,7 +354,7 @@ void CGameFramework::recvCallBack()
 
 			m_pScene->m_pPlayer[p_remove.id]->SetConnected(false);
 			m_pScene->m_pPlayer[p_remove.id]->m_PlayerController->release();
-			m_pScene->m_pPlayer[p_remove.id]->m_AttackTrigger->release();
+			//m_pScene->m_pPlayer[p_remove.id]->m_AttackTrigger->release();
 
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_remove);
