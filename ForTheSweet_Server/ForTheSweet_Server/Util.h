@@ -9,3 +9,5 @@ constexpr float CH_CAPSULE_RADIUS = 10.f;
 
 constexpr int MAX_WEAPON_TYPE = 3;
 constexpr int MAX_WEAPON_NUM = 30;
+
+constexpr int MAX_ANIM = 18;

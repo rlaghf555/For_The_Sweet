@@ -26,7 +26,7 @@ CPhysx *gPhysx;
 
 vector<PxVec3> gMapVertex;
 vector<int> gMapIndex;
-vector<pair<int, float>> aniInfo;
+float gAniInfo[MAX_ANIM];
 
 CGameTimer gGameTimer;
 volatile bool start = false;
@@ -95,7 +95,7 @@ void do_recv(char id)
 		int err_no = WSAGetLastError();
 		if (WSA_IO_PENDING != err_no)
 		{
-			cout << "Error1 - IO pending Failure\n";
+			cout << "Error1 - IO pending Recv Failure\n";
 		}
 	}
 	else {
@@ -121,7 +121,7 @@ void sendPacket(char key, void *ptr)
 		int err_no = WSAGetLastError();
 		if (WSA_IO_PENDING != err_no)
 		{
-			cout << "Error1 - IO pending Failure\n";
+			cout << "Error1 - IO pending Send Failure\n";
 		}
 	}
 	else {
@@ -133,6 +133,10 @@ void process_packet(char key, char *buffer)
 {
 	char Anim_Index;
 	float Anim_Time;
+
+	float vx;
+	float vz;
+	float velocity;
 
 	switch (buffer[1]) {
 	case CS_CONNECT:
@@ -240,13 +244,39 @@ void process_packet(char key, char *buffer)
 		if (p_move->key == CS_RIGHT && p_move->state == 1) {   // right
 			clients[key].playerinfo->m_Vel.x = 1.f;
 		}
+		if (p_move->key == CS_UP && p_move->state == 2) {  // forward
+			clients[key].playerinfo->m_Vel.z = 2.f;
+		}
+		if (p_move->key == CS_DOWN && p_move->state == 2) {   // backward
+			clients[key].playerinfo->m_Vel.z = -2.f;
+		}
+		if (p_move->key == CS_LEFT && p_move->state == 2) {   // left
+			clients[key].playerinfo->m_Vel.x = -2.f;
+		}
+		if (p_move->key == CS_RIGHT && p_move->state == 2) {   // right
+			clients[key].playerinfo->m_Vel.x = 2.f;
+		}
 
-		clients[key].playerinfo->setVelocity(Normalize(clients[key].playerinfo->m_Vel));
-		if (clients[key].playerinfo->m_Vel.x == 0.0f && clients[key].playerinfo->m_Vel.z == 0.0f) {
-			clients[key].playerinfo->m_AniIndex = Anim::Idle;
+		if (p_move->state == 2) {
+			clients[key].playerinfo->setVelocity(Normalize(clients[key].playerinfo->m_Vel) * 2);
 		}
 		else {
+			clients[key].playerinfo->setVelocity(Normalize(clients[key].playerinfo->m_Vel));
+		}
+
+		vx = clients[key].playerinfo->m_Vel.x;
+		vz = clients[key].playerinfo->m_Vel.z;
+		velocity = sqrt((vx*vx) + (vz*vz));
+
+		if (velocity == 0.0f) {
+			clients[key].playerinfo->m_AniIndex = Anim::Idle;
+		}
+		else if (velocity > 0.f && velocity < 1.5f) {
 			clients[key].playerinfo->m_AniIndex = Anim::Walk;
+			clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
+		}
+		else if (velocity >= 1.5f) {
+			clients[key].playerinfo->m_AniIndex = Anim::Run;
 			clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
 		}
 		clients[key].playerinfo->m_AniFrame = 0.0f;
@@ -298,7 +328,7 @@ void process_packet(char key, char *buffer)
 		}
 		if (p_anim->key == CS_WEAK) {
 			if (clients[key].playerinfo->weapon_type == -1) {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
 					clients[key].playerinfo->setAniFrame(0.0f);
 					clients[key].playerinfo->setAniLoop(false);
@@ -315,7 +345,7 @@ void process_packet(char key, char *buffer)
 				}
 			}
 			else {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack1);
 					clients[key].playerinfo->setAniFrame(0.0f);
 					clients[key].playerinfo->setAniLoop(false);
@@ -330,7 +360,7 @@ void process_packet(char key, char *buffer)
 		}
 		if (p_anim->key == CS_HARD) {
 			if (clients[key].playerinfo->weapon_type == -1) {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
 					clients[key].playerinfo->setAniFrame(0.0f);
 					clients[key].playerinfo->setAniLoop(false);
@@ -342,7 +372,7 @@ void process_packet(char key, char *buffer)
 				}
 			}
 			else {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk) {
+				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Hard_Attack);
 					clients[key].playerinfo->setAniFrame(0.0f);
 					clients[key].playerinfo->setAniLoop(false);
@@ -406,7 +436,7 @@ void worker_thread()
 
 		if (is_error == FALSE) {
 			//cout << "Error in GQCS\n";
-			//cout << "[" << int(key) << "] Clients Disconnect\n";
+			cout << "[" << int(key) << "] Clients Disconnect\n";
 			sc_packet_remove p_remove;
 			p_remove.id = key;
 			p_remove.type = SC_REMOVE;
@@ -414,13 +444,13 @@ void worker_thread()
 
 			for (int i = 0; i < MAX_USER; ++i)
 			{
-				if (clients[i].connected)
+				if (clients[i].connected == true)
 					if (i != key)
 						sendPacket(i, &p_remove);
 					else {
 						clients[i].connected = false;
-						clients[i].playerinfo->m_PlayerController->release();
-						clients[i].playerinfo->m_AttackTrigger->release();
+						clients[i].playerinfo->m_PlayerController->release();  clients[i].playerinfo->m_PlayerController = nullptr;
+						clients[i].playerinfo->m_AttackTrigger->release(); clients[i].playerinfo->m_AttackTrigger = nullptr;
 						gPhysx->removePlayer(i);
 					}
 			}
@@ -568,7 +598,7 @@ void do_accept()
 
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSocket), g_iocp, new_id, 0);
 
-		clients[new_id].connected = true;
+		//clients[new_id].connected = true;
 
 		do_recv(new_id);
 	}
@@ -608,11 +638,11 @@ void clientInputProcess()
 						p_weapon2.weapon_index = weapon_index;
 						p_weapon2.weapon_success = 1;
 
-						for (int i = 0; i < MAX_USER; ++i)
+						for (int j = 0; j < MAX_USER; ++j)
 						{
-							if (clients[i].connected == true)
+							if (clients[j].connected == true)
 							{
-								sendPacket(i, &p_weapon2);
+								sendPacket(j, &p_weapon2);
 							}
 						}
 					}
@@ -704,7 +734,9 @@ void clientUpdateProcess(float fTime)
 	{
 		if (clients[i].connected == true)
 		{
-			if (clients[i].playerinfo->hitted) {
+			if (clients[i].playerinfo->hitted == true) {
+
+				cout << "!!!\n";
 
 				sc_packet_anim p_anim;
 				p_anim.type = SC_ANIM;
@@ -757,6 +789,8 @@ void broadcastPosPacket()
 			p_pos.ani_frame = clients[i].playerinfo->m_AniFrame;
 			p_pos.type = SC_POS;
 			p_pos.size = sizeof(sc_packet_pos);
+
+			//cout << "BroadPos : " << p_pos.x << "," << p_pos.y << "," << p_pos.z << endl;
 
 			for (char j = 0; j < MAX_USER; ++j)
 			{
@@ -855,7 +889,7 @@ void aniLoad()
 		in >> i;
 		in >> f;
 
-		aniInfo.push_back(make_pair(i, f));
+		gAniInfo[i] = f;
 	}
 	in.close();
 
@@ -881,7 +915,7 @@ int main()
 	{
 		clients[i].connected = false;
 		clients[i].playerinfo = new CPlayer();
-		clients[i].playerinfo->setAniInfo(aniInfo);
+		clients[i].playerinfo->setAniInfo(gAniInfo);
 	}
 
 	vector<thread> worker_threads;

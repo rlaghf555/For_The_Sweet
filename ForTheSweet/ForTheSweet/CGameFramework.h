@@ -10,7 +10,7 @@ class CGameFramework
 {
 public:
 	// Socket
-	bool state[4] = { false, false, false, false };
+	bool state[5] = { false, false, false, false, false };
 	CSocket *m_pSocket;
 	//float cooltime = 0.f;
 	bool attackstate = false;

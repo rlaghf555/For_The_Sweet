@@ -26,7 +26,7 @@ public:
 	void onContact(const PxContactPairHeader&, const PxContactPair*, PxU32) { }
 
 	void setPlayer(CPlayer* pl, int index) { player[index] = pl; }
-	void removePlayer(int index) { delete player[index]; }
+	void removePlayer(int index) { delete player[index]; player[index] = NULL; }
 	//void setPlayer(GameObject* object) { player = object; }
 };
 

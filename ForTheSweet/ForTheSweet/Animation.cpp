@@ -17,8 +17,8 @@ LoadAnimation::LoadAnimation(string filename, float trigger, float skip) :
 		end_time = (float)m_pAnim->mChannels[0]->mPositionKeys[m_pAnim->mChannels[0]->mNumPositionKeys - 1].mTime - 1.0f;
 		//프레임 종료 시점에서 1.0 만큼 빼줘야 프레임이 안겹침
 
-		cout << filename << " start Time : " << start_time << endl;
-		cout << filename << " end Time : " << end_time << endl;
+		//cout << filename << " start Time : " << start_time << endl;
+		//cout << filename << " end Time : " << end_time << endl;
 
 		if (IsZero(trigger))
 			trigger_time = (end_time - start_time) / 2 + start_time;
@@ -32,7 +32,7 @@ LoadAnimation::LoadAnimation(string filename, float trigger, float skip) :
 
 		now_time = start_time;
 
-		//m_animSpeed = (end_time - start_time) / m_pAnim->mChannels[0]->mNumPositionKeys;
+		m_animSpeed = (end_time - start_time) / m_pAnim->mChannels[0]->mNumPositionKeys;
 		m_animSpeed = m_pAnim->mTicksPerSecond;
 		//cout << m_animSpeed << endl;
 	}

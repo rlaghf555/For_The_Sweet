@@ -45,7 +45,8 @@ enum Anim {
 	Lollipop_Hard_Attack,
 	Lollipop_Skill,
 	Small_React,
-	Pick_Up
+	Pick_Up,
+	Run
 };
 
 class PlayerHitReport : public PxUserControllerHitReport {
@@ -93,7 +94,7 @@ public:
 	void setAniIndex(char index);
 	void setAniFrame(float frame);
 	void setAniLoop(bool loop);
-	void setAniInfo(vector<pair<int, float>> aniInfo);
+	void setAniInfo(float *aniinfo);
 	void jumpstart() { m_Jump.startJump(70); }
 
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
@@ -108,9 +109,9 @@ public:
 	PlayerHitReport *m_HitReport;
 	PxRigidActor* m_AttackTrigger;
 	CJump m_Jump;
-	bool hitted = false;
+	volatile bool hitted = false;
 
-	vector<pair<int, float>> m_AniInfo;
+	float m_AniInfo[MAX_ANIM];
 	bool m_AniLoop;
 
 	char m_AniIndex;

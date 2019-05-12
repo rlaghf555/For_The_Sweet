@@ -33,6 +33,13 @@ PxF32 CJump::getHeight(PxF32 elapsedTime)
 
 CPlayer::CPlayer()
 {
+	m_Pos = PxVec3(0, 0, 0);
+	m_Vel = PxVec3(0, 0, 0);
+	m_Look = PxVec3(0, 0, 1);
+
+	m_PlayerController = NULL;
+	m_HitReport = NULL;
+	m_AttackTrigger = NULL;
 }
 
 CPlayer::~CPlayer()
@@ -64,11 +71,10 @@ void CPlayer::setAniFrame(float frame)
 	m_AniFrame = frame;
 }
 
-void CPlayer::setAniInfo(vector<pair<int, float>> aniInfo)
+void CPlayer::setAniInfo(float *animinfo)
 {
-	m_AniInfo.resize((int)(aniInfo.size()));
-
-	std::copy(aniInfo.begin(), aniInfo.end(), m_AniInfo.begin());
+	for (int i = 0; i < MAX_ANIM; ++i)
+		m_AniInfo[i] = animinfo[i];
 }
 
 void CPlayer::setAniLoop(bool loop)
@@ -81,17 +87,20 @@ void CPlayer::animate(float fTime)
 	//cout << int(m_AniIndex) << endl;
 
 	m_AniFrame += 30 * fTime;
-	if (m_AniFrame > m_AniInfo[m_AniIndex].second) {
+	if (m_AniFrame > m_AniInfo[m_AniIndex]) {
 		m_AniFrame = 0.0f;
 		if (!m_AniLoop) {
-			if (m_Vel.x == 0.0f && m_Vel.y == 0.0f)
+			if (m_Vel.x == 0.0f && m_Vel.z == 0.0f)
 			{
 				m_AniIndex = Anim::Idle;
 				m_AniLoop = true;
 			}
 			else
 			{
-				m_AniIndex = Anim::Walk;
+				if(sqrt((m_Vel.x*m_Vel.x) + (m_Vel.z*m_Vel.z)) > 1.5)
+					m_AniIndex = Anim::Run;
+				else
+					m_AniIndex = Anim::Walk;
 				m_AniLoop = true;
 			}
 		}

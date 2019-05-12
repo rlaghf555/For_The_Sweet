@@ -314,7 +314,7 @@ void CGameFramework::recvCallBack()
 			m_pScene->getplayer(p_put.id)->SetPhysController(m_pPhysx, m_pScene->getplayer(p_put.id)->getCollisionCallback(), &ControllerPos);
 			m_pScene->getplayer(p_put.id)->ChangeAnimation(p_put.ani_index);
 			m_pScene->getplayer(p_put.id)->SetAnimFrame(p_put.ani_frame);
-			if (p_put.ani_index == Anim_Idle) {
+			if (p_put.ani_index == Anim_Idle || p_put.ani_index == Anim_Walk || p_put.ani_index == Anim_Run) {
 				m_pScene->getplayer(p_put.id)->EnableLoop();
 			}
 			else {
@@ -332,21 +332,26 @@ void CGameFramework::recvCallBack()
 			XMFLOAT3 pos(p_pos.x, p_pos.y, p_pos.z);
 			XMFLOAT3 vel(p_pos.vx, p_pos.vy, p_pos.vz);
 
-			//m_pScene->m_pPlayer[p_pos.id]->SetPosition(position);
-			m_pScene->getplayer(p_pos.id)->SetPosition(pos);
-			m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
+			if (p_pos.size == sizeof(sc_packet_pos))
+			{
 
-			m_pScene->getplayer(p_pos.id)->SetLook(vel);
-			m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
-			m_pScene->getplayer(p_pos.id)->SetAnimFrame(p_pos.ani_frame);
-			if (p_pos.ani_index == Anim_Idle || p_pos.ani_index == Anim_Walk) {
-				m_pScene->getplayer(p_pos.id)->EnableLoop();
-			}
-			else {
-				m_pScene->getplayer(p_pos.id)->DisableLoop();
-			}
+				//m_pScene->m_pPlayer[p_pos.id]->SetPosition(position);
+				m_pScene->getplayer(p_pos.id)->SetPosition(pos);
+				m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
+				m_pScene->getplayer(p_pos.id)->SetLook(vel);
 
-			//cout << int(p_pos.id) << "Player SC_POS : " << pos.x << "," << pos.y << "," << pos.z << endl;
+				m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
+				m_pScene->getplayer(p_pos.id)->SetAnimFrame(p_pos.ani_frame);
+				if (p_pos.ani_index == Anim_Idle || p_pos.ani_index == Anim_Walk || p_pos.ani_index == Anim_Run) {
+					if (p_pos.ani_index == Anim_Run) cout << p_pos.ani_frame << endl;
+					m_pScene->getplayer(p_pos.id)->EnableLoop();
+				}
+				else {
+					m_pScene->getplayer(p_pos.id)->DisableLoop();
+				}
+
+				//cout << int(p_pos.id) << "Player SC_POS : " << pos.x << "," << pos.z << endl;
+			}
 
 			ptr += sizeof(p_pos);
 			retval -= sizeof(p_pos);
@@ -355,7 +360,7 @@ void CGameFramework::recvCallBack()
 			memcpy(&p_remove, m_pSocket->buf, sizeof(p_remove));
 
 			m_pScene->m_pPlayer[p_remove.id]->SetConnected(false);
-			m_pScene->m_pPlayer[p_remove.id]->m_PlayerController->release();
+			m_pScene->m_pPlayer[p_remove.id]->m_PlayerController->release(); m_pScene->m_pPlayer[p_remove.id]->m_PlayerController = NULL;
 			//m_pScene->m_pPlayer[p_remove.id]->m_AttackTrigger->release();
 
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
@@ -368,7 +373,7 @@ void CGameFramework::recvCallBack()
 			//cout << int(p_anim.id) << "Player SC_ANIM : " << int(p_anim.ani_index) << ", " << int(p_anim.ani_frame) << endl;
 
 			cout << int(p_anim.ani_index) << endl;
-			if (p_anim.ani_index >= Anim_Idle && p_anim.ani_index <= Anim_Pick_up) {
+			if (p_anim.ani_index >= Anim_Idle && p_anim.ani_index <= Anim_Run) {
 				m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
 				m_pScene->getplayer(p_anim.id)->SetAnimFrame(p_anim.ani_frame);
 				m_pScene->getplayer(p_anim.id)->DisableLoop();
@@ -475,6 +480,7 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/small_react.FBX", 0));			//Anim_Small_React
 
 	character_animation.emplace_back(make_pair("./resource/character/pick_up.FBX", 0));			//Anim_Pick_up
+	character_animation.emplace_back(make_pair("./resource/character/run.FBX", 0));			//Run
 
 
 
@@ -510,6 +516,7 @@ void CGameFramework::BuildObjects()
 	if (SERVER_ON) {
 		if (m_pCamera == nullptr) {
 			m_pCamera = new CCamera();
+			m_pCamera->InitCamera(m_pd3dDevice, m_pd3dCommandList);
 		}
 	}
 	if (!SERVER_ON) {
@@ -712,24 +719,47 @@ void CGameFramework::ProcessInput()
 	{
 		if (::GetFocus())
 		{
+			if (::GetAsyncKeyState(VK_SHIFT) & 0x8000 && !state[5]) {
+				state[5] = true;
+			}
+			if (::GetAsyncKeyState(VK_SHIFT) == 0 && state[5]) {
+				state[5] = false;
+			}
+
 			if (::GetAsyncKeyState(VK_UP) & 0x8000 && !state[0]) {
 				//cout << "UP DOWN\n";
-				m_pSocket->sendPacket(CS_MOVE, CS_UP, 1, 0);
+				if (state[5]) {
+					cout << "UP Run DOWN\n";
+					m_pSocket->sendPacket(CS_MOVE, CS_UP, 2, 0);
+				}
+				else {
+					cout << "UP Walk DOWN\n";
+					m_pSocket->sendPacket(CS_MOVE, CS_UP, 1, 0);
+				}
 				state[0] = true;
 			}
 			if (::GetAsyncKeyState(VK_DOWN) & 0x8000 && !state[1]) {
 				//cout << "DOWN DOWN\n";
-				m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 1, 0);
+				if (state[5])
+					m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 2, 0);
+				else
+					m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 1, 0);
 				state[1] = true;
 			}
 			if (::GetAsyncKeyState(VK_LEFT) & 0x8000 && !state[2]) {
 				//cout << "LEFT DOWN\n";
-				m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 1, 0);
+				if (state[5])
+					m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 2, 0);
+				else
+					m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 1, 0);
 				state[2] = true;
 			}
 			if (::GetAsyncKeyState(VK_RIGHT) & 0x8000 && !state[3]) {
-				//cout << "RIGHT DOWN\n";
-				m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 1, 0);
+				cout << "RIGHT DOWN\n";
+				if (state[5])
+					m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 2, 0);
+				else
+					m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 1, 0);
 				state[3] = true;
 			}
 
@@ -749,7 +779,7 @@ void CGameFramework::ProcessInput()
 				state[2] = false;
 			}
 			if (::GetAsyncKeyState(VK_RIGHT) == 0 && state[3]) {
-				//cout << "RIGHT UP\n";
+				cout << "RIGHT UP\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
 				state[3] = false;
 			}
@@ -1254,6 +1284,7 @@ void CGameFramework::FrameAdvance()
 				position.x = m_pPlayer->GetPosition().x;
 				position.y = m_pPlayer->GetPosition().y;
 				position.z = m_pPlayer->GetPosition().z;
+				if (position.y < 0) position.y = 0;
 				m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 				m_pCamera->SetLookAt(position);
 			}

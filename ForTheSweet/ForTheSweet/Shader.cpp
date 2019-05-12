@@ -1387,8 +1387,8 @@ D3D12_RASTERIZER_DESC WeaponShader::CreateRasterizerState(int index)
 	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
-	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
 
 	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
