@@ -36,7 +36,7 @@ public:
 	Model_Animation				*character_anim;
 	PlayerShader				*m_pPlayerShader[MAX_USER];
 
-	CModelShader				*m_MapShader = NULL;
+	CModelShader				*m_MapShader[2];
 	LoadModel					**Map_Model;
 
 	CottonCloudShader			*m_CottonShader[2];

@@ -147,7 +147,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWaveModel(VS_MODEL_TEXTURED_OUTPUT input, ui
     input.normalW = normalize(input.normalW);
 	
     output.color = cColor;
-    output.color.w = 0.9f;
+    output.color.w = 0.7f;
 	//output.color = float4(1, 1, 1, 1);
     output.nrmoutline = float4(input.normalW, 1.0f);
     output.nrm = output.nrmoutline;

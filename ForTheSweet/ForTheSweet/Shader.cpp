@@ -849,6 +849,37 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	}
 }
 
+void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 5;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_2.dds", 0);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
+		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_bbObjects[i] = map;
+		m_bbObjects[i]->SetPosition(0, -20 + -20*i, 0);
+	}
+}
+
 void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
 {
 	CModelShader::OnPrepareRender(pd3dCommandList, 0);
@@ -1137,7 +1168,7 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 1;
+	m_nObjects = 10;
 	m_ppObjects = vector<CGameObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
@@ -1156,17 +1187,16 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	m_pMaterial->SetReflection(1);
 	
 	for (int i = 0; i < m_nObjects; i++) {
-
 		CGameObject *Map_Object = NULL;
 
 		Map_Object = new CGameObject();
 		Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 		m_ppObjects[i] = Map_Object;
 
-		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 1500, 1000, 20, 20);	// Width(w, h), xycount(m, n)
+		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 201, 1000, 10, 40);	// Width(w, h), xycount(m, n)
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
-		m_ppObjects[i]->SetPosition(0, -20, 0);//20.f * i - 200,0,200
+		m_ppObjects[i]->SetPosition(i * 200 - 1000, 0, 0);//20.f * i - 200,0,200
 	}
 }
 
@@ -1177,6 +1207,9 @@ void WaveShader::Animate(float fTimeElapsed)
 	for (UINT i = 0; i < m_nObjects; ++i) {
 		if (m_ppObjects[i]) {
 			m_ppObjects[i]->Animate(fTimeElapsed);
+			float xx = m_ppObjects[i]->GetPosition().x;
+			if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, 0, 0);
+			else m_ppObjects[i]->SetPosition(-1000, 0, 0);
 		}
 	}
 }
