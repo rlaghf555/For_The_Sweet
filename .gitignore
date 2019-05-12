@@ -36,3 +36,7 @@
 *.idb
 *.pdb
 *.vs
+*.log
+*.tlog
+*.iobj
+*.ipdb

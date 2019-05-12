@@ -1196,7 +1196,7 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 201, 1000, 10, 40);	// Width(w, h), xycount(m, n)
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
-		m_ppObjects[i]->SetPosition(i * 200 - 1000, 0, 0);//20.f * i - 200,0,200
+		m_ppObjects[i]->SetPosition(i * 200 - 1000, -10, 0);//20.f * i - 200,0,200
 	}
 }
 
@@ -1208,8 +1208,8 @@ void WaveShader::Animate(float fTimeElapsed)
 		if (m_ppObjects[i]) {
 			m_ppObjects[i]->Animate(fTimeElapsed);
 			float xx = m_ppObjects[i]->GetPosition().x;
-			if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, 0, 0);
-			else m_ppObjects[i]->SetPosition(-1000, 0, 0);
+			if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -10, 0);
+			else m_ppObjects[i]->SetPosition(-1000, -10, 0);
 		}
 	}
 }

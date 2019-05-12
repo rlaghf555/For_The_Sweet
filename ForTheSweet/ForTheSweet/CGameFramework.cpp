@@ -390,10 +390,10 @@ void CGameFramework::recvCallBack()
 		if(type == SC_WEAPON)
 		{
 			memcpy(&p_weapon, m_pSocket->buf, sizeof(p_weapon));
+			if (p_weapon.weapon_type >= 0 && p_weapon.weapon_type <= WEAPON_MAX_NUM && p_weapon.weapon_index >= 0 && p_weapon.weapon_index <= 30)
+				m_pScene->m_pPlayer[p_weapon.id]->SetWeapon(true, p_weapon.weapon_type ,p_weapon.weapon_index);
 
-			m_pScene->m_pPlayer[p_weapon.id]->SetWeapon(true, p_weapon.weapon_type ,p_weapon.weapon_index);
-
-			cout << p_weapon.id << " Player Weapon Success\n";
+			cout << (int)p_weapon.id << (int)p_weapon.weapon_type << "   " << (int)p_weapon.weapon_index << " Player Weapon Success\n";
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_weapon);
 			retval -= sizeof(p_weapon);
