@@ -47,7 +47,7 @@ public:
 	int prev_size;
 	CPlayer *playerinfo;
 	//float vx, vy, vz;
-	bool connected;
+	volatile bool connected;
 
 	SOCKETINFO() {
 		over_ex.dataBuffer.len = MAX_BUFFER;
@@ -179,7 +179,7 @@ void process_packet(char key, char *buffer)
 		// 자신(key)과 다른 클라에게 자기 위치 정보 Send
 		for (int i = 0; i < MAX_USER; ++i)
 		{
-			if (clients[i].connected)
+			if (clients[i].connected == true)
 			{
 				if (i != key)
 				{
@@ -191,7 +191,7 @@ void process_packet(char key, char *buffer)
 		// 로그인 시, 접속 중인 다른 클라 위치 정보를 자신에게 Send
 		for (int i = 0; i < MAX_USER; ++i)
 		{
-			if (clients[i].connected)
+			if (clients[i].connected == true)
 			{
 				if (i != key)
 				{
@@ -302,12 +302,12 @@ void process_packet(char key, char *buffer)
 		// Move한 정보를 브로드캐스팅
 		for (int i = 0; i < MAX_USER; ++i)
 		{
-			if (clients[i].connected)
+			if (clients[i].connected == true)
 				sendPacket(i, &p_pos);
 		}
 		break;
 
-	case CS_ATTACK: 
+	case CS_ATTACK:
 		cs_packet_anim *p_anim;
 		p_anim = reinterpret_cast<cs_packet_anim*>(buffer);
 
@@ -389,7 +389,7 @@ void process_packet(char key, char *buffer)
 
 		for (int i = 0; i < MAX_USER; ++i)
 		{
-			if (clients[i].connected)
+			if (clients[i].connected == true)
 				sendPacket(i, &p_anim2);
 		}
 		break;
@@ -415,7 +415,7 @@ void process_packet(char key, char *buffer)
 
 		for (int i = 0; i < MAX_USER; ++i)
 		{
-			if (clients[i].connected)
+			if (clients[i].connected == true)
 				sendPacket(i, &p_anim3);
 		}
 		break;
@@ -427,12 +427,12 @@ void worker_thread()
 	while (true)
 	{
 		ULONG io_byte;
-		ULONG io_key;
+		ULONGLONG io_key;
 		OVER_EX *over_ex;
 
 		BOOL is_error = GetQueuedCompletionStatus(g_iocp, &io_byte, (PULONG_PTR)&io_key, reinterpret_cast<LPWSAOVERLAPPED *>(&over_ex), INFINITE);
 
-		char key = static_cast<char>(io_key);
+		int key = static_cast<char>(io_key);
 
 		if (is_error == FALSE) {
 			//cout << "Error in GQCS\n";
@@ -448,10 +448,11 @@ void worker_thread()
 					if (i != key)
 						sendPacket(i, &p_remove);
 					else {
+						closesocket(clients[i].socket);
 						clients[i].connected = false;
 						clients[i].playerinfo->m_PlayerController->release();  clients[i].playerinfo->m_PlayerController = nullptr;
 						clients[i].playerinfo->m_AttackTrigger->release(); clients[i].playerinfo->m_AttackTrigger = nullptr;
-						gPhysx->removePlayer(i);
+						//gPhysx->removePlayer(i);
 					}
 			}
 			continue;
@@ -466,7 +467,7 @@ void worker_thread()
 
 			for (int i = 0; i < MAX_USER; ++i)
 			{
-				if (clients[i].connected)
+				if (clients[i].connected == true)
 					if (i != key)
 						sendPacket(i, &p_remove);
 					else {
@@ -697,7 +698,7 @@ void clientInputProcess()
 						clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
 					}
 				}
-				
+
 
 				float jumpheight;
 				jumpheight = clients[i].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
@@ -730,7 +731,7 @@ void clientInputProcess()
 
 void clientUpdateProcess(float fTime)
 {
-	for (char i = 0; i < MAX_USER; ++i)
+	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (clients[i].connected == true)
 		{
@@ -747,7 +748,7 @@ void clientUpdateProcess(float fTime)
 
 				for (int j = 0; j < MAX_USER; ++j)
 				{
-					if (clients[j].connected)
+					if (clients[j].connected == true)
 						sendPacket(j, &p_anim);
 				}
 
@@ -756,7 +757,7 @@ void clientUpdateProcess(float fTime)
 
 			clients[i].playerinfo->animate(fTime);
 
-			if (clients[i].playerinfo->m_PlayerController) {
+			if (clients[i].playerinfo->m_PlayerController != nullptr) {
 				PxExtendedVec3 position = clients[i].playerinfo->m_PlayerController->getPosition();
 				//cout << int(i) << " Client Pos : " << position.x << "," << position.y << "," << position.z << endl;
 
@@ -771,7 +772,7 @@ void clientUpdateProcess(float fTime)
 void broadcastPosPacket()
 {
 	//cout << "BroadCast\n";
-	for (char i = 0; i < MAX_USER; ++i)
+	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (clients[i].connected == true)
 		{
@@ -792,7 +793,7 @@ void broadcastPosPacket()
 
 			//cout << "BroadPos : " << p_pos.x << "," << p_pos.y << "," << p_pos.z << endl;
 
-			for (char j = 0; j < MAX_USER; ++j)
+			for (int j = 0; j < MAX_USER; ++j)
 			{
 				if (clients[j].connected == true)
 				{

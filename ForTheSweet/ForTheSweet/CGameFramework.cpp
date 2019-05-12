@@ -370,9 +370,8 @@ void CGameFramework::recvCallBack()
 		if (type == SC_ANIM) {
 			memcpy(&p_anim, m_pSocket->buf, sizeof(p_anim));
 
-			//cout << int(p_anim.id) << "Player SC_ANIM : " << int(p_anim.ani_index) << ", " << int(p_anim.ani_frame) << endl;
+			cout << int(p_anim.id) << "Player SC_ANIM : " << int(p_anim.ani_index) << ", " << int(p_anim.ani_frame) << endl;
 
-			cout << int(p_anim.ani_index) << endl;
 			if (p_anim.ani_index >= Anim_Idle && p_anim.ani_index <= Anim_Run) {
 				m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
 				m_pScene->getplayer(p_anim.id)->SetAnimFrame(p_anim.ani_frame);

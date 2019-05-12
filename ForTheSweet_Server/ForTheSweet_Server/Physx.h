@@ -26,7 +26,7 @@ public:
 	void onContact(const PxContactPairHeader&, const PxContactPair*, PxU32) { }
 
 	void setPlayer(CPlayer* pl, int index) { player[index] = pl; }
-	void removePlayer(int index) { delete player[index]; player[index] = NULL; }
+	//void removePlayer(int index) { delete player[index]; player[index] = nullptr; }
 	//void setPlayer(GameObject* object) { player = object; }
 };
 
@@ -77,7 +77,7 @@ public:
 	PxRigidStatic* getTrigger(PxVec3& t, PxVec3 size);
 
 	void registerPlayer(CPlayer* player, int index) { m_Simulator.setPlayer(player, index); }
-	void removePlayer(int index) { m_Simulator.removePlayer(index); }
+	//void removePlayer(int index) { m_Simulator.removePlayer(index); }
 };
 
 inline PxExtendedVec3 PXtoPXEx(const PxVec3& pos) {
@@ -91,7 +91,7 @@ inline PxVec3 PXExtoPX(const PxExtendedVec3& pos) {
 inline PxVec3 Normalize(PxVec3& vec)
 {
 	PxVec3 Normal;
-	
+
 	float vec_size = sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
 	if (vec_size > 0)
 	{

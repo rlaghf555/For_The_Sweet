@@ -15,9 +15,10 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 
 			for (int j = 0; j < 8; ++j)
 			{
-				if (player[j] != NULL) {
-					cout << j << endl;
-					if (pairs[i].triggerActor != player[j]->m_AttackTrigger)
+				cout << j << endl;
+				if (pairs[i].triggerActor != player[j]->m_AttackTrigger)
+				{
+					if (player[j]->m_PlayerController != nullptr)
 					{
 						if (pairs[i].otherActor == player[j]->getControllerActor()) {
 							cout << j << " Player Hitted\n";
@@ -33,7 +34,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 	}
 } //트리거박스 충돌 체크
 
-CPhysx::CPhysx() 
+CPhysx::CPhysx()
 {
 
 	m_Foundation = NULL;
@@ -48,7 +49,7 @@ CPhysx::CPhysx()
 	//m_PlayerController = NULL;
 }
 
-void CPhysx::initPhysics() 
+void CPhysx::initPhysics()
 {
 	m_Foundation = PxCreateFoundation(PX_PHYSICS_VERSION, m_Allocator, m_ErrorCallback);
 

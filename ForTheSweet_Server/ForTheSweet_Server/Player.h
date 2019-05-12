@@ -105,8 +105,8 @@ public:
 	PxVec3 m_Vel;
 	PxVec3 m_Look;
 
-	PxCapsuleController *m_PlayerController;
-	PlayerHitReport *m_HitReport;
+	PxCapsuleController* m_PlayerController;
+	PlayerHitReport* m_HitReport;
 	PxRigidActor* m_AttackTrigger;
 	CJump m_Jump;
 	volatile bool hitted = false;
@@ -119,6 +119,6 @@ public:
 
 	char weapon_type = -1;
 	char weapon_index = -1;
-	bool weapon_send = false;
+	volatile bool weapon_send = false;
 };
 

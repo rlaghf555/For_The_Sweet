@@ -37,9 +37,9 @@ CPlayer::CPlayer()
 	m_Vel = PxVec3(0, 0, 0);
 	m_Look = PxVec3(0, 0, 1);
 
-	m_PlayerController = NULL;
-	m_HitReport = NULL;
-	m_AttackTrigger = NULL;
+	m_PlayerController = nullptr;
+	//m_HitReport = nullptr;
+	m_AttackTrigger = nullptr;
 }
 
 CPlayer::~CPlayer()
@@ -97,7 +97,7 @@ void CPlayer::animate(float fTime)
 			}
 			else
 			{
-				if(sqrt((m_Vel.x*m_Vel.x) + (m_Vel.z*m_Vel.z)) > 1.5)
+				if (sqrt((m_Vel.x*m_Vel.x) + (m_Vel.z*m_Vel.z)) > 1.5)
 					m_AniIndex = Anim::Run;
 				else
 					m_AniIndex = Anim::Walk;
