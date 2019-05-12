@@ -84,8 +84,16 @@ void CPlayer::animate(float fTime)
 	if (m_AniFrame > m_AniInfo[m_AniIndex].second) {
 		m_AniFrame = 0.0f;
 		if (!m_AniLoop) {
-			m_AniIndex = Anim::Idle;
-			m_AniLoop = true;
+			if (m_Vel.x == 0.0f && m_Vel.y == 0.0f)
+			{
+				m_AniIndex = Anim::Idle;
+				m_AniLoop = true;
+			}
+			else
+			{
+				m_AniIndex = Anim::Walk;
+				m_AniLoop = true;
+			}
 		}
 	}
 }

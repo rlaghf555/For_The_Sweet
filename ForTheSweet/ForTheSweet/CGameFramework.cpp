@@ -339,12 +339,14 @@ void CGameFramework::recvCallBack()
 			m_pScene->getplayer(p_pos.id)->SetLook(vel);
 			m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
 			m_pScene->getplayer(p_pos.id)->SetAnimFrame(p_pos.ani_frame);
-			if (p_pos.ani_index == Anim_Idle) {
+			if (p_pos.ani_index == Anim_Idle || p_pos.ani_index == Anim_Walk) {
 				m_pScene->getplayer(p_pos.id)->EnableLoop();
 			}
 			else {
 				m_pScene->getplayer(p_pos.id)->DisableLoop();
 			}
+
+			//cout << int(p_pos.id) << "Player SC_POS : " << pos.x << "," << pos.y << "," << pos.z << endl;
 
 			ptr += sizeof(p_pos);
 			retval -= sizeof(p_pos);
@@ -362,6 +364,8 @@ void CGameFramework::recvCallBack()
 		}
 		if (type == SC_ANIM) {
 			memcpy(&p_anim, m_pSocket->buf, sizeof(p_anim));
+
+			//cout << int(p_anim.id) << "Player SC_ANIM : " << int(p_anim.ani_index) << ", " << int(p_anim.ani_frame) << endl;
 
 			cout << int(p_anim.ani_index) << endl;
 			if (p_anim.ani_index >= Anim_Idle && p_anim.ani_index <= Anim_Pick_up) {
@@ -502,6 +506,11 @@ void CGameFramework::BuildObjects()
 		m_pScene->SetWeapon(weapon);
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
+	}
+	if (SERVER_ON) {
+		if (m_pCamera == nullptr) {
+			m_pCamera = new CCamera();
+		}
 	}
 	if (!SERVER_ON) {
 		My_ID = 0;
@@ -704,43 +713,43 @@ void CGameFramework::ProcessInput()
 		if (::GetFocus())
 		{
 			if (::GetAsyncKeyState(VK_UP) & 0x8000 && !state[0]) {
-				cout << "UP DOWN\n";
+				//cout << "UP DOWN\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_UP, 1, 0);
 				state[0] = true;
 			}
 			if (::GetAsyncKeyState(VK_DOWN) & 0x8000 && !state[1]) {
-				cout << "DOWN DOWN\n";
+				//cout << "DOWN DOWN\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 1, 0);
 				state[1] = true;
 			}
 			if (::GetAsyncKeyState(VK_LEFT) & 0x8000 && !state[2]) {
-				cout << "LEFT DOWN\n";
+				//cout << "LEFT DOWN\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 1, 0);
 				state[2] = true;
 			}
 			if (::GetAsyncKeyState(VK_RIGHT) & 0x8000 && !state[3]) {
-				cout << "RIGHT DOWN\n";
+				//cout << "RIGHT DOWN\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 1, 0);
 				state[3] = true;
 			}
 
 			if (::GetAsyncKeyState(VK_UP) == 0 && state[0]) {
-				cout << "UP UP\n";
+				//cout << "UP UP\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_UP, 0, 0);
 				state[0] = false;
 			}
 			if (::GetAsyncKeyState(VK_DOWN) == 0 && state[1]) {
-				cout << "DOWN UP\n";
+				//cout << "DOWN UP\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 0, 0);
 				state[1] = false;
 			}
 			if (::GetAsyncKeyState(VK_LEFT) == 0 && state[2]) {
-				cout << "LEFT UP\n";
+				//cout << "LEFT UP\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 0, 0);
 				state[2] = false;
 			}
 			if (::GetAsyncKeyState(VK_RIGHT) == 0 && state[3]) {
-				cout << "RIGHT UP\n";
+				//cout << "RIGHT UP\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
 				state[3] = false;
 			}
@@ -749,7 +758,7 @@ void CGameFramework::ProcessInput()
 				int type = m_pPlayer->Get_Weapon_type();	//무기 종류
 				int index = m_pPlayer->Get_Weapon_index();  //무기 번호
 
-				cout << type << ", " << index << endl;
+				//cout << type << ", " << index << endl;
 
 				if (!m_pPlayer->Get_Weapon_grab())
 				{

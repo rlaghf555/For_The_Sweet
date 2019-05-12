@@ -421,6 +421,7 @@ void worker_thread()
 						clients[i].connected = false;
 						clients[i].playerinfo->m_PlayerController->release();
 						clients[i].playerinfo->m_AttackTrigger->release();
+						gPhysx->removePlayer(i);
 					}
 			}
 			continue;
