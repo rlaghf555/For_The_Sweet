@@ -281,8 +281,8 @@ void process_packet(char key, char *buffer)
 		}
 		clients[key].playerinfo->m_AniFrame = 0.0f;
 
-		cout << "[" << int(key) << "] Clients Move => " << clients[key].playerinfo->m_Vel.x << ","
-			<< clients[key].playerinfo->m_Vel.y << "," << clients[key].playerinfo->m_Vel.z << "\n";
+		//cout << "[" << int(key) << "] Clients Move => " << clients[key].playerinfo->m_Vel.x << ","
+		//	<< clients[key].playerinfo->m_Vel.y << "," << clients[key].playerinfo->m_Vel.z << "\n";
 
 		sc_packet_pos p_pos;
 		p_pos.id = key;
@@ -404,7 +404,7 @@ void process_packet(char key, char *buffer)
 		clients[key].playerinfo->setAniFrame(0.0f);
 		clients[key].playerinfo->setAniLoop(false);
 
-		cout << int(key) << " Player Weapon Success : " << int(p_weapon->weapon_type) << ", " << int(p_weapon->weapon_index) << endl;;
+		//cout << int(key) << " Player Weapon Success : " << int(p_weapon->weapon_type) << ", " << int(p_weapon->weapon_index) << endl;;
 
 		sc_packet_anim p_anim3;
 		p_anim3.type = SC_ANIM;
@@ -737,8 +737,6 @@ void clientUpdateProcess(float fTime)
 		{
 			if (clients[i].playerinfo->hitted == true) {
 
-				cout << "!!!\n";
-
 				sc_packet_anim p_anim;
 				p_anim.type = SC_ANIM;
 				p_anim.size = sizeof(sc_packet_anim);
@@ -759,7 +757,7 @@ void clientUpdateProcess(float fTime)
 
 			if (clients[i].playerinfo->m_PlayerController != nullptr) {
 				PxExtendedVec3 position = clients[i].playerinfo->m_PlayerController->getPosition();
-				//cout << int(i) << " Client Pos : " << position.x << "," << position.y << "," << position.z << endl;
+				//cout << int(i) << " Client Pos : " << position.x << "," << position.y - 17.5 << "," << position.z << endl;
 
 				clients[i].playerinfo->m_Pos.x = position.x;
 				clients[i].playerinfo->m_Pos.y = position.y - 17.5;

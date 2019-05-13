@@ -343,7 +343,6 @@ void CGameFramework::recvCallBack()
 				m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
 				m_pScene->getplayer(p_pos.id)->SetAnimFrame(p_pos.ani_frame);
 				if (p_pos.ani_index == Anim_Idle || p_pos.ani_index == Anim_Walk || p_pos.ani_index == Anim_Run) {
-					if (p_pos.ani_index == Anim_Run) cout << p_pos.ani_frame << endl;
 					m_pScene->getplayer(p_pos.id)->EnableLoop();
 				}
 				else {
@@ -393,7 +392,7 @@ void CGameFramework::recvCallBack()
 			if (p_weapon.weapon_type >= 0 && p_weapon.weapon_type <= WEAPON_MAX_NUM && p_weapon.weapon_index >= 0 && p_weapon.weapon_index <= 30)
 				m_pScene->m_pPlayer[p_weapon.id]->SetWeapon(true, p_weapon.weapon_type ,p_weapon.weapon_index);
 
-			cout << (int)p_weapon.id << (int)p_weapon.weapon_type << "   " << (int)p_weapon.weapon_index << " Player Weapon Success\n";
+			cout << (int)p_weapon.id << " Player : " << (int)p_weapon.weapon_type << ", " << (int)p_weapon.weapon_index << " Player Weapon Success\n";
 			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 			ptr += sizeof(p_weapon);
 			retval -= sizeof(p_weapon);
@@ -727,11 +726,11 @@ void CGameFramework::ProcessInput()
 			if (::GetAsyncKeyState(VK_UP) & 0x8000 && !state[0]) {
 				//cout << "UP DOWN\n";
 				if (state[5]) {
-					cout << "UP Run DOWN\n";
+					//cout << "UP Run DOWN\n";
 					m_pSocket->sendPacket(CS_MOVE, CS_UP, 2, 0);
 				}
 				else {
-					cout << "UP Walk DOWN\n";
+					//cout << "UP Walk DOWN\n";
 					m_pSocket->sendPacket(CS_MOVE, CS_UP, 1, 0);
 				}
 				state[0] = true;
@@ -753,7 +752,7 @@ void CGameFramework::ProcessInput()
 				state[2] = true;
 			}
 			if (::GetAsyncKeyState(VK_RIGHT) & 0x8000 && !state[3]) {
-				cout << "RIGHT DOWN\n";
+				//cout << "RIGHT DOWN\n";
 				if (state[5])
 					m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 2, 0);
 				else
@@ -777,7 +776,7 @@ void CGameFramework::ProcessInput()
 				state[2] = false;
 			}
 			if (::GetAsyncKeyState(VK_RIGHT) == 0 && state[3]) {
-				cout << "RIGHT UP\n";
+				//cout << "RIGHT UP\n";
 				m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
 				state[3] = false;
 			}
@@ -791,17 +790,17 @@ void CGameFramework::ProcessInput()
 				if (!m_pPlayer->Get_Weapon_grab())
 				{
 					if (type != -1 && index != -1) {
-						cout << "무기줍기 Send\n";
+						//cout << "무기줍기 Send\n";
 						m_pSocket->sendPacket(CS_WEAPON, type, index, 0);
 					}
 					else
 					{
-						cout << "무기 X 약공격 Send\n";
+						//cout << "무기 X 약공격 Send\n";
 						m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
 					}
 				}
 				else {
-					cout << "무기 O 약공격 Send\n";
+					//cout << "무기 O 약공격 Send\n";
 					m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
 				}
 				attackstate = true;
@@ -813,7 +812,7 @@ void CGameFramework::ProcessInput()
 			}
 
 			if (::GetAsyncKeyState(0x53) & 0x8000 && !attackstate2) {
-				cout << "강공격 Send\n";
+				//cout << "강공격 Send\n";
 				m_pSocket->sendPacket(CS_ATTACK, CS_HARD, 0, 0);
 				attackstate2 = true;
 			}
@@ -824,7 +823,7 @@ void CGameFramework::ProcessInput()
 			}
 
 			if (::GetAsyncKeyState(VK_SPACE) & 0x8000 && !jumpstate) {
-				cout << "점프 Send\n";
+				//cout << "점프 Send\n";
 				if(m_pPlayer->m_Jump.mJump == false)
 					m_pSocket->sendPacket(CS_ATTACK, CS_JUMP, 0, 0);
 				jumpstate = true;
@@ -1271,6 +1270,9 @@ void CGameFramework::FrameAdvance()
 					position.z = playerPosition.z;
 					//m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 					//m_pCamera->SetLookAt(position);
+
+					//cout << int(i) << " Client Pos : " << position.x << "," << position.y - 17.5 << "," << position.z << endl;
+
 					m_pScene->m_pPlayer[i]->SetPosition(position);
 				}
 			}
