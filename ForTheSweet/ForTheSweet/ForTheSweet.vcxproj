@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="ButtonUI.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CGameFramework.h" />
     <ClInclude Include="D3DMath.h" />
@@ -189,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="ButtonUI.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CGameFramework.cpp" />
     <ClCompile Include="D3DMath.cpp" />

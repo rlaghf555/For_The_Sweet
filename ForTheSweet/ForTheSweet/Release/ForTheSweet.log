@@ -1,11 +1,14 @@
 ﻿  ForTheSweet.cpp
 c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\modelobject.h(59): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(192): warning C4101: 'OldBitmap' :참조되지 않은 지역 변수입니다.
-c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(191): warning C4101: 'memdc' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(129): warning C4101: 'bit' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(128): warning C4101: 'by' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(128): warning C4101: 'bx' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(222): warning C4101: 'OldBitmap' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(221): warning C4101: 'memdc' :참조되지 않은 지역 변수입니다.
   코드를 생성하고 있습니다.
-  3 of 3266 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  2 of 3271 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    1 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
 PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\For_The_Sweet\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\For_The_Sweet\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
