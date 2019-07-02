@@ -37,8 +37,8 @@ public:
 	virtual void BuildMaterials(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) { }
 	virtual void CreateCollisionBox();
 	virtual void SetEnabled(bool enable) { m_bEnabled = enable; }
-	virtual void SetScreenSize(XMFLOAT2& size);
-	virtual void SetPosition(XMFLOAT2& pos);
+	virtual void SetScreenSize(XMFLOAT2 size);
+	virtual void SetPosition(XMFLOAT2 pos);
 	virtual void SetScale(XMFLOAT2& scale);
 	virtual void SetSize(XMUINT2& size);
 	virtual void SetAlpha(float alpha);

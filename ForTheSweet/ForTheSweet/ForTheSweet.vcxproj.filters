@@ -22,6 +22,9 @@
     <Filter Include="소스 파일\Util">
       <UniqueIdentifier>{1e0099af-5efa-408f-99b6-79a989428a58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\UI">
+      <UniqueIdentifier>{4e25be2c-3556-4d66-830c-5ad571edcf06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -97,7 +100,13 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ButtonUI.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>소스 파일\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIObject.h">
+      <Filter>소스 파일\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIShader.h">
+      <Filter>소스 파일\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -162,7 +171,13 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ButtonUI.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIobject.cpp">
+      <Filter>소스 파일\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIShader.cpp">
+      <Filter>소스 파일\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

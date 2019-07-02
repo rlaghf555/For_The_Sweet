@@ -55,12 +55,12 @@ void UIObject::CreateCollisionBox()
 	);
 }
 
-void UIObject::SetScreenSize(XMFLOAT2 & size)
+void UIObject::SetScreenSize(XMFLOAT2 size)
 {
 	m_xmf2ScreenSize = size;
 }
 
-void UIObject::SetPosition(XMFLOAT2 & pos)
+void UIObject::SetPosition(XMFLOAT2 pos)
 {
 	m_xmf2ScreenPos = pos;
 }

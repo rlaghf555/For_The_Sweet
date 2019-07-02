@@ -1,7 +1,20 @@
 #include "stdafx.h"
 #include "CGameFramework.h"
 
+char * ConvertWCtoC(wchar_t* str)
+{
+	//반환할 char* 변수 선언
+	char* pStr;
 
+	//입력받은 wchar_t 변수의 길이를 구함
+	int strSize = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
+	//char* 메모리 할당
+	pStr = new char[strSize];
+
+	//형 변환 
+	WideCharToMultiByte(CP_ACP, 0, str, -1, pStr, strSize, 0, 0);
+	return pStr;
+}
 CGameFramework::CGameFramework()
 {
 	_tcscpy_s(m_pszFrameRate, _T("ForTheSweet("));
@@ -64,7 +77,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	BuildObjects();		//렌더링할 객체(게임 월드 객체)를 생성한다.
 
 	if (SERVER_ON) {
-		m_pSocket = new CSocket();
+		m_pSocket = new CSocket(m_pid,m_pip);
 		if (m_pSocket) {
 			if (m_pSocket->init())
 			{
@@ -1224,6 +1237,12 @@ void CGameFramework::WaitForGpuComplete()
 		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
 		::WaitForSingleObject(m_hFenceEvent, INFINITE);
 	}
+}
+
+void CGameFramework::SetIDIP(wchar_t * id, wchar_t * ip)
+{
+	m_pid = ConvertWCtoC(id);
+	m_pip = ConvertWCtoC(ip);
 }
 
 void CGameFramework::MoveToNextFrame()

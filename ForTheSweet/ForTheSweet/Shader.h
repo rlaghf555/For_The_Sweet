@@ -21,6 +21,8 @@ struct VS_VB_INSTANCE
 	XMFLOAT4 m_xmcColor;
 };
 
+D3D12_SHADER_RESOURCE_VIEW_DESC GetShaderResourceViewDesc(D3D12_RESOURCE_DESC d3dResourceDesc, UINT nTextureType);
+
 class CompiledShaders
 {
 public:
@@ -336,3 +338,4 @@ public:
 	virtual void Rotate(float x, float y, float z);
 	virtual CGameObject* getObjects() { return m_ppObjects[0]; }
 };
+

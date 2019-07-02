@@ -7,6 +7,13 @@ CSocket::CSocket()
 	memset(buf, 0, MAX_PACKET_SIZE);
 }
 
+CSocket::CSocket(char * id, char * ip)
+{
+	m_pid = id;
+	m_pip = ip;
+	memset(buf, 0, MAX_PACKET_SIZE);
+}
+
 
 CSocket::~CSocket()
 {
@@ -39,10 +46,10 @@ bool CSocket::init()
 	serverAddr.sin_family = AF_INET;
 	//serveraddr.sin_addr.s_addr = inet_addr(serverip);
 	//serverAddr.sin_addr.s_addr = inet_addr("218.37.39.194");
-	char addr[30];
-	cout << "ip林家:";
-	cin >> addr;
-	serverAddr.sin_addr.s_addr = inet_addr(addr);
+	//char addr[30];
+	//cout << "ip林家:";
+	//cin >> addr;
+	serverAddr.sin_addr.s_addr = inet_addr(m_pip);
 	serverAddr.sin_port = htons(SERVER_PORT);
 	if (connect(clientSocket, (SOCKADDR *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{

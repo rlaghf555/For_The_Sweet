@@ -186,6 +186,8 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="UIObject.h" />
+    <ClInclude Include="UIShader.h" />
     <ClInclude Include="UploadBuffer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +217,8 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="UIobject.cpp" />
+    <ClCompile Include="UIShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ForTheSweet.rc" />
