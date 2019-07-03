@@ -77,15 +77,32 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	BuildObjects();		//·»´õ¸µÇÒ °´Ã¼(°ÔÀÓ ¿ùµå °´Ã¼)¸¦ »ý¼ºÇÑ´Ù.
 
 	if (SERVER_ON) {
-		m_pSocket = new CSocket(m_pid,m_pip);
-		if (m_pSocket) {
-			if (m_pSocket->init())
-			{
-				m_pSocket->sendPacket(CS_CONNECT, 0, 0, 0);
-				cout << "CONNECT ÆÐÅ¶ º¸³¿\n";
+		if (UI_ON) {
+			m_pSocket = new CSocket(m_pid, m_pip);
+			if (m_pSocket) {
+				if (m_pSocket->init())
+				{
+					m_pSocket->sendPacket(CS_CONNECT, 0, 0, 0);
+					cout << "CONNECT ÆÐÅ¶ º¸³¿\n";
+				}
+				else
+					return false;
 			}
-			else
-				return false;
+		}
+		else if (UI_ON==false) { 
+			char tmpip[15];
+			cout << "ip:";
+			cin >> tmpip;
+			m_pSocket = new CSocket(m_pid, tmpip);
+			if (m_pSocket) {
+				if (m_pSocket->init())
+				{
+					m_pSocket->sendPacket(CS_CONNECT, 0, 0, 0);
+					cout << "CONNECT ÆÐÅ¶ º¸³¿\n";
+				}
+				else
+					return false;
+			}
 		}
 	}
 
