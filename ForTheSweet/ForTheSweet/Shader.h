@@ -229,20 +229,38 @@ public:
 	virtual void Animate(float fTimeElapsed);
 };
 
-
-
 class WeaponShader : public CModelShader
 {
 protected:
 	LoadModel	*weapon_model;
+	bool		cupcake_up_flag = false;
 
 public:
 	WeaponShader();
 	WeaponShader(LoadModel *ma);
 	~WeaponShader();
+	
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
 //	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+
+	virtual void Animate(float fTimeElapsed, bool flag_up, int weapon_num);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int nRenderTargets = 1, void * pContext = NULL);
+	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
+	bool get_cupcake_up_flag() { return cupcake_up_flag; }
+};
+
+class Map_Macaron_Shader : public CModelShader
+{
+protected:
+	LoadModel	*map_test_model;
+
+public:
+	Map_Macaron_Shader();
+	Map_Macaron_Shader(LoadModel *ma);
+	~Map_Macaron_Shader();
+
+	virtual void Animate(float fTimeElapsed, bool flag_up);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
 	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 };
 

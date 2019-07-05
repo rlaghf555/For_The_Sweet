@@ -514,13 +514,15 @@ void CGameFramework::LoadModels()
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
 	Map_Model[0] = new LoadModel("./resource/map/map_1.FBX", true);			// M_Map_1
-	Map_Model[1] = new LoadModel("./resource/map/cotton_1.FBX", true);		// cotton_candy
+	Map_Model[1] = new LoadModel("./resource/map/cotton_1.FBX", true);		// cotton_candy_cloud
 	Map_Model[2] = new LoadModel("./resource/map/111.FBX", true);			// map_1_wall
-	//cotton_candy_cloud
+	Map_Model[3] = new LoadModel("./resource/map/map_macaron.FBX", true);	// map_1_macaron
 
 	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);		// M_Weapon_Lollipop
 	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);			// M_Weapon_chupachupse
 	weapon[2] = new LoadModel("./resource/weapon/pepero.FBX", true);		// M_Weapon_pepero
+	weapon[3] = new LoadModel("./resource/weapon/pepero.FBX", true);		// M_Weapon_chocolate
+	weapon[4] = new LoadModel("./resource/weapon/cupcake.FBX", true);		// M_Weapon_cupcake
 }
 
 void CGameFramework::BuildObjects()

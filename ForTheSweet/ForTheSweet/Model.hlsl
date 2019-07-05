@@ -1,5 +1,16 @@
 #define NUM_DIRECTION_LIGHTS 1
 
+const float3 c_Light1 = float3(500.0f, -500.0f, -500.0f);
+const float3 ambient = float3(1.0f, 1.0f, 1.0f);
+const float3 diffuseColor = float3(1.0f, 1.0f, 1.0f);
+const float3 specColor = float3(1.0f, 1.0f, 1.0f);
+
+const float3 c_CameraDir = float3(0.0f,0.0f, 0.0f);
+
+const float a = 1.0f;
+const float d = 0.5f;
+const float s = 1.0f;
+
 Texture2DArray gBoxTextured : register(t0);
 SamplerState gDefaultSamplerState : register(s0);
 
@@ -75,7 +86,7 @@ VS_MODEL_TEXTURED_OUTPUT VSDynamicModel(VS_MODEL_INPUT input)
 		normalL += weights[i] * mul(input.normal, (float3x3)gBoneTransforms[input.index[i]]).xyz;
 		tanL += weights[i] * mul(input.tan, (float3x3)gBoneTransforms[input.index[i]]).xyz;
 	}
-
+    
 	// Right + Texture
 	output.normalW = mul(normalL, (float3x3)gmtxObject);
 	output.positionW = (float3)mul(float4(posL, 1.0f), gmtxObject);
@@ -93,9 +104,22 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input,
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
 	float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
 	
+    float3 v_normal = float3(input.normalW.xy, input.normalW.z * 0.2);
+
 	input.normalW = normalize(input.normalW);
 	
-	output.color = cColor;
+    float3 v_Pos = input.positionW;
+    
+    float3 lightDir = c_Light1 - v_Pos;
+    float diffuse = clamp(dot(lightDir, v_normal), 0.0f, 1.0f);
+    float3 reflectDir = reflect(lightDir, v_normal);
+    float3 viewDir = v_Pos - c_CameraDir;
+    float spec = clamp(dot(viewDir, reflectDir), 0.0f, 1.0f);
+    spec = pow(spec, 12.0);
+
+    float3 newColor = ambient * a + diffuseColor * diffuse * d + specColor * spec * s;
+
+    output.color = cColor; //(newColor * cColor.xyz, cColor.w);
 	//output.color = float4(1, 1, 1, 1);
 	output.nrmoutline = float4(input.normalW, 1.0f);
 	output.nrm = output.nrmoutline;

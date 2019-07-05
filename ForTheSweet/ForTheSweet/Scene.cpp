@@ -69,7 +69,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_1]);
 		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
-		m_MapShader[1] = new CModelShader(Map_Model[2]);
+		m_MapShader[1] = new CModelShader(Map_Model[M_Map_1_wall]);
 		m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList);
 
 		for (int i = 0; i < 2; i++) {
@@ -77,6 +77,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_CottonShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
 		}
 		
+		m_Map_ObjectShader[0] = new Map_Macaron_Shader(Map_Model[M_Map_1_macaron]);
+		m_Map_ObjectShader[0]->BuildObjects(pd3dDevice, pd3dCommandList);
+
 		m_WavesShader = new WaveShader();
 		m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList);
 	}
@@ -93,10 +96,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	
 	for (int i = 0; i < MAX_USER; i++) {
 		bounding_box_test[i] = new testBox();
-		bounding_box_test[i]->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[i],OBJECT_PLAYER);
+		bounding_box_test[i]->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[i], OBJECT_PLAYER);
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		for (int j = 0; j < 30; j++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 			weapon_box[i][j] = new testBox();
 			weapon_box[i][j]->BuildObjects(pd3dDevice, pd3dCommandList, m_WeaponShader[i]->getObject(j), i);
 		}
@@ -207,6 +210,11 @@ void CScene::ReleaseObjects()
 		m_MapShader[1]->ReleaseObjects();
 		delete m_MapShader[1];
 	}
+	if (m_Map_ObjectShader[0]) {
+		m_Map_ObjectShader[0]->ReleaseShaderVariables();
+		m_Map_ObjectShader[0]->ReleaseObjects();
+		delete m_Map_ObjectShader[0];
+	}
 	for (int i = 0; i < 2; ++i) {
 		if (m_CottonShader[i]) {
 			m_CottonShader[i]->ReleaseShaderVariables();
@@ -222,7 +230,7 @@ void CScene::ReleaseObjects()
 		}
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) {
-		for (int j = 0; j < 30; ++j) {
+		for (int j = 0; j < WEAPON_EACH_NUM; ++j) {
 			if (weapon_box[i][j]) {
 				weapon_box[i][j]->ReleaseShaderVariables();
 				weapon_box[i][j]->ReleaseObjects();
@@ -309,9 +317,14 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		}
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {	
-		for (int j = 0; j < 30; j++)
-		weapon_box[i][j]->getObjects()->m_xmf4x4World= m_WeaponShader[i]->getObject(j)->m_xmf4x4World;
+		for (int j = 0; j < WEAPON_EACH_NUM; j++)
+			weapon_box[i][j]->getObjects()->m_xmf4x4World = m_WeaponShader[i]->getObject(j)->m_xmf4x4World;
 	}
+
+	if(m_WeaponShader[M_Weapon_cupcake]->get_cupcake_up_flag() == false)
+		m_WeaponShader[M_Weapon_cupcake]->Animate(fTimeElapsed, macaron_flag, M_Weapon_cupcake);
+	
+	m_Map_ObjectShader[0]->Animate(fTimeElapsed, macaron_flag);
 
 	m_WavesShader->Animate(fTimeElapsed);
 }
@@ -369,7 +382,7 @@ void CScene::CollisionProcess(int index)
 {
 	bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		for (int j = 0; j < 30; j++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 			if (m_WeaponShader[i]->getObject(j)) {
 				weapon_box[i][j]->bounding.Center = m_WeaponShader[i]->getObject(j)->GetPosition();
 				XMMATRIX tmp = XMLoadFloat4x4(&m_WeaponShader[i]->getObject(j)->m_xmf4x4World);
@@ -394,8 +407,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
 	if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 	if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
-	for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
+	if (m_Map_ObjectShader[0]) m_Map_ObjectShader[0]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {

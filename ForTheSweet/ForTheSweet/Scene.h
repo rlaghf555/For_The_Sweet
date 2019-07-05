@@ -39,13 +39,16 @@ public:
 	CModelShader				*m_MapShader[2];
 	LoadModel					**Map_Model;
 
+	Map_Macaron_Shader			*m_Map_ObjectShader[1];
+	bool						macaron_flag = true;
+
 	CottonCloudShader			*m_CottonShader[2];
 
 	WeaponShader				*m_WeaponShader[WEAPON_MAX_NUM];
 	LoadModel					**weapon_Model;
 
 	testBox						*bounding_box_test[MAX_USER];
-	testBox						*weapon_box[WEAPON_MAX_NUM][30];
+	testBox						*weapon_box[WEAPON_MAX_NUM][WEAPON_EACH_NUM];
 	MeshShader					*m_BackGroundShader = NULL;
 
 	WaveShader					*m_WavesShader = NULL;
