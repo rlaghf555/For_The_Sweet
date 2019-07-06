@@ -1,16 +1,5 @@
 #define NUM_DIRECTION_LIGHTS 1
 
-const float3 c_Light1 = float3(500.0f, -500.0f, -500.0f);
-const float3 ambient = float3(1.0f, 1.0f, 1.0f);
-const float3 diffuseColor = float3(1.0f, 1.0f, 1.0f);
-const float3 specColor = float3(1.0f, 1.0f, 1.0f);
-
-const float3 c_CameraDir = float3(0.0f,0.0f, 0.0f);
-
-const float a = 1.0f;
-const float d = 0.5f;
-const float s = 1.0f;
-
 Texture2DArray gBoxTextured : register(t0);
 SamplerState gDefaultSamplerState : register(s0);
 
@@ -99,28 +88,48 @@ VS_MODEL_TEXTURED_OUTPUT VSDynamicModel(VS_MODEL_INPUT input)
 PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDynamicModel(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
 {
 	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
-
-	
+    	
 	float3 uvw = float3(input.uv, nPrimitiveID / 2);
 	float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
-	
-    float3 v_normal = float3(input.normalW.xy, input.normalW.z * 0.2);
+	    
+    float3 Light_Position = float3(0.f, 1.f, 0.f);
+    float3 c_Light1 = float3(0.f, -1.0f, 0.4f);
 
-	input.normalW = normalize(input.normalW);
-	
-    float3 v_Pos = input.positionW;
+    float3 ambient = float3(0.7f, 0.7f, 0.7f);
+    float3 diffuse = float3(0.5f, 0.5f, 0.5f);
+    float3 specular = float3(1.0f, 1.0f, 1.0f);
+
+    float constant = 1.0f;
+    float linear_ = 0.09f;
+    float quadratic = 0.0032f;
+       
+    // ambient
+    float3 ambient_ = ambient * cColor.rgb;
     
-    float3 lightDir = c_Light1 - v_Pos;
-    float diffuse = clamp(dot(lightDir, v_normal), 0.0f, 1.0f);
-    float3 reflectDir = reflect(lightDir, v_normal);
-    float3 viewDir = v_Pos - c_CameraDir;
-    float spec = clamp(dot(viewDir, reflectDir), 0.0f, 1.0f);
-    spec = pow(spec, 12.0);
+    // diffuse
+    input.normalW = normalize(input.normalW);
+    float3 lightDir = normalize(-c_Light1); // -c_Light1
+    float diff = clamp(dot(input.normalW, lightDir), 0.0, 1.0);
+    float3 diffuse_ = diffuse * diff * cColor.rgb;
 
-    float3 newColor = ambient * a + diffuseColor * diffuse * d + specColor * spec * s;
+    //specular
+    float3 CameraDir_test = float3(0.0f, -1.0f, 0.2f); // gvCameraPosition
+    float3 viewDir = normalize(gvCameraPosition - input.position.xyz); //positionW
+    float3 reflectDir = reflect(-lightDir, input.normalW);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);   // 32 : shiness
+    float3 specular_test = float3(1.0, 1.0, 1.0);
+    float3 specular_ = specular * spec * specular_test;  //cColor.rgb;
+    
+    float distance = length(Light_Position - input.position.xyz);
+    float attenuation = 1.0 / (constant + linear_ * distance + quadratic * (distance * distance));
 
-    output.color = cColor; //(newColor * cColor.xyz, cColor.w);
-	//output.color = float4(1, 1, 1, 1);
+    //ambient_ *= attenuation;
+    //diffuse_ *= attenuation;
+    //specular_ *= attenuation;
+
+    float3 result = ambient_ + diffuse_ + specular_;
+
+    output.color = float4(result, cColor.w); // cColor.w); //(newColor * cColor.xyz, cColor.w);
 	output.nrmoutline = float4(input.normalW, 1.0f);
 	output.nrm = output.nrmoutline;
 	output.pos = float4(input.positionW, 1.0f);
