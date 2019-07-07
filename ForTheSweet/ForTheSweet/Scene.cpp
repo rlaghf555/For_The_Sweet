@@ -320,13 +320,15 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		for (int j = 0; j < WEAPON_EACH_NUM; j++)
 			weapon_box[i][j]->getObjects()->m_xmf4x4World = m_WeaponShader[i]->getObject(j)->m_xmf4x4World;
 	}
-
-	if(m_WeaponShader[M_Weapon_cupcake]->get_cupcake_up_flag() == false)
-		m_WeaponShader[M_Weapon_cupcake]->Animate(fTimeElapsed, macaron_flag, M_Weapon_cupcake);
 	
-	m_Map_ObjectShader[0]->Animate(fTimeElapsed, macaron_flag);
+	if (Map_SELECT == M_Map_1) {
+		if (m_WeaponShader[M_Weapon_cupcake]->get_cupcake_up_flag() == false)
+			m_WeaponShader[M_Weapon_cupcake]->Animate(fTimeElapsed, macaron_flag, M_Weapon_cupcake);
 
-	m_WavesShader->Animate(fTimeElapsed);
+		m_Map_ObjectShader[0]->Animate(fTimeElapsed, macaron_flag);
+
+		m_WavesShader->Animate(fTimeElapsed);
+	}
 }
 
 void CScene::AnimateWeapon(int i)
@@ -405,13 +407,19 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
-	if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
-	if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
-	if (m_Map_ObjectShader[0]) m_Map_ObjectShader[0]->Render(pd3dCommandList, pCamera);
+
+	if (Map_SELECT == M_Map_1) {
+		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
+		if (m_Map_ObjectShader[0]) m_Map_ObjectShader[0]->Render(pd3dCommandList, pCamera);
+	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
-	for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
+
+	if (Map_SELECT == M_Map_1) {
+		for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
+		if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
+	}
 	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
-	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 	//	for (int j = 0; j < 30; j++) {
 	//		if (weapon_box[i][j])

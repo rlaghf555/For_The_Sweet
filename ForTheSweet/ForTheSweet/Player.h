@@ -60,6 +60,7 @@ protected:
 
 	bool m_connected;
 	bool weapon_grab = false;
+	bool Scale_flag = false;
 	int weapon_index = -1;
 	int weapon_type = -1;
 	XMFLOAT3 m_xmf3Velocity;		//플레이어의 이동 속도를 나타내는 벡터이다.
@@ -78,6 +79,8 @@ public:
 	PxRigidActor* m_AttackTrigger;
 
 	Jump m_Jump;
+	
+	float Scale_time = 0.3f;
 
 public:
 	CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
@@ -90,6 +93,8 @@ public:
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
 	void jumpstart() { m_Jump.startJump(70); }
 
+	void SetScaleflag(bool flag) { Scale_flag = flag; }
+	bool GetScaleflag() { return(Scale_flag); }
 
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
@@ -105,7 +110,7 @@ public:
 	void SetMaxVelocityY(float fMaxVelocity) { m_fMaxVelocityY = fMaxVelocity; }
 	void SetVelocity(XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
 	void SetWeapon(bool grab, int Weapon_type, int Weapon_Index) { weapon_grab = grab; weapon_type = Weapon_type;  weapon_index = Weapon_Index; }
-
+	
 	bool Get_Weapon_grab() { return weapon_grab; }
 	int Get_Weapon_type() { return weapon_type; }
 	int Get_Weapon_index() { return weapon_index; }

@@ -483,33 +483,31 @@ void CGameFramework::CreateDepthStencilView()
 void CGameFramework::LoadModels()
 {
 	vector<pair<string, float>> character_animation;
-	character_animation.emplace_back(make_pair("./resource/character/stay.FBX", 0));			//Anim_Idle
+	character_animation.emplace_back(make_pair("./resource/character/stay.FBX", 0));			// Anim_Idle
+	character_animation.emplace_back(make_pair("./resource/character/walk.FBX", 0));			// Anim_Walk
 
-	character_animation.emplace_back(make_pair("./resource/character/walk.FBX", 0));			//Anim_Walk
+	character_animation.emplace_back(make_pair("./resource/character/weak_attack_1.FBX", 0));	// Anim_Weak_Attack1
+	character_animation.emplace_back(make_pair("./resource/character/weak_attack_2.FBX", 0));	// Anim_Weak_Attack2
+	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));	// Anim_Weak_Attack3
 
-	character_animation.emplace_back(make_pair("./resource/character/weak_attack_1.FBX", 0));	//Anim_Weak_Attack1
-	character_animation.emplace_back(make_pair("./resource/character/weak_attack_2.FBX", 0));	//Anim_Weak_Attack2
-	character_animation.emplace_back(make_pair("./resource/character/weak_attack_3.FBX", 0));	//Anim_Weak_Attack3
-
-	character_animation.emplace_back(make_pair("./resource/character/hard_attack_1.FBX", 0));	//Anim_Hard_Attack1
-	character_animation.emplace_back(make_pair("./resource/character/hard_attack_2.FBX", 0));	//Anim_Hard_Attack2
+	character_animation.emplace_back(make_pair("./resource/character/hard_attack_1.FBX", 0));	// Anim_Hard_Attack1
+	character_animation.emplace_back(make_pair("./resource/character/hard_attack_2.FBX", 0));	// Anim_Hard_Attack2
 	
-	character_animation.emplace_back(make_pair("./resource/character/guard.FBX", 0));	//Anim_Guard
+	character_animation.emplace_back(make_pair("./resource/character/guard.FBX", 0));			// Anim_Guard
+	character_animation.emplace_back(make_pair("./resource/character/power_up.FBX", 0));		// Anim_PowerUp
+	character_animation.emplace_back(make_pair("./resource/character/jump.FBX", 0));			// Anim_Jump
 
-	character_animation.emplace_back(make_pair("./resource/character/power_up.FBX", 0));	//Anim_PowerUp
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_1.FBX", 0));	// Anim_Lollipop_Attack1
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_2.FBX", 0));	// Anim_Lollipop_Attack2
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_guard.FBX", 0));		// Anim_Lollipop_Guard
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_hard_attack.FBX", 0));// Anim_Lollipop_HardAttack
+	character_animation.emplace_back(make_pair("./resource/character/lollipop_skill.FBX", 0));		// Anim_Lollipop_skill
 
-	character_animation.emplace_back(make_pair("./resource/character/jump.FBX", 0));	//Anim_PowerUp
+	character_animation.emplace_back(make_pair("./resource/character/small_react.FBX", 0));		// Anim_Small_React
+	character_animation.emplace_back(make_pair("./resource/character/pick_up.FBX", 0));			// Anim_Pick_up
+	character_animation.emplace_back(make_pair("./resource/character/run.FBX", 0));				// Anim_Run
 
-	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_1.FBX", 0));	//Anim_Lollipop_Attack1
-	character_animation.emplace_back(make_pair("./resource/character/lollipop_attack_2.FBX", 0));	//Anim_Lollipop_Attack2
-	character_animation.emplace_back(make_pair("./resource/character/lollipop_guard.FBX", 0));	//Anim_Lollipop_Guard
-	character_animation.emplace_back(make_pair("./resource/character/lollipop_hard_attack.FBX", 0));	//Anim_Lollipop_HardAttack
-	character_animation.emplace_back(make_pair("./resource/character/lollipop_skill.FBX", 0));	//Anim_Lollipop_skill
-
-	character_animation.emplace_back(make_pair("./resource/character/small_react.FBX", 0));			//Anim_Small_React
-
-	character_animation.emplace_back(make_pair("./resource/character/pick_up.FBX", 0));			//Anim_Pick_up
-	character_animation.emplace_back(make_pair("./resource/character/run.FBX", 0));			//Run
+	character_animation.emplace_back(make_pair("./resource/character/cupcake_eat.FBX", 0));		// Anim_Cupckae_Eat
 	   
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
@@ -932,45 +930,240 @@ void CGameFramework::ProcessInput()
 
 		m_pPlayer->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
 
-		if (m_pPlayer->Get_Weapon_grab()) {
-			if (Key_A || Key_S) {
+		if (m_pPlayer->GetScaleflag()) {
+			if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 0 && Anim_Time < 20))
+				m_pPlayer->SetScale(1.0f);
+			else if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 20 && Anim_Time < 30)) {
+				m_pPlayer->SetWeapon(false, -1, -1);
+				m_pPlayer->SetScale(1.3f);
+			}
+			else if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 30 && Anim_Time < 38))
+				m_pPlayer->SetScale(1.7f);
+			else if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 38 && Anim_Time < 40))
+				m_pPlayer->SetScale(2.0f);
+			else if (Anim_Index != Anim_Cupckae_Eat) {
+				m_pPlayer->SetScale(2.0f);
 
-				if (Key_A&&Key_S) {//둘다 눌리면 막기
-					m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
-					m_pPlayer->SetAnimFrame(10);
-					m_pPlayer->DisableLoop();
-				}
-				else if (Key_A && !Key_S) { //약공격 or 줍기
-				   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
-
-				   //아니면 약공격
-					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
-						m_pPlayer->DisableLoop();
-					}
-					if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
-						m_pPlayer->SetAnimFrame(Anim_Time);
-						m_pPlayer->DisableLoop();
-					}
-				}
-				else if (!Key_A && Key_S) { //강공격 or 줍기
-				   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
-
-				   //아니면 강공격
-					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
-						m_pPlayer->DisableLoop();
-					}
-					
+				if (m_pPlayer->Scale_time < 100)
+					m_pPlayer->Scale_time += m_pPlayer->Scale_time * m_GameTimer.GetTimeElapsed();
+				else {
+					m_pPlayer->SetScaleflag(false);
+					m_pPlayer->Scale_time = 0.3f;
 				}
 			}
+		}
+		else m_pPlayer->SetScale(1.0f);
+		
+		if (m_pPlayer->Get_Weapon_grab()) {
+			if (type == M_Weapon_Lollipop) {
+				if (Key_A || Key_S) {
 
-			if (Key_D) { //무기 스킬
-			//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
-				if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-					m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
-					m_pPlayer->DisableLoop();
+					if (Key_A&&Key_S) {//둘다 눌리면 막기
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
+						m_pPlayer->SetAnimFrame(10);
+						m_pPlayer->DisableLoop();
+					}
+					else if (Key_A && !Key_S) { //약공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
+
+					   //아니면 약공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
+							m_pPlayer->DisableLoop();
+						}
+						if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
+							m_pPlayer->SetAnimFrame(Anim_Time);
+							m_pPlayer->DisableLoop();
+						}
+					}
+					else if (!Key_A && Key_S) { //강공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+					   //아니면 강공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->DisableLoop();
+						}
+
+					}
+				}
+
+				if (Key_D) { //무기 스킬
+				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->DisableLoop();
+					}
+				}
+			}
+			else if (type == M_Weapon_chupachupse) {
+				if (Key_A || Key_S) {
+
+					if (Key_A&&Key_S) {//둘다 눌리면 막기
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
+						m_pPlayer->SetAnimFrame(10);
+						m_pPlayer->DisableLoop();
+					}
+					else if (Key_A && !Key_S) { //약공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
+
+					   //아니면 약공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
+							m_pPlayer->DisableLoop();
+						}
+						if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
+							m_pPlayer->SetAnimFrame(Anim_Time);
+							m_pPlayer->DisableLoop();
+						}
+					}
+					else if (!Key_A && Key_S) { //강공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+					   //아니면 강공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->DisableLoop();
+						}
+
+					}
+				}
+
+				if (Key_D) { //무기 스킬
+				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->DisableLoop();
+					}
+				}
+			}
+			else if (type == M_Weapon_pepero) {
+				if (Key_A || Key_S) {
+
+					if (Key_A&&Key_S) {//둘다 눌리면 막기
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
+						m_pPlayer->SetAnimFrame(10);
+						m_pPlayer->DisableLoop();
+					}
+					else if (Key_A && !Key_S) { //약공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
+
+					   //아니면 약공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
+							m_pPlayer->DisableLoop();
+						}
+						if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
+							m_pPlayer->SetAnimFrame(Anim_Time);
+							m_pPlayer->DisableLoop();
+						}
+					}
+					else if (!Key_A && Key_S) { //강공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+					   //아니면 강공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->DisableLoop();
+						}
+
+					}
+				}
+
+				if (Key_D) { //무기 스킬
+				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->DisableLoop();
+					}
+				}
+			}
+			else if (type == M_Weapon_chocolate) {
+				if (Key_A || Key_S) {
+
+					if (Key_A&&Key_S) {//둘다 눌리면 막기
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
+						m_pPlayer->SetAnimFrame(10);
+						m_pPlayer->DisableLoop();
+					}
+					else if (Key_A && !Key_S) { //약공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
+
+					   //아니면 약공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
+							m_pPlayer->DisableLoop();
+						}
+						if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
+							m_pPlayer->SetAnimFrame(Anim_Time);
+							m_pPlayer->DisableLoop();
+						}
+					}
+					else if (!Key_A && Key_S) { //강공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+					   //아니면 강공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->DisableLoop();
+						}
+
+					}
+				}
+
+				if (Key_D) { //무기 스킬
+				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->DisableLoop();
+					}
+				}
+			}
+			else if (type == M_Weapon_cupcake) {
+				if (Key_A || Key_S) {
+
+					if (Key_A&&Key_S) {//둘다 눌리면 막기
+						m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
+						m_pPlayer->SetAnimFrame(10);
+						m_pPlayer->DisableLoop();
+					}
+					else if (Key_A && !Key_S) { //약공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
+
+					   //아니면 약공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
+							m_pPlayer->DisableLoop();
+						}
+						if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
+							m_pPlayer->SetAnimFrame(Anim_Time);
+							m_pPlayer->DisableLoop();
+						}
+					}
+					else if (!Key_A && Key_S) { //강공격 or 줍기
+					   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기
+
+					   //아니면 강공격
+						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->DisableLoop();
+						}
+
+					}
+				}
+
+				if (Key_D) { //무기 스킬
+				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
+					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
+						m_pPlayer->ChangeAnimation(Anim_Cupckae_Eat);
+						m_pPlayer->SetScaleflag(true);
+						m_pPlayer->DisableLoop();
+					}
 				}
 			}
 		}
