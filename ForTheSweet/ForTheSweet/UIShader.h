@@ -34,17 +34,17 @@ public:
 	virtual void CreateCbvAndSrvDescriptorHeaps(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, int nShaderResourceViews, bool bIsGraphics = true);
 	virtual void CreateConstantBufferViews(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nConstantBufferViews, ID3D12Resource * pd3dConstantBuffers, UINT nStride);
 	virtual void CreateShaderResourceViews(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CTexture * pTexture, UINT nRootParameterStartIndex, bool bAutoIncrement, bool bIsGraphics = true);
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(int index);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(int index);
 
 	virtual void BuildPSO(ID3D12Device * pd3dDevice, UINT nRenderTargets, int index = 0);
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
-	virtual void ReleaseObjects() { }
+	virtual void ReleaseObjects();
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int index = 0);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void SetTimer(float apearTime, float existTime, float retreatTime);							// 등장 시간 Set
 	virtual XMUINT2 GetSpriteSize(int texIndex, CTexture* pTexture, XMUINT2 numSprite = XMUINT2(1, 1));
-
+	virtual void SetTime(int t) {}
 	virtual void CreatePipelineParts();
 protected:
 	unique_ptr<UploadBuffer<CB_UI_INFO>>	m_ObjectCB = nullptr;
@@ -56,7 +56,7 @@ protected:
 	float									m_RetreatTime;	// 사라지는 시간
 	float									m_ExistTime;	// 존재하는 시간
 	float									m_ElapsedTime;
-	
+
 	ComPtr<ID3DBlob>*						m_CSByteCode = nullptr;
 
 	ComPtr<ID3D12DescriptorHeap>			m_CbvSrvDescriptorHeap = nullptr;
@@ -90,4 +90,29 @@ protected:
 
 	UINT									m_nComputePSO = 0;
 	UINT									m_nComputeBuffers = 0;
+
+	ComPtr<ID3DBlob>*						m_VSByteCode = nullptr;
+	ComPtr<ID3DBlob>*						m_PSByteCode = nullptr;
+	//ComPtr<ID3DBlob>*						m_CSByteCode = nullptr;
+};
+
+class UIHPBarShader : public UIShader
+{
+public:
+	UIHPBarShader() { };
+	~UIHPBarShader() { };
+
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+};
+
+class UITimeShader : public UIShader
+{
+public:
+	UITimeShader() { };
+	~UITimeShader() { };
+
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+	virtual void SetTime(int t);	//초(sec) 단위
 };

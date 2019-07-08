@@ -197,4 +197,10 @@
     <None Include="Shaders.hlsl" />
     <None Include="Model.hlsl" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Sampler.hlsl" />
+    <FxCompile Include="Texture.hlsl" />
+    <FxCompile Include="UICbuffer.hlsl" />
+    <FxCompile Include="UIShader.hlsl" />
+  </ItemGroup>
 </Project>

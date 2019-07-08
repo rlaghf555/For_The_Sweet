@@ -130,7 +130,7 @@ void UIShader::MovePos(XMFLOAT2 & pos, UINT index)
 
 void UIShader::CreateGraphicsRootSignature(ID3D12Device * pd3dDevice)
 {
-	ComPtr<ID3D12RootSignature> pd3dGraphicsRootSignature = nullptr;
+	//ComPtr<ID3D12RootSignature> pd3dGraphicsRootSignature = nullptr;
 
 	CD3DX12_DESCRIPTOR_RANGE pd3dDescriptorRanges[1 + NUM_MAX_UITEXTURE];
 	pd3dDescriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, CBVUIInfo, 0, 0); // GameObject
@@ -305,27 +305,44 @@ void UIShader::CreateShaderResourceViews(ID3D12Device * pd3dDevice, ID3D12Graphi
 	}
 }
 
-D3D12_SHADER_BYTECODE UIShader::CreateVertexShader(ID3DBlob ** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE UIShader::CreateVertexShader(int index)
 {
-	wchar_t filename[100] = L"Model.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "VSStaticModel", "vs_5_1", ppd3dShaderBlob));
+	//wchar_t filename[100] = L"UIShader.hlsl";
+	//return(CShader::CompileShaderFromFile(filename, "VSUITextured", "vs_5_1", ppd3dShaderBlob));
+	D3D12_SHADER_BYTECODE byteCode;
+	::ZeroMemory(&byteCode, sizeof(D3D12_SHADER_BYTECODE));
+
+	if (m_VSByteCode[index] != nullptr) {
+		byteCode.pShaderBytecode = m_VSByteCode[index]->GetBufferPointer();
+		byteCode.BytecodeLength = m_VSByteCode[index]->GetBufferSize();
+	}
+	return byteCode;
 }
 
-D3D12_SHADER_BYTECODE UIShader::CreatePixelShader(ID3DBlob ** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE UIShader::CreatePixelShader(int index)
 {
-	wchar_t filename[100] = L"Model.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "VSStaticModel", "vs_5_1", ppd3dShaderBlob));
+	//wchar_t filename[100] = L"UIShader.hlsl";
+	//return(CShader::CompileShaderFromFile(filename, "PSDefaultUI", "ps_5_1", ppd3dShaderBlob));
+	D3D12_SHADER_BYTECODE byteCode;
+	::ZeroMemory(&byteCode, sizeof(D3D12_SHADER_BYTECODE));
+
+	if (m_PSByteCode[index] != nullptr) {
+		byteCode.pShaderBytecode = m_PSByteCode[index]->GetBufferPointer();
+		byteCode.BytecodeLength = m_PSByteCode[index]->GetBufferSize();
+	}
+
+	return byteCode;
 }
 
 void UIShader::BuildPSO(ID3D12Device * pd3dDevice, UINT nRenderTargets, int index)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	::ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	ID3DBlob *pd3dVertexShaderBlob = NULL, *pd3dPixelShaderBlob = NULL;
+
 	psoDesc.InputLayout = CreateInputLayout();
 	psoDesc.pRootSignature = m_RootSignature[index].Get();
-	psoDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
-	psoDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+	psoDesc.VS = CreateVertexShader(index);
+	psoDesc.PS = CreatePixelShader(index);
 	psoDesc.RasterizerState = CreateRasterizerState();
 	psoDesc.BlendState = CreateBlendState(index);
 	psoDesc.DepthStencilState = CreateDepthStencilState(index);
@@ -337,8 +354,6 @@ void UIShader::BuildPSO(ID3D12Device * pd3dDevice, UINT nRenderTargets, int inde
 	psoDesc.SampleDesc.Count = 1;
 	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	ThrowIfFailed(pd3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(m_pPSO[index].GetAddressOf())));
-	if (pd3dVertexShaderBlob) pd3dVertexShaderBlob->Release();
-	if (pd3dPixelShaderBlob) pd3dPixelShaderBlob->Release();
 }
 
 
@@ -351,14 +366,16 @@ void UIShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 	m_nPSO = 1;
 
 	CreatePipelineParts();
-
-	//m_VSByteCode[0] = COMPILEDSHADERS->GetCompiledShader(L"hlsl\\UIShader.hlsl", nullptr, "VSUITextured", "vs_5_0");
-	//m_PSByteCode[0] = COMPILEDSHADERS->GetCompiledShader(L"hlsl\\UIShader.hlsl", nullptr, "PSDefaultUI", "ps_5_0");
+	m_VSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "VSUITextured", "vs_5_1");
+	m_PSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "PSDefaultUI", "ps_5_1");
 
 	CTexture *pTexture = new CTexture(nTextures, RESOURCE_TEXTURE2D, 0);
-//	for (int i = 0; i < nTextures; ++i) {
-//		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, (*textures).m_texture.c_str(), i);
-//	}
+	//for (int i = 0; i < nTextures; ++i) {
+	//	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\UIsample2.dds", i);
+	//}
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\UIsample1.dds", 0);
+	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\UIsample2.dds", 1);
+
 	UINT ncbElementBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(CB_UI_INFO));
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, pTexture->GetTextureCount());
@@ -388,13 +405,24 @@ void UIShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 
 	for (int i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
-		XMUINT2 tmpsize(0, 0);
+		XMUINT2 tmpsize(1, 1);
 		m_pUIObjects[i]->SetNumSprite(tmpsize, tmpsize);
-		//m_pUIObjects[i]->SetSize(GetSpriteSize(i, pTexture, XMUINT2(XMUINT2((*textures).m_MaxX, (*textures).m_MaxY))));
+		XMUINT2 sizetmp(1, 1);
+		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
+		m_pUIObjects[i]->SetSize(sizetmp);
 		m_pUIObjects[i]->SetType(i);
 		m_pUIObjects[i]->CreateCollisionBox();
 		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 	}
+}
+
+void UIShader::ReleaseObjects()
+{
+	for (int i = 0; i < m_nObjects; i++) {
+		if (m_pUIObjects[i])
+			delete m_pUIObjects[i];		
+	}
+	m_pUIObjects.clear();
 }
 
 void UIShader::OnPrepareRender(ID3D12GraphicsCommandList * pd3dCommandList, int index)
@@ -443,8 +471,8 @@ void UIShader::CreatePipelineParts() {
 		m_pPSO = new ComPtr<ID3D12PipelineState>[m_nPSO];
 		m_RootSignature = new ComPtr<ID3D12RootSignature>[m_nPSO];
 
-	//	m_VSByteCode = new ComPtr<ID3DBlob>[m_nPSO];
-	//	m_PSByteCode = new ComPtr<ID3DBlob>[m_nPSO];
+		m_VSByteCode = new ComPtr<ID3DBlob>[m_nPSO];
+		m_PSByteCode = new ComPtr<ID3DBlob>[m_nPSO];
 	}
 
 	if (m_nComputePSO > 0) {
@@ -459,4 +487,163 @@ void UIShader::CreatePipelineParts() {
 
 		m_CSByteCode = new ComPtr<ID3DBlob>[m_nComputePSO];
 	}
+}
+
+void UIHPBarShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	UINT nTextures = 3;
+	m_nObjects = nTextures;
+	m_nPSO = 1;
+
+	CreatePipelineParts();
+
+	m_VSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "VSUITextured", "vs_5_1");
+	m_PSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "PSUIHPBar", "ps_5_1");
+
+	CTexture *pTexture = new CTexture(m_nObjects, RESOURCE_TEXTURE2D, 0);
+
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\HPedge.dds", 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\HPbar.dds", 1);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\MPbar.dds", 2);
+
+	UINT ncbElementBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(CB_UI_INFO));
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, pTexture->GetTextureCount());
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), ncbElementBytes);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 1, true);
+
+	CreateGraphicsRootSignature(pd3dDevice);
+
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	m_pUIObjects = vector<UIObject*>(m_nObjects);
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT2 pos = XMFLOAT2(0, 0);
+	XMFLOAT2 scale = XMFLOAT2(0.8f, 0.8f);
+
+	UIObject* HPedge;
+	HPedge = new UIObject();
+	HPedge->SetPosition(pos);
+	HPedge->SetScale(scale);
+	m_pUIObjects[0] = HPedge;
+
+
+	HPBarObject* hpBar;
+	hpBar = new HPBarObject();
+	hpBar->SetPosition(XMFLOAT2(pos));
+	hpBar->SetScale(scale);
+	m_pUIObjects[1] = hpBar;
+
+
+
+	HPBarObject* mpBar;
+	mpBar = new HPBarObject();
+	mpBar->SetPosition(pos);
+	mpBar->SetScale(scale);
+
+	m_pUIObjects[2] = mpBar;
+
+	for (int i = 0; i < m_nObjects; ++i) {
+		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
+		XMUINT2 sizetmp(1, 1);
+		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
+		m_pUIObjects[i]->SetSize(sizetmp);
+		m_pUIObjects[i]->SetType(i);
+		m_pUIObjects[i]->CreateCollisionBox();
+		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+	}
+}
+
+void UITimeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+
+	UINT nTextures = 1;
+	m_nObjects = 3;
+	m_nPSO = 1;
+
+	CreatePipelineParts();
+
+	m_VSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "VSUITextured", "vs_5_1");
+	m_PSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "PSDefaultUI", "ps_5_1");
+
+	CTexture *pTexture = new CTexture(nTextures, RESOURCE_TEXTURE2D, 0);
+
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\number.dds", 0);
+
+	UINT ncbElementBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(CB_UI_INFO));
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, pTexture->GetTextureCount());
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), ncbElementBytes);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 1, true);
+
+	CreateGraphicsRootSignature(pd3dDevice);
+
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	m_pUIObjects = vector<UIObject*>(m_nObjects);
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT2 pos;
+	XMFLOAT2 scale = XMFLOAT2(0.3f, 0.3f);
+
+	pos = XMFLOAT2(550, 650);
+	UIObject* Time;
+	Time = new UIObject();
+	Time->SetPosition(pos);
+	Time->SetScale(scale);
+	m_pUIObjects[0] = Time;
+
+	pos = XMFLOAT2(690, 650);
+	UIObject* min1;
+	min1 = new UIObject();
+	min1->SetPosition(pos);
+	min1->SetScale(scale);
+	m_pUIObjects[1] = min1;
+
+	pos = XMFLOAT2(790, 650);
+	UIObject* min2;
+	min2 = new UIObject();
+	min2->SetPosition(pos);
+	min2->SetScale(scale);
+	m_pUIObjects[2] = min2;
+
+	for (int i = 0; i < m_nObjects; ++i) {
+		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
+		XMUINT2 sizetmp(1, 1);
+		sizetmp = GetSpriteSize(0, pTexture, sizetmp);
+		m_pUIObjects[i]->SetSize(sizetmp);
+		m_pUIObjects[i]->SetType(i);
+		XMUINT2 numsprite(5, 2);
+		XMUINT2 nowsprite(0, 0);
+		m_pUIObjects[i]->SetNumSprite(numsprite, nowsprite);
+		m_pUIObjects[i]->CreateCollisionBox();
+		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+	}
+}
+
+void UITimeShader::SetTime(int t)
+{
+	int time = t / 60;
+	int min_1 = t % 60 / 10;
+	int min_2 = t % 60 % 10;
+	XMUINT2 numsprite(5, 2);
+
+	XMUINT2 nowsprite(0, 0);
+	nowsprite.x = (time) % 5;
+	nowsprite.y = (time) / 5;
+	m_pUIObjects[0]->SetNumSprite(numsprite, nowsprite);
+	nowsprite.x = (min_1) % 5;
+	nowsprite.y = (min_1) / 5;
+	m_pUIObjects[1]->SetNumSprite(numsprite, nowsprite);
+	nowsprite.x = (min_2) % 5;
+	nowsprite.y = (min_2) / 5;
+	m_pUIObjects[2]->SetNumSprite(numsprite, nowsprite);
+
 }

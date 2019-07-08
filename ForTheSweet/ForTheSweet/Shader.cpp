@@ -269,14 +269,14 @@ void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComma
 
 void CObjectsShader::ReleaseObjects()
 {
-	//if (m_ppObjects.size())
-	//{
-	//	for (int j = 0; j < m_nObjects; j++)
-	//	{
-	//		if (m_ppObjects[j]) delete m_ppObjects[j];
-	//	}
-	//	delete[] m_ppObjects;
-	//}
+	if (m_ppObjects.size())
+	{
+		for (int j = 0; j < m_nObjects; j++)
+		{
+			if (m_ppObjects[j]) delete m_ppObjects[j];
+		}
+		
+	}
 }
 
 void CObjectsShader::AnimateObjects(float fTimeElapsed)

@@ -5,7 +5,7 @@
 #include "Camera.h"
 #include "Physx.h"
 #include "Protocol.h"
-
+#include "UIShader.h"
 class CScene
 {
 public:
@@ -15,6 +15,7 @@ public:
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, CPhysx* physx);
+	void BuildUI(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
 	void BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
 	void ReleaseObjects();
 	bool ProcessInput(UCHAR *pKeysBuffer);
@@ -22,6 +23,7 @@ public:
 	void AnimateWeapon(int i);
 	void CollisionProcess(int index);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+	void RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList);
 	void ReleaseUploadBuffers();
 	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }
 	void SetMap(LoadModel **mapmodel) { Map_Model = mapmodel; }
@@ -54,7 +56,9 @@ public:
 	WaveShader					*m_WavesShader = NULL;
 
 	unique_ptr<CCamera>			m_Camera = nullptr;
-
+	//UI
+	vector<UIShader*>			m_ppUIShaders;
+	UINT						m_nUIShaders;
 protected:
 	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다.
 	//CGameObject * *m_ppObjects = NULL;

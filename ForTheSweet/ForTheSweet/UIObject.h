@@ -29,7 +29,7 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetCbvGPUDescriptorHandle() { return(m_d3dCbvGPUDescriptorHandle); }
 
-	virtual void Update(float fTimeElapsed) {};
+	virtual void Update(float fTimeElapsed);
 
 	virtual void SetRootParameter(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList);
@@ -43,7 +43,7 @@ public:
 	virtual void SetSize(XMUINT2& size);
 	virtual void SetAlpha(float alpha);
 	virtual void SetNumSprite(XMUINT2& numSprite, XMUINT2& nowSprite);
-
+	virtual void SetHP(float hp) {}
 	virtual void SetType(UINT type) { m_nTexType = type; }
 
 public:
@@ -68,4 +68,20 @@ public:
 	XMFLOAT2	m_xmf2Scale = XMFLOAT2(1.0f, 1.0f);
 	XMFLOAT2	m_xmf2StartPos;
 	XMFLOAT2	m_xmf2EndPos;
+};
+
+class HPBarObject : public UIObject
+{
+public:
+	HPBarObject() {};
+	~HPBarObject() {};
+
+public:
+	void SetHP(float hp) { Now_Gauge = hp; UpdateScale(); }
+	void SetMaxGauge(float Gauge) { Max_Gauge = Gauge; }
+	//virtual void Update(float fTimeElapsed);
+	void UpdateScale();
+protected:
+	float Max_Gauge = 100;		// √÷¥Î HP
+	float Now_Gauge = 100;
 };

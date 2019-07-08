@@ -22,7 +22,9 @@ void UIObject::Render(ID3D12GraphicsCommandList * pd3dCommandList)
 	pd3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pd3dCommandList->DrawInstanced(6, 1, 0, 0);
 }
+void UIObject::Update(float fTimeElapsed) {
 
+}
 bool UIObject::CollisionUI(POINT * pPoint, XMFLOAT2& trueSetData, XMFLOAT2& falseSetData)
 {
 	if (m_fAlpha < 1.0f) {
@@ -86,3 +88,11 @@ void UIObject::SetNumSprite(XMUINT2 & numSprite, XMUINT2& nowSprite)
 	m_nNowSprite = nowSprite;
 }
 
+void HPBarObject::UpdateScale()
+{
+	float tmp = m_nSize.x *m_xmf2Scale.x;
+	m_xmf2Scale.x = m_xmf2Scale.x *Now_Gauge / Max_Gauge;
+	float tmp2 = m_nSize.x * m_xmf2Scale.x;
+	tmp -= tmp2;
+	m_xmf2ScreenPos.x -= (tmp / 2);
+}

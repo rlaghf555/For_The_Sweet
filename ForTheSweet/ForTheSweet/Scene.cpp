@@ -107,6 +107,58 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 }
 
+void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
+{
+	m_ppUIShaders.clear();
+	m_nUIShaders = 9;
+	m_ppUIShaders.resize(m_nUIShaders);
+
+	//UIShader* pSample = new UIShader();
+	//pSample->BuildObjects(pDevice, pCommandList, 1);
+	//XMFLOAT2 pos = XMFLOAT2(0.5f, 0.045f);
+	//pSample->SetPosScreenRatio(pos, 0);
+	//m_ppUIShaders[0] = pSample;
+	for (int i = 0; i < 4; i++) {
+		UIHPBarShader* pHPBar = new UIHPBarShader();
+		pHPBar->BuildObjects(pDevice, pCommandList, 1);
+		//XMFLOAT2 pos = XMFLOAT2(0.25*(i+1)-0.12, 0.1);
+		//
+		//pHPBar->SetPosScreenRatio(pos, 0);
+		//pHPBar->SetPosScreenRatio(pos, 1);
+		//pHPBar->SetPosScreenRatio(pos, 2);
+		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 150);
+		pHPBar->SetPos(&pos, 0);
+		pos = XMFLOAT2(172 + i * 313, 155);
+		pHPBar->SetPos(&pos, 1);
+		pos = XMFLOAT2(172 + i * 313, 125);
+		pHPBar->SetPos(&pos, 2);
+		m_ppUIShaders[i] = pHPBar;
+	}
+	for (int i = 0; i < 4; i++) {
+		UIHPBarShader* pHPBar = new UIHPBarShader();
+		pHPBar->BuildObjects(pDevice, pCommandList, 1);
+		//XMFLOAT2 pos = XMFLOAT2(0.25*(i+1)-0.12, 0.1);
+		//
+		//pHPBar->SetPosScreenRatio(pos, 0);
+		//pHPBar->SetPosScreenRatio(pos, 1);
+		//pHPBar->SetPosScreenRatio(pos, 2);
+		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 50);
+		pHPBar->SetPos(&pos, 0);
+		pos = XMFLOAT2(172 + i * 313, 55);
+		pHPBar->SetPos(&pos, 1);
+		pos = XMFLOAT2(172 + i * 313, 25);
+		pHPBar->SetPos(&pos, 2);
+		m_ppUIShaders[i + 4] = pHPBar;
+	}
+	XMFLOAT2 scale = XMFLOAT2(0.5, 0.5);
+	m_ppUIShaders[0]->getObejct(1)->SetHP(13);
+	m_ppUIShaders[0]->getObejct(2)->SetHP(5);
+	UITimeShader* pTime = new UITimeShader();
+	pTime->BuildObjects(pDevice, pCommandList, 1);
+	m_ppUIShaders[8] = pTime;
+	m_ppUIShaders[8]->SetTime(300);
+}
+
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
 {
 	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[2];
@@ -243,6 +295,14 @@ void CScene::ReleaseObjects()
 			bounding_box_test[i]->ReleaseShaderVariables();
 			bounding_box_test[i]->ReleaseObjects();
 			delete bounding_box_test[i];
+		}
+	}
+	for (int i = 0; i < m_nUIShaders; ++i) {
+		if (m_ppUIShaders[i]) {
+			m_ppUIShaders[i]->ReleaseShaderVariables();
+			m_ppUIShaders[i]->ReleaseObjects();
+			delete m_ppUIShaders[i];
+
 		}
 	}
 }
@@ -427,4 +487,12 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//	}
 	//}
 	//for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
+}
+
+void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
+{
+	//for (UINT i = 0; i < m_nUIShaders - 2; ++i)
+	//	m_ppUIShaders[i]->Render(pCommandList);
+	for (UINT i = 0; i < m_nUIShaders; ++i)
+		m_ppUIShaders[i]->Render(pCommandList);
 }
