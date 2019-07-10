@@ -67,10 +67,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	if (Map_SELECT == M_Map_1) {
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_1]);
-		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx);
+		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1);
 
 		m_MapShader[1] = new CModelShader(Map_Model[M_Map_1_wall]);
-		m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList);
+		m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
 
 		for (int i = 0; i < 2; i++) {
 			m_CottonShader[i] = new CottonCloudShader(Map_Model[M_Map_1_cotton]);
@@ -82,6 +82,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		m_WavesShader = new WaveShader();
 		m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	}
+	if (Map_SELECT == M_Map_2) {
+		m_MapShader[0] = new CModelShader(Map_Model[M_Map_2]);
+		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2);
 	}
 
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
@@ -489,6 +493,11 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_Map_ObjectShader[0]) m_Map_ObjectShader[0]->Render(pd3dCommandList, pCamera);
+	}
+	if (Map_SELECT == M_Map_2) {
+		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
+		//if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
+		//if (m_Map_ObjectShader[0]) m_Map_ObjectShader[0]->Render(pd3dCommandList, pCamera);
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 

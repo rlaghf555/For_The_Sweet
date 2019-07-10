@@ -68,7 +68,7 @@ private:
 	//펜스 인터페이스 포인터, 펜스의 값, 이벤트 핸들이다.
 
 	Model_Animation *Character_Model;
-	LoadModel		*Map_Model[4];
+	LoadModel		*Map_Model[10];
 	LoadModel		*weapon[7];
 #if defined(_DEBUG)
 	ID3D12Debug *m_pd3dDebugController;

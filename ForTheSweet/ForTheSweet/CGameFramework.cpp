@@ -516,6 +516,7 @@ void CGameFramework::LoadModels()
 	Map_Model[1] = new LoadModel("./resource/map/cotton_1.FBX", true);		// cotton_candy_cloud
 	Map_Model[2] = new LoadModel("./resource/map/111.FBX", true);			// map_1_wall
 	Map_Model[3] = new LoadModel("./resource/map/map_macaron.FBX", true);	// map_1_macaron
+	Map_Model[4] = new LoadModel("./resource/map/map_oreo.FBX", true);		// map_2
 
 	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);		// M_Weapon_Lollipop
 	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);			// M_Weapon_chupachupse
