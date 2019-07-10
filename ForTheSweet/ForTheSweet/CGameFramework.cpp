@@ -68,8 +68,9 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	CreateDirect3DDevice();
 	CreateCommandQueueAndList();
-	CreateRtvAndDsvDescriptorHeaps();
 	CreateSwapChain();
+	CreateRtvAndDsvDescriptorHeaps();
+	OnResizeBackBuffers();
 	LoadModels();
 	//CreateRenderTargetView();
 	//CreateDepthStencilView();

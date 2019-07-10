@@ -24,8 +24,8 @@ Model_Animation::Model_Animation(string Model_filename , vector<pair<string, flo
 
 }
 Model_Animation::~Model_Animation()
-
 {
+	delete model;
 }
 void Model_Animation::LodingModels(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList)
 {

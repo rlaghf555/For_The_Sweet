@@ -130,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir)Physx\include;$(ProjectDir)Physx\source\physxextensions\src;$(ProjectDir)Physx\pxshared;$(ProjectDir)Physx\source\foundation\include;$(ProjectDir)Physx\source\geomutils\include;$(ProjectDir)Physx\source\geomuils\src;$(ProjectDir)Physx\source\geomutils\src\contact;$(ProjectDir)Physx\source\geomutils\src\common;$(ProjectDir)Physx\source\geomutils\src\convex;$(ProjectDir)Physx\source\geomutils\src\sweep;$(ProjectDir)Physx\source\geomutils\src\distance;$(ProjectDir)Physx\source\geomutils\src\gjk;$(ProjectDir)Physx\source\geomutils\src\intersection;$(ProjectDir)Physx\source\geomutils\src\mesh;$(ProjectDir)Physx\source\geomutils\src\hf;$(ProjectDir)Physx\source\geomutils\src\pcm;$(ProjectDir)Physx\source\geomutils\src\ccd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
