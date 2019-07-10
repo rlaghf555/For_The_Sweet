@@ -30,7 +30,6 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetCbvGPUDescriptorHandle() { return(m_d3dCbvGPUDescriptorHandle); }
 
 	virtual void Update(float fTimeElapsed);
-
 	virtual void SetRootParameter(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual bool CollisionUI(POINT* pPoint, XMFLOAT2& trueSetData, XMFLOAT2& falseSetData);
@@ -54,6 +53,7 @@ public:
 
 public:
 	bool										m_bEnabled = true;
+	bool										Is_Render = true;
 	float										m_fAnimationTime = 0.3f;
 	D3D12_GPU_DESCRIPTOR_HANDLE					m_d3dCbvGPUDescriptorHandle;
 
@@ -73,6 +73,9 @@ public:
 	XMFLOAT2	m_xmf2Scale = XMFLOAT2(1.0f, 1.0f);
 	XMFLOAT2	m_xmf2StartPos;
 	XMFLOAT2	m_xmf2EndPos;
+
+	int mystate = UI_NONE;
+	int uistate;
 };
 
 class HPBarObject : public UIObject
@@ -89,4 +92,11 @@ public:
 protected:
 	float Max_Gauge = 100;		// √÷¥Î HP
 	float Now_Gauge = 100;
+};
+class MessageObject : public UIObject {
+public:
+	MessageObject() {};
+	~MessageObject() {};
+	virtual void Update(float fTimeElapsed);
+
 };

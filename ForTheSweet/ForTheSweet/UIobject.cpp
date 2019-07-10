@@ -25,6 +25,8 @@ void UIObject::Render(ID3D12GraphicsCommandList * pd3dCommandList)
 void UIObject::Update(float fTimeElapsed) {
 
 }
+
+
 bool UIObject::CollisionUI(POINT * pPoint, XMFLOAT2& trueSetData, XMFLOAT2& falseSetData)
 {
 	if (m_fAlpha < 1.0f) {
@@ -95,4 +97,23 @@ void HPBarObject::UpdateScale()
 	float tmp2 = m_nSize.x * m_xmf2Scale.x;
 	tmp -= tmp2;
 	m_xmf2ScreenPos.x -= (tmp / 2);
+}
+
+
+
+void MessageObject::Update(float fTimeElapsed)	//날아오는 메세지 속도조정
+{
+	if (mystate == uistate) {
+		m_bEnabled = true;
+
+		if (m_xmf2ScreenPos.x > 600 && m_xmf2ScreenPos.x < 750) {
+			m_xmf2ScreenPos.x -= 4;
+		}
+		else m_xmf2ScreenPos.x -= 20;
+		if (m_xmf2ScreenPos.x < -300)
+			m_bEnabled = false;
+	}
+	else {
+		m_bEnabled = false;
+	}
 }

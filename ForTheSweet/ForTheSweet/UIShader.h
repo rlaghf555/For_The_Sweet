@@ -14,6 +14,7 @@ public:
 	virtual D3D12_DEPTH_STENCIL_DESC	CreateDepthStencilState(int index = 0);
 
 	virtual void Animate(float fTimeElapsed);
+	virtual void UpdateState(int ui_state);
 	virtual void RefreshTimer(float fTimeElapsed, UINT index = 0);
 	virtual void SetPos(XMFLOAT2* pos, UINT index = 0) { m_pUIObjects[index]->m_xmf2ScreenPos = *pos; }
 	virtual void SetNowSprite(XMUINT2& nowSprite, UINT index = 0);	// 현재 스프라이트 수정

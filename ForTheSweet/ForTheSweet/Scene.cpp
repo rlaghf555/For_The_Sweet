@@ -158,11 +158,12 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 
 	UIReadyShader* pReady = new UIReadyShader();
 	pReady->BuildObjects(pDevice, pCommandList);
-	XMFLOAT2 pos = XMFLOAT2(640, 400);
+	XMFLOAT2 pos = XMFLOAT2(1300, 400);
 	pReady->SetPos(&pos, 0);
 	m_ppUIShaders[10] = pReady;
 
 	UIFightShader* pFight = new UIFightShader();
+	pos = XMFLOAT2(1280, 400);
 	pFight->BuildObjects(pDevice, pCommandList);
 	pFight->SetPos(&pos, 0);
 	m_ppUIShaders[11] = pFight;
@@ -408,7 +409,12 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 		m_WavesShader->Animate(fTimeElapsed);
 	}
-
+	for (int i = 0; i < m_nUIShaders; i++) {
+		if (m_ppUIShaders[i]) {
+			m_ppUIShaders[i]->UpdateState(ready_state);
+			m_ppUIShaders[i]->Animate(fTimeElapsed);
+		}
+	}
 	pMes_Weapon->Animate(1.f, pMes_Weapon->Shader_flag);
 }
 
@@ -520,11 +526,7 @@ void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComma
 	//for (UINT i = 0; i < m_nUIShaders - 2; ++i)
 	//	m_ppUIShaders[i]->Render(pCommandList);
 	for (UINT i = 0; i < m_nUIShaders; ++i) {
-		if (i == 10 || i == 11) {
-			if(ready_state == UI_READY) m_ppUIShaders[10]->Render(pCommandList);
-			else if(ready_state == UI_FIGHT) m_ppUIShaders[11]->Render(pCommandList);
-		}
-		else m_ppUIShaders[i]->Render(pCommandList);
+		m_ppUIShaders[i]->Render(pCommandList);
 	}
 	if(pMes_Weapon) pMes_Weapon->Render(pCommandList);
 }

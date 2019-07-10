@@ -50,8 +50,16 @@ D3D12_DEPTH_STENCIL_DESC UIShader::CreateDepthStencilState(int index)
 
 void UIShader::Animate(float fTimeElapsed)
 {
-	for (int i = 0; i < m_nObjects; ++i)
+	for (int i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->Update(fTimeElapsed);
+	}
+}
+
+void UIShader::UpdateState(int ui_state)
+{
+	for (int i = 0; i < m_nObjects; ++i) {
+		m_pUIObjects[i]->uistate = ui_state;
+	}
 }
 
 void UIShader::RefreshTimer(float fTimeElapsed, UINT index)
@@ -420,7 +428,7 @@ void UIShader::ReleaseObjects()
 {
 	for (int i = 0; i < m_nObjects; i++) {
 		if (m_pUIObjects[i])
-			delete m_pUIObjects[i];		
+			delete m_pUIObjects[i];
 	}
 	m_pUIObjects.clear();
 }
@@ -530,13 +538,13 @@ void UIHPBarShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	HPedge->SetPosition(pos);
 	HPedge->SetScale(scale);
 	m_pUIObjects[0] = HPedge;
-	
+
 	HPBarObject* hpBar;
 	hpBar = new HPBarObject();
 	hpBar->SetPosition(XMFLOAT2(pos));
 	hpBar->SetScale(scale);
 	m_pUIObjects[1] = hpBar;
-	   
+
 	HPBarObject* mpBar;
 	mpBar = new HPBarObject();
 	mpBar->SetPosition(pos);
@@ -729,12 +737,13 @@ void UIReadyShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	XMFLOAT2 pos = XMFLOAT2(0, 0);	//570,680;
 	XMFLOAT2 scale = XMFLOAT2(0.8f, 0.8f);
 
-	UIObject* Ready;
-	Ready = new UIObject();
+	MessageObject* Ready;
+	Ready = new MessageObject();
 	Ready->SetPosition(pos);
 	Ready->SetScale(scale);
+	Ready->mystate = UI_READY;
 	m_pUIObjects[0] = Ready;
-	
+
 	for (int i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
@@ -780,10 +789,11 @@ void UIFightShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	XMFLOAT2 pos = XMFLOAT2(0, 0);	//570,680;
 	XMFLOAT2 scale = XMFLOAT2(0.8f, 0.8f);
 
-	UIObject* Fight;
-	Fight = new UIObject();
+	MessageObject* Fight;
+	Fight = new MessageObject();
 	Fight->SetPosition(pos);
 	Fight->SetScale(scale);
+	Fight->mystate = UI_FIGHT;
 	m_pUIObjects[0] = Fight;
 
 	for (int i = 0; i < m_nObjects; ++i) {
