@@ -244,7 +244,7 @@ public:
 //	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 
 	virtual void Animate(float fTimeElapsed, bool flag_up, int weapon_num);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int mpa_type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 	bool get_cupcake_up_flag() { return cupcake_up_flag; }
 };

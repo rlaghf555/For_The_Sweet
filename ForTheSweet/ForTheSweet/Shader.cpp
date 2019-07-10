@@ -822,6 +822,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (map_type == M_Map_1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_2.dds", 0);
 	if (map_type == M_Map_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_oreo.dds", 0);
+	if (map_type == M_Map_1_macaron || map_type == M_Map_1_macaron_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron_2.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -830,7 +831,9 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	for (int i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
-		if (map_type == M_Map_2) map->SetPosition(0.f, -30.f, 0.f);
+		if (map_type == M_Map_2) map->SetPosition(0.f, -20.f, 0.f);
+		if (map_type == M_Map_1_macaron) map->SetPosition(185.f, -10.f, 0.f);
+		if (map_type == M_Map_1_macaron_2) map->SetPosition(-185.f, -10.f, 0.f);
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
 
@@ -1460,15 +1463,16 @@ D3D12_BLEND_DESC WeaponShader::CreateBlendState(int index)
 	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 	return(d3dBlendDesc);
 }*/
-void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int nRenderTargets, void * pContext)
+void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int mpa_type, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
 
 	//if (weapon_num == M_Weapon_cupcake) m_nObjects = 1;
 	//else 
-	m_nObjects = WEAPON_EACH_NUM;
-
+	if (mpa_type == M_Map_1) m_nObjects = WEAPON_EACH_NUM;
+	else if (mpa_type == M_Map_2) m_nObjects = WEAPON_EACH_NUM;
+	
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
 	CreateGraphicsRootSignature(pd3dDevice);
@@ -1499,12 +1503,20 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 			weapon->SetPosition(0, -100 + 15, 0);
 		}
 		else {
-			float b = D3DMath::RandF(-13, 13);
-			float c = D3DMath::RandF(-8, 8);
-			if (b > -2 && b < 2 || c > -2 && c < 2) { i -= 1; continue; }
+			if (mpa_type == M_Map_1) {
+				float b = D3DMath::RandF(-13, 13);
+				float c = D3DMath::RandF(-8, 8);
+				if (b > -2 && b < 2 || c > -2 && c < 2) { i -= 1; continue; }
+				weapon->SetPosition(b * 20, 10, c * 20);
+			}
+			if (mpa_type == M_Map_2) {
+				float b = D3DMath::RandF(-6, 6);
+				float c = D3DMath::RandF(-7, 7);
+				weapon->SetPosition(b * 20, 10, c * 20);
+			}
 
-			weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
-			weapon->SetPosition(b * 20, 10, c * 20);
+			//weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
+			
 			weapon->Rotate(0, 0, 90);
 			weapon->Rotate(&a, D3DMath::Rand(0, 4) * 90.f);
 		}

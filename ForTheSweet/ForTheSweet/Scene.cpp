@@ -82,16 +82,27 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		m_WavesShader = new WaveShader();
 		m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList);
+
+		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_1);
+		}
 	}
 	if (Map_SELECT == M_Map_2) {
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_2]);
 		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2);
+
+		m_MapShader[1] = new CModelShader(Map_Model[M_Map_1_macaron]);
+		m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron);
+		m_MapShader[2] = new CModelShader(Map_Model[M_Map_1_macaron]);
+		m_MapShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_2);
+
+		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
+		}
 	}
 
-	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
-		m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
-	}
 	
 	m_BackGroundShader = new MeshShader();
 	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -502,7 +513,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	}
 	if (Map_SELECT == M_Map_2) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
-		//if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[2]) m_MapShader[2]->Render(pd3dCommandList, pCamera);
 		//if (m_Map_ObjectShader[0]) m_Map_ObjectShader[0]->Render(pd3dCommandList, pCamera);
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);

@@ -38,7 +38,7 @@ public:
 	Model_Animation				*character_anim;
 	PlayerShader				*m_pPlayerShader[MAX_USER];
 
-	CModelShader				*m_MapShader[2];
+	CModelShader				*m_MapShader[3] = { NULL, };
 	LoadModel					**Map_Model;
 
 	Map_Macaron_Shader			*m_Map_ObjectShader[1];
