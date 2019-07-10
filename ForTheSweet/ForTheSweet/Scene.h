@@ -44,6 +44,9 @@ public:
 	Map_Macaron_Shader			*m_Map_ObjectShader[1];
 	bool						macaron_flag = true;
 
+	int							ready_state	= UI_READY;
+	float						ready_state_test = 0.3f;
+
 	CottonCloudShader			*m_CottonShader[2];
 
 	WeaponShader				*m_WeaponShader[WEAPON_MAX_NUM];
@@ -59,6 +62,8 @@ public:
 	//UI
 	vector<UIShader*>			m_ppUIShaders;
 	UINT						m_nUIShaders;
+	
+	MessageShader				*pMes_Weapon = NULL;
 protected:
 	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다.
 	//CGameObject * *m_ppObjects = NULL;

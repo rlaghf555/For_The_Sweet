@@ -116,3 +116,47 @@ public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 	virtual void SetTime(int t);	//√ (sec) ¥‹¿ß
 };
+
+class UIDotShader : public UIShader
+{
+public:
+	UIDotShader() { };
+	~UIDotShader() { };
+
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+};
+
+class UIReadyShader : public UIShader
+{
+public:
+	UIReadyShader() { };
+	~UIReadyShader() { };
+
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+};
+
+class UIFightShader : public UIShader
+{
+public:
+	UIFightShader() { };
+	~UIFightShader() { };
+
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+};
+
+class MessageShader : public UIShader
+{
+public:
+	bool Shader_flag = true;
+	int	m_test_flag = 0;
+public:
+	MessageShader() { };
+	~MessageShader() { };
+
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+	virtual void Animate(float fTimeElapsed, bool flag);
+};

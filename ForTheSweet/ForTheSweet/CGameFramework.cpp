@@ -955,6 +955,25 @@ void CGameFramework::ProcessInput()
 		}
 		else m_pPlayer->SetScale(1.0f);
 		
+		if (m_pScene->ready_state != UI_NONE) {
+			if (m_pScene->ready_state == UI_READY) {
+				if (m_pScene->ready_state_test < 10)
+					m_pScene->ready_state_test += m_pScene->ready_state_test * m_GameTimer.GetTimeElapsed();
+				else {
+					m_pScene->ready_state = UI_FIGHT;
+					m_pScene->ready_state_test = 0.3f;
+				}
+			}
+			if (m_pScene->ready_state == UI_FIGHT) {
+				if (m_pScene->ready_state_test < 2)
+					m_pScene->ready_state_test += m_pScene->ready_state_test * m_GameTimer.GetTimeElapsed();
+				else {
+					m_pScene->ready_state = UI_NONE;
+					m_pScene->ready_state_test = 0.3f;
+				}
+			}
+		}
+
 		if (m_pPlayer->Get_Weapon_grab()) {
 			if (type == M_Weapon_Lollipop) {
 				if (Key_A || Key_S) {
@@ -1477,7 +1496,7 @@ void CGameFramework::FrameAdvance()
 	
 	ProcessInput();
 	UpdateProcess();
-
+	
 	if (SERVER_ON) {
 		m_pPhysx->m_Scene->simulate(1.f / 60.f);
 		m_pPhysx->m_Scene->fetchResults(true);

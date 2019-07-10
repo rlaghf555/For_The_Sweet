@@ -110,7 +110,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
 {
 	m_ppUIShaders.clear();
-	m_nUIShaders = 9;
+	m_nUIShaders = 12;
 	m_ppUIShaders.resize(m_nUIShaders);
 
 	//UIShader* pSample = new UIShader();
@@ -121,32 +121,22 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 	for (int i = 0; i < 4; i++) {
 		UIHPBarShader* pHPBar = new UIHPBarShader();
 		pHPBar->BuildObjects(pDevice, pCommandList, 1);
-		//XMFLOAT2 pos = XMFLOAT2(0.25*(i+1)-0.12, 0.1);
-		//
-		//pHPBar->SetPosScreenRatio(pos, 0);
-		//pHPBar->SetPosScreenRatio(pos, 1);
-		//pHPBar->SetPosScreenRatio(pos, 2);
 		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 150);
 		pHPBar->SetPos(&pos, 0);
-		pos = XMFLOAT2(172 + i * 313, 155);
+		pos = XMFLOAT2(172 + i * 313, 156);
 		pHPBar->SetPos(&pos, 1);
-		pos = XMFLOAT2(172 + i * 313, 125);
+		pos = XMFLOAT2(172 + i * 313, 136);
 		pHPBar->SetPos(&pos, 2);
 		m_ppUIShaders[i] = pHPBar;
 	}
 	for (int i = 0; i < 4; i++) {
 		UIHPBarShader* pHPBar = new UIHPBarShader();
 		pHPBar->BuildObjects(pDevice, pCommandList, 1);
-		//XMFLOAT2 pos = XMFLOAT2(0.25*(i+1)-0.12, 0.1);
-		//
-		//pHPBar->SetPosScreenRatio(pos, 0);
-		//pHPBar->SetPosScreenRatio(pos, 1);
-		//pHPBar->SetPosScreenRatio(pos, 2);
 		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 50);
 		pHPBar->SetPos(&pos, 0);
-		pos = XMFLOAT2(172 + i * 313, 55);
+		pos = XMFLOAT2(172 + i * 313, 56);
 		pHPBar->SetPos(&pos, 1);
-		pos = XMFLOAT2(172 + i * 313, 25);
+		pos = XMFLOAT2(172 + i * 313, 36);
 		pHPBar->SetPos(&pos, 2);
 		m_ppUIShaders[i + 4] = pHPBar;
 	}
@@ -157,6 +147,26 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 	pTime->BuildObjects(pDevice, pCommandList, 1);
 	m_ppUIShaders[8] = pTime;
 	m_ppUIShaders[8]->SetTime(300);
+
+	UIDotShader* pDot = new UIDotShader();
+	pDot->BuildObjects(pDevice, pCommandList);
+	m_ppUIShaders[9] = pDot;
+
+	UIReadyShader* pReady = new UIReadyShader();
+	pReady->BuildObjects(pDevice, pCommandList);
+	XMFLOAT2 pos = XMFLOAT2(640, 400);
+	pReady->SetPos(&pos, 0);
+	m_ppUIShaders[10] = pReady;
+
+	UIFightShader* pFight = new UIFightShader();
+	pFight->BuildObjects(pDevice, pCommandList);
+	pFight->SetPos(&pos, 0);
+	m_ppUIShaders[11] = pFight;
+
+	pMes_Weapon = new MessageShader();
+	pMes_Weapon->BuildObjects(pDevice, pCommandList);
+	pos = XMFLOAT2(-100, 600);
+	pMes_Weapon->SetPos(&pos, 0);
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -302,9 +312,14 @@ void CScene::ReleaseObjects()
 			m_ppUIShaders[i]->ReleaseShaderVariables();
 			m_ppUIShaders[i]->ReleaseObjects();
 			delete m_ppUIShaders[i];
-
 		}
 	}
+	if (pMes_Weapon) {
+		pMes_Weapon->ReleaseShaderVariables();
+		pMes_Weapon->ReleaseObjects();
+		delete pMes_Weapon;
+	}
+	
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -389,6 +404,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 		m_WavesShader->Animate(fTimeElapsed);
 	}
+
+	pMes_Weapon->Animate(1.f, pMes_Weapon->Shader_flag);
 }
 
 void CScene::AnimateWeapon(int i)
@@ -493,6 +510,12 @@ void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComma
 {
 	//for (UINT i = 0; i < m_nUIShaders - 2; ++i)
 	//	m_ppUIShaders[i]->Render(pCommandList);
-	for (UINT i = 0; i < m_nUIShaders; ++i)
-		m_ppUIShaders[i]->Render(pCommandList);
+	for (UINT i = 0; i < m_nUIShaders; ++i) {
+		if (i == 10 || i == 11) {
+			if(ready_state == UI_READY) m_ppUIShaders[10]->Render(pCommandList);
+			else if(ready_state == UI_FIGHT) m_ppUIShaders[11]->Render(pCommandList);
+		}
+		else m_ppUIShaders[i]->Render(pCommandList);
+	}
+	if(pMes_Weapon) pMes_Weapon->Render(pCommandList);
 }

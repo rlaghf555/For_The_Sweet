@@ -39,17 +39,22 @@ public:
 	virtual void SetEnabled(bool enable) { m_bEnabled = enable; }
 	virtual void SetScreenSize(XMFLOAT2 size);
 	virtual void SetPosition(XMFLOAT2 pos);
+	virtual void SetPosition(float x, float y)
+	{
+		m_xmf2ScreenPos.x = x;
+		m_xmf2ScreenPos.x = y;
+	}
 	virtual void SetScale(XMFLOAT2& scale);
 	virtual void SetSize(XMUINT2& size);
 	virtual void SetAlpha(float alpha);
 	virtual void SetNumSprite(XMUINT2& numSprite, XMUINT2& nowSprite);
 	virtual void SetHP(float hp) {}
 	virtual void SetType(UINT type) { m_nTexType = type; }
+	virtual XMFLOAT2 GetPos() { return m_xmf2ScreenPos; }
 
 public:
-
 	bool										m_bEnabled = true;
-	float										m_fAnimationTime;
+	float										m_fAnimationTime = 0.3f;
 	D3D12_GPU_DESCRIPTOR_HANDLE					m_d3dCbvGPUDescriptorHandle;
 
 	XMFLOAT2	m_xmf2ScreenPos;
