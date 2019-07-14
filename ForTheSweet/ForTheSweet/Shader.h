@@ -95,6 +95,7 @@ public:
 protected:
 	vector<CGameObject* >	m_ppObjects;
 	vector<ModelObject* >	m_bbObjects;
+	CMaterial							*m_pMaterial = NULL;
 	int m_nObjects = 0;
 };
 
@@ -117,7 +118,7 @@ protected:
 
 	vector<D3D12_INPUT_ELEMENT_DESC>				m_pInputElementDesc;
 	//vector<CGameObject* >							m_ppObjects;
-	CMaterial										*m_pMaterial = NULL;
+	//CMaterial										*m_pMaterial = NULL;
 
 	UINT											m_nObjects = 0;
 	UINT											m_nPSO = 1;

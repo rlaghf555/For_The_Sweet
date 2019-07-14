@@ -430,7 +430,13 @@ void UIShader::ReleaseObjects()
 		if (m_pUIObjects[i])
 			delete m_pUIObjects[i];
 	}
-	m_pUIObjects.clear();
+	//m_pUIObjects.clear();
+}
+
+void UIShader::ReleaseShaderVariables()
+{
+	if (m_ObjectCB)
+		m_ObjectCB->~UploadBuffer();
 }
 
 void UIShader::OnPrepareRender(ID3D12GraphicsCommandList * pd3dCommandList, int index)

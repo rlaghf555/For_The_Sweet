@@ -58,13 +58,13 @@ LoadModel::LoadModel(const string& fileName, bool isStatic)
 		InitScene();
 
 		m_ModelMeshes.resize(m_meshes.size());
-		if (strcmp(fileName.c_str(), "./resource/map/map_1.FBX") != 0) {
-			BoundingOrientedBox::CreateFromPoints(boundingbox, m_possize, m_pos, sizeof(XMFLOAT3));
-			//corners = new XMFLOAT3[8];
-			//boundingbox.GetCorners(corners);
-
-		}
-		delete[] m_pos;
+		//if (strcmp(fileName.c_str(), "./resource/map/map_1.FBX") != 0) {
+		//	BoundingOrientedBox::CreateFromPoints(boundingbox, m_possize, m_pos, sizeof(XMFLOAT3));
+		//	//corners = new XMFLOAT3[8];
+		//	//boundingbox.GetCorners(corners);
+		//
+		//}
+		//delete[] m_pos;
 	}
 
 }
@@ -77,7 +77,7 @@ LoadModel::LoadModel(const LoadModel & T)
 
 	m_numVertices = T.m_numVertices;
 	m_numBones = T.m_numBones;
-	boundingbox = T.boundingbox;
+	//boundingbox = T.boundingbox;
 }
 
 inline void CalculateTangentArray(UINT vertexCount, vector<vertexDatas>& vertices, long triangleCount, vector<int>& indeies)
@@ -147,8 +147,34 @@ inline void CalculateTangentArray(UINT vertexCount, vector<vertexDatas>& vertice
 
 LoadModel::~LoadModel()
 {
-	m_meshes.clear();
-	delete m_pScene;
+	//for (int i = 0; i < m_meshes.size(); i++) {
+	//
+	//	m_meshes[i].~mesh();
+	//}
+	if (m_meshes.size() > 0) {
+		vector<mesh> a;
+		m_meshes.swap(a);
+		a.clear();
+		m_meshes.clear();
+	//	cout << "LoadModel m_meshes.clear()" << endl;
+	}
+	if (m_pScene) {
+		m_pScene->~aiScene();
+	}
+
+
+	//for (UINT i = 0; i < m_ModelMeshes.size(); ++i) {
+	//	m_ModelMeshes[i]->Release();
+	//}
+	//if (m_ModelMeshes.size() > 0) {
+	//	vector<ModelMesh*> a;
+	//	m_ModelMeshes.swap(a);
+	//	a.clear();
+	//	m_ModelMeshes.clear();
+	//}
+	//if (m_Bones.size() > 0) {
+	//	m_Bones.clear();
+	//}
 }
 
 void LoadModel::InitScene()
@@ -169,7 +195,7 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 	m_meshes[index].m_vertices.reserve(pMesh->mNumVertices);
 	m_meshes[index].m_indices.reserve(pMesh->mNumFaces * 3);
 	//삼각형이므로 면을 이루는 꼭지점 3개
-	m_pos = new XMFLOAT3[pMesh->mNumVertices];
+	//m_pos = new XMFLOAT3[pMesh->mNumVertices];
 	m_possize = pMesh->mNumVertices;
 	for (UINT i = 0; i < pMesh->mNumVertices; ++i) {
 		XMFLOAT3 zero_3(0.0f, 0.0f, 0.0f);
@@ -178,8 +204,8 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 		pos.y = pMesh->mVertices[i].y;
 		pos.z = pMesh->mVertices[i].z;
 
-		const XMFLOAT3 pos_p = pos;
-		m_pos[i] = pos_p;
+		//const XMFLOAT3 pos_p = pos;
+		//m_pos[i] = pos_p;
 
 		XMFLOAT3 normal(0.0f, 0.0f, 0.0f);
 		normal.x = pMesh->mNormals[i].x;

@@ -269,14 +269,42 @@ void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComma
 
 void CObjectsShader::ReleaseObjects()
 {
+	if (m_pMaterial) {
+		m_pMaterial->ReleaseShaderVariables();
+		m_pMaterial->ReleaseUploadBuffers();
+		m_pMaterial->Release();
+		//delete m_pMaterial;
+	}
 	if (m_ppObjects.size())
 	{
-		for (int j = 0; j < m_nObjects; j++)
-		{
-			if (m_ppObjects[j]) delete m_ppObjects[j];
-		}
-		
+		//vector<CGameObject*> a;
+		//m_ppObjects.swap(a);
+		//a.clear();
+		//m_ppObjects.clear();
+		//for (int j = 0; j < m_ppObjects.size(); j++)
+		//{
+		//	if (m_ppObjects[j])
+		//		delete m_ppObjects[j];
+		//}
+		//m_ppObjects[0]->Release();
+
 	}
+	//if (m_bbObjects.size()>0)
+	//{
+	//	vector<ModelObject*> a;
+	//	m_bbObjects.swap(a);
+	//	a.clear();
+	//	m_bbObjects.clear();
+	//}
+	//
+	for (int j = 0; j < m_bbObjects.size(); j++)
+	{
+		if (m_bbObjects[j]) {
+			delete m_bbObjects[j];
+		}
+
+	}
+	m_bbObjects.clear();
 }
 
 void CObjectsShader::AnimateObjects(float fTimeElapsed)
@@ -778,6 +806,8 @@ void CModelShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommand
 
 void CModelShader::ReleaseShaderVariables()
 {
+	if (m_ObjectCB)
+		m_ObjectCB->~UploadBuffer();
 }
 
 void CModelShader::CreatePipelineParts()

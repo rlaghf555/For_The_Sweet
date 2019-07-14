@@ -57,7 +57,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//Character_Model = new LoadModel("main_character.FBX", false);
 
 	BuildRootSignature(pd3dDevice, pd3dCommandList);
-
+	animate_flag = Selected_Map;
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		m_pPlayerShader[i] = new PlayerShader(character_anim);
@@ -65,7 +65,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_pPlayer[i] = reinterpret_cast<CPlayer*>(m_pPlayerShader[i]->getPlayer());
 	}
 
-	if (Map_SELECT == M_Map_1) {
+	if (Selected_Map == M_Map_1) {
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_1]);
 		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1);
 
@@ -85,7 +85,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_1);
 		}
 	}
-	if (Map_SELECT == M_Map_2) {
+	if (Selected_Map == M_Map_2) {
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_2]);
 		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2);
 
@@ -104,7 +104,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
 		}
 	}
-	if (Map_SELECT == M_Map_3) {
+	if (Selected_Map == M_Map_3) {
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_3]);
 		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3);
 		m_MapShader[1] = new CModelShader(Map_Model[M_Map_3]);
@@ -458,17 +458,17 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			weapon_box[i][j]->getObjects()->m_xmf4x4World = m_WeaponShader[i]->getObject(j)->m_xmf4x4World;
 	}
 	
-	if (Map_SELECT == M_Map_1) {
+	if (Selected_Map == M_Map_1) {
 		if (m_WeaponShader[M_Weapon_cupcake]->get_cupcake_up_flag() == false)
 			m_WeaponShader[M_Weapon_cupcake]->Animate(fTimeElapsed, animate_flag, M_Weapon_cupcake);
 
 		m_MapShader[2]->Animate(fTimeElapsed, animate_flag);
 	}
-	if (Map_SELECT == M_Map_3) {
+	if (Selected_Map == M_Map_3) {
 		m_MapShader[7]->Animate(fTimeElapsed, animate_flag);
 	}
 
-	m_WavesShader->Animate(fTimeElapsed, Map_SELECT);
+	m_WavesShader->Animate(fTimeElapsed, Selected_Map);
 	
 	for (int i = 0; i < m_nUIShaders; i++) {
 		if (m_ppUIShaders[i]) {
@@ -556,12 +556,12 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
 
-	if (Map_SELECT == M_Map_1) {
+	if (Selected_Map == M_Map_1) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[2]) m_MapShader[2]->Render(pd3dCommandList, pCamera);
 	}
-	if (Map_SELECT == M_Map_2) {
+	if (Selected_Map == M_Map_2) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[2]) m_MapShader[2]->Render(pd3dCommandList, pCamera);
@@ -569,7 +569,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[4]) m_MapShader[4]->Render(pd3dCommandList, pCamera);
 		//if (m_Map_ObjectShader[0]) m_Map_ObjectShader[0]->Render(pd3dCommandList, pCamera);
 	}
-	if (Map_SELECT == M_Map_3) {
+	if (Selected_Map == M_Map_3) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[2]) m_MapShader[2]->Render(pd3dCommandList, pCamera);
@@ -583,7 +583,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 
-	if (Map_SELECT == M_Map_1) {
+	if (Selected_Map == M_Map_1) {
 		for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
 	}
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);

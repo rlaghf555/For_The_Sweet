@@ -78,7 +78,7 @@ public:
 
 public:
 	CPhysx();
-	~CPhysx() = default;
+	~CPhysx();
 
 	void initPhysics();
 	void move(DWORD direction, float distance);

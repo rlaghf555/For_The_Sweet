@@ -17,6 +17,12 @@ char * ConvertWCtoC(wchar_t* str)
 }
 CGameFramework::CGameFramework()
 {
+	
+}
+
+//다음 함수는 응용 프로그램이 실행되어 주 윈도우가 생성되면 호출된다는 것에 유의하라.
+bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
+{
 	_tcscpy_s(m_pszFrameRate, _T("ForTheSweet("));
 
 	m_pdxgiFactory = NULL;
@@ -53,15 +59,12 @@ CGameFramework::CGameFramework()
 	//m_nFenceValue = 0;
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
-	
+
 	Character_Model = NULL;
 
 	m_pPhysx = NULL;
-}
 
-//다음 함수는 응용 프로그램이 실행되어 주 윈도우가 생성되면 호출된다는 것에 유의하라.
-bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
-{
+	//-----------------------------------------초기화
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
 	//Direct3D 디바이스, 명령 큐와 명령 리스트, 스왑 체인 등을 생성하는 함수를 호출한다.
@@ -132,6 +135,18 @@ void CGameFramework::OnDestroy()
 	if (m_pdxgiSwapChain) m_pdxgiSwapChain->Release();
 	if (m_pd3dDevice) m_pd3dDevice->Release();
 	if (m_pdxgiFactory) m_pdxgiFactory->Release();
+
+	if (m_pPhysx) delete m_pPhysx;
+
+	for (int i = 0; i < 12; i++) {
+		if(Map_Model[i])
+			delete Map_Model[i];
+	}
+	for (int i = 0; i < 7; i++) {
+		if (weapon[i])
+			delete weapon[i];
+	}
+	DestroyWindow(m_hWnd);
 }
 
 void CGameFramework::CreateSwapChain()
@@ -567,6 +582,12 @@ void CGameFramework::BuildObjects()
 		m_pScene->SetMap(Map_Model);
 		m_pScene->SetWeapon(weapon);
 
+		if (selected_map == 1)
+			selected_map = M_Map_2;
+		else if (selected_map == 2)
+			selected_map = M_Map_3;
+		m_pScene->Selected_Map = selected_map;
+
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 		m_pScene->BuildUI(m_pd3dDevice, m_pd3dCommandList);
 	}
@@ -771,9 +792,30 @@ void CGameFramework::ProcessInput()
 	// 0x0001 : 이전에 누른적이 있고, 호출 시점에도 눌려있지 않은 상태
 	// 0x8000 : 이전에 누른적이 없고, 호출 시점에는 눌려있는 상태
 	// 0x8001 : 이전에 누른적이 있고, 호출 시점에도 눌려있는 상태
+	
+	//UI 시간 임시
+	if (m_pScene->ready_state != UI_NONE) {
+		if (m_pScene->ready_state == UI_READY) {
+			if (m_pScene->ready_state_test < 10)
+				m_pScene->ready_state_test += m_pScene->ready_state_test * m_GameTimer.GetTimeElapsed();
+			else {
+				m_pScene->ready_state = UI_FIGHT;
+				m_pScene->ready_state_test = 0.3f;
+			}
+		}
+		if (m_pScene->ready_state == UI_FIGHT) {
+			if (m_pScene->ready_state_test < 2)
+				m_pScene->ready_state_test += m_pScene->ready_state_test * m_GameTimer.GetTimeElapsed();
+			else {
+				m_pScene->ready_state = UI_NONE;
+				m_pScene->ready_state_test = 0.3f;
+			}
+		}
+	}
 
 	if (SERVER_ON)
 	{
+		if(m_pPlayer)
 		if (::GetFocus())
 		{
 			char status = m_pPlayer->GetStatus();
@@ -1107,24 +1149,7 @@ void CGameFramework::ProcessInput()
 		}
 		else m_pPlayer->SetScale(1.0f);
 		
-		if (m_pScene->ready_state != UI_NONE) {
-			if (m_pScene->ready_state == UI_READY) {
-				if (m_pScene->ready_state_test < 10)
-					m_pScene->ready_state_test += m_pScene->ready_state_test * m_GameTimer.GetTimeElapsed();
-				else {
-					m_pScene->ready_state = UI_FIGHT;
-					m_pScene->ready_state_test = 0.3f;
-				}
-			}
-			if (m_pScene->ready_state == UI_FIGHT) {
-				if (m_pScene->ready_state_test < 2)
-					m_pScene->ready_state_test += m_pScene->ready_state_test * m_GameTimer.GetTimeElapsed();
-				else {
-					m_pScene->ready_state = UI_NONE;
-					m_pScene->ready_state_test = 0.3f;
-				}
-			}
-		}
+	
 
 		if (m_pPlayer->Get_Weapon_grab()) {
 			if (type == M_Weapon_Lollipop) {

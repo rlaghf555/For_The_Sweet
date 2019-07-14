@@ -41,7 +41,7 @@ public:
 	CModelShader				*m_MapShader[8] = { NULL, };
 	LoadModel					**Map_Model;
 
-	int							animate_flag = Map_SELECT;
+	int							animate_flag = 0;
 
 	StairShader					*m_StairShader[2];
 	BridgeShader				*m_BridgeShader;
@@ -66,6 +66,9 @@ public:
 	UINT						m_nUIShaders;
 	
 	MessageShader				*pMes_Weapon = NULL;
+
+	int Selected_Map = 0;
+
 protected:
 	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다.
 	//CGameObject * *m_ppObjects = NULL;

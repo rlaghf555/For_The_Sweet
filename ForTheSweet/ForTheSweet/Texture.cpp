@@ -123,6 +123,8 @@ CMaterial::CMaterial()
 CMaterial::~CMaterial()
 {
 	if (m_pShader) m_pShader->Release();
+	if (m_pTexture)
+		m_pTexture.release();
 }
 
 void CMaterial::SetTexture(CTexture *pTexture)

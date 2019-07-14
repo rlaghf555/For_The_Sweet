@@ -92,10 +92,10 @@ private:
 	vector<mesh>               m_meshes;      //매쉬 정보
 	vector<ModelMesh*>            m_ModelMeshes;   //매쉬 정보 리소스(for 랜더링)
 	vector<pair<string, Bone>>      m_Bones;      //뼈 정보
-	XMFLOAT3*                  m_pos;
+	//XMFLOAT3*                  m_pos;
 	UINT                     m_possize;
-	XMFLOAT3*                  corners;
-	BoundingOrientedBox            boundingbox;
+	//XMFLOAT3*                  corners;
+	//BoundingOrientedBox            boundingbox;
 	UINT                     m_numVertices;
 	UINT                     m_numBones;
 public:
@@ -114,6 +114,6 @@ public:
 	UINT                  getNumMesh() const { return (UINT)m_meshes.size(); }
 	vector<pair<string, Bone>>* GetBones() { return &m_Bones; }
 	UINT                  getNumVertices() const { return m_numVertices; }
-	BoundingOrientedBox getBoudingBox() const { return boundingbox; }
+//	BoundingOrientedBox getBoudingBox() const { return boundingbox; }
 
 };

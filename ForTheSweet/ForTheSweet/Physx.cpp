@@ -50,6 +50,33 @@ CPhysx::CPhysx()
 	m_PlayerController = NULL;
 }
 
+CPhysx::~CPhysx()
+{
+	if (m_PlayerController)
+		m_PlayerController->release();
+
+	if (m_PlayerManager)
+		m_PlayerManager->release();
+
+	if (m_Dispatcher)
+		m_Dispatcher->release();
+
+	if (m_Material)
+		m_Material->release();
+
+	if (m_Scene)
+		m_Scene->release();
+
+	if (m_Physics)
+		m_Physics->release();
+
+	if (m_Cooking)
+		m_Cooking->release();
+
+	if (m_Foundation)
+		m_Foundation->release();
+}
+
 void CPhysx::initPhysics()
 {
 	m_Foundation = PxCreateFoundation(PX_PHYSICS_VERSION, m_Allocator, m_ErrorCallback);

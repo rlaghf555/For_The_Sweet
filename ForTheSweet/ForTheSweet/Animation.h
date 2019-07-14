@@ -32,7 +32,7 @@ private:
 public:
 	LoadAnimation(string filename, float trigger, float skip);
 	LoadAnimation(const LoadAnimation& T);
-	~LoadAnimation() {}
+	~LoadAnimation();
 
 	void setBones(vector<pair<string, Bone>>* bones) {
 		m_Bones = *bones;

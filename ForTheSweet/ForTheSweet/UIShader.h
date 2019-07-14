@@ -41,6 +41,7 @@ public:
 	virtual void BuildPSO(ID3D12Device * pd3dDevice, UINT nRenderTargets, int index = 0);
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 	virtual void ReleaseObjects();
+	virtual void ReleaseShaderVariables();
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int index = 0);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void SetTimer(float apearTime, float existTime, float retreatTime);							// 등장 시간 Set
