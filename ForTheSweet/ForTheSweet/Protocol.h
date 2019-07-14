@@ -19,6 +19,8 @@ constexpr int CS_GUARD = 14;
 constexpr int CS_WEAK = 15;
 constexpr int CS_HARD = 16;
 constexpr int CS_JUMP = 17;
+constexpr int CS_DASH = 18;
+constexpr int CS_GUARD_OFF = 19;
 
 constexpr int SC_LOGIN = 1;
 constexpr int SC_POS = 2;
@@ -51,6 +53,7 @@ struct cs_packet_anim {
 	char size;
 	char type;
 	char key;
+	char count;
 };
 
 struct cs_packet_weapon {
@@ -75,7 +78,7 @@ struct sc_packet_pos {
 	float x, y, z;
 	float vx, vy, vz;
 	char ani_index;
-	float ani_frame;
+	char dashed;
 };
 
 struct sc_packet_put_player {
@@ -85,7 +88,7 @@ struct sc_packet_put_player {
 	float x, y, z;
 	float vx, vy, vz;
 	char ani_index;
-	float ani_frame;
+	char dashed;
 };
 
 struct sc_packet_anim {
@@ -93,7 +96,6 @@ struct sc_packet_anim {
 	char type;
 	char id;
 	char ani_index;
-	float ani_frame;
 };
 
 struct sc_packet_weapon {
@@ -110,5 +112,8 @@ struct sc_packet_remove {
 	char type;
 	char id;
 };
+
+
+
 
 #pragma pack (pop)

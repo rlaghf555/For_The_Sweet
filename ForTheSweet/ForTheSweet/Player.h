@@ -15,7 +15,16 @@
 
 using namespace physx;
 
-static PxF32 gJumpGravity = -80.0f;
+enum STATUS {
+	FREE,
+	WEAK_ATTACK,
+	HARD_ATTACK,
+	DEFENSE,
+	JUMP,
+	HITTED
+};
+
+static PxF32 gJumpGravity = -140.0f;
 
 class PlayerHitReport : public PxUserControllerHitReport {
 public:
@@ -59,8 +68,11 @@ protected:
 	float m_fRoll;
 
 	bool m_connected;
+	bool m_dashed = false;
 	bool weapon_grab = false;
 	bool Scale_flag = false;
+	char m_status = STATUS::FREE;
+
 	int weapon_index = -1;
 	int weapon_type = -1;
 	XMFLOAT3 m_xmf3Velocity;		//플레이어의 이동 속도를 나타내는 벡터이다.
@@ -79,6 +91,7 @@ public:
 	PxRigidActor* m_AttackTrigger;
 
 	Jump m_Jump;
+	Jump m_Fall;
 	
 	float Scale_time = 0.3f;
 
@@ -102,6 +115,10 @@ public:
 	XMFLOAT3 GetRightVector() { return(m_xmf3Right); }
 	bool GetConnected() { return(m_connected); }
 	void SetConnected(bool connected) { m_connected = connected; }
+	bool GetDashed() { return(m_dashed); }
+	void SetDashed(bool dashed) { m_dashed = dashed; }
+	char GetStatus() { return (m_status); }
+	void SetStatus(char status) { m_status = status; }
 
 	void SetPosition(XMFLOAT3& pos) { m_xmf3Position = pos; }
 	void SetFriction(float fFriction) { m_fFriction = fFriction; }

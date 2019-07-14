@@ -6,47 +6,37 @@
 
 using namespace physx;
 
-static PxF32 gJumpGravity = -80.0f;
+static PxF32 gJumpGravity = -140.0f;
 
-#define Anim_Idle 0
-#define Anim_Walk 1
-#define Anim_Weak_Attack1 2
-#define Anim_Weak_Attack2 3
-#define Anim_Weak_Attack3 4
-#define Anim_Hard_Attack1 5
-#define Anim_Hard_Attack2 6
-#define Anim_Guard 7
-#define Anim_PowerUp 8
-#define Anim_Jump 9
-
-#define Anim_Lollipop_Attack1 10
-#define Anim_Lollipop_Attack2 11
-#define Anim_Lollipop_Guard 12
-#define Anim_Lollipop_Hard_Attack 13
-#define Anim_Lollipop_Skill 14
-
-#define Anim_Small_React 15
-#define Anim_Pick_up 16
+enum STATUS {
+	FREE,
+	WEAK_ATTACK,
+	HARD_ATTACK,
+	DEFENSE,
+	JUMP,
+	HITTED
+};
 
 enum Anim {
 	Idle,
 	Walk,
+	Run,
+	Jump,
+	Guard,
+	Small_React,
+	Pick_Up,
+	PowerUp,
+	CupCake_Eat,
 	Weak_Attack1,
 	Weak_Attack2,
 	Weak_Attack3,
 	Hard_Attack1,
 	Hard_Attack2,
-	Guard,
-	PowerUp,
-	Jump,
 	Lollipop_Attack1,
 	Lollipop_Attack2,
 	Lollipop_Guard,
 	Lollipop_Hard_Attack,
-	Lollipop_Skill,
-	Small_React,
-	Pick_Up,
-	Run
+	Lollipop_Skill
 };
 
 class PlayerHitReport : public PxUserControllerHitReport {
@@ -84,18 +74,17 @@ public:
 	~CPlayer();
 
 	void move(int direction, float distance);
-	void animate(float eTime);
 
 	void setPlayerController(CPhysx *physx);
 	void setTrigger(CPhysx *physx);
 	void setPosition(PxVec3 pos);
 	void setVelocity(PxVec3 vel);
+	void setDashed(bool dashed);
 	void setLook(PxVec3 look);
 	void setAniIndex(char index);
-	void setAniFrame(float frame);
-	void setAniLoop(bool loop);
 	void setAniInfo(float *aniinfo);
-	void jumpstart() { m_Jump.startJump(70); }
+	void setStatus(char status);
+	void jumpstart() { m_Jump.startJump(120); }
 
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
 	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
@@ -109,16 +98,21 @@ public:
 	PlayerHitReport* m_HitReport;
 	PxRigidActor* m_AttackTrigger;
 	CJump m_Jump;
+	CJump m_Fall;
+	volatile bool m_dashed = false;
 	volatile bool hitted = false;
 
 	float m_AniInfo[MAX_ANIM];
 	bool m_AniLoop;
 
 	char m_AniIndex;
-	float m_AniFrame;
 
 	char weapon_type = -1;
 	char weapon_index = -1;
 	volatile bool weapon_send = false;
+
+	char m_status;
+	high_resolution_clock::time_point attack_time;
+	char attack_count = 0;
 };
 

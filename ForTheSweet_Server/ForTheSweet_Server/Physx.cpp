@@ -25,8 +25,6 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 							if (pairs[i].otherActor == player[j]->getControllerActor()) {
 								//cout << j << " Player Hitted\n";
 								player[j]->setAniIndex(Anim::Small_React);
-								player[j]->setAniFrame(0.0f);
-								player[j]->setAniLoop(false);
 								player[j]->hitted = true;
 							}
 						}

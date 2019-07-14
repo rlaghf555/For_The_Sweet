@@ -4,8 +4,12 @@
 #include <fstream>
 #include <vector>
 #include <thread>
+#include <chrono>
+#include <queue>
+#include <mutex>
 
 using namespace std;
+using namespace chrono;
 
 #include <winsock2.h>
 #include <windows.h>

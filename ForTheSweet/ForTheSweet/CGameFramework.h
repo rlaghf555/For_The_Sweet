@@ -6,16 +6,35 @@
 #include "Physx.h"
 #include "Socket.h"
 
+struct KEY {
+	bool key;
+	high_resolution_clock::time_point time;
+};
+
 class CGameFramework
 {
 public:
-	// Socket
-	bool state[5] = { false, false, false, false, false };
 	CSocket *m_pSocket;
-	//float cooltime = 0.f;
-	bool attackstate = false;
-	bool attackstate2 = false;
-	bool jumpstate = false;
+
+	bool move_state[5] = { false, false, false, false, false }; // ╩С, го, аб, ©Л, shift
+
+	bool weak_attack_state = false;
+	char weak_attack_count = 0;
+	high_resolution_clock::time_point weak_attack_time;
+
+	bool hard_attack_state = false;
+	char hard_attack_count = 0;
+	high_resolution_clock::time_point hard_attack_time;
+
+	bool jump_state = false;
+
+	bool defense_state = false;
+	bool defense_check = false;
+	bool defense_key;
+	high_resolution_clock::time_point defense_time;
+
+	vector<KEY> key_buffer;
+
 	char *m_pid, *m_pip;	//id, ip
 	// Physx
 	CPhysx *m_pPhysx;

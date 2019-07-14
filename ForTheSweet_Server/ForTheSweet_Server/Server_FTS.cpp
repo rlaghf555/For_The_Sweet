@@ -31,6 +31,26 @@ float gAniInfo[MAX_ANIM];
 CGameTimer gGameTimer;
 volatile bool start = false;
 
+enum EVENT_TYPE {
+	EV_FREE, EV_HIT,												// 플레이어에 해당
+	EV_WEAPON, EV_FOG, EV_FEVER, EV_LIGHTNING, EV_SLIME				// 심판에 해당
+};
+
+struct EVENT_ST {
+	int id;
+	EVENT_TYPE type;
+	high_resolution_clock::time_point start_time;
+	char attack_count;
+
+	constexpr bool operator < (const EVENT_ST& left) const
+	{
+		return (start_time > left.start_time);
+	}
+};
+
+priority_queue<EVENT_ST> timer_queue;
+mutex timer_l;
+
 struct OVER_EX {
 	WSAOVERLAPPED overlapped;
 	WSABUF dataBuffer;
@@ -82,6 +102,13 @@ void ErrorDisplay(const char * location)
 	error_display(location, WSAGetLastError());
 }
 
+void add_timer(int id, EVENT_TYPE et, high_resolution_clock::time_point start_time, char attack_count = 0)
+{
+	timer_l.lock();
+	timer_queue.push(EVENT_ST{ id, et, start_time, attack_count });
+	timer_l.unlock();
+}
+
 void do_recv(char id)
 {
 	DWORD flags = 0;
@@ -129,52 +156,87 @@ void sendPacket(char key, void *ptr)
 	}
 }
 
+void send_login_packet(char client) {
+	sc_packet_login p_login;
+	p_login.id = client;
+	p_login.x = PlayerInitPosition[client].x;
+	p_login.y = PlayerInitPosition[client].y;
+	p_login.z = PlayerInitPosition[client].z;
+	p_login.vx = 0.f;
+	p_login.vy = 0.f;
+	p_login.vz = 0.f;
+	p_login.type = SC_LOGIN;
+	p_login.size = sizeof(sc_packet_login);
+
+	sendPacket(client, &p_login);
+}
+
+void send_put_player_packet(char client, char new_id) {
+	sc_packet_put_player p_put;
+	p_put.id = new_id;
+	p_put.x = clients[new_id].playerinfo->m_Pos.x;
+	p_put.y = clients[new_id].playerinfo->m_Pos.y;
+	p_put.z = clients[new_id].playerinfo->m_Pos.z;
+	p_put.vx = clients[new_id].playerinfo->m_Vel.x;
+	p_put.vy = clients[new_id].playerinfo->m_Vel.y;
+	p_put.vz = clients[new_id].playerinfo->m_Vel.z;
+	p_put.ani_index = clients[new_id].playerinfo->m_AniIndex;
+	p_put.dashed = clients[new_id].playerinfo->m_dashed;
+	p_put.type = SC_PUT_PLAYER;
+	p_put.size = sizeof(sc_packet_put_player);
+
+	sendPacket(client, &p_put);
+}
+
+void send_pos_packet(char client, char id) {
+	sc_packet_pos p_pos;
+	p_pos.id = id;
+	p_pos.x = clients[id].playerinfo->m_Pos.x;
+	p_pos.y = clients[id].playerinfo->m_Pos.y;
+	p_pos.z = clients[id].playerinfo->m_Pos.z;
+	p_pos.vx = clients[id].playerinfo->m_Vel.x;
+	p_pos.vy = clients[id].playerinfo->m_Vel.y;
+	p_pos.vz = clients[id].playerinfo->m_Vel.z;
+	p_pos.ani_index = clients[id].playerinfo->m_AniIndex;
+	p_pos.dashed = clients[id].playerinfo->m_dashed;
+	p_pos.type = SC_POS;
+	p_pos.size = sizeof(sc_packet_pos);
+
+	sendPacket(client, &p_pos);
+}
+
+void send_remove_player_packet(char client, int id) {
+
+}
+
+void send_anim_packet(char client, char id) {
+	sc_packet_anim p_anim;
+	p_anim.type = SC_ANIM;
+	p_anim.size = sizeof(sc_packet_anim);
+	p_anim.id = id;
+	p_anim.ani_index = clients[id].playerinfo->m_AniIndex;
+
+	sendPacket(client, &p_anim);
+}
+
 void process_packet(char key, char *buffer)
 {
 	char Anim_Index;
-	float Anim_Time;
-
-	float vx;
-	float vz;
-	float velocity;
 
 	switch (buffer[1]) {
 	case CS_CONNECT:
 		cout << "[" << int(key) << "] Clients Login\n";
-		sc_packet_login p_login;
-		p_login.id = key;
-		p_login.x = PlayerInitPosition[key].x;
-		p_login.y = PlayerInitPosition[key].y;
-		p_login.z = PlayerInitPosition[key].z;
-		p_login.vx = 0.f;
-		p_login.vy = 0.f;
-		p_login.vz = 0.f;
-		p_login.type = SC_LOGIN;
-		p_login.size = sizeof(sc_packet_login);
-
-		sc_packet_put_player p_put;
-		p_put.id = key;
-		p_put.x = PlayerInitPosition[key].x;
-		p_put.y = PlayerInitPosition[key].y;
-		p_put.z = PlayerInitPosition[key].z;
-		p_put.vx = 0.f;
-		p_put.vy = 0.f;
-		p_put.vz = 0.f;
-		p_put.ani_index = Anim::Idle;
-		p_put.ani_frame = 0.0f;
-		p_put.type = SC_PUT_PLAYER;
-		p_put.size = sizeof(sc_packet_put_player);
 
 		clients[key].playerinfo->setPosition(PlayerInitPosition[key]);
 		clients[key].playerinfo->setVelocity(PxVec3(0, 0, 0));
 		clients[key].playerinfo->setLook(PxVec3(0, 0, 1));
+		clients[key].playerinfo->setDashed(false);
 		clients[key].playerinfo->setPlayerController(gPhysx);
 		clients[key].playerinfo->setTrigger(gPhysx);
 		gPhysx->registerPlayer(clients[key].playerinfo, key);
 		clients[key].connected = true;
 
-		cout << "Login Packet Send\n";
-		sendPacket(key, &p_login);
+		send_login_packet(key);
 
 		// 자신(key)과 다른 클라에게 자기 위치 정보 Send
 		for (int i = 0; i < MAX_USER; ++i)
@@ -183,8 +245,8 @@ void process_packet(char key, char *buffer)
 			{
 				if (i != key)
 				{
-					cout << "Put Packet Send\n";
-					sendPacket(i, &p_put);
+					//cout << "Put Packet Send\n";
+					send_put_player_packet(i, key);
 				}
 			}
 		}
@@ -195,18 +257,7 @@ void process_packet(char key, char *buffer)
 			{
 				if (i != key)
 				{
-					p_put.id = i;
-					p_put.x = clients[i].playerinfo->m_Pos.x;
-					p_put.y = clients[i].playerinfo->m_Pos.y;
-					p_put.z = clients[i].playerinfo->m_Pos.z;
-					p_put.vx = clients[i].playerinfo->m_Vel.x;
-					p_put.vy = clients[i].playerinfo->m_Vel.y;
-					p_put.vz = clients[i].playerinfo->m_Vel.z;
-					p_put.ani_index = clients[i].playerinfo->m_AniIndex;
-					p_put.ani_frame = clients[i].playerinfo->m_AniFrame;
-					p_put.type = SC_PUT_PLAYER;
-					p_put.size = sizeof(sc_packet_put_player);
-					sendPacket(key, &p_put);
+					send_put_player_packet(key, i);
 				}
 			}
 		}
@@ -217,143 +268,166 @@ void process_packet(char key, char *buffer)
 		break;
 
 	case CS_MOVE:
+	{
 		cs_packet_move *p_move;
 		p_move = reinterpret_cast<cs_packet_move*>(buffer);
 
-		if (p_move->key == CS_UP && p_move->state == 0) {  // forward
-			clients[key].playerinfo->m_Vel.z = 0.f;
+		if (p_move->state == 0)
+		{
+			if (p_move->key == CS_UP) {  // forward
+				clients[key].playerinfo->m_Vel.z -= 1.f;
+			}
+			else if (p_move->key == CS_DOWN) {   // backward
+				clients[key].playerinfo->m_Vel.z += 1.f;
+			}
+			else if (p_move->key == CS_LEFT) {   // left
+				clients[key].playerinfo->m_Vel.x += 1.f;
+			}
+			else if (p_move->key == CS_RIGHT) {   // right
+				clients[key].playerinfo->m_Vel.x -= 1.f;
+			}
 		}
-		if (p_move->key == CS_DOWN && p_move->state == 0) {   // backward
-			clients[key].playerinfo->m_Vel.z = 0.f;
-		}
-		if (p_move->key == CS_LEFT && p_move->state == 0) {   // left
-			clients[key].playerinfo->m_Vel.x = 0.f;
-		}
-		if (p_move->key == CS_RIGHT && p_move->state == 0) {   // right
-			clients[key].playerinfo->m_Vel.x = 0.f;
-		}
-		if (p_move->key == CS_UP && p_move->state == 1) {  // forward
-			clients[key].playerinfo->m_Vel.z = 1.f;
-		}
-		if (p_move->key == CS_DOWN && p_move->state == 1) {   // backward
-			clients[key].playerinfo->m_Vel.z = -1.f;
-		}
-		if (p_move->key == CS_LEFT && p_move->state == 1) {   // left
-			clients[key].playerinfo->m_Vel.x = -1.f;
-		}
-		if (p_move->key == CS_RIGHT && p_move->state == 1) {   // right
-			clients[key].playerinfo->m_Vel.x = 1.f;
-		}
-		if (p_move->key == CS_UP && p_move->state == 2) {  // forward
-			clients[key].playerinfo->m_Vel.z = 2.f;
-		}
-		if (p_move->key == CS_DOWN && p_move->state == 2) {   // backward
-			clients[key].playerinfo->m_Vel.z = -2.f;
-		}
-		if (p_move->key == CS_LEFT && p_move->state == 2) {   // left
-			clients[key].playerinfo->m_Vel.x = -2.f;
-		}
-		if (p_move->key == CS_RIGHT && p_move->state == 2) {   // right
-			clients[key].playerinfo->m_Vel.x = 2.f;
+		else if (p_move->state == 1) {
+			if (p_move->key == CS_UP) {  // forward
+				clients[key].playerinfo->m_Vel.z += 1.f;
+			}
+			if (p_move->key == CS_DOWN) {   // backward
+				clients[key].playerinfo->m_Vel.z -= 1.f;
+			}
+			if (p_move->key == CS_LEFT) {   // left
+				clients[key].playerinfo->m_Vel.x -= 1.f;
+			}
+			if (p_move->key == CS_RIGHT) {   // right
+				clients[key].playerinfo->m_Vel.x += 1.f;
+			}
 		}
 
-		if (p_move->state == 2) {
-			clients[key].playerinfo->setVelocity(Normalize(clients[key].playerinfo->m_Vel) * 2);
+		if (p_move->key == CS_DASH)
+		{
+			if (p_move->state == 1) {
+				clients[key].playerinfo->m_dashed = true;
+			}
+			else if (p_move->state == 0) {
+				clients[key].playerinfo->m_dashed = false;
+			}
+		}
+
+		PxVec3 vel;
+
+		vel = clients[key].playerinfo->m_Vel;
+
+
+		if (vel.isZero()) {
+			clients[key].playerinfo->setAniIndex(Anim::Idle);
 		}
 		else {
-			clients[key].playerinfo->setVelocity(Normalize(clients[key].playerinfo->m_Vel));
-		}
+			if (clients[key].playerinfo->m_dashed) {
+				clients[key].playerinfo->setAniIndex(Anim::Run);
+				clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
+			}
+			else {
+				clients[key].playerinfo->setAniIndex(Anim::Walk);
+				clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
+			}
 
-		vx = clients[key].playerinfo->m_Vel.x;
-		vz = clients[key].playerinfo->m_Vel.z;
-		velocity = sqrt((vx*vx) + (vz*vz));
-
-		if (velocity == 0.0f) {
-			clients[key].playerinfo->m_AniIndex = Anim::Idle;
 		}
-		else if (velocity > 0.f && velocity < 1.5f) {
-			clients[key].playerinfo->m_AniIndex = Anim::Walk;
-			clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
-		}
-		else if (velocity >= 1.5f) {
-			clients[key].playerinfo->m_AniIndex = Anim::Run;
-			clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
-		}
-		clients[key].playerinfo->m_AniFrame = 0.0f;
 
 		//cout << "[" << int(key) << "] Clients Move => " << clients[key].playerinfo->m_Vel.x << ","
 		//	<< clients[key].playerinfo->m_Vel.y << "," << clients[key].playerinfo->m_Vel.z << "\n";
-
-		sc_packet_pos p_pos;
-		p_pos.id = key;
-		p_pos.x = clients[key].playerinfo->m_Pos.x;
-		p_pos.y = clients[key].playerinfo->m_Pos.y;
-		p_pos.z = clients[key].playerinfo->m_Pos.z;
-		p_pos.vx = clients[key].playerinfo->m_Vel.x;
-		p_pos.vy = clients[key].playerinfo->m_Vel.y;
-		p_pos.vz = clients[key].playerinfo->m_Vel.z;
-		p_pos.ani_index = clients[key].playerinfo->m_AniIndex;
-		p_pos.ani_frame = clients[key].playerinfo->m_AniFrame;
-		p_pos.type = SC_POS;
-		p_pos.size = sizeof(sc_packet_pos);
-
 		//cout << p_pos.vx << "," << p_pos.vy << "," << p_pos.vz << endl;
 
 		// Move한 정보를 브로드캐스팅
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			if (clients[i].connected == true)
-				sendPacket(i, &p_pos);
+				send_pos_packet(i, key);
 		}
 		break;
+	}
 
 	case CS_ATTACK:
 		cs_packet_anim *p_anim;
 		p_anim = reinterpret_cast<cs_packet_anim*>(buffer);
 
 		Anim_Index = clients[key].playerinfo->m_AniIndex;
-		Anim_Time = clients[key].playerinfo->m_AniFrame;
 
 		if (p_anim->key == CS_JUMP) {
+			cout << "jump" << endl;
 			clients[key].playerinfo->setAniIndex(Anim::Jump);
-			clients[key].playerinfo->setAniFrame(0.0f);
-			clients[key].playerinfo->setAniLoop(false);
 			clients[key].playerinfo->jumpstart();
+			clients[key].playerinfo->setStatus(STATUS::JUMP);
 		}
 
-		if (p_anim->key == CS_GUARD) {                        // 예외처리 필수!
+		if (p_anim->key == CS_GUARD) {
+			cout << "guard" << endl;
 			clients[key].playerinfo->setAniIndex(Anim::Guard);
-			clients[key].playerinfo->setAniFrame(10.0f);
-			clients[key].playerinfo->setAniLoop(false);
+			clients[key].playerinfo->setStatus(STATUS::DEFENSE);
 		}
+
+		if (p_anim->key == CS_GUARD_OFF) {
+			cout << "guard off" << endl;
+			clients[key].playerinfo->setAniIndex(Anim::Idle);
+			clients[key].playerinfo->setStatus(STATUS::FREE);
+		}
+
 		if (p_anim->key == CS_WEAK) {
+			cout << "weak attack ";
+			if (p_anim->count == 0) {
+				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
+				clients[key].playerinfo->attack_time = high_resolution_clock::now();			// 최초 공격 시작
+				clients[key].playerinfo->attack_count = 1;
+				add_timer(key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
+			}
+			else if (p_anim->count == 1) {
+				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
+				clients[key].playerinfo->attack_count = 2;
+				add_timer(key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 2);
+			}
+			else if (p_anim->count == 2) {
+				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
+				clients[key].playerinfo->attack_count = 3;
+				add_timer(key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 3);
+			}
+			clients[key].playerinfo->setStatus(STATUS::WEAK_ATTACK);
+			cout << int(p_anim->count) << endl;
+
+		}
+
+		if (p_anim->key == CS_HARD) {
+			cout << "hard attack ";
+			if (p_anim->count == 0) {
+				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
+				clients[key].playerinfo->attack_time = high_resolution_clock::now();
+				clients[key].playerinfo->attack_count = 1;
+				add_timer(key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
+			}
+			else if (p_anim->count == 1) {
+				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
+				clients[key].playerinfo->attack_count = 2;
+				add_timer(key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 2);
+			}
+			clients[key].playerinfo->setStatus(STATUS::HARD_ATTACK);
+			cout << int(p_anim->count) << endl;
+		}
+
+		/*if (p_anim->key == CS_WEAK) {
 			if (clients[key].playerinfo->weapon_type == -1) {
 				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
-					clients[key].playerinfo->setAniFrame(0.0f);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 				if (Anim_Index == Anim::Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
 					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
-					clients[key].playerinfo->setAniFrame(Anim_Time);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 				if (Anim_Index == Anim::Weak_Attack2 && (Anim_Time > 20 && Anim_Time < 25)) {
 					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
-					clients[key].playerinfo->setAniFrame(Anim_Time);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 			}
 			else {
 				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack1);
-					clients[key].playerinfo->setAniFrame(0.0f);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 				if (Anim_Index == Anim::Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
 					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack2);
-					clients[key].playerinfo->setAniFrame(Anim_Time);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 
 			}
@@ -362,35 +436,22 @@ void process_packet(char key, char *buffer)
 			if (clients[key].playerinfo->weapon_type == -1) {
 				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
-					clients[key].playerinfo->setAniFrame(0.0f);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 				if (Anim_Index == Anim::Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
 					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
-					clients[key].playerinfo->setAniFrame(Anim_Time);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 			}
 			else {
 				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
 					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Hard_Attack);
-					clients[key].playerinfo->setAniFrame(0.0f);
-					clients[key].playerinfo->setAniLoop(false);
 				}
 			}
-		}
-
-		sc_packet_anim p_anim2;
-		p_anim2.type = SC_ANIM;
-		p_anim2.size = sizeof(sc_packet_anim);
-		p_anim2.id = key;
-		p_anim2.ani_index = clients[key].playerinfo->m_AniIndex;
-		p_anim2.ani_frame = clients[key].playerinfo->m_AniFrame;
+		}*/
 
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			if (clients[i].connected == true)
-				sendPacket(i, &p_anim2);
+				send_anim_packet(i, key);
 		}
 		break;
 
@@ -401,22 +462,13 @@ void process_packet(char key, char *buffer)
 		clients[key].playerinfo->weapon_type = p_weapon->weapon_type;
 		clients[key].playerinfo->weapon_index = p_weapon->weapon_index;
 		clients[key].playerinfo->setAniIndex(Anim::Pick_Up);
-		clients[key].playerinfo->setAniFrame(0.0f);
-		clients[key].playerinfo->setAniLoop(false);
 
 		//cout << int(key) << " Player Weapon Success : " << int(p_weapon->weapon_type) << ", " << int(p_weapon->weapon_index) << endl;;
-
-		sc_packet_anim p_anim3;
-		p_anim3.type = SC_ANIM;
-		p_anim3.size = sizeof(sc_packet_anim);
-		p_anim3.id = key;
-		p_anim3.ani_index = clients[key].playerinfo->m_AniIndex;
-		p_anim3.ani_frame = clients[key].playerinfo->m_AniFrame;
 
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			if (clients[i].connected == true)
-				sendPacket(i, &p_anim3);
+				send_anim_packet(i, key);
 		}
 		break;
 	}
@@ -613,6 +665,52 @@ void do_accept()
 	return;
 }
 
+void process_event(EVENT_ST &ev)
+{
+	switch (ev.type)
+	{
+		// 플레이어
+	case EV_FREE:
+	{
+		if (clients[ev.id].playerinfo->attack_count != ev.attack_count)
+			break;
+
+		clients[ev.id].playerinfo->setStatus(STATUS::FREE);
+		clients[ev.id].playerinfo->attack_count = 0;
+		break;
+	}
+	case EV_HIT:
+	{
+		break;
+	}
+
+	// 심판
+	case EV_WEAPON:
+	{
+		break;
+	}
+	case EV_FOG:
+	{
+		break;
+	}
+	case EV_FEVER:
+	{
+		break;
+	}
+	case EV_LIGHTNING:
+	{
+		break;
+	}
+	case EV_SLIME:
+	{
+		break;
+	}
+	default:
+		cout << "Event Error!" << endl;
+		while (true);
+	}
+}
+
 void clientInputProcess()
 {
 	for (char i = 0; i < MAX_USER; ++i)
@@ -620,6 +718,8 @@ void clientInputProcess()
 		if (clients[i].connected == true)
 		{
 			int Ani_Index = clients[i].playerinfo->m_AniIndex;
+
+			/*
 			float Anim_Time = clients[i].playerinfo->m_AniFrame;
 
 			if (Ani_Index == Anim::Pick_Up) {
@@ -649,6 +749,7 @@ void clientInputProcess()
 					}
 				}
 			}
+			*/
 
 			if (clients[i].playerinfo->m_AttackTrigger)
 			{
@@ -658,6 +759,7 @@ void clientInputProcess()
 				PxExtendedVec3 playerpos = clients[i].playerinfo->m_PlayerController->getPosition();
 				PxVec3 look = clients[i].playerinfo->m_Look;
 
+				/*
 				if (Ani_Index == Anim::Weak_Attack1 || Ani_Index == Anim::Weak_Attack2 || Ani_Index == Anim::Weak_Attack3) {
 					if ((Anim_Time > 10 && Anim_Time < 15) || (Anim_Time > 22 && Anim_Time < 27) || (Anim_Time > 32 && Anim_Time < 37))
 					{
@@ -698,34 +800,87 @@ void clientInputProcess()
 						clients[i].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
 					}
 				}
+				*/
+				char status = clients[i].playerinfo->m_status;
 
-
-				float jumpheight;
-				jumpheight = clients[i].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
-
-				if (jumpheight == 0.0f) {
-					jumpheight = -9.81 * gGameTimer.GetTimeElapsed();
+				if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK)
+				{
+					continue;
 				}
+				else
+				{
+					float jump_height;
 
-				PxVec3 direction = clients[i].playerinfo->m_Vel;
-				//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
-				float elapsedTime = gGameTimer.GetTimeElapsed();
+					if (clients[i].playerinfo->m_Jump.mJump == true) {
+						jump_height = clients[i].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
+					}
+					else {
+						clients[i].playerinfo->m_Fall.startJump(0);
+						jump_height = clients[i].playerinfo->m_Fall.getHeight(gGameTimer.GetTimeElapsed());
+					}
 
-				PxVec3 distance = direction * elapsedTime * 20.f;
-				distance.y += jumpheight;
+					PxVec3 direction;
+					PxVec3 velocity = clients[i].playerinfo->m_Vel;
 
-				PxControllerFilters filters;
-				if (clients[i].playerinfo->m_PlayerController) {
-					const PxU32 flags = clients[i].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
+					direction = velocity.getNormalized();
 
-					if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
-					{
-						//cout << "충돌\n";
-						clients[i].playerinfo->m_Jump.stopJump();
+					if (clients[i].playerinfo->m_dashed) {
+						direction *= 2;
+					}
+
+					//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
+					float elapsedTime = gGameTimer.GetTimeElapsed();
+
+					PxVec3 distance = direction * elapsedTime * 20.f;
+					distance.y += jump_height;
+
+					PxControllerFilters filters;
+					if (clients[i].playerinfo->m_PlayerController) {
+						const PxU32 flags = clients[i].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
+
+						if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+						{
+							//cout << "충돌\n";
+							if (clients[i].playerinfo->m_Jump.mJump) {
+								clients[i].playerinfo->m_Jump.stopJump();
+								if (velocity.magnitude() > 0.f)
+								{
+									if (clients[i].playerinfo->m_dashed == true)
+										clients[i].playerinfo->setAniIndex(Anim::Run);
+									else
+										clients[i].playerinfo->setAniIndex(Anim::Walk);
+								}
+								else {
+									clients[i].playerinfo->setAniIndex(Anim::Idle);
+								}
+								clients[i].playerinfo->setStatus(STATUS::FREE);
+							}
+							if (clients[i].playerinfo->m_Fall.mJump) {
+								clients[i].playerinfo->m_Fall.stopJump();
+							}
+						}
 					}
 				}
 			}
 		}
+	}
+
+	while (true)
+	{
+		timer_l.lock();
+		if (true == timer_queue.empty()) {
+			timer_l.unlock();
+			break;
+		}
+		EVENT_ST ev = timer_queue.top();
+		if (ev.start_time > high_resolution_clock::now()) {
+			timer_l.unlock();
+			break;
+		}
+		timer_queue.pop();
+		timer_l.unlock();
+
+		process_event(ev);
 	}
 }
 
@@ -742,7 +897,6 @@ void clientUpdateProcess(float fTime)
 				p_anim.size = sizeof(sc_packet_anim);
 				p_anim.id = i;
 				p_anim.ani_index = clients[i].playerinfo->m_AniIndex;
-				p_anim.ani_frame = clients[i].playerinfo->m_AniFrame;
 
 				for (int j = 0; j < MAX_USER; ++j)
 				{
@@ -753,7 +907,7 @@ void clientUpdateProcess(float fTime)
 				clients[i].playerinfo->hitted = false;
 			}
 
-			clients[i].playerinfo->animate(fTime);
+			//clients[i].playerinfo->animate(fTime);
 
 			if (clients[i].playerinfo->m_PlayerController != nullptr) {
 				PxExtendedVec3 position = clients[i].playerinfo->m_PlayerController->getPosition();
@@ -774,29 +928,11 @@ void broadcastPosPacket()
 	{
 		if (clients[i].connected == true)
 		{
-			//clients[i].playerinfo->m_Vel = Normalize(clients[i].playerinfo->m_Vel);
-
-			sc_packet_pos p_pos;
-			p_pos.id = i;
-			p_pos.x = clients[i].playerinfo->m_Pos.x;
-			p_pos.y = clients[i].playerinfo->m_Pos.y;
-			p_pos.z = clients[i].playerinfo->m_Pos.z;
-			p_pos.vx = clients[i].playerinfo->m_Vel.x;
-			p_pos.vy = clients[i].playerinfo->m_Vel.y;
-			p_pos.vz = clients[i].playerinfo->m_Vel.z;
-			p_pos.ani_index = clients[i].playerinfo->m_AniIndex;
-			p_pos.ani_frame = clients[i].playerinfo->m_AniFrame;
-			p_pos.type = SC_POS;
-			p_pos.size = sizeof(sc_packet_pos);
-
-			//cout << "BroadPos : " << p_pos.x << "," << p_pos.y << "," << p_pos.z << endl;
-
 			for (int j = 0; j < MAX_USER; ++j)
 			{
 				if (clients[j].connected == true)
 				{
-					//cout << p_pos.x << "," << p_pos.y << "," << p_pos.z << endl;
-					sendPacket(j, &p_pos);
+					send_pos_packet(j, i);
 				}
 			}
 		}
