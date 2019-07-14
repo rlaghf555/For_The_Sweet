@@ -65,14 +65,6 @@ c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\d3duti
   DDSTextureLoader12.cpp
   ForTheSweet.cpp
 c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\modelobject.h(59): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(165): error C4996: '_itow': This function or variable may be unsafe. Consider using _itow_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\corecrt_wstdlib.h(64): note: '_itow' 선언을 참조하십시오.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(167): error C4996: '_itow': This function or variable may be unsafe. Consider using _itow_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\corecrt_wstdlib.h(64): note: '_itow' 선언을 참조하십시오.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(652): error C4996: '_itow': This function or variable may be unsafe. Consider using _itow_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\corecrt_wstdlib.h(64): note: '_itow' 선언을 참조하십시오.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(654): error C4996: '_itow': This function or variable may be unsafe. Consider using _itow_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\corecrt_wstdlib.h(64): note: '_itow' 선언을 참조하십시오.
 c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(321): warning C4101: 'OldBitmap' :참조되지 않은 지역 변수입니다.
 c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\forthesweet.cpp(320): warning C4101: 'memdc' :참조되지 않은 지역 변수입니다.
   Mesh.cpp
@@ -148,3 +140,4 @@ c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\uishad
 c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\uishader.cpp(799): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
 c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet\forthesweet\uishader.cpp(850): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
   코드를 생성하고 있습니다...
+  ForTheSweet.vcxproj -> C:\Users\KYH\Desktop\새 폴더 (3)\For_The_Sweet\ForTheSweet\Debug\ForTheSweet.exe

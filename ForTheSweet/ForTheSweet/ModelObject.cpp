@@ -113,10 +113,20 @@ void ModelObject::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * 
 void ModelObject::ChangeAnimation(UINT nextIndex)
 {
 	if (nextIndex == m_AnimIndex)
-		if(nextIndex != Anim_Small_React)
+		if (nextIndex != Anim_Small_React)
 			return;
-
-	m_ani[m_AnimIndex]->ResetAnimation();
+	if (nextIndex == Anim_Weak_Attack2 || nextIndex == Anim_Weak_Attack3 || nextIndex == Anim_Hard_Attack2)
+	{
+		//cout << "~~~" << endl;
+		m_ani[nextIndex]->SetAnimFrame(m_ani[m_AnimIndex]->getAnimTime());
+		m_ani[m_AnimIndex]->ResetAnimation();
+	}
+	else {
+		if (nextIndex != m_AnimIndex) {
+			m_ani[m_AnimIndex]->ResetAnimation();
+			//cout << "asdfsf\n";
+		}
+	}
 	//m_loopCheck = 0;
 	m_AnimIndex = nextIndex;
 }

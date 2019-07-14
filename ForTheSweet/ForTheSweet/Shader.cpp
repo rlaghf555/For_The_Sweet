@@ -842,7 +842,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	for (int i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
-		if (map_type == M_Map_1_macaron_1) map->SetPosition(0.f, -100.f, 0.f);
+		if (map_type == M_Map_1_macaron_1) map->SetPosition(0.f, -50.f, 0.f);
 
 		if (map_type == M_Map_2) map->SetPosition(0.f, -20.f, 0.f);
 		if (map_type == M_Map_1_macaron) map->SetPosition(185.f, -10.f, 0.f);

@@ -104,7 +104,7 @@ public:
 	PlayerHitReport* getCollisionCallback() { return &m_HitReport; }
 	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
-	void jumpstart() { m_Jump.startJump(70); }
+	void jumpstart() { m_Jump.startJump(120); }
 
 	void SetScaleflag(bool flag) { Scale_flag = flag; }
 	bool GetScaleflag() { return(Scale_flag); }

@@ -93,6 +93,7 @@ void CSocket::sendPacket(char type, char key, char state, char id)
 		p_anim.type = CS_ATTACK;
 		p_anim.size = sizeof(cs_packet_anim);
 		p_anim.key = key;
+		p_anim.count = state;
 		send(clientSocket, (char *)&p_anim, sizeof(cs_packet_anim), 0);
 		break;
 

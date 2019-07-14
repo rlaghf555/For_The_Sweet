@@ -595,8 +595,8 @@ void CGameFramework::BuildObjects()
 
 		if (m_pPhysx)
 		{
-			PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
-			m_pPhysx->m_Scene->addActor(*groundPlane);
+			//PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
+			//m_pPhysx->m_Scene->addActor(*groundPlane);
 
 			//PxBoxControllerDesc bdesc;
 			//bdesc.position = PxExtendedVec3(0, 0, 0);

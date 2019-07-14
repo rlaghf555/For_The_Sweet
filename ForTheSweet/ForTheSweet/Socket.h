@@ -14,6 +14,7 @@ public:
 	SOCKET clientSocket;
 	SOCKADDR_IN serverAddr;
 	char buf[MAX_PACKET_SIZE];
+	char packetBuffer[MAX_PACKET_SIZE];
 	//char id = -1;
 	char *m_pid, *m_pip;
 public:
