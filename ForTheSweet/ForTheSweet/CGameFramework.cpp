@@ -512,17 +512,26 @@ void CGameFramework::LoadModels()
 	   
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
-	Map_Model[0] = new LoadModel("./resource/map/map_1.FBX", true);			// M_Map_1
-	Map_Model[1] = new LoadModel("./resource/map/cotton_1.FBX", true);		// cotton_candy_cloud
-	Map_Model[2] = new LoadModel("./resource/map/111.FBX", true);			// map_1_wall
-	Map_Model[3] = new LoadModel("./resource/map/map_macaron.FBX", true);	// map_1_macaron
-	Map_Model[4] = new LoadModel("./resource/map/map_oreo.FBX", true);		// map_2
+	Map_Model[0] = new LoadModel("./resource/map/map_1.FBX", true);				// M_Map_1
+	Map_Model[1] = new LoadModel("./resource/map/cotton_1.FBX", true);			// cotton_candy_cloud
+	Map_Model[2] = new LoadModel("./resource/map/111.FBX", true);				// map_1_wall
+	Map_Model[3] = new LoadModel("./resource/map/map_macaron.FBX", true);		// map_1_macaron
+	
+	Map_Model[4] = new LoadModel("./resource/map/map_oreo.FBX", true);			// map_2
+	Map_Model[5] = new LoadModel("./resource/map/map_chocolate_bar.FBX", true);	// map_2_chocolate_bar
 
-	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);		// M_Weapon_Lollipop
-	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);			// M_Weapon_chupachupse
-	weapon[2] = new LoadModel("./resource/weapon/pepero.FBX", true);		// M_Weapon_pepero
-	weapon[3] = new LoadModel("./resource/weapon/pepero.FBX", true);		// M_Weapon_chocolate
-	weapon[4] = new LoadModel("./resource/weapon/cupcake.FBX", true);		// M_Weapon_cupcake
+	Map_Model[6] = new LoadModel("./resource/map/map_3_cake_1.FBX", true);		// map_3
+	Map_Model[7] = new LoadModel("./resource/map/map_3_cake_2.FBX", true);		// map_3_cake_2
+	Map_Model[8] = new LoadModel("./resource/map/map_3_cake_3.FBX", true);		// map_3_cake_3
+	Map_Model[9] = new LoadModel("./resource/map/map_3_stair.FBX", true);		// map_3_stair
+	Map_Model[10] = new LoadModel("./resource/map/map_3_bridge.FBX", true);		// map_3_bridge
+	Map_Model[11] = new LoadModel("./resource/map/map_3_cake_black.FBX", true); // map_3_cake_in_black
+
+	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);			// M_Weapon_Lollipop
+	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);				// M_Weapon_chupachupse
+	weapon[2] = new LoadModel("./resource/weapon/pepero.FBX", true);			// M_Weapon_pepero
+	weapon[3] = new LoadModel("./resource/weapon/chocolate.FBX", true);			// M_Weapon_chocolate
+	weapon[4] = new LoadModel("./resource/weapon/cupcake.FBX", true);			// M_Weapon_cupcake
 }
 
 void CGameFramework::BuildObjects()

@@ -205,6 +205,22 @@ struct VS_OUTPUT
     float2 uv : TEXCOORD;
 };
 
+VS_MODEL_TEXTURED_OUTPUT VSWave(VS_INPUT input)
+{
+    VS_MODEL_TEXTURED_OUTPUT output;
+    
+    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
+    float4 position_ = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+
+    position_.y += sin(3.141592 * 2.f);
+
+    output.position = position_;
+    output.uv = input.uv;
+
+    return (output);
+}
+
 VS_MODEL_TEXTURED_OUTPUT VSDiffused(VS_INPUT input)
 {
     VS_MODEL_TEXTURED_OUTPUT output;

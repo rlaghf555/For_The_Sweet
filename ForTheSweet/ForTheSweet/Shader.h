@@ -159,6 +159,8 @@ public:
 	CModelShader(UINT index);
 	~CModelShader();
 
+	bool map_3_macaron_flag = false;
+
 	virtual D3D12_INPUT_LAYOUT_DESC		CreateInputLayout(int index = 0);
 
 	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature	*pd3dGraphicsRootSignature);
@@ -185,6 +187,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera);
 	//virtual void RenderToDepthBuffer(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera, XMFLOAT3& cameraPos, float offset);
 	virtual void Animate(float fTimeElapsed);
+	virtual void Animate(float fTimeElapsed, int flag_up);
 	virtual UINT ModelIndex() const { return modelIndex; }
 
 	virtual void setPosition(XMFLOAT3* pos, UINT num) {}
@@ -193,6 +196,26 @@ public:
 	//virtual CGameObject** getObjects() { return m_bbObjects.data(); }
 
 	void setScale(float scale);
+};
+
+class StairShader : public CModelShader
+{
+public:
+	StairShader() {};
+	StairShader(LoadModel *ma) { static_model = ma; };
+	~StairShader() {};
+
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int type, int nRenderTargets = 1, void * pContext = NULL);
+};
+
+class BridgeShader : public CModelShader
+{
+public:
+	BridgeShader() {};
+	BridgeShader(LoadModel *ma) { static_model = ma; };
+	~BridgeShader() {};
+
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int nRenderTargets = 1, void * pContext = NULL);
 };
 
 class MeshShader : public CModelShader
@@ -225,8 +248,8 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	
 	virtual D3D12_BLEND_DESC CreateBlendState(int index);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
-	virtual void Animate(float fTimeElapsed);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int map_type, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Animate(float fTimeElapsed, int map_type);
 };
 
 class WeaponShader : public CModelShader
@@ -243,25 +266,10 @@ public:
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
 //	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 
-	virtual void Animate(float fTimeElapsed, bool flag_up, int weapon_num);
+	virtual void Animate(float fTimeElapsed, int flag_up, int weapon_num);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int mpa_type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 	bool get_cupcake_up_flag() { return cupcake_up_flag; }
-};
-
-class Map_Macaron_Shader : public CModelShader
-{
-protected:
-	LoadModel	*map_test_model;
-
-public:
-	Map_Macaron_Shader();
-	Map_Macaron_Shader(LoadModel *ma);
-	~Map_Macaron_Shader();
-
-	virtual void Animate(float fTimeElapsed, bool flag_up);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
-	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 };
 
 class CottonCloudShader : public CModelShader

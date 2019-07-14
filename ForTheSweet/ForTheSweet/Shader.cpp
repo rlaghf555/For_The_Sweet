@@ -821,19 +821,43 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (map_type == M_Map_1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_2.dds", 0);
+	if (map_type == M_Map_1_macaron_1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron.dds", 0);
+	
 	if (map_type == M_Map_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_oreo.dds", 0);
 	if (map_type == M_Map_1_macaron || map_type == M_Map_1_macaron_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron_2.dds", 0);
+	if (map_type == M_Map_2_chocolate_bar || map_type == M_Map_2_chocolate_bar_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_chocolate_bar.dds", 0);
+	
+	if (map_type == M_Map_3 || map_type == M_Map_3_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_1.dds", 0);
+	if (map_type == M_Map_3_cake_2 || map_type == M_Map_3_cake_2_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_2.dds", 0);
+	if (map_type == M_Map_3_cake_3 || map_type == M_Map_3_cake_3_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_3.dds", 0);
+	if (map_type == M_Map_1_macaron_3) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron.dds", 0);
+	
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 
+	float map_3_distance = 250.f;
+
 	for (int i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
+		if (map_type == M_Map_1_macaron_1) map->SetPosition(0.f, -100.f, 0.f);
+
 		if (map_type == M_Map_2) map->SetPosition(0.f, -20.f, 0.f);
 		if (map_type == M_Map_1_macaron) map->SetPosition(185.f, -10.f, 0.f);
 		if (map_type == M_Map_1_macaron_2) map->SetPosition(-185.f, -10.f, 0.f);
+		if (map_type == M_Map_2_chocolate_bar) map->SetPosition(300.f, -20.f, 0.f);
+		if (map_type == M_Map_2_chocolate_bar_2) map->SetPosition(-300.f, -20.f, 0.f);
+		
+		if (map_type == M_Map_3) map->SetPosition(map_3_distance, -132.f, 0.f);
+		if (map_type == M_Map_3_2) map->SetPosition(-map_3_distance, -132.f, 0.f);
+		if (map_type == M_Map_3_cake_2) map->SetPosition(map_3_distance, 0.f, 50.f);
+		if (map_type == M_Map_3_cake_2_2) map->SetPosition(-map_3_distance, 0.f, 50.f);
+		if (map_type == M_Map_3_cake_3) map->SetPosition(map_3_distance, 80.f, 80.f);
+		if (map_type == M_Map_3_cake_3_2) map->SetPosition(-map_3_distance, 80.f, 80.f);
+		if (map_type == M_Map_1_macaron_3) map->SetPosition(0, 80.f, 50.f);
+		
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
 
@@ -872,6 +896,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (map_type == M_Map_1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_2.dds", 0);
 	if (map_type == M_Map_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_oreo.dds", 0);
+	if (map_type == M_Map_3)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -882,7 +907,14 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
-		m_bbObjects[i]->SetPosition(0, -20 + -20*i, 0);
+		if (map_type == M_Map_1) m_bbObjects[i]->SetPosition(0, -20 + -20*i, 0);
+		if (map_type == M_Map_3) {
+			if (i == 0) m_bbObjects[i]->SetPosition(250.f, 0.f, 50.f);
+			if (i == 1) m_bbObjects[i]->SetPosition(-250.f, 0.f, 50.f);
+			if (i == 2) m_bbObjects[i]->SetPosition(250.f, 80.f, 130.f);
+			if (i == 3) m_bbObjects[i]->SetPosition(-250.f, 80.f, 130.f);
+			if (i == 4) m_bbObjects[i]->SetPosition(-250.f, 80.f, 130.f);
+		}
 	}
 }
 
@@ -913,12 +945,148 @@ void CModelShader::Animate(float fTimeElapsed)
 	}
 }
 
+void CModelShader::Animate(float fTimeElapsed, int flag_up)
+{
+	if (IsZero(fTimeElapsed)) return;
+
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		if (m_bbObjects[i]) {
+			m_bbObjects[i]->Animate(fTimeElapsed);
+			if (flag_up == M_Map_1) {
+				float macaron_y = m_bbObjects[i]->GetPosition().y;
+				if (m_bbObjects[i]->GetPosition().y < -3) m_bbObjects[i]->SetPosition(0, macaron_y += 0.2, 0);
+				else m_bbObjects[i]->SetPosition(0, -3.0, 0);
+			}
+			if (flag_up == M_Map_3) {
+				if (!map_3_macaron_flag) {
+					float m_bbObjects_x = m_bbObjects[i]->GetPosition().x;
+					m_bbObjects[i]->SetPosition(m_bbObjects_x += 0.5f, 80.f, 50.f);
+					if (m_bbObjects[i]->GetPosition().x > 120) map_3_macaron_flag = true;
+				}
+				else {
+					float m_bbObjects_x = m_bbObjects[i]->GetPosition().x;
+					m_bbObjects[i]->SetPosition(m_bbObjects_x -= 0.5f, 80.f, 50.f);
+					if (m_bbObjects[i]->GetPosition().x < -120) map_3_macaron_flag = false;
+				}
+			}
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void CModelShader::setScale(float scale)
 {
 	for (int i = 0; i < m_nObjects; ++i) {
 		m_bbObjects[i]->SetScale(scale);
 	}
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void StairShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int type, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 11;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_stair.dds", 0);
+
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	float map_3_distance = 250.f;
+
+	for (int i = 0; i < m_nObjects; i++) {
+		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
+		if (type == 0) {
+			if (i == 10) map->SetPosition(128.f + map_3_distance, (i-1) * 8.f, i * 18.f - 50);
+			else map->SetPosition(128.f + map_3_distance, i * 8.f, i * 18.f - 50);
+		}
+		else if (type == 1) {
+			if (i == 10) map->SetPosition(-128.f - map_3_distance, (i-1) * 8.f, i * 18.f - 50);
+			else map->SetPosition(-128.f - map_3_distance, i * 8.f, i * 18.f - 50);
+		}
+		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_bbObjects[i] = map;
+
+		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices());
+		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+
+		PxMeshScale PxScale;
+		PxScale.scale = scaleTmp;
+
+		PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+		XMFLOAT3 pos = map->GetPosition();
+		PxTransform location(pos.x, pos.y, pos.z);
+
+		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+
+		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+		physx->m_Scene->addActor(*m_Actor);
+	}
+}
+
+void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 4;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_bridge.dds", 0);
+
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+	
+	for (int i = 0; i < m_nObjects; i++) {
+		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
+		map->SetPosition(0.f, 0.f, i * 20.f + 30.f);
+		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_bbObjects[i] = map;
+
+		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices());
+		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+
+		PxMeshScale PxScale;
+		PxScale.scale = scaleTmp;
+
+		PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+		XMFLOAT3 pos = map->GetPosition();
+		PxTransform location(pos.x, pos.y, pos.z);
+
+		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+
+		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+		physx->m_Scene->addActor(*m_Actor);
+	}
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1141,7 +1309,7 @@ WaveShader::~WaveShader(){}
 D3D12_SHADER_BYTECODE WaveShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
 {
 	wchar_t filename[100] = L"Model.hlsl";
-	return(CShader::CompileShaderFromFile(filename, "VSDiffused", "vs_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(filename, "VSWave", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE WaveShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
@@ -1169,7 +1337,7 @@ D3D12_BLEND_DESC WaveShader::CreateBlendState(int index)
 	return(d3dBlendDesc);
 }
 
-void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int map_type, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
@@ -1185,7 +1353,9 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	BuildPSO(pd3dDevice, nRenderTargets);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water1.dds", 0);	//1400*788
+	if (map_type == M_Map_1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water1.dds", 0);	//1400*788
+	if (map_type == M_Map_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water1.dds", 0);	//1400*788
+	if (map_type == M_Map_3) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water1.dds", 0);	//1400*788
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -1199,23 +1369,35 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 		m_ppObjects[i] = Map_Object;
 
-		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 201, 1000, 10, 40);	// Width(w, h), xycount(m, n)
+		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 201, 1000, 30, 30);	// Width(w, h), xycount(m, n)
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 		m_ppObjects[i]->SetPosition(i * 200 - 1000, -10, 0);//20.f * i - 200,0,200
 	}
 }
 
-void WaveShader::Animate(float fTimeElapsed)
+void WaveShader::Animate(float fTimeElapsed, int map_type)
 {
 	if (IsZero(fTimeElapsed))
 		return;
 	for (UINT i = 0; i < m_nObjects; ++i) {
 		if (m_ppObjects[i]) {
 			m_ppObjects[i]->Animate(fTimeElapsed);
-			float xx = m_ppObjects[i]->GetPosition().x;
-			if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -10, 0);
-			else m_ppObjects[i]->SetPosition(-1000, -10, 0);
+			if (map_type == M_Map_1) {
+				float xx = m_ppObjects[i]->GetPosition().x;
+				if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -10, 0);
+				else m_ppObjects[i]->SetPosition(-1000, -10, 0);
+			}
+			if (map_type == M_Map_2) {
+				float xx = m_ppObjects[i]->GetPosition().x;
+				if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -30, 0);
+				else m_ppObjects[i]->SetPosition(-1000, -30, 0);
+			}
+			if (map_type == M_Map_3) {
+				float xx = m_ppObjects[i]->GetPosition().x;
+				if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -50, 0);
+				else m_ppObjects[i]->SetPosition(-1000, -50, 0);
+			}
 		}
 	}
 }
@@ -1487,7 +1669,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	if (weapon_num == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\lollipop.dds", 0);
 	else if (weapon_num == 1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\candy.dds", 0);
 	else if (weapon_num == 2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\pepero.dds", 0);
-	else if (weapon_num == 3) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\pepero.dds", 0);
+	else if (weapon_num == 3) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\chocolate.dds", 0);
 	else if (weapon_num == 4) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\cupcake.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
@@ -1525,14 +1707,14 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	}
 }
 
-void WeaponShader::Animate(float fTimeElapsed, bool flag_up, int weapon_num)
+void WeaponShader::Animate(float fTimeElapsed, int flag_up, int weapon_num)
 {
 	if (IsZero(fTimeElapsed)) return;
 
 	for (UINT i = 0; i < m_nObjects; ++i) {
 		if (m_bbObjects[i]) {
 			m_bbObjects[i]->Animate(fTimeElapsed);
-			if (flag_up == true || weapon_num == M_Weapon_cupcake) {
+			if (flag_up == M_Map_1 || weapon_num == M_Weapon_cupcake) {
 				float macaron_y = m_bbObjects[i]->GetPosition().y;
 				if (m_bbObjects[i]->GetPosition().y < 15) m_bbObjects[i]->SetPosition(0, macaron_y += 0.2, 0);
 				else {
@@ -1543,71 +1725,7 @@ void WeaponShader::Animate(float fTimeElapsed, bool flag_up, int weapon_num)
 		}
 	}
 }
-////////////////////////////////////////////////////////////////////////
 
-Map_Macaron_Shader::Map_Macaron_Shader()
-{
-
-}
-
-Map_Macaron_Shader::Map_Macaron_Shader(LoadModel *ma) : CModelShader(ma)
-{
-	map_test_model = ma;
-}
-
-Map_Macaron_Shader::~Map_Macaron_Shader()
-{
-
-}
-
-void Map_Macaron_Shader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
-{
-	m_nPSO = 1;
-	CreatePipelineParts();
-
-	m_nObjects = 1;
-	m_bbObjects = vector<ModelObject*>(m_nObjects);
-
-	CreateGraphicsRootSignature(pd3dDevice);
-	BuildPSO(pd3dDevice, nRenderTargets);
-
-	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 2);
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
-
-	CTexture *pTexture;
-	pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron.dds", 0);
-	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
-
-	m_pMaterial = new CMaterial();
-	m_pMaterial->SetTexture(pTexture);
-	m_pMaterial->SetReflection(1);
-	
-	for (int i = 0; i < m_nObjects; i++) {
-
-		ModelObject* test = new ModelObject(map_test_model, pd3dDevice, pd3dCommandList);
-		test->SetPosition(0.0, -100.0, 0.0);
-		test->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_bbObjects[i] = test;
-	}
-}
-
-void Map_Macaron_Shader::Animate(float fTimeElapsed, bool flag_up)
-{
-	if (IsZero(fTimeElapsed)) return;
-
-	for (UINT i = 0; i < m_nObjects; ++i) {
-		if (m_bbObjects[i]) {
-			m_bbObjects[i]->Animate(fTimeElapsed);
-			if (flag_up == true) {
-				float macaron_y = m_bbObjects[i]->GetPosition().y;
-				if (m_bbObjects[i]->GetPosition().y < -3) m_bbObjects[i]->SetPosition(0, macaron_y += 0.2, 0);
-				else m_bbObjects[i]->SetPosition(0, -3.0, 0);
-			}
-		}
-	}
-}
 ////////////////////////////////////////////////////////////////////////
 
 DynamicModelShader::DynamicModelShader(Model_Animation *ma) : CModelShader(ma)

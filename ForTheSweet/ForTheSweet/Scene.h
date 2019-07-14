@@ -38,11 +38,13 @@ public:
 	Model_Animation				*character_anim;
 	PlayerShader				*m_pPlayerShader[MAX_USER];
 
-	CModelShader				*m_MapShader[3] = { NULL, };
+	CModelShader				*m_MapShader[8] = { NULL, };
 	LoadModel					**Map_Model;
 
-	Map_Macaron_Shader			*m_Map_ObjectShader[1];
-	bool						macaron_flag = true;
+	int							animate_flag = Map_SELECT;
+
+	StairShader					*m_StairShader[2];
+	BridgeShader				*m_BridgeShader;
 
 	int							ready_state	= UI_READY;
 	float						ready_state_test = 0.3f;
