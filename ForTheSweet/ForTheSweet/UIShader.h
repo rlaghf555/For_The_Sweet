@@ -107,7 +107,16 @@ public:
 public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 };
+class UIIDShader : public UIShader
+{
+public:
 
+	UIIDShader() {};
+	~UIIDShader() {};
+
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+	void SetID(wchar_t *str);
+};
 class UITimeShader : public UIShader
 {
 public:
@@ -117,6 +126,8 @@ public:
 public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 	virtual void SetTime(int t);	//√ (sec) ¥‹¿ß
+	virtual void Animate(float fTimeElapsed);
+	float Time=300;
 };
 
 class UIDotShader : public UIShader

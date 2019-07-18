@@ -164,7 +164,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
 {
 	m_ppUIShaders.clear();
-	m_nUIShaders = 12;
+	m_nUIShaders = 20;
 	m_ppUIShaders.resize(m_nUIShaders);
 
 	//UIShader* pSample = new UIShader();
@@ -182,19 +182,19 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 		pos = XMFLOAT2(172 + i * 313, 136);
 		pHPBar->SetPos(&pos, 2);
 		m_ppUIShaders[i] = pHPBar;
+
 	}
 	for (int i = 0; i < 4; i++) {
 		UIHPBarShader* pHPBar = new UIHPBarShader();
 		pHPBar->BuildObjects(pDevice, pCommandList, 1);
-		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 50);
+		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 40);
 		pHPBar->SetPos(&pos, 0);
-		pos = XMFLOAT2(172 + i * 313, 56);
+		pos = XMFLOAT2(172 + i * 313, 46);
 		pHPBar->SetPos(&pos, 1);
-		pos = XMFLOAT2(172 + i * 313, 36);
+		pos = XMFLOAT2(172 + i * 313, 26);
 		pHPBar->SetPos(&pos, 2);
 		m_ppUIShaders[i + 4] = pHPBar;
 	}
-	XMFLOAT2 scale = XMFLOAT2(0.5, 0.5);
 	m_ppUIShaders[0]->getObejct(1)->SetHP(13);
 	m_ppUIShaders[0]->getObejct(2)->SetHP(5);
 	UITimeShader* pTime = new UITimeShader();
@@ -217,6 +217,28 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 	pFight->BuildObjects(pDevice, pCommandList);
 	pFight->SetPos(&pos, 0);
 	m_ppUIShaders[11] = pFight;
+	for (int i = 0; i < 4; i++) {
+		UIIDShader* pID = new UIIDShader();
+		pID->BuildObjects(pDevice, pCommandList);
+		for (int j = 0; j < 10; j++) {
+			pos = XMFLOAT2(50 + j * 10 + i * 313, 200);
+			pID->SetPos(&pos, j);
+		}
+		wchar_t tmp[10] = L"ABCD4";			//플레이어 아이디 입력하자
+		pID->SetID(tmp);
+		m_ppUIShaders[12+i] = pID;
+	}
+	for (int i = 0; i < 4; i++) {
+		UIIDShader* pID = new UIIDShader();
+		pID->BuildObjects(pDevice, pCommandList);
+		for (int j = 0; j < 10; j++) {
+			pos = XMFLOAT2(50 + j * 10 + i * 313, 90);
+			pID->SetPos(&pos, j);
+		}
+		wchar_t tmp[10] = L"01234ABCD";
+		pID->SetID(tmp);
+		m_ppUIShaders[12 + i + 4] = pID;
+	}
 
 	pMes_Weapon = new MessageShader();
 	pMes_Weapon->BuildObjects(pDevice, pCommandList);

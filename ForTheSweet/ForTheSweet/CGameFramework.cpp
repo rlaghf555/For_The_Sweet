@@ -1529,7 +1529,7 @@ void CGameFramework::ProcessInput()
 
 			PxControllerFilters filters;
 
-			const PxU32 flags = m_pPlayer->m_PlayerController->move(disp, 0, 1 / 60, filters);
+			const PxU32 flags = m_pPlayer->m_PlayerController->move(disp, 0, 2 / 60, filters);
 			if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 			{
 				//cout << "Ãæµ¹\n";
