@@ -1452,6 +1452,7 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->ChangeAnimation(Anim_Jump);
 				m_pPlayer->DisableLoop();
 				m_pPlayer->jumpstart();
+				SoundManager::GetInstance()->PlaySounds(SOUND_2);	//soundeffect Å×½ºÆ®
 				m_pPlayer->SetWeapon(false, -1,-1);
 			}
 		}
