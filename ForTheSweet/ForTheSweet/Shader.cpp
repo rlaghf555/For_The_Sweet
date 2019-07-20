@@ -273,7 +273,6 @@ void CObjectsShader::ReleaseObjects()
 		m_pMaterial->ReleaseShaderVariables();
 		m_pMaterial->ReleaseUploadBuffers();
 		m_pMaterial->Release();
-		//delete m_pMaterial;
 	}
 	if (m_ppObjects.size())
 	{
@@ -297,7 +296,7 @@ void CObjectsShader::ReleaseObjects()
 	//	m_bbObjects.clear();
 	//}
 	//
-	for (int j = 0; j < m_bbObjects.size(); j++)
+	for (UINT j = 0; j < m_bbObjects.size(); j++)
 	{
 		if (m_bbObjects[j]) {
 			delete m_bbObjects[j];
@@ -870,7 +869,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	float map_3_distance = 250.f;
 
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		if (map_type == M_Map_1_macaron_1) map->SetPosition(0.f, -50.f, 0.f);
 
@@ -906,6 +905,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
 		physx->m_Scene->addActor(*m_Actor);
 	}
+	delete pTexture;
 }
 
 void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int map_type, int nRenderTargets, void * pContext)
@@ -933,7 +933,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
@@ -946,6 +946,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 			if (i == 4) m_bbObjects[i]->SetPosition(-250.f, 80.f, 130.f);
 		}
 	}
+	delete pTexture;
 }
 
 void CModelShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
@@ -1007,7 +1008,7 @@ void CModelShader::Animate(float fTimeElapsed, int flag_up)
 
 void CModelShader::setScale(float scale)
 {
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_bbObjects[i]->SetScale(scale);
 	}
 }
@@ -1040,7 +1041,7 @@ void StairShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 
 	float map_3_distance = 250.f;
 
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		if (type == 0) {
 			if (i == 10) map->SetPosition(128.f + map_3_distance, (i-1) * 8.f, i * 18.f - 50);
@@ -1068,6 +1069,7 @@ void StairShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
 		physx->m_Scene->addActor(*m_Actor);
 	}
+	delete pTexture;
 }
 
 void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int nRenderTargets, void * pContext)
@@ -1094,7 +1096,7 @@ void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 	
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		map->SetPosition(0.f, 0.f, i * 20.f + 30.f);
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
@@ -1115,6 +1117,8 @@ void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
 		physx->m_Scene->addActor(*m_Actor);
 	}
+	delete pTexture;
+
 }
 
 
@@ -1284,7 +1288,7 @@ void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	
 	XMFLOAT3 a = XMFLOAT3(0.f, 1.f, 0.f);
 
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 
 		CGameObject *Map_Object = NULL;
 
@@ -1298,6 +1302,8 @@ void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 
 		//m_ppObjects[i]->Rotate(&a, 90.f);
 	}
+	delete pTexture;
+
 }
 
 void MeshShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
@@ -1327,7 +1333,7 @@ void MeshShader::Animate(float fTimeElapsed)
 
 void MeshShader::setScale(float scale)
 {
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_ppObjects[i]->SetScale(scale);
 	}
 }
@@ -1404,13 +1410,15 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 		m_ppObjects[i]->SetPosition(i * 200 - 1000, -10, 0);//20.f * i - 200,0,200
 	}
+	delete pTexture;
+
 }
 
 void WaveShader::Animate(float fTimeElapsed, int map_type)
 {
 	if (IsZero(fTimeElapsed))
 		return;
-	for (UINT i = 0; i < m_nObjects; ++i) {
+	for (int i = 0; i < m_nObjects; ++i) {
 		if (m_ppObjects[i]) {
 			m_ppObjects[i]->Animate(fTimeElapsed);
 			if (map_type == M_Map_1) {
@@ -1481,13 +1489,13 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (kind == 0)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\cotton_candy_cloud_2.dds", 0);	//1400*788
-	if (kind == 1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\cotton_candy_cloud_1.dds", 0);	//1400*788
+	else if (kind == 1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\cotton_candy_cloud_1.dds", 0);	//1400*788
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
 		if (i < 16) {
 			if (kind == 0) {
@@ -1513,6 +1521,8 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 		cloud->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = cloud;
 	}
+	delete pTexture;
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1562,7 +1572,7 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 
 	CreateGraphicsRootSignature(pd3dDevice);
 	BuildPSO(pd3dDevice, nRenderTargets);
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		CGameObject *test_Object = NULL;
 		test_Object = new CGameObject();
 		//BoundingOrientedBox bb = mo->boundingbox;
@@ -1705,7 +1715,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	XMFLOAT3 a = XMFLOAT3(1, 0, 0);
 
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		m_pMaterial = new CMaterial();
 		m_pMaterial->SetTexture(pTexture);
 		m_pMaterial->SetReflection(1);
@@ -2035,6 +2045,7 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	player->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 	m_bbObjects[0] = player;
 	m_player = player;
+	delete pTexture;
 }
 
 void PlayerShader::Animate(float fTimeElapsed)

@@ -24,8 +24,16 @@ Model_Animation::Model_Animation(string Model_filename , vector<pair<string, flo
 
 }
 Model_Animation::~Model_Animation()
-{
+{	
+	if(model)
 	delete model;
+
+	for (int i = animStack->size() - 1; i >= 0; --i) {
+		delete (*animStack)[i];
+	}
+	animStack->clear();
+
+	cout << "model_animation ¼Ò¸êÀÚ" << endl;
 }
 void Model_Animation::LodingModels(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList)
 {

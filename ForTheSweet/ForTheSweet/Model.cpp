@@ -236,7 +236,7 @@ void LoadModel::InitMesh(UINT index, const aiMesh * pMesh)
 void LoadModel::SetMeshes(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	for (UINT i = 0; i < m_ModelMeshes.size(); ++i) {
-		ModelMesh* tmp = new ModelMesh(pd3dDevice, pd3dCommandList, m_meshes[i]);
+		shared_ptr<ModelMesh> tmp(new ModelMesh(pd3dDevice, pd3dCommandList, m_meshes[i]));
 		m_ModelMeshes[i] = tmp;
 	}
 }

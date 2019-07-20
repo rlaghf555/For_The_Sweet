@@ -144,7 +144,7 @@ void CGameObject::SetMesh(CMesh *pMesh)
 	if (m_pMesh) m_pMesh->AddRef();
 }
 
-void CGameObject::SetMesh(int nIndex, MMesh * pMesh)
+void CGameObject::SetMesh(int nIndex, shared_ptr<MMesh> pMesh)
 {
 	if (!m_ppMeshes.empty())
 	{

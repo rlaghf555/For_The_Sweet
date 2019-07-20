@@ -54,13 +54,19 @@ struct vertexDatas
 	}
 };
 
-struct mesh
+class mesh
 {
+public:
 	vector<vertexDatas>      m_vertices;
 	vector<int>            m_indices;
 	UINT               m_materialIndex;
 
 	mesh() { m_materialIndex = 0; }
+	~mesh() {
+		//cout << "mesh 소멸자" << endl;
+		m_vertices.clear();
+		m_indices.clear();
+	}
 	void SetMeshesTextureIndex(UINT index) {
 		for (auto& d : m_vertices)
 			d.m_nTextureNum = index;
@@ -82,15 +88,16 @@ class ModelMesh : public MMesh
 {
 public:
 	ModelMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, mesh& meshData);
-	virtual ~ModelMesh() {}
+	virtual ~ModelMesh() {
+	}
 };
 
 class LoadModel
 {
 private:
-	const aiScene*               m_pScene;      //모델 정보
+	const aiScene*             m_pScene;      //모델 정보
 	vector<mesh>               m_meshes;      //매쉬 정보
-	vector<ModelMesh*>            m_ModelMeshes;   //매쉬 정보 리소스(for 랜더링)
+	vector<shared_ptr<ModelMesh>>            m_ModelMeshes;   //매쉬 정보 리소스(for 랜더링)
 	vector<pair<string, Bone>>      m_Bones;      //뼈 정보
 	//XMFLOAT3*                  m_pos;
 	UINT                     m_possize;
@@ -109,7 +116,7 @@ public:
 	void InitBones(UINT index, const aiMesh* pMesh);
 	void SetTextureIndex(UINT meshIndex, UINT textureIndex) { m_meshes[meshIndex].SetMeshesTextureIndex(textureIndex); };
 
-	ModelMesh**               getMeshes() { return m_ModelMeshes.data(); }
+	shared_ptr<ModelMesh>*          getMeshes() { return m_ModelMeshes.data(); }
 	mesh*                  getMesh(UINT index) { return &m_meshes[index]; }
 	UINT                  getNumMesh() const { return (UINT)m_meshes.size(); }
 	vector<pair<string, Bone>>* GetBones() { return &m_Bones; }

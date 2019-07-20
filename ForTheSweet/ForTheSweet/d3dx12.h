@@ -1455,7 +1455,7 @@ inline UINT64 UpdateSubresources(
     pDevice->Release();
     
     UINT64 Result = UpdateSubresources(pCmdList, pDestinationResource, pIntermediate, FirstSubresource, NumSubresources, RequiredSize, pLayouts, pNumRows, pRowSizesInBytes, pSrcData);
-    HeapFree(GetProcessHeap(), 0, pMem);
+	HeapFree(GetProcessHeap(), 0, pMem);
     return Result;
 }
 

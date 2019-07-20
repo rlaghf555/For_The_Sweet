@@ -163,7 +163,6 @@ ComPtr<ID3D12Resource> D3DUtil::CreateTextureResourceFromFile(ID3D12Device * pd3
 	bool bIsCubeMap = false;
 
 	HRESULT hResult = DirectX::LoadDDSTextureFromFileEx(pd3dDevice, pszFileName, 0, D3D12_RESOURCE_FLAG_NONE, DDS_LOADER_DEFAULT, &pd3dTexture, ddsData, vSubresources, &ddsAlphaMode, &bIsCubeMap);
-
 	D3D12_HEAP_PROPERTIES d3dHeapPropertiesDesc;
 	::ZeroMemory(&d3dHeapPropertiesDesc, sizeof(D3D12_HEAP_PROPERTIES));
 	d3dHeapPropertiesDesc.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -192,16 +191,23 @@ ComPtr<ID3D12Resource> D3DUtil::CreateTextureResourceFromFile(ID3D12Device * pd3
 	d3dBufferResourceDesc.SampleDesc.Quality = 0;
 	d3dBufferResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	d3dBufferResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	HRESULT hr = pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc, D3D12_HEAP_FLAG_NONE, &d3dBufferResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void **)&ppd3dUploadBuffer);
+	if (FAILED(hr)) {
+		HRESULT reason = pd3dDevice->GetDeviceRemovedReason();
 
-	pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc, D3D12_HEAP_FLAG_NONE, &d3dBufferResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void **)&ppd3dUploadBuffer);
-
+#if defined(_DEBUG)
+		wchar_t outString[100];
+		size_t size = 100;
+		swprintf_s(outString, size, L"Device removed! DXGI_ERROR code: 0x%X\n", reason);
+		OutputDebugStringW(outString);
+#endif
+	}
 	//UINT nSubResources = (UINT)vSubresources.size();
 	//D3D12_SUBRESOURCE_DATA *pd3dSubResourceData = new D3D12_SUBRESOURCE_DATA[nSubResources];
 	//for (UINT i = 0; i < nSubResources; i++) pd3dSubResourceData[i] = vSubresources.at(i);
 
 	//	std::vector<D3D12_SUBRESOURCE_DATA>::pointer ptr = &vSubresources[0];
 	UINT64 nBytesUpdated = ::UpdateSubresources(pd3dCommandList, pd3dTexture.Get(), ppd3dUploadBuffer, 0, 0, nSubResources, &vSubresources[0]);
-
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
 	d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;

@@ -55,13 +55,15 @@ LoadAnimation::~LoadAnimation()
 //	cout << "LoadAnimation ¼Ò¸êÀÚ" << endl;
 	if (m_pScene)
 		m_pScene->~aiScene();
-	//if (m_Bones.size() > 0) {
-	//	vector<pair<string, Bone>> a;
-	//	m_Bones.swap(a);
-	//	a.clear();
-	//	m_Bones.clear();
-	//	cout << "Loadanimation m_bones clear" << endl;
-	//}
+	//if (m_pAnim)
+	//	m_pAnim->~aiAnimation();
+	if (m_Bones.size() > 0) {
+		vector<pair<string, Bone>> a;
+		m_Bones.swap(a);
+		a.clear();
+		m_Bones.clear();
+//		cout << "Loadanimation m_bones clear" << endl;
+	}
 
 }
 UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& transforms)

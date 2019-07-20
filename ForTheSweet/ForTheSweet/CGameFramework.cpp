@@ -146,6 +146,8 @@ void CGameFramework::OnDestroy()
 		if (weapon[i])
 			delete weapon[i];
 	}
+	if (Character_Model)
+		delete Character_Model;
 	DestroyWindow(m_hWnd);
 }
 

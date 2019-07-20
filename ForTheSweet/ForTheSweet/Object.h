@@ -65,7 +65,7 @@ public:
 	virtual void SetWorld(XMFLOAT4X4& xmf4x4World);
 	virtual void SetWorld(XMFLOAT3& xmf3Look, XMFLOAT3& xmf3Up, XMFLOAT3& xmf3Right);
 	virtual void SetMesh(CMesh *pMesh);
-	virtual void SetMesh(int nIndex, MMesh *pMesh);
+	virtual void SetMesh(int nIndex, shared_ptr<MMesh> pMesh);
 	virtual void SetShader(CShader *pShader);
 	virtual void Animate(float fTimeElapsed);
 	virtual void OnPrepareRender();

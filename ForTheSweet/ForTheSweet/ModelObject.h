@@ -56,7 +56,7 @@ public:
 	void EnableLoop() { m_ani[m_AnimIndex]->EnableLoop(); }
 	void printAniInfo() {
 		cout << "애니 갯수 : " << GetNumofAnim() << endl;
-		for (int i = 0; i < GetNumofAnim(); ++i)
+		for (UINT i = 0; i < GetNumofAnim(); ++i)
 		{
 			cout << "애니 타임 : " << m_ani[i]->getAnimTime() << endl;
 		}

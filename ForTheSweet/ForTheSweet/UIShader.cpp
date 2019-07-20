@@ -50,14 +50,14 @@ D3D12_DEPTH_STENCIL_DESC UIShader::CreateDepthStencilState(int index)
 
 void UIShader::Animate(float fTimeElapsed)
 {
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->Update(fTimeElapsed);
 	}
 }
 
 void UIShader::UpdateState(int ui_state)
 {
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->uistate = ui_state;
 	}
 }
@@ -104,7 +104,7 @@ void UIShader::SetPosScreenRatio(XMFLOAT2& ratio, UINT index)
 
 void UIShader::SetPosScreenRatio(XMFLOAT2& ratio)
 {
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->m_xmf2ScreenPos = XMFLOAT2(
 			static_cast<float>(FRAME_BUFFER_WIDTH) * ratio.x,
 			static_cast<float>(FRAME_BUFFER_HEIGHT) * ratio.y
@@ -121,7 +121,7 @@ void UIShader::SetAlpha(float alpha, UINT index)
 
 void UIShader::SetScale(XMFLOAT2 * scale)
 {
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->m_xmf2Scale = *scale;
 	}
 
@@ -209,7 +209,7 @@ void UIShader::CreateGraphicsRootSignature(ID3D12Device * pd3dDevice)
 
 void UIShader::CreateCollisionBox()
 {
-	for (int i = 0; i < m_nObjects; ++i)
+	for (UINT i = 0; i < m_nObjects; ++i)
 		m_pUIObjects[i]->CreateCollisionBox();
 }
 
@@ -402,7 +402,7 @@ void UIShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 
 	XMFLOAT2 scale = XMFLOAT2(0.7f, 0.7f);
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		UIObject* ui;
 		ui = new UIObject();
 		XMFLOAT2 tmp = XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH) / 2, static_cast<float>(FRAME_BUFFER_HEIGHT) * (3.0f - 1.5f * i) / 9.0);
@@ -411,7 +411,7 @@ void UIShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		m_pUIObjects[i] = ui;
 	}
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 tmpsize(1, 1);
 		m_pUIObjects[i]->SetNumSprite(tmpsize, tmpsize);
@@ -426,7 +426,7 @@ void UIShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 
 void UIShader::ReleaseObjects()
 {
-	for (int i = 0; i < m_nObjects; i++) {
+	for (UINT i = 0; i < m_nObjects; i++) {
 		if (m_pUIObjects[i])
 			delete m_pUIObjects[i];
 	}
@@ -557,7 +557,7 @@ void UIHPBarShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	mpBar->SetScale(scale);
 	m_pUIObjects[2] = mpBar;
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
 		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
@@ -567,6 +567,7 @@ void UIHPBarShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 	}
 
+	delete pTexture;
 }
 
 
@@ -625,7 +626,7 @@ void UITimeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	min2->SetScale(scale);
 	m_pUIObjects[2] = min2;
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
 		sizetmp = GetSpriteSize(0, pTexture, sizetmp);
@@ -637,6 +638,7 @@ void UITimeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		m_pUIObjects[i]->CreateCollisionBox();
 		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 	}
+	delete pTexture;
 }
 
 void UITimeShader::SetTime(int t)
@@ -706,7 +708,7 @@ void UIDotShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 	Time->SetScale(scale);
 	m_pUIObjects[0] = Time;
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
 		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
@@ -715,6 +717,7 @@ void UIDotShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 		m_pUIObjects[i]->CreateCollisionBox();
 		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 	}
+	delete pTexture;
 }
 
 void UIReadyShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
@@ -758,7 +761,7 @@ void UIReadyShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	Ready->mystate = UI_READY;
 	m_pUIObjects[0] = Ready;
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
 		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
@@ -767,6 +770,7 @@ void UIReadyShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 		m_pUIObjects[i]->CreateCollisionBox();
 		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 	}
+	delete pTexture;
 }
 
 void UIFightShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
@@ -810,7 +814,7 @@ void UIFightShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	Fight->mystate = UI_FIGHT;
 	m_pUIObjects[0] = Fight;
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
 		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
@@ -819,6 +823,7 @@ void UIFightShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 		m_pUIObjects[i]->CreateCollisionBox();
 		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 	}
+	delete pTexture;
 }
 
 void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
@@ -861,7 +866,7 @@ void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	Fight->SetScale(scale);
 	m_pUIObjects[0] = Fight;
 
-	for (int i = 0; i < m_nObjects; ++i) {
+	for (UINT i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
 		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
@@ -870,6 +875,7 @@ void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 		m_pUIObjects[i]->CreateCollisionBox();
 		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 	}
+	delete pTexture;
 }
 
 void MessageShader::Animate(float fTimeElapsed, bool flag)
@@ -955,6 +961,7 @@ void UIIDShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	}
 
 
+	delete pTexture;
 }
 
 void UIIDShader::SetID(wchar_t * str)

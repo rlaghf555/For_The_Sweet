@@ -391,7 +391,7 @@ void CScene::ReleaseObjects()
 			delete bounding_box_test[i];
 		}
 	}
-	for (int i = 0; i < m_nUIShaders; ++i) {
+	for (UINT i = 0; i < m_nUIShaders; ++i) {
 		if (m_ppUIShaders[i]) {
 			m_ppUIShaders[i]->ReleaseShaderVariables();
 			m_ppUIShaders[i]->ReleaseObjects();
@@ -492,7 +492,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	m_WavesShader->Animate(fTimeElapsed, Selected_Map);
 	
-	for (int i = 0; i < m_nUIShaders; i++) {
+	for (UINT i = 0; i < m_nUIShaders; i++) {
 		if (m_ppUIShaders[i]) {
 			m_ppUIShaders[i]->UpdateState(ready_state);
 			m_ppUIShaders[i]->Animate(fTimeElapsed);
