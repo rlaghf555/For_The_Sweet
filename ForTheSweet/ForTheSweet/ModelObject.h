@@ -6,7 +6,8 @@ struct CB_DYNAMICOBJECT_INFO
 {
 	XMFLOAT4X4		m_xmf4x4World;
 	XMFLOAT4X4		m_bone[96];
-	UINT					m_nMaterial = 0;
+	UINT			m_nMaterial = 0;
+	XMFLOAT4X4		m_xmf4x4ShadowTransform;
 };
 
 class ModelObject : public CGameObject

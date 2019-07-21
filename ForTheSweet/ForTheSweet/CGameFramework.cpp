@@ -561,6 +561,8 @@ void CGameFramework::LoadModels()
 	Map_Model[10] = new LoadModel("./resource/map/map_3_bridge.FBX", true);		// map_3_bridge
 	Map_Model[11] = new LoadModel("./resource/map/map_3_cake_black.FBX", true); // map_3_cake_in_black
 
+	Map_Model[12] = new LoadModel("./resource/map/shadow_test_1.FBX", true);	// shadow_test
+
 	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);			// M_Weapon_Lollipop
 	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);				// M_Weapon_chupachupse
 	weapon[2] = new LoadModel("./resource/weapon/pepero.FBX", true);			// M_Weapon_pepero

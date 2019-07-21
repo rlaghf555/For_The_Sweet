@@ -1495,7 +1495,7 @@ void CottonCloudShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
-	for (UINT i = 0; i < m_nObjects; i++) {
+	for (int i = 0; i < m_nObjects; i++) {
 		ModelObject* cloud = new ModelObject(cloud_model, pd3dDevice, pd3dCommandList);
 		if (i < 16) {
 			if (kind == 0) {
@@ -1881,6 +1881,7 @@ void DynamicModelShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dC
 		//cBone.m_xmf4x4World = m_ppObjects[i]->m_xmf4x4World;
 		XMStoreFloat4x4(&cBone.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World)));
 		cBone.m_nMaterial = 0;
+		XMStoreFloat4x4(&cBone.m_xmf4x4ShadowTransform, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World) * shadow_mat));
 
 		memcpy(cBone.m_bone, m_bbObjects[i]->GetBoneData(), sizeof(XMFLOAT4X4) * m_bbObjects[i]->GetBoneNum());
 
@@ -1895,6 +1896,12 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 
 	m_nObjects = 1;
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
+	XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
+	XMMATRIX shadowoffset = XMMatrixTranslation(0.0f, 11.f, 0.0f);
+	shadow_mat = S * shadowoffset;//XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.36f, 0.0f))) * XMMatrixTranslation(+0.0f, +11.0f, 0.f);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 1);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2016,6 +2023,12 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_nObjects = 1;
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
+	XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
+	XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
+	XMMATRIX shadowoffset = XMMatrixTranslation(0.0f, 11.f, 0.0f);
+	shadow_mat = S * shadowoffset;//XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.36f, 0.0f))) * XMMatrixTranslation(+0.0f, +11.0f, 0.f);
+
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 1);
 	//CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 3);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2060,9 +2073,432 @@ void PlayerShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommand
 		//cBone.m_xmf4x4World = m_ppObjects[i]->m_xmf4x4World;
 		XMStoreFloat4x4(&cBone.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World)));
 		cBone.m_nMaterial = 0;
+		XMStoreFloat4x4(&cBone.m_xmf4x4ShadowTransform, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World) * shadow_mat));
 
 		memcpy(cBone.m_bone, m_bbObjects[i]->GetBoneData(), sizeof(XMFLOAT4X4) * m_bbObjects[i]->GetBoneNum());
 
 		m_BoneCB->CopyData(i, cBone);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ShadowDebugShader::ShadowDebugShader()
+{
+}
+
+ShadowDebugShader::ShadowDebugShader(LoadModel *ma) : CModelShader(ma)
+{
+}
+
+ShadowDebugShader::~ShadowDebugShader()
+{
+}
+
+void ShadowDebugShader::CreateGraphicsRootSignature(ID3D12Device * pd3dDevice)
+{
+	int i = 0;
+	ComPtr<ID3D12RootSignature> pd3dGraphicsRootSignature = nullptr;
+
+	CD3DX12_DESCRIPTOR_RANGE pd3dDescriptorRanges[2];
+
+	pd3dDescriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2, 0, 0); // GameObject	//SRVShadowMapp
+	pd3dDescriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, SRVTexArray, 0, 0); // Texture
+
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[3];
+
+	pd3dRootParameters[0].InitAsConstantBufferView(1);
+	pd3dRootParameters[1].InitAsDescriptorTable(1, &pd3dDescriptorRanges[0], D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[2].InitAsDescriptorTable(1, &pd3dDescriptorRanges[1], D3D12_SHADER_VISIBILITY_PIXEL);
+
+	D3D12_STATIC_SAMPLER_DESC d3dSamplerDesc[2];
+	::ZeroMemory(&d3dSamplerDesc, sizeof(D3D12_STATIC_SAMPLER_DESC));
+
+	d3dSamplerDesc[0] = CD3DX12_STATIC_SAMPLER_DESC(
+		0,
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		0.0f,
+		1,
+		D3D12_COMPARISON_FUNC_ALWAYS,
+		D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE,
+		0.0f,
+		D3D12_FLOAT32_MAX,
+		D3D12_SHADER_VISIBILITY_PIXEL
+	);
+
+	d3dSamplerDesc[1] = CD3DX12_STATIC_SAMPLER_DESC(
+		1, // shaderRegister
+		D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_BORDER,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_BORDER,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_BORDER,  // addressW
+		0.0f,                               // mipLODBias
+		16,                                 // maxAnisotropy
+		D3D12_COMPARISON_FUNC_LESS_EQUAL,
+		D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK
+	);
+
+
+	D3D12_ROOT_SIGNATURE_FLAGS d3dRootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+	D3D12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc;
+	::ZeroMemory(&d3dRootSignatureDesc, sizeof(D3D12_ROOT_SIGNATURE_DESC));
+	d3dRootSignatureDesc.NumParameters = _countof(pd3dRootParameters);
+	d3dRootSignatureDesc.pParameters = pd3dRootParameters;
+	d3dRootSignatureDesc.NumStaticSamplers = 2;
+	d3dRootSignatureDesc.pStaticSamplers = d3dSamplerDesc;
+	d3dRootSignatureDesc.Flags = d3dRootSignatureFlags;
+
+	ComPtr<ID3DBlob> pd3dSignatureBlob = NULL;
+	ComPtr<ID3DBlob> pd3dErrorBlob = NULL;
+	HRESULT hr = D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, pd3dSignatureBlob.GetAddressOf(), pd3dErrorBlob.GetAddressOf());
+
+	if (pd3dErrorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)pd3dErrorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(0,
+		pd3dSignatureBlob->GetBufferPointer(),
+		pd3dSignatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(m_RootSignature[PSO_OBJECT].GetAddressOf()))
+	);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(0,
+		pd3dSignatureBlob->GetBufferPointer(),
+		pd3dSignatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(m_RootSignature[PSO_SHADOWMAP].GetAddressOf()))
+	);
+}
+
+D3D12_SHADER_BYTECODE ShadowDebugShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "VSShadow", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE ShadowDebugShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
+
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSShadow", "ps_5_1", ppd3dShaderBlob));
+}
+
+D3D12_BLEND_DESC ShadowDebugShader::CreateBlendState(int index)
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+	d3dBlendDesc.AlphaToCoverageEnable = FALSE;			// FALSE
+	d3dBlendDesc.IndependentBlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;	// FALSE
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;	//D3D12_BLEND_ONE
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//D3D12_BLEND_ZERO
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	return(d3dBlendDesc);
+}
+
+//깊이-스텐실 검사를 위한 상태를 설정하기 위한 구조체를 반환한다.
+D3D12_DEPTH_STENCIL_DESC ShadowDebugShader::CreateDepthStencilState(int index)
+{
+	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
+	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
+	d3dDepthStencilDesc.DepthEnable = true;
+	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;			// D3D12_COMPARISON_FUNC_LESS
+	d3dDepthStencilDesc.StencilEnable = true;
+	d3dDepthStencilDesc.StencilReadMask = 0xff;
+	d3dDepthStencilDesc.StencilWriteMask = 0xff;
+	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_INVERT;		// D3D12_STENCIL_OP_KEEP	//D3D12_STENCIL_OP_INVERT	//D3D12_STENCIL_OP_INCR
+	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;	// D3D12_COMPARISON_FUNC_NEVER
+	// 후면 다각형 렌더링
+	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_INCR;		// D3D12_STENCIL_OP_KEEP	//D3D12_STENCIL_OP_REPLACE
+	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;	// D3D12_COMPARISON_FUNC_NEVER
+	return(d3dDepthStencilDesc);
+}
+
+void ShadowDebugShader::CreateShaderVariables(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	m_ShadowCB = make_unique<UploadBuffer<CB_SHADOW_INFO>>(pd3dDevice, m_nObjects, true);
+}
+
+void ShadowDebugShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	CB_SHADOW_INFO cBuffer;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		//float3 c_Light1 = float3(0.f, -1.0f, 0.4f);
+		//auto _Shadow = XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.4f, 0.0f))) * XMMatrixTranslation(+0.0f, -4.99f, +4.99f);
+
+		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World) * shadow_mat));
+		cBuffer.m_nMaterial = 0;
+
+		//XMStoreFloat4x4(&cBuffer.m_xmf4x4ShadowTransform, XMMatrixTranspose(shadow_mat));
+
+		m_ShadowCB->CopyData(i, cBuffer);
+	}
+}
+
+void ShadowDebugShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+
+	CreatePipelineParts();
+
+	m_nObjects = 1;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	if (type == M_Map_1) {
+		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
+		XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
+		XMMATRIX shadowoffset = XMMatrixTranslation(-4.0f, 11.f, -5.5f);
+		shadow_mat = S * shadowoffset;//XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.36f, 0.0f))) * XMMatrixTranslation(+0.0f, +11.0f, 0.f);
+	}
+	if (type == M_Map_3_cake_2 || type == M_Map_3_cake_2_2 || type == M_Map_3_cake_3 || type == M_Map_3_cake_3_2) {
+		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
+		XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
+		XMMATRIX shadowoffset;
+		if (type == M_Map_3_cake_2) shadowoffset = XMMatrixTranslation(250.f, 1.5f, 50.f);
+		if (type == M_Map_3_cake_2_2) shadowoffset = XMMatrixTranslation(-250.f, 1.5f, 50.f);
+		if (type == M_Map_3_cake_3) shadowoffset = XMMatrixTranslation(250.f, 80.f, 80.f);
+		if (type == M_Map_3_cake_3_2) shadowoffset = XMMatrixTranslation(-250.f, 80.f, 80.f);
+		shadow_mat = S * shadowoffset;//XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.36f, 0.0f))) * XMMatrixTranslation(+0.0f, +11.0f, 0.f);
+	}
+
+	//if (map_type == M_Map_3_cake_2) map->SetPosition(map_3_distance, 0.f, 50.f);	250
+	//if (map_type == M_Map_3_cake_2_2) map->SetPosition(-map_3_distance, 0.f, 50.f);
+	//if (map_type == M_Map_3_cake_3) map->SetPosition(map_3_distance, 80.f, 80.f);
+	//if (map_type == M_Map_3_cake_3_2) map->SetPosition(-map_3_distance, 80.f, 80.f);
+	//if (map_type == M_Map_1_macaron_3) map->SetPosition(0, 80.f, 50.f);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ShadowCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_SHADOW_INFO)));
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 1, true);
+
+	CreateGraphicsRootSignature(pd3dDevice);
+
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		ModelObject* Shadow_ = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
+		Shadow_->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_bbObjects[i] = Shadow_;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+PlayerShadowShader::PlayerShadowShader(Model_Animation *ma) : PlayerShader(ma)
+{
+}
+
+PlayerShadowShader::~PlayerShadowShader()
+{
+}
+
+D3D12_SHADER_BYTECODE PlayerShadowShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "VSDynamicShadow", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE PlayerShadowShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
+
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSShadow", "ps_5_1", ppd3dShaderBlob));
+}
+
+D3D12_BLEND_DESC PlayerShadowShader::CreateBlendState(int index)
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+	d3dBlendDesc.AlphaToCoverageEnable = FALSE;			// FALSE
+	d3dBlendDesc.IndependentBlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;	// FALSE
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;	//D3D12_BLEND_ONE
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//D3D12_BLEND_ZERO
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	return(d3dBlendDesc);
+}
+
+//깊이-스텐실 검사를 위한 상태를 설정하기 위한 구조체를 반환한다.
+D3D12_DEPTH_STENCIL_DESC PlayerShadowShader::CreateDepthStencilState(int index)
+{
+	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
+	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
+	d3dDepthStencilDesc.DepthEnable = true;
+	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;			// D3D12_COMPARISON_FUNC_LESS
+	d3dDepthStencilDesc.StencilEnable = true;
+	d3dDepthStencilDesc.StencilReadMask = 0xff;
+	d3dDepthStencilDesc.StencilWriteMask = 0xff;
+	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_INCR;		// D3D12_STENCIL_OP_KEEP
+	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;	// D3D12_COMPARISON_FUNC_NEVER
+	// 후면 다각형 렌더링
+	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_INCR;		// D3D12_STENCIL_OP_KEEP	//D3D12_STENCIL_OP_REPLACE
+	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;	// D3D12_COMPARISON_FUNC_NEVER
+	return(d3dDepthStencilDesc);
+}
+
+void PlayerShadowShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 1;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
+	XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
+	XMMATRIX shadowoffset = XMMatrixTranslation(0.0f, 11.f, 0.0f);
+	shadow_mat = S * shadowoffset;//XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.36f, 0.0f))) * XMMatrixTranslation(+0.0f, +11.0f, 0.f);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 1);
+	//CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, 1, 3);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_BoneCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_DYNAMICOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth_1.dds", 0);	//cloth_2
+	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\body.dds", 0);
+	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth.dds", 1);
+	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\eye.dds", 2);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	CPlayer* player = new CPlayer(model_anim, pd3dDevice, pd3dCommandList);
+	player->SetAnimations(model_anim->getAnimCount(), model_anim->getAnim(0));
+	m_Camera = player->GetCamera();
+	//cout << "애니 갯수 : " << model_anim->getAnimCount() << endl;
+	//cout << "뼈 : " << model_anim-> << endl;
+
+	//tmp->SetPosition(XMFLOAT3(0, 0, 0));
+	player->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+	m_bbObjects[0] = player;
+	m_player = player;
+}
+
+//////////////
+
+D3D12_SHADER_BYTECODE ShadowREverseShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSReverseShadow", "ps_5_1", ppd3dShaderBlob));
+}
+
+D3D12_BLEND_DESC ShadowREverseShader::CreateBlendState(int index)
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+	d3dBlendDesc.AlphaToCoverageEnable = FALSE;			// FALSE
+	d3dBlendDesc.IndependentBlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;	// FALSE
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;	//D3D12_BLEND_ONE
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//D3D12_BLEND_ZERO
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	return(d3dBlendDesc);
+}
+
+D3D12_DEPTH_STENCIL_DESC ShadowREverseShader::CreateDepthStencilState(int index)
+{
+	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
+	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
+	d3dDepthStencilDesc.DepthEnable = true;
+	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;			// D3D12_COMPARISON_FUNC_LESS
+	d3dDepthStencilDesc.StencilEnable = true;
+	d3dDepthStencilDesc.StencilReadMask = 0xff;
+	d3dDepthStencilDesc.StencilWriteMask = 0xff;
+	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_INVERT;		// D3D12_STENCIL_OP_KEEP
+	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;	// D3D12_COMPARISON_FUNC_NEVER
+	// 후면 다각형 렌더링
+	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;		// D3D12_STENCIL_OP_KEEP	//D3D12_STENCIL_OP_REPLACE
+	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;	// D3D12_COMPARISON_FUNC_NEVER
+	return(d3dDepthStencilDesc);
+}
+
+void ShadowREverseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 1;
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\candyland.dds", 0);	//1400*788
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT3 a = XMFLOAT3(0.f, 1.f, 0.f);
+
+	for (int i = 0; i < m_nObjects; i++) {
+
+		CGameObject *Map_Object = NULL;
+
+		Map_Object = new CGameObject();
+		Map_Object->SetPosition(0, 0, 161);
+		m_ppObjects[i] = Map_Object;
+
+		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000.f, 500.f, 20.f);	// pos(x, y), Width(w, h), depth
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+		m_ppObjects[i]->SetMesh(pCubeMesh);
+
+		//m_ppObjects[i]->Rotate(&a, 90.f);
 	}
 }

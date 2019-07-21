@@ -37,6 +37,7 @@ public:
 	CPlayer*					getplayer(char id) { return m_pPlayer[id]; }
 	Model_Animation				*character_anim;
 	PlayerShader				*m_pPlayerShader[MAX_USER];
+	PlayerShadowShader			*m_pPlayerShadowShader[MAX_USER];
 
 	CModelShader				*m_MapShader[8] = { NULL, };
 	LoadModel					**Map_Model;
@@ -66,6 +67,10 @@ public:
 	UINT						m_nUIShaders;
 	
 	MessageShader				*pMes_Weapon = NULL;
+
+	ShadowDebugShader			*m_ShadowShader[5] = { NULL, };
+
+	ShadowREverseShader			*m_ShadowReverseShader = NULL;
 
 	int Selected_Map = 0;
 

@@ -21,6 +21,13 @@ struct VS_VB_INSTANCE
 	XMFLOAT4 m_xmcColor;
 };
 
+struct CB_SHADOW_INFO
+{
+	XMFLOAT4X4	m_xmf4x4World;
+	UINT		m_nMaterial = 0;
+	XMFLOAT4X4 m_xmf4x4ShadowTransform;
+};
+
 D3D12_SHADER_RESOURCE_VIEW_DESC GetShaderResourceViewDesc(D3D12_RESOURCE_DESC d3dResourceDesc, UINT nTextureType);
 
 class CompiledShaders
@@ -315,6 +322,8 @@ protected:
 	//UploadBuffer<MATERIALS>*						m_MatCB = nullptr;
 
 public:
+	XMMATRIX shadow_mat;
+
 	CPlayer* m_player;
 
 	DynamicModelShader(Model_Animation *ma);
@@ -337,7 +346,7 @@ public:
 
 class PlayerShader : public DynamicModelShader
 {
-private:
+public:
 	CCamera * m_Camera;
 public:
 	PlayerShader(Model_Animation *ma);
@@ -366,3 +375,50 @@ public:
 	virtual CGameObject* getObjects() { return m_ppObjects[0]; }
 };
 
+
+class ShadowDebugShader : public CModelShader
+{
+public:
+	unique_ptr<UploadBuffer<CB_SHADOW_INFO>>		m_ShadowCB = nullptr;
+	XMMATRIX		shadow_mat;
+
+public:
+	ShadowDebugShader();
+	ShadowDebugShader(LoadModel *ma);
+	//ShadowDebugShader(Model_Animation *ma);
+	~ShadowDebugShader();
+
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int index);
+	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual void CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int type, int nRenderTargets = 1, void *pContext = NULL);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList);
+};
+
+class ShadowREverseShader : public MeshShader
+{
+public:
+	ShadowREverseShader() {};
+	~ShadowREverseShader() {};
+
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int index);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+};
+
+class PlayerShadowShader : public PlayerShader
+{
+public:
+	PlayerShadowShader(Model_Animation *ma);
+	~PlayerShadowShader();
+
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int index);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+};
