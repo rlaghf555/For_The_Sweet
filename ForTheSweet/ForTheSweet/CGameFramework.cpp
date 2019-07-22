@@ -561,7 +561,11 @@ void CGameFramework::LoadModels()
 	Map_Model[10] = new LoadModel("./resource/map/map_3_bridge.FBX", true);		// map_3_bridge
 	Map_Model[11] = new LoadModel("./resource/map/map_3_cake_black.FBX", true); // map_3_cake_in_black
 
-	Map_Model[12] = new LoadModel("./resource/map/shadow_test_1.FBX", true);	// shadow_test
+	Map_Model[12] = new LoadModel("./resource/map/shadow_test_1.FBX", true);	// map_1_chocolate_for_shadow
+
+	Map_Model[13] = new LoadModel("./resource/map/map_3_in.FBX", true);			// map_3_in
+	Map_Model[14] = new LoadModel("./resource/map/map_3_in_stair_1.FBX", true);	// map_3_in_stair_1
+	Map_Model[15] = new LoadModel("./resource/map/map_3_in_stair_2.FBX", true);	// map_3_in_stair_2
 
 	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);			// M_Weapon_Lollipop
 	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);				// M_Weapon_chupachupse
@@ -1485,15 +1489,13 @@ void CGameFramework::ProcessInput()
 		}
 
 
-
-
 		if (!SERVER_ON)
 		{
 			//m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), true);
 			//m_pPhysx->move(dwDirection, 20.0f * m_GameTimer.GetTimeElapsed());
 			XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 			XMFLOAT3 xmf3Direction = XMFLOAT3(0, 0, 0);
-			float distance = 20.0f * m_GameTimer.GetTimeElapsed();
+			float distance = 50.0f * m_GameTimer.GetTimeElapsed();
 			//XMFLOAT3 Look = XMFLOAT3(0, 0, 0);
 
 			if (dwDirection & DIR_FORWARD) {
@@ -1671,6 +1673,17 @@ void CGameFramework::CollisionProcess()
 				if (m_pScene->m_pPlayer[My_ID]->GetConnected()) {
 					if (!m_pScene->m_pPlayer[My_ID]->Get_Weapon_grab())
 						m_pScene->CollisionProcess(My_ID);
+
+					if (selected_map == M_Map_3) {
+						m_pScene->Collision_telleport(My_ID);	// юс╫ц
+						XMFLOAT3 position;
+						position.x = m_pPlayer->GetPosition().x;
+						position.y = m_pPlayer->GetPosition().y;
+						position.z = m_pPlayer->GetPosition().z;
+
+						m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+						m_pCamera->SetLookAt(position);
+					}
 				}
 			}
 		}

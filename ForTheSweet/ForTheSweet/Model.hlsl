@@ -261,6 +261,23 @@ VS_MODEL_TEXTURED_OUTPUT VSShadow(VS_MODEL_INPUT input)
     return (output);
 };
 
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSBoundBox(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
+{
+    PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+    	
+    float3 uvw = float3(input.uv, nPrimitiveID / 2);
+    float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	    
+    input.normalW = normalize(input.normalW);
+       
+    output.color = float4(1.f, 0.f, 0.f, 1.0f);
+    output.nrmoutline = float4(input.normalW, 1.0f);
+    output.nrm = output.nrmoutline;
+    output.pos = float4(input.positionW, 1.0f);
+	
+    return (output);
+};
+
 VS_MODEL_TEXTURED_OUTPUT VSDynamicShadow(VS_MODEL_INPUT input)
 {
     VS_MODEL_TEXTURED_OUTPUT output;

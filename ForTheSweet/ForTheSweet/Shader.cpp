@@ -860,6 +860,9 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	if (map_type == M_Map_3_cake_2 || map_type == M_Map_3_cake_2_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_2.dds", 0);
 	if (map_type == M_Map_3_cake_3 || map_type == M_Map_3_cake_3_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_3.dds", 0);
 	if (map_type == M_Map_1_macaron_3) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron.dds", 0);
+	if (map_type == M_Map_3_in || map_type == M_Map_3_in_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_in.dds", 0);
+	if (map_type == M_Map_3_in_stair_1 || map_type == M_Map_3_in_stair_1_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
+	if (map_type == M_Map_3_in_stair_2 || map_type == M_Map_3_in_stair_2_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
 	
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
@@ -886,6 +889,13 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		if (map_type == M_Map_3_cake_3) map->SetPosition(map_3_distance, 80.f, 80.f);
 		if (map_type == M_Map_3_cake_3_2) map->SetPosition(-map_3_distance, 80.f, 80.f);
 		if (map_type == M_Map_1_macaron_3) map->SetPosition(0, 80.f, 50.f);
+
+		if (map_type == M_Map_3_in) map->SetPosition(map_3_distance, 500.f, 40.f);
+		if (map_type == M_Map_3_in_stair_1) map->SetPosition(map_3_distance, 500.f, 40.f);
+		if (map_type == M_Map_3_in_stair_2) map->SetPosition(map_3_distance, 500.f, 40.f);
+		if (map_type == M_Map_3_in_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
+		if (map_type == M_Map_3_in_stair_1_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
+		if (map_type == M_Map_3_in_stair_2_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
 		
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
@@ -925,7 +935,6 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (map_type == M_Map_1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_2.dds", 0);
-	if (map_type == M_Map_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_oreo.dds", 0);
 	if (map_type == M_Map_3)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
@@ -1263,7 +1272,34 @@ void MeshShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandLi
 	}
 }
 
-void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+D3D12_RASTERIZER_DESC MeshShader::CreateRasterizerState(int index)
+{
+	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
+	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
+
+	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+
+	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
+	d3dRasterizerDesc.DepthBias = 0;
+	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
+	d3dRasterizerDesc.SlopeScaledDepthBias = 0.0f;
+
+	d3dRasterizerDesc.DepthClipEnable = TRUE;
+	//d3dRasterizerDesc.DepthClipEnable = FALSE;
+
+	d3dRasterizerDesc.MultisampleEnable = FALSE;
+	d3dRasterizerDesc.AntialiasedLineEnable = FALSE;
+	d3dRasterizerDesc.ForcedSampleCount = 0;
+	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+	return(d3dRasterizerDesc);
+}
+
+void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
@@ -1279,28 +1315,28 @@ void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	BuildPSO(pd3dDevice, nRenderTargets);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\candyland.dds", 0);	//1400*788
+	if(type == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\candyland.dds", 0);	//1400*788
+	if(type == 1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 	
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 	
-	XMFLOAT3 a = XMFLOAT3(0.f, 1.f, 0.f);
-
 	for (UINT i = 0; i < m_nObjects; i++) {
 
 		CGameObject *Map_Object = NULL;
 
 		Map_Object = new CGameObject();
-		Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
+		if (type == 0)Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
+		if (type == 1)Map_Object->SetPosition(0.f, 400.f, 0.f);
 		m_ppObjects[i] = Map_Object;
 
-		CMesh *pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -1400, 1000, 2800, 1500, 1000);	// pos(x, y), Width(w, h), depth
+		CMesh *pCubeMesh = NULL;
+		if (type == 0) pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -1400, 1000, 2800, 1500, 1000);	// pos(x, y), Width(w, h), depth
+		if (type == 1) pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000, 500, 500);				
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
-
-		//m_ppObjects[i]->Rotate(&a, 90.f);
 	}
 	delete pTexture;
 
@@ -1366,6 +1402,7 @@ D3D12_BLEND_DESC WaveShader::CreateBlendState(int index)
 	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//D3D12_BLEND_ZERO
 	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+
 	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
@@ -1558,6 +1595,13 @@ D3D12_RASTERIZER_DESC testBox::CreateRasterizerState(int index)
 	return(d3dRasterizerDesc);
 }
 
+D3D12_SHADER_BYTECODE testBox::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
+
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSBoundBox", "ps_5_1", ppd3dShaderBlob));
+}
+
 void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int type, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
@@ -1576,9 +1620,22 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 		CGameObject *test_Object = NULL;
 		test_Object = new CGameObject();
 		//BoundingOrientedBox bb = mo->boundingbox;
-		XMFLOAT3 pos = mo->GetPosition();
+		XMFLOAT3 pos;
+		if (type <= 10)pos = mo->GetPosition();
+		else {
+			if (type == LEFT_DOWN_OUT) pos = XMFLOAT3(-250.f, 10.f, -50.f);
+			if (type == LEFT_DOWN_IN) pos = XMFLOAT3(-250.f, 30.f + 500.f, -70.f);
+			if (type == LEFT_UP_OUT) pos = XMFLOAT3(-250.f, 85.f, 30.f);
+			if (type == LEFT_UP_IN) pos = XMFLOAT3(-250.f, 85.f + 500.f, 20.f);
+
+			if (type == RIGHT_DOWN_OUT) pos = XMFLOAT3(250.f, 10.f, -50.f);
+			if (type == RIGHT_DOWN_IN) pos = XMFLOAT3(250.f, 30.f + 500.f, -70.f);
+			if (type == RIGHT_UP_OUT) pos = XMFLOAT3(250.f, 85.f, 30.f);
+			if (type == RIGHT_UP_IN) pos = XMFLOAT3(250.f, 85.f + 500.f, 20.f);
+		}
 		test_Object->SetPosition(pos);
 		m_ppObjects[i] = test_Object;
+
 		if (type == OBJECT_PLAYER) {
 			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 15, 35, 15);	// pos(x, y), Width(w, h), depth
 			bounding.Extents.x = 15; bounding.Extents.y = 35; bounding.Extents.z = 15;
@@ -1611,6 +1668,30 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 			m_ppObjects[i]->SetMesh(pCubeMesh);
 		}
+		if (type == M_Weapon_chocolate) {
+			//	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 45, 5);	// pos(x, y), Width(w, h), depth
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 10, 10);	// pos(x, y), Width(w, h), depth
+			bounding.Extents.x = 5; bounding.Extents.y = 5; bounding.Extents.z = 5;
+
+			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_ppObjects[i]->SetMesh(pCubeMesh);
+		}
+		if (type == M_Weapon_cupcake) {
+			//	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 45, 5);	// pos(x, y), Width(w, h), depth
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 10, 10);	// pos(x, y), Width(w, h), depth
+			bounding.Extents.x = 5; bounding.Extents.y = 5; bounding.Extents.z = 5;
+
+			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_ppObjects[i]->SetMesh(pCubeMesh);
+		}
+		if (type >= LEFT_DOWN_OUT && type <= RIGHT_UP_IN){
+			//	CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 45, 5);	// pos(x, y), Width(w, h), depth
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 4, 4, 4);	// pos(x, y), Width(w, h), depth
+			bounding.Extents.x = 2; bounding.Extents.y = 2; bounding.Extents.z = 2;
+
+			m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+			m_ppObjects[i]->SetMesh(pCubeMesh);
+		}
 	}
 }
 
@@ -1624,7 +1705,18 @@ void testBox::Rotate(float x, float y, float z)
 	m_ppObjects[0]->Rotate(x, y, z);
 }
 
+void testBox::Animate(float fTimeElapsed)
+{
+	if (IsZero(fTimeElapsed))
+		return;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		if (m_ppObjects[i])
+			m_ppObjects[i]->Animate(fTimeElapsed);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////////////
+
 WeaponShader::WeaponShader()
 {
 
@@ -1735,6 +1827,12 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 				float b = D3DMath::RandF(-6, 6);
 				float c = D3DMath::RandF(-7, 7);
 				weapon->SetPosition(b * 20, 10, c * 20);
+			}
+			if (mpa_type == M_Map_3) {
+				float b = D3DMath::RandF(-13, 13);
+				float c = D3DMath::RandF(-7, 7);
+				if (c > -2 && c < 2) { i -= 1; continue; }
+				weapon->SetPosition(b * 20, 0, c * 20);
 			}
 
 			//weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
@@ -2495,7 +2593,7 @@ void ShadowREverseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphics
 		Map_Object->SetPosition(0, 0, 161);
 		m_ppObjects[i] = Map_Object;
 
-		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000.f, 500.f, 20.f);	// pos(x, y), Width(w, h), depth
+		CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000.f, 100.f, 20.f);	// pos(x, y), Width(w, h), depth
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 

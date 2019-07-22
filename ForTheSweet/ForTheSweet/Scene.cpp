@@ -111,6 +111,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		}
 	}
 	if (Selected_Map == M_Map_3) {
+		for (int i = 0; i < 8; i++) {
+			door[i] = new testBox();
+			door[i]->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[i], 11 + i);
+		}
+
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_3]);
 		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3);
 		m_MapShader[1] = new CModelShader(Map_Model[M_Map_3]);
@@ -131,6 +136,20 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		m_MapShader[7] = new CModelShader(Map_Model[M_Map_1_macaron]);
 		m_MapShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_3);
+
+		m_MapShader[8] = new CModelShader(Map_Model[M_Map_3_in]);
+		m_MapShader[8]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in);
+		m_MapShader[9] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
+		m_MapShader[9]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1);
+		m_MapShader[10] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
+		m_MapShader[10]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2);
+
+		m_MapShader[11] = new CModelShader(Map_Model[M_Map_3_in]);
+		m_MapShader[11]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_2);
+		m_MapShader[12] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
+		m_MapShader[12]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1_2);
+		m_MapShader[13] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
+		m_MapShader[13]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2_2);
 
 		m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
 		m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
@@ -162,9 +181,13 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_WavesShader = new WaveShader();
 	m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList, Map_SELECT);
 
-	m_BackGroundShader = new MeshShader();
-	m_BackGroundShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	m_BackGroundShader[0] = new MeshShader();
+	m_BackGroundShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
 
+	if (Selected_Map == M_Map_3) {
+		m_BackGroundShader[1] = new MeshShader();
+		m_BackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+	}
 	//m_pPlayer[0]->SetWeapon(true, 0);
 	
 	for (int i = 0; i < MAX_USER; i++) {
@@ -358,7 +381,7 @@ void CScene::ReleaseObjects()
 			delete m_pPlayerShader[i];
 		}
 	}
-	for (int i = 0; i < 9; i++) {
+	for (int i = 0; i < 14; i++) {
 		if (m_MapShader[i]) {
 			m_MapShader[i]->ReleaseShaderVariables();
 			m_MapShader[i]->ReleaseObjects();
@@ -396,6 +419,13 @@ void CScene::ReleaseObjects()
 			delete m_StairShader[i];
 		}
 	}
+	for (int i = 0; i < 2; ++i) {
+		if (m_BackGroundShader[i]) {
+			m_BackGroundShader[i]->ReleaseShaderVariables();
+			m_BackGroundShader[i]->ReleaseObjects();
+			delete m_BackGroundShader[i];
+		}
+	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) {
 		if (m_WeaponShader[i]) {
 			m_WeaponShader[i]->ReleaseShaderVariables();
@@ -417,6 +447,13 @@ void CScene::ReleaseObjects()
 			bounding_box_test[i]->ReleaseShaderVariables();
 			bounding_box_test[i]->ReleaseObjects();
 			delete bounding_box_test[i];
+		}
+	}
+	for (int i = 0; i < 8; ++i) {
+		if (door[i]) {
+			door[i]->ReleaseShaderVariables();
+			door[i]->ReleaseObjects();
+			delete door[i];
 		}
 	}
 	for (UINT i = 0; i < m_nUIShaders; ++i) {
@@ -487,8 +524,7 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	//for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].AnimateObjects(fTimeElapsed);
-
-
+	
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (m_pPlayer[i]) {
@@ -598,6 +634,30 @@ void CScene::CollisionProcess(int index)
 	m_pPlayer[index]->SetWeapon(false, -1, -1);
 }
 
+void CScene::Collision_telleport(int index)
+{
+	bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
+	
+	for (int i = 0; i < 8; i++) {
+		door[i]->bounding.Center = door[i]->getObjects()->GetPosition();
+		bool result = door[i]->bounding.Intersects(bounding_box_test[index]->bounding);
+		if (result) {
+			//XMFLOAT3 telpos;
+			if (i == 0) { XMFLOAT3 telpos = door[1]->getObjects()->GetPosition(); telpos.z += 15.f;      m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_OUT	
+			else if (i == 1) { XMFLOAT3 telpos = door[0]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_IN	
+			else if (i == 2) { XMFLOAT3 telpos = door[3]->getObjects()->GetPosition(); telpos.z += 15.f; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_OUT		
+			else if (i == 3) { XMFLOAT3 telpos = door[2]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_IN		
+																						  		
+			else if (i == 4) { XMFLOAT3 telpos = door[5]->getObjects()->GetPosition(); telpos.z += 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_OUT	
+			else if (i == 5) { XMFLOAT3 telpos = door[4]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_IN	
+			else if (i == 6) { XMFLOAT3 telpos = door[7]->getObjects()->GetPosition(); telpos.z += 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_OUT	
+			else if (i == 7) { XMFLOAT3 telpos = door[6]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_IN		
+			//m_pPlayer[index]->SetPosition(telpos);
+			return;
+		}
+	}
+}
+
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
@@ -621,6 +681,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[4]) m_MapShader[4]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_3) {
+		for (int i = 0; i < 8; ++i)if (door[i]) door[i]->Render(pd3dCommandList, pCamera);
+		
+		if (m_MapShader[8]) m_MapShader[8]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[9]) m_MapShader[9]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[10]) m_MapShader[10]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[11]) m_MapShader[11]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[12]) m_MapShader[12]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[13]) m_MapShader[13]->Render(pd3dCommandList, pCamera);
+
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[2]) m_MapShader[2]->Render(pd3dCommandList, pCamera);
@@ -629,13 +698,14 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[5]) m_MapShader[5]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[6]) m_MapShader[6]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[7]) m_MapShader[7]->Render(pd3dCommandList, pCamera);
+
 		m_BridgeShader->Render(pd3dCommandList, pCamera);
 		for (int i = 0; i < 2; ++i) if (m_StairShader[i]) m_StairShader[i]->Render(pd3dCommandList, pCamera);
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
-	if (m_BackGroundShader) m_BackGroundShader->Render(pd3dCommandList, pCamera);
+	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
 	if (Selected_Map == M_Map_1) {
 		for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
 	}
@@ -646,14 +716,16 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_ShadowShader[1]) m_ShadowShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowShader[2]) m_ShadowShader[2]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowShader[3]) m_ShadowShader[3]->Render(pd3dCommandList, pCamera);
+
+		if (m_BackGroundShader[1]) m_BackGroundShader[1]->Render(pd3dCommandList, pCamera);
 	}
-	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-	//	for (int j = 0; j < 30; j++) {
-	//		if (weapon_box[i][j])
-	//			weapon_box[i][j]->Render(pd3dCommandList, pCamera);
-	//	}
-	//}
-	//for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
+			if (weapon_box[i][j])
+				weapon_box[i][j]->Render(pd3dCommandList, pCamera);
+		}
+	}
+	for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
 }
 
 void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)

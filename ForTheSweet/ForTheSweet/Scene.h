@@ -22,6 +22,7 @@ public:
 	void AnimateObjects(float fTimeElapsed);
 	void AnimateWeapon(int i);
 	void CollisionProcess(int index);
+	void Collision_telleport(int index);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList);
 	void ReleaseUploadBuffers();
@@ -39,7 +40,7 @@ public:
 	PlayerShader				*m_pPlayerShader[MAX_USER];
 	PlayerShadowShader			*m_pPlayerShadowShader[MAX_USER];
 
-	CModelShader				*m_MapShader[8] = { NULL, };
+	CModelShader				*m_MapShader[14] = { NULL, };
 	LoadModel					**Map_Model;
 
 	int							animate_flag = 0;
@@ -55,9 +56,11 @@ public:
 	WeaponShader				*m_WeaponShader[WEAPON_MAX_NUM];
 	LoadModel					**weapon_Model;
 
-	testBox						*bounding_box_test[MAX_USER];
-	testBox						*weapon_box[WEAPON_MAX_NUM][WEAPON_EACH_NUM];
-	MeshShader					*m_BackGroundShader = NULL;
+	testBox						*bounding_box_test[MAX_USER] = { NULL, };
+	testBox						*weapon_box[WEAPON_MAX_NUM][WEAPON_EACH_NUM] = { NULL, };
+	testBox						*door[8] = { NULL, };
+
+	MeshShader					*m_BackGroundShader[2] = { NULL, };
 
 	WaveShader					*m_WavesShader = NULL;
 

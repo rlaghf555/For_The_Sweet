@@ -236,11 +236,13 @@ public:
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
-	
+
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
+
 	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	virtual void Animate(float fTimeElapsed);
 	virtual void setScale(float scale);
@@ -367,12 +369,15 @@ public:
 	BoundingOrientedBox bounding;
 	testBox();
 	~testBox();
+
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int type,int nRenderTargets = 1, void * pContext = NULL);
 	//virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void SetPosition(XMFLOAT3& pos);
 	virtual void Rotate(float x, float y, float z);
 	virtual CGameObject* getObjects() { return m_ppObjects[0]; }
+	virtual void Animate(float fTimeElapsed);
 };
 
 
