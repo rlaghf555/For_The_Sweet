@@ -97,6 +97,11 @@ float4 PSUIHPBar(VS_TEXTURED_OUTPUT input) : SV_Target
        // if (uv.x < gfData)
         finalColor = gUITextures4.Sample(gDefaultSamplerState, uv);
     }
+    else if (gnTexType == 4)
+    {
+       // if (uv.x < gfData)
+        finalColor = gUITextures5.Sample(gDefaultSamplerState, uv);
+    }
     finalColor.a *= gfAlpha;
 
     return finalColor;

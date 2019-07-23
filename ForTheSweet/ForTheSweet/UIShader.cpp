@@ -828,7 +828,7 @@ void UIFightShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 
 void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
 {
-	UINT nTextures = 1;
+	UINT nTextures = 5;
 	m_nObjects = nTextures;
 	m_nPSO = 1;
 
@@ -838,8 +838,11 @@ void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	m_PSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "PSUIHPBar", "ps_5_1");
 
 	CTexture *pTexture = new CTexture(nTextures, RESOURCE_TEXTURE2D, 0);
-
 	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\message_weapon.dds", 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\message_fever.dds", 1);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\message_fog.dds", 2);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\message_cupcake.dds", 3);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\message_lightning.dds", 4); 
 
 	UINT ncbElementBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(CB_UI_INFO));
 
@@ -860,13 +863,43 @@ void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	XMFLOAT2 pos = XMFLOAT2(-100, 0);	//570,680;
 	XMFLOAT2 scale = XMFLOAT2(0.8f, 0.8f);
 
-	UIObject* Fight;
-	Fight = new UIObject();
-	Fight->SetPosition(pos);
-	Fight->SetScale(scale);
-	m_pUIObjects[0] = Fight;
+	UIObject* weapon;
+	weapon = new UIObject();
+	pos = XMFLOAT2(650, 600);
+	weapon->SetPosition(pos);
+	weapon->SetScale(scale);
+	weapon->m_bEnabled = false;
+	m_pUIObjects[0] = weapon;
 
-	for (UINT i = 0; i < m_nObjects; ++i) {
+	UIObject* fever;
+	fever = new UIObject();
+	fever->SetPosition(pos);
+	fever->SetScale(scale);
+	fever->m_bEnabled = false;
+	m_pUIObjects[1] = fever;
+
+	UIObject* fog;
+	fog = new UIObject();
+	fog->SetPosition(pos);
+	fog->SetScale(scale);
+	fog->m_bEnabled = false;
+	m_pUIObjects[2] = fog;
+
+	UIObject* cupcake;
+	cupcake = new UIObject();
+	cupcake->SetPosition(pos);
+	cupcake->SetScale(scale);
+	cupcake->m_bEnabled = false;
+	m_pUIObjects[3] = cupcake;
+
+	UIObject* lightning;
+	lightning = new UIObject();
+	lightning->SetPosition(pos);
+	lightning->SetScale(scale);
+	lightning->m_bEnabled = false;
+	m_pUIObjects[4] = lightning;
+
+	for (UINT i = 0; i < MESSAGE_NUM; ++i) {
 		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
 		XMUINT2 sizetmp(1, 1);
 		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
@@ -878,34 +911,22 @@ void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	delete pTexture;
 }
 
-void MessageShader::Animate(float fTimeElapsed, bool flag)
+void MessageShader::Animate(float fTimeElapsed)
 {
-	if (IsZero(fTimeElapsed)) return;
-
-	for (UINT i = 0; i < m_nObjects; ++i) {
-		if (m_pUIObjects[i]) {
-			if (flag == true) {
-				if (m_test_flag == 0) {
-					float ui_x = m_pUIObjects[i]->GetPos().x;
-					if (m_pUIObjects[i]->GetPos().x < 660) m_pUIObjects[i]->SetPosition(ui_x += 0.5, 600.f);
-					else m_test_flag = 1;
-				}
-				if (m_test_flag == 1) {
-					if (m_pUIObjects[i]->m_fAnimationTime < 1) m_pUIObjects[i]->m_fAnimationTime += m_pUIObjects[i]->m_fAnimationTime * fTimeElapsed;
-					else m_test_flag = 2;
-				}
-				else {
-					float ui_x = m_pUIObjects[i]->GetPos().x;
-					if (m_pUIObjects[i]->GetPos().x < 1800) m_pUIObjects[i]->SetPosition(ui_x += 0.5, 600.f);
-					else {
-						m_test_flag = 0;
-						Shader_flag = false;
-					}
-				}
-			}
-		}
+	for(UINT i=0;i<MESSAGE_NUM;++i)
+	if (m_pUIObjects[i]->m_bEnabled) {
+		ShowTime += fTimeElapsed;
+		if (ShowTime > 5)		//보이는 시간 조정 (sec)
+			m_pUIObjects[i]->m_bEnabled = false;
 	}
 }
+
+void MessageShader::ShowMessage(int message_type)
+{
+	m_pUIObjects[message_type]->m_bEnabled = true;
+	ShowTime = 0.f;
+}
+
 
 void UIIDShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
 {

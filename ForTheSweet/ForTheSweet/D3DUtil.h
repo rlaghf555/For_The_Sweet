@@ -35,17 +35,17 @@ enum SRVRegisterNumber {
 	SRVInstanceAnimationInfo		= 6,
 	SRVShadowMap					= 7,
 	SRVUITextureMap					= 9,
-	SRVMultiTexture					= 13,
-	SRVFullScreenTexture			= 17,
-	SRVFullScreenOutLineNormTexture	= 18,
-	SRVFullScreenNormalTexture		= 19,
-	SRVFullScreenDepthTexture		= 20,
-	SRVFullScreenHDR				= 22,
-	SRVAverageValues1D				= 24,
-	SRVAverageValues				= 25,
-	SRVHDRDownScale					= 26,
-	SRVBloomInput					= 27,
-	SRVHPBarData					= 28
+	SRVMultiTexture					= 14,
+	SRVFullScreenTexture			= 18,
+	SRVFullScreenOutLineNormTexture	= 19,
+	SRVFullScreenNormalTexture		= 20,
+	SRVFullScreenDepthTexture		= 21,
+	SRVFullScreenHDR				= 23,
+	SRVAverageValues1D				= 25,
+	SRVAverageValues				= 26,
+	SRVHDRDownScale					= 27,
+	SRVBloomInput					= 28,
+	SRVHPBarData					= 29
 };
 
 enum UAVRegisterNumber {

@@ -2,7 +2,7 @@
 #include "Shader.h"
 #include "UIObject.h"
 #include "Texture.h"
-#define NUM_MAX_UITEXTURE 4
+#define NUM_MAX_UITEXTURE 5
 class UIShader : public CShader
 {
 public:
@@ -162,14 +162,12 @@ public:
 
 class MessageShader : public UIShader
 {
-public:
-	bool Shader_flag = true;
-	int	m_test_flag = 0;
+	float ShowTime = 0.f;
 public:
 	MessageShader() { };
 	~MessageShader() { };
 
-public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
-	virtual void Animate(float fTimeElapsed, bool flag);
+	virtual void Animate(float fTimeElapsed);
+	virtual void ShowMessage(int message_type);
 };

@@ -285,10 +285,10 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 		m_ppUIShaders[12 + i + 4] = pID;
 	}
 
-	pMes_Weapon = new MessageShader();
-	pMes_Weapon->BuildObjects(pDevice, pCommandList);
-	pos = XMFLOAT2(-100, 600);
-	pMes_Weapon->SetPos(&pos, 0);
+	m_MessageShader = new MessageShader();
+	m_MessageShader->BuildObjects(pDevice, pCommandList);
+	m_MessageShader->ShowMessage(MESSAGE_LIGHTING);
+
 }
 
 void CScene::BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
@@ -466,10 +466,10 @@ void CScene::ReleaseObjects()
 			delete m_ppUIShaders[i];
 		}
 	}
-	if (pMes_Weapon) {
-		pMes_Weapon->ReleaseShaderVariables();
-		pMes_Weapon->ReleaseObjects();
-		delete pMes_Weapon;
+	if (m_MessageShader) {
+		m_MessageShader->ReleaseShaderVariables();
+		m_MessageShader->ReleaseObjects();
+		delete m_MessageShader;
 	}
 	
 }
@@ -568,7 +568,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			m_ppUIShaders[i]->Animate(fTimeElapsed);
 		}
 	}
-	pMes_Weapon->Animate(1.f, pMes_Weapon->Shader_flag);
+	m_MessageShader->Animate(fTimeElapsed);
 }
 
 void CScene::AnimateWeapon(int i)
@@ -743,5 +743,5 @@ void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComma
 	for (UINT i = 0; i < m_nUIShaders; ++i) {
 		m_ppUIShaders[i]->Render(pCommandList);
 	}
-	if(pMes_Weapon) pMes_Weapon->Render(pCommandList);
+	if(m_MessageShader) m_MessageShader->Render(pCommandList);
 }

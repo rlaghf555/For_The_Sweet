@@ -14,8 +14,13 @@ c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(237): warnin
 c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(239): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(269): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(280): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  UIShader.cpp
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\uishader.cpp(408): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\uishader.cpp(480): warning C4244: '인수': 'UINT64'에서 'uint32_t'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\uishader.cpp(667): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\uishader.cpp(962): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
   코드를 생성하고 있습니다.
-  3 of 3841 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  2 of 3842 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     1 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.

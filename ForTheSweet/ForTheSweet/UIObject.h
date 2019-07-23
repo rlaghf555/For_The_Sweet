@@ -53,7 +53,6 @@ public:
 
 public:
 	bool										m_bEnabled = true;
-	bool										Is_Render = true;
 	float										m_fAnimationTime = 0.3f;
 	D3D12_GPU_DESCRIPTOR_HANDLE					m_d3dCbvGPUDescriptorHandle;
 

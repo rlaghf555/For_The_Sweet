@@ -5,6 +5,7 @@ Texture2D gUITextures1 : register(t9);
 Texture2D gUITextures2 : register(t10);
 Texture2D gUITextures3 : register(t11);
 Texture2D gUITextures4 : register(t12);
+Texture2D gUITextures5 : register(t13);
 
 
 struct VS_TEXTURED_INPUT

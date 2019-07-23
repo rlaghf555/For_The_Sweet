@@ -69,7 +69,7 @@ public:
 	vector<UIShader*>			m_ppUIShaders;
 	UINT						m_nUIShaders;
 	
-	MessageShader				*pMes_Weapon = NULL;
+	MessageShader				*m_MessageShader =  NULL;
 
 	ShadowDebugShader			*m_ShadowShader[5] = { NULL, };
 
