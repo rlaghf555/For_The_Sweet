@@ -198,6 +198,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 			weapon_box[i][j] = new testBox();
 			weapon_box[i][j]->BuildObjects(pd3dDevice, pd3dCommandList, m_WeaponShader[i]->getObject(j), i);
+			if (i == 4) {
+				j = WEAPON_EACH_NUM;
+			}
 		}
 	}
 
@@ -540,8 +543,11 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		}
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {	
-		for (int j = 0; j < WEAPON_EACH_NUM; j++)
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
+			if (i == 4 && j == 1)//дедиюм 1╟Ё
+				break;
 			weapon_box[i][j]->getObjects()->m_xmf4x4World = m_WeaponShader[i]->getObject(j)->m_xmf4x4World;
+		}
 	}
 	
 	if (Selected_Map == M_Map_1) {
@@ -619,6 +625,8 @@ void CScene::CollisionProcess(int index)
 	bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
+			if (i == 4 && j == 1)	//дедиюм
+				break;
 			if (m_WeaponShader[i]->getObject(j)) {
 				weapon_box[i][j]->bounding.Center = m_WeaponShader[i]->getObject(j)->GetPosition();
 				XMMATRIX tmp = XMLoadFloat4x4(&m_WeaponShader[i]->getObject(j)->m_xmf4x4World);
