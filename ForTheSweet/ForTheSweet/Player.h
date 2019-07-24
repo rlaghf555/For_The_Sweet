@@ -73,6 +73,7 @@ protected:
 	bool Scale_flag = false;
 	char m_status = STATUS::FREE;
 
+	int weapon_skill = -1;
 	int weapon_index = -1;
 	int weapon_type = -1;
 	XMFLOAT3 m_xmf3Velocity;		//플레이어의 이동 속도를 나타내는 벡터이다.
@@ -127,7 +128,10 @@ public:
 	void SetMaxVelocityY(float fMaxVelocity) { m_fMaxVelocityY = fMaxVelocity; }
 	void SetVelocity(XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
 	void SetWeapon(bool grab, int Weapon_type, int Weapon_Index) { weapon_grab = grab; weapon_type = Weapon_type;  weapon_index = Weapon_Index; }
-	
+
+	int Get_Weapon_Skill() { return weapon_skill; }
+	void Set_Weapon_Skill(int weapon_skill_type) { weapon_skill = weapon_skill_type; }
+
 	bool Get_Weapon_grab() { return weapon_grab; }
 	int Get_Weapon_type() { return weapon_type; }
 	int Get_Weapon_index() { return weapon_index; }

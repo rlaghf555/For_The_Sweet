@@ -526,7 +526,7 @@ void CGameFramework::LoadModels()
 
 	character_animation.emplace_back(make_pair("./resource/character/small_react.FBX", 0));		// Anim_Small_React
 	character_animation.emplace_back(make_pair("./resource/character/pick_up.FBX", 0));			// Anim_Pick_up
-	character_animation.emplace_back(make_pair("./resource/character/power_up.FBX", 0));		// Anim_PowerUp
+	character_animation.emplace_back(make_pair("./resource/character/power_up.FBX", 0));		// Anim_PowerUpAnim_PowerUp
 
 	character_animation.emplace_back(make_pair("./resource/character/cupcake_eat.FBX", 0));		// Anim_Cupckae_Eat
 
@@ -543,6 +543,10 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/lollipop_hard_attack.FBX", 0));// Anim_Lollipop_HardAttack
 	character_animation.emplace_back(make_pair("./resource/character/lollipop_skill.FBX", 0));		// Anim_Lollipop_skill
 
+	character_animation.emplace_back(make_pair("./resource/character/pepero_hard_attack_1.FBX", 0));// Anim_pepero_HardAttack_1
+	character_animation.emplace_back(make_pair("./resource/character/pepero_hard_attack_2.FBX", 0));// Anim_pepero_HardAttack_2
+	character_animation.emplace_back(make_pair("./resource/character/pepero_skill.FBX", 0));		// Anim_pepero_Skill
+	
 	   
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
@@ -1136,10 +1140,8 @@ void CGameFramework::ProcessInput()
 		if (m_pPlayer->GetScaleflag()) {
 			if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 0 && Anim_Time < 20))
 				m_pPlayer->SetScale(1.0f);
-			else if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 20 && Anim_Time < 30)) {
-				m_pPlayer->SetWeapon(false, -1, -1);
+			else if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 20 && Anim_Time < 30))
 				m_pPlayer->SetScale(1.3f);
-			}
 			else if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 30 && Anim_Time < 38))
 				m_pPlayer->SetScale(1.7f);
 			else if (Anim_Index == Anim_Cupckae_Eat && (Anim_Time >= 38 && Anim_Time < 40))
@@ -1157,7 +1159,24 @@ void CGameFramework::ProcessInput()
 		}
 		else m_pPlayer->SetScale(1.0f);
 		
-	
+		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_Lollipop) {
+			if (Anim_Index == Anim_Lollipop_Skill && Anim_Time >= 23) {	// 롤리팝 수직으로 세우기
+				m_pPlayer->SetWeapon(false, -1, -1);
+				m_pPlayer->Set_Weapon_Skill(-1);
+			}
+		}
+		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_pepero) {
+			if (Anim_Index == Anim_pepero_Skill && Anim_Time >= 19) {	// 빼빼로 던지기
+				m_pPlayer->SetWeapon(false, -1, -1);
+				m_pPlayer->Set_Weapon_Skill(-1);
+			}
+		}
+		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_cupcake) {
+			if (Anim_Index == Anim_Cupckae_Eat && Anim_Time >= 20) {	// 컵케이크 사라지기
+				m_pPlayer->SetWeapon(false, -1, -1);
+				m_pPlayer->Set_Weapon_Skill(-1);
+			}
+		}
 
 		if (m_pPlayer->Get_Weapon_grab()) {
 			if (type == M_Weapon_Lollipop) {
@@ -1198,6 +1217,7 @@ void CGameFramework::ProcessInput()
 				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
 						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->Set_Weapon_Skill(M_Weapon_Lollipop);
 						m_pPlayer->DisableLoop();
 					}
 				}
@@ -1271,7 +1291,12 @@ void CGameFramework::ProcessInput()
 
 					   //아니면 강공격
 						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->ChangeAnimation(Anim_pepero_HardAttack_1);
+							m_pPlayer->DisableLoop();
+						}
+						if (Anim_Index == Anim_pepero_HardAttack_1 && (Anim_Time > 8 && Anim_Time < 14)) {
+							m_pPlayer->ChangeAnimation(Anim_pepero_HardAttack_2);
+							m_pPlayer->SetAnimFrame(Anim_Time);
 							m_pPlayer->DisableLoop();
 						}
 
@@ -1281,7 +1306,8 @@ void CGameFramework::ProcessInput()
 				if (Key_D) { //무기 스킬
 				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->ChangeAnimation(Anim_pepero_Skill);
+						m_pPlayer->Set_Weapon_Skill(M_Weapon_pepero);
 						m_pPlayer->DisableLoop();
 					}
 				}
@@ -1332,7 +1358,7 @@ void CGameFramework::ProcessInput()
 				if (Key_A || Key_S) {
 
 					if (Key_A&&Key_S) {//둘다 눌리면 막기
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
+						m_pPlayer->ChangeAnimation(Anim_Guard);
 						m_pPlayer->SetAnimFrame(10);
 						m_pPlayer->DisableLoop();
 					}
@@ -1366,6 +1392,7 @@ void CGameFramework::ProcessInput()
 				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
 						m_pPlayer->ChangeAnimation(Anim_Cupckae_Eat);
+						m_pPlayer->Set_Weapon_Skill(M_Weapon_cupcake);
 						m_pPlayer->SetScaleflag(true);
 						m_pPlayer->DisableLoop();
 					}
@@ -1388,8 +1415,6 @@ void CGameFramework::ProcessInput()
 				}
 				else if (Key_A && !Key_S) { //약공격 or 줍기
 				   //충돌체크 (무기 오브젝트랑) 충돌이면 줍기      
-
-					
 
 					if (type != -1 && index != -1) {
 						m_pPlayer->ChangeAnimation(Anim_Pick_up);
