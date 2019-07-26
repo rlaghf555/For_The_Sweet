@@ -1,6 +1,8 @@
 #define NUM_DIRECTION_LIGHTS 1
 
 Texture2DArray gBoxTextured : register(t0);
+Texture2D gEffectTexture : register(t3);
+
 SamplerState gDefaultSamplerState : register(s0);
 
 cbuffer cbPerObject : register(b0)
@@ -215,6 +217,23 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWaveModel(VS_MODEL_TEXTURED_OUTPUT input, ui
     return (output);
 };
 
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSEffect(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
+{
+    PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+    
+    float2 uv = input.uv;
+    float4 cColor = gEffectTexture.Sample(gDefaultSamplerState, uv);
+	
+    input.normalW = normalize(input.normalW);
+	
+    output.color = cColor;
+    //output.color.a = 0.7f;
+    output.nrmoutline = float4(input.normalW, 1.0f);
+    output.nrm = output.nrmoutline;
+    output.pos = float4(input.positionW, 1.0f);
+	
+    return (output);
+};
 ///////////////////////////////////
 
 VS_MODEL_TEXTURED_OUTPUT VSWave(VS_INPUT input)
@@ -245,6 +264,20 @@ VS_MODEL_TEXTURED_OUTPUT VSDiffused(VS_INPUT input)
     return (output);
 }
 
+VS_MODEL_TEXTURED_OUTPUT VSLightning(VS_INPUT input)
+{
+    VS_MODEL_TEXTURED_OUTPUT output;
+    
+    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
+    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+    output.uv =float2(
+    input.uv.x / 8 + float(gnMaterial) / float(8),
+    input.uv.y / 1 + float(0) / float(1)
+    );
+    
+    return (output);
+}
 VS_MODEL_TEXTURED_OUTPUT VSShadow(VS_MODEL_INPUT input)
 {
     VS_MODEL_TEXTURED_OUTPUT output;

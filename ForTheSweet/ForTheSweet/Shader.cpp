@@ -1281,6 +1281,7 @@ D3D12_RASTERIZER_DESC MeshShader::CreateRasterizerState(int index)
 	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
 	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
 
@@ -2599,4 +2600,214 @@ void ShadowREverseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphics
 
 		//m_ppObjects[i]->Rotate(&a, 90.f);
 	}
+}
+
+EffectShader::EffectShader()
+{
+}
+
+EffectShader::~EffectShader()
+{
+}
+
+D3D12_BLEND_DESC EffectShader::CreateBlendState(int index)
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+
+	d3dBlendDesc.AlphaToCoverageEnable = false;
+	d3dBlendDesc.IndependentBlendEnable = false;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = true;
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = false;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	return d3dBlendDesc;
+}
+
+D3D12_SHADER_BYTECODE EffectShader::CreateVertexShader(ID3DBlob ** ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "VSLightning", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE EffectShader::CreatePixelShader(ID3DBlob ** ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSEffect", "ps_5_1", ppd3dShaderBlob));
+}
+
+void EffectShader::CreateGraphicsRootSignature(ID3D12Device * pd3dDevice)
+{
+	int i = 0;
+	ComPtr<ID3D12RootSignature> pd3dGraphicsRootSignature = nullptr;
+
+	CD3DX12_DESCRIPTOR_RANGE pd3dDescriptorRanges[2];
+
+	pd3dDescriptorRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, CBVObjectInfo, 0, 0); // GameObject
+	pd3dDescriptorRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, SRVAnimation, 0, 0); // Texture
+
+	CD3DX12_ROOT_PARAMETER pd3dRootParameters[3];
+
+	pd3dRootParameters[0].InitAsConstantBufferView(1);
+	pd3dRootParameters[1].InitAsDescriptorTable(1, &pd3dDescriptorRanges[0], D3D12_SHADER_VISIBILITY_ALL);
+	pd3dRootParameters[2].InitAsDescriptorTable(1, &pd3dDescriptorRanges[1], D3D12_SHADER_VISIBILITY_PIXEL);
+
+	D3D12_STATIC_SAMPLER_DESC d3dSamplerDesc[2];
+	::ZeroMemory(&d3dSamplerDesc, sizeof(D3D12_STATIC_SAMPLER_DESC));
+
+	d3dSamplerDesc[0] = CD3DX12_STATIC_SAMPLER_DESC(
+		0,
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		0.0f,
+		1,
+		D3D12_COMPARISON_FUNC_ALWAYS,
+		D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE,
+		0.0f,
+		D3D12_FLOAT32_MAX,
+		D3D12_SHADER_VISIBILITY_PIXEL
+	);
+
+	d3dSamplerDesc[1] = CD3DX12_STATIC_SAMPLER_DESC(
+		1, // shaderRegister
+		D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_BORDER,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_BORDER,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_BORDER,  // addressW
+		0.0f,                               // mipLODBias
+		16,                                 // maxAnisotropy
+		D3D12_COMPARISON_FUNC_LESS_EQUAL,
+		D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK
+	);
+
+
+	D3D12_ROOT_SIGNATURE_FLAGS d3dRootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+	D3D12_ROOT_SIGNATURE_DESC d3dRootSignatureDesc;
+	::ZeroMemory(&d3dRootSignatureDesc, sizeof(D3D12_ROOT_SIGNATURE_DESC));
+	d3dRootSignatureDesc.NumParameters = _countof(pd3dRootParameters);
+	d3dRootSignatureDesc.pParameters = pd3dRootParameters;
+	d3dRootSignatureDesc.NumStaticSamplers = 2;
+	d3dRootSignatureDesc.pStaticSamplers = d3dSamplerDesc;
+	d3dRootSignatureDesc.Flags = d3dRootSignatureFlags;
+
+	ComPtr<ID3DBlob> pd3dSignatureBlob = NULL;
+	ComPtr<ID3DBlob> pd3dErrorBlob = NULL;
+	HRESULT hr = D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, pd3dSignatureBlob.GetAddressOf(), pd3dErrorBlob.GetAddressOf());
+
+	if (pd3dErrorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)pd3dErrorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(0,
+		pd3dSignatureBlob->GetBufferPointer(),
+		pd3dSignatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(m_RootSignature[PSO_OBJECT].GetAddressOf()))
+	);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(0,
+		pd3dSignatureBlob->GetBufferPointer(),
+		pd3dSignatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(m_RootSignature[PSO_SHADOWMAP].GetAddressOf()))
+	);
+}
+
+void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 1;
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if (type == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\effect_lightning.dds", 0);
+	spritenum = 8;	//스프라이트 갯수
+
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	for (UINT i = 0; i < m_nObjects; i++) {
+
+		CGameObject *effect_object = NULL;
+
+		effect_object = new CGameObject();
+		if (type == 0)effect_object->SetPosition(0, 100, 0);
+		m_ppObjects[i] = effect_object;
+
+		CMesh *pCubeMesh = NULL;
+		if (type == 0) pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 50, 100, 0);	// pos(x, y), Width(w, h), depth
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+		m_ppObjects[i]->SetMesh(pCubeMesh);
+	}
+	delete pTexture;
+
+}
+
+void EffectShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	CB_GAMEOBJECT_INFO cBuffer;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[i]->m_xmf4x4World)));
+		cBuffer.m_nMaterial = m_ppObjects[i]->nowsprite;
+		m_ObjectCB->CopyData(i, cBuffer);
+	}
+}
+
+void EffectShader::Animate(float fTimeElapsed)
+{
+	time += fTimeElapsed;
+	if (time > 0.02f) {
+		m_ppObjects[0]->nowsprite++;
+		time = 0;
+		if (m_ppObjects[0]->nowsprite > spritenum)
+			m_ppObjects[0]->nowsprite = 0;
+	}
+}
+
+D3D12_RASTERIZER_DESC EffectShader::CreateRasterizerState(int index)
+{
+	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
+	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
+
+	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+
+	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
+	d3dRasterizerDesc.DepthBias = 0;
+	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
+	d3dRasterizerDesc.SlopeScaledDepthBias = 0.0f;
+
+	d3dRasterizerDesc.DepthClipEnable = TRUE;
+	//d3dRasterizerDesc.DepthClipEnable = FALSE;
+
+	d3dRasterizerDesc.MultisampleEnable = FALSE;
+	d3dRasterizerDesc.AntialiasedLineEnable = FALSE;
+	d3dRasterizerDesc.ForcedSampleCount = 0;
+	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+	return(d3dRasterizerDesc);
 }

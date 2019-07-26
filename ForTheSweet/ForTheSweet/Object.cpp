@@ -47,6 +47,19 @@ void CGameObject::SetPosition(XMFLOAT3& xmf3Position)
 {
 	SetPosition(xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
+void CGameObject::SetEffectLook(XMFLOAT3& xmf3Look)
+{
+	if (xmf3Look.x == 0 && xmf3Look.y == 0 && xmf3Look.z == 0)
+		return;
+	XMFLOAT3 m_xmf3Look = xmf3Look;
+	XMFLOAT3 m_xmf3Up(0,1,0);
+	m_xmf3Look.y = 0.0f;
+	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+	XMFLOAT3 m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
+	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+	SetWorld(m_xmf3Look, m_xmf3Up, m_xmf3Right);
+
+}
 void CGameObject::SetScale(float value)
 {
 	m_xmf4x4World._11 *= value;

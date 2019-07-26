@@ -248,6 +248,24 @@ public:
 	virtual void setScale(float scale);
 };
 
+class EffectShader : public MeshShader
+{
+public:
+	EffectShader();
+	~EffectShader();
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
+	virtual void CreateGraphicsRootSignature(ID3D12Device * pd3dDevice);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
+	virtual void Animate(float fTimeElapsed);
+	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
+
+	int spritenum;
+	float time;
+};
 class WaveShader : public MeshShader
 {
 public:

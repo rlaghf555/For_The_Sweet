@@ -23,6 +23,7 @@ public:
 	//게임 객체의 위치를 설정한다.
 	virtual void SetPosition(float x, float y, float z);
 	virtual void SetPosition(XMFLOAT3& xmf3Position);
+	virtual void SetEffectLook(XMFLOAT3&xmf3Look);
 	void SetScale(float value);
 	//게임 객체를 로컬 x-축, y-축, z-축 방향으로 이동한다.
 	void MoveStrafe(float fDistance = 1.0f);
@@ -54,6 +55,7 @@ public:
 	CShader						*m_pShader = NULL;
 	vector<unique_ptr<MMesh>>	m_ppMeshes;
 	UINT						m_nMeshes;
+	UINT						nowsprite;
 	BoundingOrientedBox				boundingbox;
 	XMFLOAT3*						corners;
 	D3D12_GPU_DESCRIPTOR_HANDLE					m_d3dCbvGPUDescriptorHandle;
