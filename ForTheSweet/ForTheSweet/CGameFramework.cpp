@@ -547,6 +547,7 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/pepero_hard_attack_2.FBX", 0));// Anim_pepero_HardAttack_2
 	character_animation.emplace_back(make_pair("./resource/character/pepero_skill.FBX", 0));		// Anim_pepero_Skill
 	
+	character_animation.emplace_back(make_pair("./resource/character/candy_hard_attack.FBX", 0));		// Anim_candy_HardAttack
 	   
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
@@ -1249,7 +1250,7 @@ void CGameFramework::ProcessInput()
 
 					   //아니면 강공격
 						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->ChangeAnimation(Anim_candy_HardAttack);
 							m_pPlayer->DisableLoop();
 						}
 

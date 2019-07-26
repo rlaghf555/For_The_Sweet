@@ -942,7 +942,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 
-	for (UINT i = 0; i < m_nObjects; i++) {
+	for (int i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
@@ -2620,12 +2620,13 @@ D3D12_BLEND_DESC EffectShader::CreateBlendState(int index)
 	d3dBlendDesc.RenderTarget[0].BlendEnable = true;
 	d3dBlendDesc.RenderTarget[0].LogicOpEnable = false;
 	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	//D3D12_BLEND_INV_SRC_ALPHA
 	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;	//D3D12_BLEND_OP_ADD	//D3D12_BLEND_OP_SUBTRACT
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_AND;	// D3D12_LOGIC_OP_NOOP
 	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	return d3dBlendDesc;
@@ -2738,7 +2739,7 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	BuildPSO(pd3dDevice);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	if (type == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\effect_lightning.dds", 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\effect_lightning.dds", 0);
 	spritenum = 8;	//스프라이트 갯수
 
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
@@ -2747,21 +2748,30 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 
-	for (UINT i = 0; i < m_nObjects; i++) {
-
+	for (int i = 0; i < m_nObjects; i++) {
 		CGameObject *effect_object = NULL;
-
 		effect_object = new CGameObject();
-		if (type == 0)effect_object->SetPosition(0, 100, 0);
 		m_ppObjects[i] = effect_object;
 
 		CMesh *pCubeMesh = NULL;
-		if (type == 0) pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 50, 100, 0);	// pos(x, y), Width(w, h), depth
+		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 60, 120, 0);	// pos(x, y), Width(w, h), depth
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
+
+		if(type == 0) m_ppObjects[i]->SetPosition(-240.f, 100.f, 110.f);
+		if(type == 1) m_ppObjects[i]->SetPosition(-120.f, 100.f, 110.f);
+		if(type == 2) m_ppObjects[i]->SetPosition(120.f, 100.f, 110.f);
+		if(type == 3) m_ppObjects[i]->SetPosition(240.f, 100.f, 110.f);
+
+		if(type == 4) m_ppObjects[i]->SetPosition(-150.f, 100.f, 0.f);
+		if(type == 5) m_ppObjects[i]->SetPosition(150.f, 100.f, 0.f);
+
+		if(type == 6) m_ppObjects[i]->SetPosition(-240.f, 100.f, -110.f);
+		if(type == 7) m_ppObjects[i]->SetPosition(-120.f, 100.f, -110.f);
+		if(type == 8) m_ppObjects[i]->SetPosition(120.f, 100.f, -110.f);
+		if(type == 9) m_ppObjects[i]->SetPosition(240.f, 100.f, -110.f);
 	}
 	delete pTexture;
-
 }
 
 void EffectShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)
@@ -2777,10 +2787,10 @@ void EffectShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommand
 void EffectShader::Animate(float fTimeElapsed)
 {
 	time += fTimeElapsed;
-	if (time > 0.02f) {
+	if (time > 0.08f) {
 		m_ppObjects[0]->nowsprite++;
 		time = 0;
-		if (m_ppObjects[0]->nowsprite > spritenum)
+		if (m_ppObjects[0]->nowsprite > spritenum + 1)
 			m_ppObjects[0]->nowsprite = 0;
 	}
 }
@@ -2793,8 +2803,8 @@ D3D12_RASTERIZER_DESC EffectShader::CreateRasterizerState(int index)
 	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
-	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;	//D3D12_CULL_MODE_BACK
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
 
 	d3dRasterizerDesc.FrontCounterClockwise = FALSE;

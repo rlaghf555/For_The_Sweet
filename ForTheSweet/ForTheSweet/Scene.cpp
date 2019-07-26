@@ -203,9 +203,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			}
 		}
 	}
-	m_EffectShader = new EffectShader();
-	m_EffectShader->BuildObjects(pd3dDevice, pd3dCommandList, 0);
-	m_EffectShader->getObject(0)->SetPosition(50, 100, 150);
+	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++) {
+		m_EffectShader[i] = new EffectShader();
+		m_EffectShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+	}
 }
 
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
@@ -473,12 +474,13 @@ void CScene::ReleaseObjects()
 		m_MessageShader->ReleaseObjects();
 		delete m_MessageShader;
 	}
-	if (m_EffectShader) {
-		m_EffectShader->ReleaseShaderVariables();
-		m_EffectShader->ReleaseObjects();
-		delete m_EffectShader;
+	for (int i = 0; i < PATTERN_LIGHTNING_NUM; ++i) {
+		if (m_EffectShader[i]) {
+			m_EffectShader[i]->ReleaseShaderVariables();
+			m_EffectShader[i]->ReleaseObjects();
+			delete m_EffectShader[i];
+		}
 	}
-	
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -576,7 +578,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		}
 	}
 	m_MessageShader->Animate(fTimeElapsed);
-	m_EffectShader->Animate(fTimeElapsed);
+	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)m_EffectShader[i]->Animate(fTimeElapsed);
 
 }
 
@@ -683,7 +685,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
-
+	
 	if (Selected_Map == M_Map_1) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
@@ -742,9 +744,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 				weapon_box[i][j]->Render(pd3dCommandList, pCamera);
 		}
 	}
+	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)if (m_EffectShader[i]) m_EffectShader[i]->Render(pd3dCommandList, pCamera);
+
 	for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
-	if (m_EffectShader)
-		m_EffectShader->Render(pd3dCommandList, pCamera);
 }
 
 void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
