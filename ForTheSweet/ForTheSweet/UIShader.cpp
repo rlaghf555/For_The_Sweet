@@ -1012,3 +1012,77 @@ void UIIDShader::SetID(wchar_t * str)
 
 	}
 }
+
+void WinLoseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	UINT nTextures = 2;
+	m_nObjects = nTextures;
+	m_nPSO = 1;
+
+	CreatePipelineParts();
+
+	m_VSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "VSUITextured", "vs_5_1");
+	m_PSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "PSUIHPBar", "ps_5_1");
+
+	CTexture *pTexture = new CTexture(nTextures, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\win.dds", 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\lose.dds", 1);
+
+
+	UINT ncbElementBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(CB_UI_INFO));
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, pTexture->GetTextureCount());
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), ncbElementBytes);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 1, true);
+
+	CreateGraphicsRootSignature(pd3dDevice);
+
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	m_pUIObjects = vector<UIObject*>(m_nObjects);
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT2 pos = XMFLOAT2(-100, 0);	//570,680;
+	XMFLOAT2 scale = XMFLOAT2(0.8f, 0.8f);
+
+	UIObject* win;
+	win = new UIObject();
+	pos = XMFLOAT2(650, 400);
+	win->SetPosition(pos);
+	win->SetScale(scale);
+	win->m_bEnabled = false;
+	m_pUIObjects[0] = win;
+
+	UIObject* lose;
+	lose = new UIObject();
+	lose->SetPosition(pos);
+	lose->SetScale(scale);
+	lose->m_bEnabled = false;
+	m_pUIObjects[1] = lose;
+
+
+
+	for (UINT i = 0; i < 2; ++i) {
+		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
+		XMUINT2 sizetmp(1, 1);
+		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
+		m_pUIObjects[i]->SetSize(sizetmp);
+		m_pUIObjects[i]->SetType(i);
+		m_pUIObjects[i]->CreateCollisionBox();
+		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+	}
+	delete pTexture;
+}
+
+void WinLoseShader::ShowMessage(bool win)
+{
+	if (win) {
+		m_pUIObjects[0]->m_bEnabled = true;
+	}
+	else {
+		m_pUIObjects[1]->m_bEnabled = true;
+	}
+}

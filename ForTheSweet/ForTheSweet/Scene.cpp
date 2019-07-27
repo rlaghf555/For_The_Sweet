@@ -212,7 +212,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
 {
 	m_ppUIShaders.clear();
-	m_nUIShaders = 20;
+	m_nUIShaders = 21;
 	m_ppUIShaders.resize(m_nUIShaders);
 
 	//UIShader* pSample = new UIShader();
@@ -243,8 +243,8 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 		pHPBar->SetPos(&pos, 2);
 		m_ppUIShaders[i + 4] = pHPBar;
 	}
-	m_ppUIShaders[0]->getObejct(1)->SetHP(13);
-	m_ppUIShaders[0]->getObejct(2)->SetHP(5);
+	m_ppUIShaders[0]->getObejct(1)->SetHP(m_pPlayer[0]->hp);	
+	m_ppUIShaders[0]->getObejct(2)->SetHP(m_pPlayer[0]->mp);
 	UITimeShader* pTime = new UITimeShader();
 	pTime->BuildObjects(pDevice, pCommandList, 1);
 	m_ppUIShaders[8] = pTime;
@@ -287,6 +287,10 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 		pID->SetID(tmp);
 		m_ppUIShaders[12 + i + 4] = pID;
 	}
+	WinLoseShader *winlose = new WinLoseShader();
+	winlose->BuildObjects(pDevice, pCommandList);
+	m_ppUIShaders[20] = winlose;
+	//m_ppUIShaders[20]->ShowMessage(false);   //true¸é win false¸é lose
 
 	m_MessageShader = new MessageShader();
 	m_MessageShader->BuildObjects(pDevice, pCommandList);
@@ -486,6 +490,13 @@ void CScene::ReleaseObjects()
 void CScene::ReleaseUploadBuffers()
 {
 	for (int i = 0; i < m_nInstancingShaders; i++) m_pInstancingShaders[i].ReleaseUploadBuffers();
+
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		if (m_pPlayerShader[i]) {
+			m_pPlayerShader[i]->ReleaseUploadBuffers();
+		}
+	}
 }
 
 ID3D12RootSignature *CScene::GetGraphicsRootSignature()

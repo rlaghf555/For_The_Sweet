@@ -48,6 +48,7 @@ public:
 	virtual XMUINT2 GetSpriteSize(int texIndex, CTexture* pTexture, XMUINT2 numSprite = XMUINT2(1, 1));
 	virtual void SetTime(int t) {}
 	virtual void CreatePipelineParts();
+	virtual void ShowMessage(bool win) {};
 protected:
 	unique_ptr<UploadBuffer<CB_UI_INFO>>	m_ObjectCB = nullptr;
 	std::vector<UIObject*>					m_pUIObjects;
@@ -170,4 +171,12 @@ public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 	virtual void Animate(float fTimeElapsed);
 	virtual void ShowMessage(int message_type);
+};
+class WinLoseShader : public UIShader
+{
+public:
+	WinLoseShader() {};
+	~WinLoseShader() {};
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+	virtual void ShowMessage(bool win);//win = true, lose = false
 };

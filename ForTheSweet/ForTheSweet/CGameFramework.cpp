@@ -60,10 +60,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 
-	Character_Model = NULL;
-
 	m_pPhysx = NULL;
-
 	//-----------------------------------------ÃÊ±âÈ­
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
@@ -115,8 +112,8 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 void CGameFramework::OnDestroy()
 {
+	WaitForGpuComplete();
 	if (m_pSocket) m_pSocket->Release();
-
 	ReleaseObjects();
 	::CloseHandle(m_hFenceEvent);
 #if defined(_DEBUG)
@@ -139,15 +136,21 @@ void CGameFramework::OnDestroy()
 	if (m_pPhysx) delete m_pPhysx;
 
 	for (int i = 0; i < 12; i++) {
-		if(Map_Model[i])
+		if (Map_Model[i]) {
 			delete Map_Model[i];
+			Map_Model[i] = NULL;
+		}
 	}
 	for (int i = 0; i < 7; i++) {
-		if (weapon[i])
+		if (weapon[i]) {
 			delete weapon[i];
+			weapon[i] = NULL;
+		}
 	}
-	if (Character_Model)
+	if (Character_Model) {
 		delete Character_Model;
+		Character_Model = NULL;
+	}
 	DestroyWindow(m_hWnd);
 }
 
@@ -680,7 +683,10 @@ void CGameFramework::BuildObjects()
 
 void CGameFramework::ReleaseObjects()
 {
-	if (m_pScene) m_pScene->ReleaseObjects();
+	if (m_pScene) {
+		//m_pScene->ReleaseUploadBuffers();
+		m_pScene->ReleaseObjects();
+	}
 	if (m_pScene) delete m_pScene;
 }
 
