@@ -683,7 +683,7 @@ void CScene::Collision_telleport(int index)
 			else if (i == 6) { XMFLOAT3 telpos = door[7]->getObjects()->GetPosition(); telpos.z += 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_OUT	
 			else if (i == 7) { XMFLOAT3 telpos = door[6]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_IN		
 			//m_pPlayer[index]->SetPosition(telpos);
-			return;
+			//return;
 		}
 	}
 }

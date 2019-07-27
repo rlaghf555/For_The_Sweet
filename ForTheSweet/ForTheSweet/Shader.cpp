@@ -1673,7 +1673,7 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 			m_ppObjects[i]->SetMesh(pCubeMesh);
 		}
 		if (type == M_Weapon_chocolate) {
-			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 20, 20);	// pos(x, y), Width(w, h), depth
+			CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5, 10, 10);	// pos(x, y), Width(w, h), depth
 			//CMesh *pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 10, 10, 10);	// pos(x, y), Width(w, h), depth
 			bounding.Extents.x = 5; bounding.Extents.y = 5; bounding.Extents.z = 5;
 
@@ -2763,16 +2763,16 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 		if(type == 0) m_ppObjects[i]->SetPosition(-240.f, 100.f, 110.f);
 		if(type == 1) m_ppObjects[i]->SetPosition(-120.f, 100.f, 110.f);
-		if(type == 2) m_ppObjects[i]->SetPosition(120.f, 100.f, 110.f);
-		if(type == 3) m_ppObjects[i]->SetPosition(240.f, 100.f, 110.f);
+		if(type == 2) m_ppObjects[i]->SetPosition(60.f, 100.f, 110.f);
+		if(type == 3) m_ppObjects[i]->SetPosition(180.f, 100.f, 110.f);
 
 		if(type == 4) m_ppObjects[i]->SetPosition(-150.f, 100.f, 0.f);
-		if(type == 5) m_ppObjects[i]->SetPosition(150.f, 100.f, 0.f);
+		if(type == 5) m_ppObjects[i]->SetPosition(90.f, 100.f, 0.f);
 
 		if(type == 6) m_ppObjects[i]->SetPosition(-240.f, 100.f, -110.f);
 		if(type == 7) m_ppObjects[i]->SetPosition(-120.f, 100.f, -110.f);
-		if(type == 8) m_ppObjects[i]->SetPosition(120.f, 100.f, -110.f);
-		if(type == 9) m_ppObjects[i]->SetPosition(240.f, 100.f, -110.f);
+		if(type == 8) m_ppObjects[i]->SetPosition(60.f, 100.f, -110.f);
+		if(type == 9) m_ppObjects[i]->SetPosition(180.f, 100.f, -110.f);
 	}
 	delete pTexture;
 }

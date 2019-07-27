@@ -550,7 +550,11 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/pepero_hard_attack_2.FBX", 0));// Anim_pepero_HardAttack_2
 	character_animation.emplace_back(make_pair("./resource/character/pepero_skill.FBX", 0));		// Anim_pepero_Skill
 	
-	character_animation.emplace_back(make_pair("./resource/character/candy_hard_attack.FBX", 0));		// Anim_candy_HardAttack
+	character_animation.emplace_back(make_pair("./resource/character/candy_hard_attack.FBX", 0));	// Anim_candy_HardAttack
+	character_animation.emplace_back(make_pair("./resource/character/candy_skill.FBX", 0));			// Anim_candy_Skill
+
+	character_animation.emplace_back(make_pair("./resource/character/chocolate_attack.FBX", 0));	// Anim_chocolate_Attack
+	character_animation.emplace_back(make_pair("./resource/character/chocolate_hard_attack.FBX", 0));// Anim_chocolate_HardAttack
 	   
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
@@ -1266,7 +1270,7 @@ void CGameFramework::ProcessInput()
 				if (Key_D) { //무기 스킬
 				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->ChangeAnimation(Anim_candy_Skill);
 						m_pPlayer->DisableLoop();
 					}
 				}
@@ -1332,12 +1336,7 @@ void CGameFramework::ProcessInput()
 
 					   //아니면 약공격
 						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack1);
-							m_pPlayer->DisableLoop();
-						}
-						if (Anim_Index == Anim_Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-							m_pPlayer->ChangeAnimation(Anim_Lollipop_Attack2);
-							m_pPlayer->SetAnimFrame(Anim_Time);
+							m_pPlayer->ChangeAnimation(Anim_chocolate_Attack);
 							m_pPlayer->DisableLoop();
 						}
 					}
@@ -1346,7 +1345,7 @@ void CGameFramework::ProcessInput()
 
 					   //아니면 강공격
 						if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-							m_pPlayer->ChangeAnimation(Anim_Lollipop_Hard_Attack);
+							m_pPlayer->ChangeAnimation(Anim_chocolate_HardAttack);
 							m_pPlayer->DisableLoop();
 						}
 
