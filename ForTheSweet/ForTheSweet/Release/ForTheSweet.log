@@ -1,25 +1,15 @@
-﻿  Scene.cpp
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(63): warning C4316: 'PlayerShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(67): warning C4316: 'PlayerShadowShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(91): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(157): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(159): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(162): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(164): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(226): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(228): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(230): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(238): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(240): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(242): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(246): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(247): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(272): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\scene.cpp(283): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+﻿  UIShader.cpp
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(408): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(480): warning C4244: '인수': 'UINT64'에서 'uint32_t'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(605): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(609): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(622): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(819): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(1114): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
   코드를 생성하고 있습니다.
-  2 of 3871 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  1 of 3887 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    5 functions had inline decision re-evaluated but remain unchanged
+    1 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
 PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\졸작\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\졸작\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.

@@ -49,6 +49,9 @@ public:
 	virtual void SetTime(int t) {}
 	virtual void CreatePipelineParts();
 	virtual void ShowMessage(bool win) {};
+	virtual void SetFog() {};
+	virtual void FogOff() {};
+
 protected:
 	unique_ptr<UploadBuffer<CB_UI_INFO>>	m_ObjectCB = nullptr;
 	std::vector<UIObject*>					m_pUIObjects;
@@ -97,6 +100,18 @@ protected:
 	ComPtr<ID3DBlob>*						m_VSByteCode = nullptr;
 	ComPtr<ID3DBlob>*						m_PSByteCode = nullptr;
 	//ComPtr<ID3DBlob>*						m_CSByteCode = nullptr;
+};
+class FogShader : public UIShader {
+public:
+	FogShader() {};
+	~FogShader() {};
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+	virtual void SetFog();
+	virtual void FogOff();
+	virtual void Animate(float fTimeElapsed);
+	bool Fog_Flag = false;
+	bool Fog_Off_Flag = false;
+	float ftime;
 };
 
 class UIHPBarShader : public UIShader

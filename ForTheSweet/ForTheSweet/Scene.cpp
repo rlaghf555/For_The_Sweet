@@ -212,7 +212,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
 {
 	m_ppUIShaders.clear();
-	m_nUIShaders = 21;
+	m_nUIShaders = 22;
 	m_ppUIShaders.resize(m_nUIShaders);
 
 	//UIShader* pSample = new UIShader();
@@ -220,6 +220,7 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 	//XMFLOAT2 pos = XMFLOAT2(0.5f, 0.045f);
 	//pSample->SetPosScreenRatio(pos, 0);
 	//m_ppUIShaders[0] = pSample;
+
 	for (int i = 0; i < 4; i++) {
 		UIHPBarShader* pHPBar = new UIHPBarShader();
 		pHPBar->BuildObjects(pDevice, pCommandList, 1);
@@ -291,6 +292,12 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 	winlose->BuildObjects(pDevice, pCommandList);
 	m_ppUIShaders[20] = winlose;
 	//m_ppUIShaders[20]->ShowMessage(false);   //true면 win false면 lose
+
+	//안개는 UISHADER 마지막에 
+	FogShader *fog = new FogShader();
+	fog->BuildObjects(pDevice, pCommandList);
+	m_ppUIShaders[21] = fog;
+	m_ppUIShaders[21]->SetFog();
 
 	m_MessageShader = new MessageShader();
 	m_MessageShader->BuildObjects(pDevice, pCommandList);
@@ -764,7 +771,7 @@ void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComma
 {
 	//for (UINT i = 0; i < m_nUIShaders - 2; ++i)
 	//	m_ppUIShaders[i]->Render(pCommandList);
-	for (UINT i = 0; i < m_nUIShaders; ++i) {
+	for (int i = m_nUIShaders-1; i >= 0; i--) {
 		m_ppUIShaders[i]->Render(pCommandList);
 	}
 	if(m_MessageShader) m_MessageShader->Render(pCommandList);

@@ -503,6 +503,158 @@ void UIShader::CreatePipelineParts() {
 	}
 }
 
+void FogShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	UINT nTextures = 1;
+
+	m_nObjects = 8;
+	m_nPSO = 1;
+
+	CreatePipelineParts();
+	m_VSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "VSUITextured", "vs_5_1");
+	m_PSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "PSDefaultUI", "ps_5_1");
+
+	CTexture *pTexture = new CTexture(nTextures, RESOURCE_TEXTURE2D, 0);
+
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Fog.dds", 0);
+
+	UINT ncbElementBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(CB_UI_INFO));
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, pTexture->GetTextureCount());
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), ncbElementBytes);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 1, true);
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	m_pUIObjects = vector<UIObject*>(m_nObjects);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT2 scale = XMFLOAT2(5, 5);
+
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		UIObject* fog;
+		fog = new UIObject();
+		fog->SetScale(scale);
+		m_pUIObjects[i] = fog;
+	}
+
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
+		XMUINT2 sizetmp(1, 1);
+		sizetmp = GetSpriteSize(0, pTexture, sizetmp);
+		m_pUIObjects[i]->SetSize(sizetmp);
+		m_pUIObjects[i]->SetType(i);
+		m_pUIObjects[i]->CreateCollisionBox();
+		m_pUIObjects[i]->m_bEnabled=false;
+		// m_pUIObjects[i]->m_fAlpha = 0.8f;
+		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+	}
+	XMUINT2 numsprite(2, 2);
+	XMUINT2 nowsprite(0, 0);
+	m_pUIObjects[0]->SetNumSprite(numsprite, nowsprite);
+	nowsprite= XMUINT2(0, 1);
+	m_pUIObjects[1]->SetNumSprite(numsprite, nowsprite);
+	nowsprite = XMUINT2(1, 0);
+	m_pUIObjects[2]->SetNumSprite(numsprite, nowsprite);
+	nowsprite = XMUINT2(1, 1);
+	m_pUIObjects[3]->SetNumSprite(numsprite, nowsprite);
+	nowsprite = XMUINT2(0, 0);
+	m_pUIObjects[4]->SetNumSprite(numsprite, nowsprite);
+	nowsprite = XMUINT2(0, 1);
+	m_pUIObjects[5]->SetNumSprite(numsprite, nowsprite);
+	nowsprite = XMUINT2(1, 0);
+	m_pUIObjects[6]->SetNumSprite(numsprite, nowsprite);
+	nowsprite = XMUINT2(1, 1);
+	m_pUIObjects[7]->SetNumSprite(numsprite, nowsprite);
+}
+
+void FogShader::SetFog()
+{
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		m_pUIObjects[i]->m_bEnabled = true;
+		m_pUIObjects[i]->m_fAlpha = 0.8f;
+	}
+	
+	m_pUIObjects[0]->SetPosition(0,-720);
+	m_pUIObjects[1]->SetPosition(1000, -720);
+	m_pUIObjects[2]->SetPosition(0,-1720);
+	m_pUIObjects[3]->SetPosition(1000,-1720);
+	m_pUIObjects[4]->SetPosition(500,-720);
+	m_pUIObjects[5]->SetPosition(0,-1320);
+	m_pUIObjects[6]->SetPosition(500,-1720);
+	m_pUIObjects[7]->SetPosition(1000, -1320);
+
+	Fog_Flag = true;
+	ftime = 0.f;
+}
+
+void FogShader::FogOff()
+{
+	Fog_Off_Flag = true;
+	
+}
+
+void FogShader::Animate(float fTimeElapsed)
+{
+	if (Fog_Off_Flag) {
+		for (int i = 0; i < m_nObjects; ++i) {
+			m_pUIObjects[i]->m_fAlpha -= 0.01f;
+		}
+		if (m_pUIObjects[0]->m_fAlpha < 0.f) {
+			for (int i = 0; i < m_nObjects; ++i) {
+				m_pUIObjects[i]->m_bEnabled = false;
+			}
+			Fog_Flag = false;
+		}
+	}
+	if (!Fog_Flag)
+		return;
+	if (IsZero(fTimeElapsed))
+		return;
+	ftime += fTimeElapsed;
+	if (ftime > 20)	// 지속시간
+		FogOff();
+	for (int i = 0; i < m_nObjects; ++i) {
+		auto pos = m_pUIObjects[i]->GetPos();
+		pos.x -=0.3f; pos.y += 2;
+		m_pUIObjects[i]->SetPosition(pos);
+		if (pos.y > 1700) {
+			switch (i)
+			{
+			case 0:
+				m_pUIObjects[0]->SetPosition(0, -720);
+				break;
+			case 1:
+				m_pUIObjects[1]->SetPosition(1500, -720);
+				break;
+			case 2:
+				m_pUIObjects[2]->SetPosition(0, -1720);
+				break;
+			case 3:
+				m_pUIObjects[3]->SetPosition(1500, -1720);
+				break;
+			case 4:
+				m_pUIObjects[4]->SetPosition(1000, -720);
+				break;
+			case 5:
+				m_pUIObjects[5]->SetPosition(500, -1320);
+				break;
+			case 6:
+				m_pUIObjects[6]->SetPosition(1000, -1720);
+				break;
+			case 7:
+				m_pUIObjects[7]->SetPosition(1500, -1320);
+				break;
+			}
+		}
+	}
+}
+
 void UIHPBarShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
 {
 	UINT nTextures = 3;
@@ -1086,3 +1238,4 @@ void WinLoseShader::ShowMessage(bool win)
 		m_pUIObjects[1]->m_bEnabled = true;
 	}
 }
+

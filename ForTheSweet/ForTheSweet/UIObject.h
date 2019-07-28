@@ -41,7 +41,7 @@ public:
 	virtual void SetPosition(float x, float y)
 	{
 		m_xmf2ScreenPos.x = x;
-		m_xmf2ScreenPos.x = y;
+		m_xmf2ScreenPos.y = y;
 	}
 	virtual void SetScale(XMFLOAT2& scale);
 	virtual void SetSize(XMUINT2& size);
