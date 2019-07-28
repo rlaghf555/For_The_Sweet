@@ -1841,7 +1841,8 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 			//weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
 			
-			weapon->Rotate(0, 0, 90);
+			if (weapon_num == 3) weapon->Rotate(0, 0, -90);
+			else weapon->Rotate(0, 0, 90);
 			weapon->Rotate(&a, D3DMath::Rand(0, 4) * 90.f);
 		}
 		weapon->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));

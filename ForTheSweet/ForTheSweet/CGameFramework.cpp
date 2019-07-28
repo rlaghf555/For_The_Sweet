@@ -555,6 +555,8 @@ void CGameFramework::LoadModels()
 
 	character_animation.emplace_back(make_pair("./resource/character/chocolate_attack.FBX", 0));	// Anim_chocolate_Attack
 	character_animation.emplace_back(make_pair("./resource/character/chocolate_hard_attack.FBX", 0));// Anim_chocolate_HardAttack
+	character_animation.emplace_back(make_pair("./resource/character/chocolate_guard.FBX", 0));		// Anim_chocolate_Guard
+	character_animation.emplace_back(make_pair("./resource/character/chocolate_skill.FBX", 0));		// Anim_chocolate_Skill
 	   
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
@@ -1327,7 +1329,7 @@ void CGameFramework::ProcessInput()
 				if (Key_A || Key_S) {
 
 					if (Key_A&&Key_S) {//둘다 눌리면 막기
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Guard);
+						m_pPlayer->ChangeAnimation(Anim_chocolate_Guard);
 						m_pPlayer->SetAnimFrame(10);
 						m_pPlayer->DisableLoop();
 					}
@@ -1355,7 +1357,7 @@ void CGameFramework::ProcessInput()
 				if (Key_D) { //무기 스킬
 				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
-						m_pPlayer->ChangeAnimation(Anim_Lollipop_Skill);
+						m_pPlayer->ChangeAnimation(Anim_chocolate_Skill);
 						m_pPlayer->DisableLoop();
 					}
 				}

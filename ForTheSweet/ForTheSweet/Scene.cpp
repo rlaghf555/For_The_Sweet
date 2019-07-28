@@ -630,10 +630,12 @@ void CScene::AnimateWeapon(int i)
 	if (m_pPlayer[i]->getAnimIndex() != Anim_Lollipop_Guard) {
 		player._11 = -player_right.x; player._12 = -player_right.y; player._13 = -player_right.z;
 	}
-	else
+	else {
 		player._11 = player_right.x; player._12 = player_right.y; player._13 = player_right.z;
+	}
 
 	player._21 = player_up.x; player._22 = player_up.y; player._23 = player_up.z;
+
 	player._31 = player_look.x; player._32 = player_look.y; player._33 = player_look.z;
 
 	bone = Matrix4x4::Multiply(bone, player);
@@ -645,6 +647,8 @@ void CScene::AnimateWeapon(int i)
 	m_WeaponShader[weapon_type]->getObject(weapon_index)->SetWorld(bone);
 	m_WeaponShader[weapon_type]->getObject(weapon_index)->SetPosition(pos);
 //	m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 0, 90);
+	
+	//if (weapon_type != M_Weapon_chocolate) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 	m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 
 }
