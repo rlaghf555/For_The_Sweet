@@ -83,6 +83,8 @@ struct VS_OUTPUT
     float2 uv : TEXCOORD;
 };
 
+///////////////////////////////////////////     MODEL       /////////////////////////////////////////////
+
 VS_MODEL_TEXTURED_OUTPUT VSDynamicModel(VS_MODEL_INPUT input)
 {
     VS_MODEL_TEXTURED_OUTPUT output;
@@ -197,6 +199,24 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSCottonModel(VS_MODEL_TEXTURED_OUTPUT input, 
     return (output);
 };
 
+///////////////////////////////////     MESH    ///////////////////////////////////
+
+VS_MODEL_TEXTURED_OUTPUT VSWave(VS_INPUT input)
+{
+    VS_MODEL_TEXTURED_OUTPUT output;
+    
+    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
+    float4 position_ = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+
+    position_.y += sin(3.141592 * 2.f);
+
+    output.position = position_;
+    output.uv = input.uv;
+
+    return (output);
+}
+
 PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWaveModel(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
 {
     PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
@@ -217,41 +237,6 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWaveModel(VS_MODEL_TEXTURED_OUTPUT input, ui
     return (output);
 };
 
-PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSEffect(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
-{
-    PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
-    
-    float2 uv = input.uv;
-    float4 cColor = gEffectTexture.Sample(gDefaultSamplerState, uv);
-	
-    input.normalW = normalize(input.normalW);
-	
-    output.color = cColor;
-    //output.color.a = 0.7f;
-    output.nrmoutline = float4(input.normalW, 1.0f);
-    output.nrm = output.nrmoutline;
-    output.pos = float4(input.positionW, 1.0f);
-	
-    return (output);
-};
-///////////////////////////////////
-
-VS_MODEL_TEXTURED_OUTPUT VSWave(VS_INPUT input)
-{
-    VS_MODEL_TEXTURED_OUTPUT output;
-    
-    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
-    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
-    float4 position_ = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
-
-    position_.y += sin(3.141592 * 2.f);
-
-    output.position = position_;
-    output.uv = input.uv;
-
-    return (output);
-}
-
 VS_MODEL_TEXTURED_OUTPUT VSDiffused(VS_INPUT input)
 {
     VS_MODEL_TEXTURED_OUTPUT output;
@@ -263,36 +248,6 @@ VS_MODEL_TEXTURED_OUTPUT VSDiffused(VS_INPUT input)
 
     return (output);
 }
-
-VS_MODEL_TEXTURED_OUTPUT VSLightning(VS_INPUT input)
-{
-    VS_MODEL_TEXTURED_OUTPUT output;
-    
-    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
-    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
-    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
-    output.uv =float2(
-    input.uv.x / 8 + float(gnMaterial) / float(8),
-    input.uv.y / 1 + float(0) / float(1)
-    );
-    
-    return (output);
-}
-VS_MODEL_TEXTURED_OUTPUT VSShadow(VS_MODEL_INPUT input)
-{
-    VS_MODEL_TEXTURED_OUTPUT output;
-
-    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
-    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
-    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
-    //output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxShadow);
-    //output.position = mul(mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection), gmtxShadow);
-    output.uv = input.uv;
-
-	//for (int i = 0; i < NUM_DIRECTION_LIGHTS; i++) output.ShadowPosH[i] = mul(float4(output.positionW, 1.0f), gmtxShadowProjection[i]);
-       
-    return (output);
-};
 
 PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSBoundBox(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {
@@ -308,6 +263,24 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSBoundBox(VS_MODEL_TEXTURED_OUTPUT input, uin
     output.nrm = output.nrmoutline;
     output.pos = float4(input.positionW, 1.0f);
 	
+    return (output);
+};
+
+//////////////////////////////////////////////////      Shadow      //////////////////////////////////////
+
+VS_MODEL_TEXTURED_OUTPUT VSShadow(VS_MODEL_INPUT input)
+{
+    VS_MODEL_TEXTURED_OUTPUT output;
+
+    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
+    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+    //output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxShadow);
+    //output.position = mul(mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection), gmtxShadow);
+    output.uv = input.uv;
+
+	//for (int i = 0; i < NUM_DIRECTION_LIGHTS; i++) output.ShadowPosH[i] = mul(float4(output.positionW, 1.0f), gmtxShadowProjection[i]);
+       
     return (output);
 };
 
@@ -369,6 +342,56 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSReverseShadow(VS_MODEL_TEXTURED_OUTPUT input
     input.normalW = normalize(input.normalW);
        
     output.color = float4(0.f, 0.f, 0.f, 0.0f); // 그림자 이므로 반투명한 검은색
+    output.nrmoutline = float4(input.normalW, 1.0f);
+    output.nrm = output.nrmoutline;
+    output.pos = float4(input.positionW, 1.0f);
+	
+    return (output);
+};
+
+///////////////////////////                  EFFECT                  ////////////////////////////////////////////////////
+
+VS_MODEL_TEXTURED_OUTPUT VSLightning(VS_INPUT input)
+{
+    VS_MODEL_TEXTURED_OUTPUT output;
+    
+    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
+    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+    output.uv = float2(
+    input.uv.x / 8 + float(gnMaterial) / float(8),
+    input.uv.y / 1 + float(0) / float(1)
+    );
+    
+    return (output);
+}
+
+VS_MODEL_TEXTURED_OUTPUT VSSkillEffect_1(VS_INPUT input)
+{
+    VS_MODEL_TEXTURED_OUTPUT output;
+    
+    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
+    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+    output.uv = float2(
+    input.uv.x / 4 + float(gnMaterial) % float(4),
+    input.uv.y / 4 + float(gnMaterial) / float(4)
+    );
+    
+    return (output);
+}
+
+
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSEffect(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
+{
+    PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+    
+    float2 uv = input.uv;
+    float4 cColor = gEffectTexture.Sample(gDefaultSamplerState, uv);
+	
+    input.normalW = normalize(input.normalW);
+	
+    output.color = cColor;
     output.nrmoutline = float4(input.normalW, 1.0f);
     output.nrm = output.nrmoutline;
     output.pos = float4(input.positionW, 1.0f);

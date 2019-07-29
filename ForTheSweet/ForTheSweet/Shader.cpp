@@ -2804,18 +2804,18 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 
-		if(type == 0) m_ppObjects[i]->SetPosition(-240.f, 100.f, 110.f);
-		if(type == 1) m_ppObjects[i]->SetPosition(-120.f, 100.f, 110.f);
-		if(type == 2) m_ppObjects[i]->SetPosition(60.f, 100.f, 110.f);
-		if(type == 3) m_ppObjects[i]->SetPosition(180.f, 100.f, 110.f);
+		if (type == 0) m_ppObjects[i]->SetPosition(-240.f, 100.f, 110.f);
+		if (type == 1) m_ppObjects[i]->SetPosition(-120.f, 100.f, 110.f);
+		if (type == 2) m_ppObjects[i]->SetPosition(60.f, 100.f, 110.f);
+		if (type == 3) m_ppObjects[i]->SetPosition(180.f, 100.f, 110.f);
 
-		if(type == 4) m_ppObjects[i]->SetPosition(-150.f, 100.f, 0.f);
-		if(type == 5) m_ppObjects[i]->SetPosition(90.f, 100.f, 0.f);
+		if (type == 4) m_ppObjects[i]->SetPosition(-150.f, 100.f, 0.f);
+		if (type == 5) m_ppObjects[i]->SetPosition(90.f, 100.f, 0.f);
 
-		if(type == 6) m_ppObjects[i]->SetPosition(-240.f, 100.f, -110.f);
-		if(type == 7) m_ppObjects[i]->SetPosition(-120.f, 100.f, -110.f);
-		if(type == 8) m_ppObjects[i]->SetPosition(60.f, 100.f, -110.f);
-		if(type == 9) m_ppObjects[i]->SetPosition(180.f, 100.f, -110.f);
+		if (type == 6) m_ppObjects[i]->SetPosition(-240.f, 100.f, -110.f);
+		if (type == 7) m_ppObjects[i]->SetPosition(-120.f, 100.f, -110.f);
+		if (type == 8) m_ppObjects[i]->SetPosition(60.f, 100.f, -110.f);
+		if (type == 9) m_ppObjects[i]->SetPosition(180.f, 100.f, -110.f);
 	}
 	delete pTexture;
 }
@@ -2832,12 +2832,22 @@ void EffectShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommand
 
 void EffectShader::Animate(float fTimeElapsed)
 {
-	time += fTimeElapsed;
-	if (time > 0.08f) {
-		m_ppObjects[0]->nowsprite++;
-		time = 0;
-		if (m_ppObjects[0]->nowsprite > spritenum + 1)
-			m_ppObjects[0]->nowsprite = 0;
+	for (int i = 0; i < m_nObjects; i++) {
+		if (visible == true) {
+			time += fTimeElapsed;
+			if (time > 0.08f) {
+				m_ppObjects[i]->nowsprite++;
+				time = 0;
+				if (m_ppObjects[i]->nowsprite > spritenum + 1)
+					m_ppObjects[i]->nowsprite = 0;
+			}
+			duration_time += fTimeElapsed;
+			if (duration_time > 3.f) {
+				visible = false;
+				duration_time = 0.f;
+				time = 0.f;
+			}
+		}
 	}
 }
 
@@ -2866,4 +2876,77 @@ D3D12_RASTERIZER_DESC EffectShader::CreateRasterizerState(int index)
 	d3dRasterizerDesc.ForcedSampleCount = 0;
 	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 	return(d3dRasterizerDesc);
+}
+
+///////////////////////////////////////////////////////
+
+D3D12_SHADER_BYTECODE SkillEffectShader::CreateVertexShader(ID3DBlob ** ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "VSSkillEffect_1", "vs_5_1", ppd3dShaderBlob));	//	//VSSkillEffect_1
+}
+
+void SkillEffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 2;
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\effect_1.dds", 0);
+	spritenum = 16;	//스프라이트 갯수
+
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT3 a = XMFLOAT3(0.f, 1.f, 0.f);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		CGameObject *effect_object = NULL;
+		effect_object = new CGameObject();
+		m_ppObjects[i] = effect_object;
+
+		CMesh *pCubeMesh = NULL;
+		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 50, 50, 0);	// pos(x, y), Width(w, h), depth
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+		m_ppObjects[i]->SetMesh(pCubeMesh);
+
+		if (i == 0) m_ppObjects[i]->Rotate(&a, 45.f);
+		if (i == 1) m_ppObjects[i]->Rotate(&a, -45.f);
+	}
+	delete pTexture;
+}
+
+void SkillEffectShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
+{
+	for (int i = 0; i < m_nObjects; i++) {
+		if (visible == true) {
+			m_ppObjects[i]->SetPosition(pos);
+			time += fTimeElapsed;
+			if (time > 0.08f) {
+				m_ppObjects[i]->nowsprite++;
+				time = 0;
+				if (m_ppObjects[i]->nowsprite > spritenum + 1)
+					m_ppObjects[i]->nowsprite = 0;
+			}
+			duration_time += fTimeElapsed;
+			if (duration_time > 3.f) {
+				visible = false;
+				duration_time = 0.f;
+				time = 0.f;
+			}
+		}
+	}
 }

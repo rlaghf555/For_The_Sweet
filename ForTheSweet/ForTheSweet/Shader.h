@@ -263,9 +263,22 @@ public:
 	virtual void Animate(float fTimeElapsed);
 	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
 
+	bool visible = false;
+	float duration_time = 0.f;
 	int spritenum;
 	float time;
 };
+
+class SkillEffectShader : public EffectShader
+{
+public:
+	SkillEffectShader() {};
+	~SkillEffectShader() {};
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 pos);
+};
+
 class WaveShader : public MeshShader
 {
 public:

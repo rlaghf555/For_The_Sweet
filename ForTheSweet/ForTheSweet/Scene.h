@@ -63,6 +63,7 @@ public:
 
 	MeshShader					*m_BackGroundShader[2] = { NULL, };
 	EffectShader				*m_EffectShader[PATTERN_LIGHTNING_NUM] = { NULL, };
+	SkillEffectShader			*m_SkillEffectShader[MAX_USER] = { NULL, };
 	WaveShader					*m_WavesShader = NULL;
 
 	unique_ptr<CCamera>			m_Camera = nullptr;

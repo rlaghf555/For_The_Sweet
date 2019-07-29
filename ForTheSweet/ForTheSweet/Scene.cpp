@@ -210,6 +210,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++) {
 		m_EffectShader[i] = new EffectShader();
 		m_EffectShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+		m_EffectShader[i]->visible = true;	// test 3 sec
+	}
+	for (int i = 0; i < MAX_USER; i++) {
+		m_SkillEffectShader[i] = new SkillEffectShader();
+		m_SkillEffectShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
 	}
 }
 
@@ -490,6 +495,13 @@ void CScene::ReleaseObjects()
 			delete m_EffectShader[i];
 		}
 	}
+	for (int i = 0; i < MAX_USER; ++i) {
+		if (m_SkillEffectShader[i]) {
+			m_SkillEffectShader[i]->ReleaseShaderVariables();
+			m_SkillEffectShader[i]->ReleaseObjects();
+			delete m_SkillEffectShader[i];
+		}
+	}
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -590,6 +602,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_pPlayerShadowShader[i]->ChangeAnimation(m_pPlayer[i]->getAnimIndex());
 				}
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1)m_SkillEffectShader[i]->visible = true;
+				m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
 					AnimateWeapon(i);
 				}
@@ -814,7 +829,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)if (m_EffectShader[i]) m_EffectShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);
+
+	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)if (m_EffectShader[i]) if (m_EffectShader[i]->visible == true) m_EffectShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
 }
