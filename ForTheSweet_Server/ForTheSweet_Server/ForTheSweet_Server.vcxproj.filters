@@ -19,6 +19,9 @@
     <Filter Include="소스 파일\Player">
       <UniqueIdentifier>{f4664f39-0c6c-4e82-b500-b2089bee7518}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Room">
+      <UniqueIdentifier>{b717bc6e-af18-43c8-bcc8-515fa3155211}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server_FTS.cpp">
@@ -32,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>소스 파일\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>소스 파일\Room</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>소스 파일\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>소스 파일\Room</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

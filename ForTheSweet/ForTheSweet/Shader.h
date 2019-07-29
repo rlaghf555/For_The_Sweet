@@ -395,6 +395,7 @@ class testBox : public MeshShader
 {
 public:
 	BoundingOrientedBox bounding;
+	bool pick = false;
 	testBox();
 	~testBox();
 

@@ -44,4 +44,5 @@ struct RoomStatus {
 	int max_user = 8;
 	int mode = MODE_TEAM;
 	int map = 0;
+	int room_num = 0;
 };

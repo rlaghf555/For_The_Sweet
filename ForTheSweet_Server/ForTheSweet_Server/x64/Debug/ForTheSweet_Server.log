@@ -1,18 +1,23 @@
 ﻿  Physx.cpp
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\physx.cpp(88): warning C4267: '=': 'size_t'에서 'physx::PxU32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\physx.cpp(90): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\physx.cpp(92): warning C4267: '=': 'size_t'에서 'physx::PxU32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\physx.cpp(119): warning C4267: '=': 'size_t'에서 'physx::PxU32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\physx.cpp(121): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\physx.cpp(123): warning C4267: '=': 'size_t'에서 'physx::PxU32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Player.cpp
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Room.cpp
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Server_FTS.cpp
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(17): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(18): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(839): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(916): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(917): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\새 폴더 (3)\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(918): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(31): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(32): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1005): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1006): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1007): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1127): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1222): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1223): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0730\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1224): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Timer.cpp
   코드를 생성하고 있습니다...
-  ForTheSweet_Server.vcxproj -> C:\Users\KYH\Desktop\새 폴더 (3)\For_The_Sweet\ForTheSweet_Server\x64\Debug\ForTheSweet_Server.exe
+  ForTheSweet_Server.vcxproj -> C:\Users\KYH\Desktop\0730\For_The_Sweet\ForTheSweet_Server\x64\Debug\ForTheSweet_Server.exe

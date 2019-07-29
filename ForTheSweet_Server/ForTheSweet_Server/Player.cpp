@@ -38,6 +38,13 @@ CPlayer::CPlayer()
 	m_Look = PxVec3(0, 0, 1);
 	m_dashed = false;
 
+	weapon_type = -1;
+	weapon_index = -1;
+	weapon_send = false;
+
+	m_status = STATUS::FREE;
+	attack_count = 0;
+
 	m_PlayerController = nullptr;
 	//m_HitReport = nullptr;
 	m_AttackTrigger = nullptr;
@@ -57,6 +64,11 @@ void CPlayer::setVelocity(PxVec3 vel)
 	m_Vel = vel;
 }
 
+void CPlayer::setJumpVelocity(PxVec3 jumpVel)
+{
+	m_JumpVel = jumpVel;
+}
+
 void CPlayer::setDashed(bool dashed)
 {
 	m_dashed = dashed;
@@ -72,15 +84,14 @@ void CPlayer::setAniIndex(char index)
 	m_AniIndex = index;
 }
 
-void CPlayer::setAniInfo(float *animinfo)
-{
-	for (int i = 0; i < MAX_ANIM; ++i)
-		m_AniInfo[i] = animinfo[i];
-}
-
 void CPlayer::setStatus(char status)
 {
 	m_status = status;
+}
+
+void CPlayer::setClientNum(int num)
+{
+	client_num = num;
 }
 
 void CPlayer::move(int direction, float distance)

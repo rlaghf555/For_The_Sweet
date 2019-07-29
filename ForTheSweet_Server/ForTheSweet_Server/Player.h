@@ -79,11 +79,12 @@ public:
 	void setTrigger(CPhysx *physx);
 	void setPosition(PxVec3 pos);
 	void setVelocity(PxVec3 vel);
+	void setJumpVelocity(PxVec3 jumpVel);
 	void setDashed(bool dashed);
 	void setLook(PxVec3 look);
 	void setAniIndex(char index);
-	void setAniInfo(float *aniinfo);
 	void setStatus(char status);
+	void setClientNum(int num);
 	void jumpstart() { m_Jump.startJump(120); }
 
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
@@ -92,6 +93,7 @@ public:
 public:
 	PxVec3 m_Pos;
 	PxVec3 m_Vel;
+	PxVec3 m_JumpVel;
 	PxVec3 m_Look;
 
 	PxCapsuleController* m_PlayerController;
@@ -102,17 +104,16 @@ public:
 	volatile bool m_dashed = false;
 	volatile bool hitted = false;
 
-	float m_AniInfo[MAX_ANIM];
-	bool m_AniLoop;
-
 	char m_AniIndex;
 
-	char weapon_type = -1;
-	char weapon_index = -1;
+	char weapon_type;
+	char weapon_index;
 	volatile bool weapon_send = false;
 
 	char m_status;
 	high_resolution_clock::time_point attack_time;
-	char attack_count = 0;
+	char attack_count;
+
+	int client_num;
 };
 

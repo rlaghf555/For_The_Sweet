@@ -35,7 +35,7 @@ void SoundManager::PlaySounds(SOUNDKIND eSound)
 
 void SoundManager::PlayBackGroundSounds(SOUNDKIND eSound)
 {
-	g_pSystem->playSound(g_pSound[eSound], NULL, false, &g_pChannel[0]);
+	//g_pSystem->playSound(g_pSound[eSound], NULL, false, &g_pChannel[0]);
 }
 
 void SoundManager::StopBackGroundSounds()

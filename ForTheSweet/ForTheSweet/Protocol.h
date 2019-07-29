@@ -22,6 +22,12 @@ constexpr int CS_JUMP = 17;
 constexpr int CS_DASH = 18;
 constexpr int CS_GUARD_OFF = 19;
 
+constexpr int CS_MAKE_ROOM = 100;
+constexpr int CS_ATTEND_ROOM = 101;
+constexpr int CS_START_ROOM = 102;
+constexpr int CS_READY_ROOM = 103;
+constexpr int CS_LOAD_COMPLETE = 104;
+
 constexpr int SC_LOGIN = 1;
 constexpr int SC_POS = 2;
 constexpr int SC_PUT_PLAYER = 3;
@@ -29,15 +35,47 @@ constexpr int SC_REMOVE = 4;
 constexpr int SC_ANIM = 5;
 constexpr int SC_WEAPON = 6;
 
+constexpr int SC_ROOM_INFO = 100;
+constexpr int SC_ROOM_DETAIL_INFO = 101;
 
 #pragma pack(push, 1)
 
 struct cs_packet_connect {
 	char size;
 	char type;
+	char id[15];
 };
 
 struct cs_packet_disconnect {
+	char size;
+	char type;
+};
+
+struct cs_packet_make_room {
+	char size;
+	char type;
+	char name[10];
+};
+
+struct cs_packet_attend_room {
+	char size;
+	char type;
+	int room_num;
+};
+
+struct cs_packet_start_room {
+	char size;
+	char type;
+	int room_num;
+};
+
+struct cs_packet_ready_room {
+	char size;
+	char type;
+	int room_num;
+};
+
+struct cs_packet_load_complete {
 	char size;
 	char type;
 };
@@ -69,6 +107,23 @@ struct sc_packet_login {
 	char id;
 	float x, y, z;
 	float vx, vy, vz;
+};
+
+struct sc_packet_room_info {
+	char size;
+	char type;
+	char name[10];
+	char current_num;
+	int room_num;
+};
+
+struct sc_packet_room_detail_info {
+	char size;
+	char type;
+	int room_num;
+	char room_index;
+	char name[15];
+	char host;
 };
 
 struct sc_packet_pos {
@@ -104,7 +159,6 @@ struct sc_packet_weapon {
 	char id;
 	char weapon_type;
 	char weapon_index;
-	char weapon_success;
 };
 
 struct sc_packet_remove {

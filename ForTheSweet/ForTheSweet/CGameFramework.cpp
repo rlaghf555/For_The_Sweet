@@ -15,6 +15,22 @@ char * ConvertWCtoC(wchar_t* str)
 	WideCharToMultiByte(CP_ACP, 0, str, -1, pStr, strSize, 0, 0);
 	return pStr;
 }
+
+wchar_t* ConverCtoWC(char* str)
+{
+	//wchar_t형 변수 선언
+	wchar_t* pStr;
+	//멀티 바이트 크기 계산 길이 반환
+	int strSize = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, NULL);
+
+	//wchar_t 메모리 할당
+	pStr = new WCHAR[strSize];
+	//형 변환
+	MultiByteToWideChar(CP_ACP, 0, str, strlen(str) + 1, pStr, strSize);
+
+	return pStr;
+}
+
 CGameFramework::CGameFramework()
 {
 	
@@ -79,16 +95,13 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	if (SERVER_ON) {
 		if (UI_ON) {
-			m_pSocket = new CSocket(m_pid, m_pip);
-			if (m_pSocket) {
-				if (m_pSocket->init())
-				{
-					m_pSocket->sendPacket(CS_CONNECT, 0, 0, 0);
-					cout << "CONNECT 패킷 보냄\n";
-				}
-				else
-					return false;
-			}
+			cs_packet_load_complete p_load_complete;
+			p_load_complete.type = CS_LOAD_COMPLETE;
+			p_load_complete.size = sizeof(cs_packet_load_complete);
+
+			cout << "send load complete packet\n";
+
+			send(m_pSocket->clientSocket, (char *)&p_load_complete, sizeof(cs_packet_load_complete), 0);
 		}
 		else if (UI_ON==false) { 
 			char tmpip[15];
@@ -286,7 +299,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 	::gnCbvSrvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-void CGameFramework::recvCallBack()
+void CGameFramework::processPacket(char *ptr)
 {
 	sc_packet_login p_login;
 	sc_packet_pos p_pos;
@@ -295,178 +308,197 @@ void CGameFramework::recvCallBack()
 	sc_packet_anim p_anim;
 	sc_packet_weapon p_weapon;
 
-	int retval;
 
-	//while(m_pSocket == NULL);
-
-	retval = recv(m_pSocket->clientSocket, m_pSocket->buf, MAX_PACKET_SIZE, 0);
-
-	if (retval == 0 || retval == SOCKET_ERROR)
+	switch (ptr[1])
 	{
-		closesocket(m_pSocket->clientSocket);
+	case SC_LOGIN:
+	{
+		memcpy(&p_login, ptr, sizeof(p_login));
+
+		My_ID = p_login.id;
+		XMFLOAT3 pos(p_login.x, p_login.y, p_login.z);
+		XMFLOAT3 vel(p_login.vx, p_login.vy, p_login.vz);
+		//XMFLOAT3 look(0, 0, 1);
+
+		m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
+		cout << "ID : " << My_ID << endl;
+		m_pCamera = m_pScene->m_pPlayer[My_ID]->GetCamera();
+		m_pScene->getplayer(My_ID)->SetPosition(pos);
+		m_pScene->getplayer(My_ID)->SetVelocity(vel);
+		//m_pScene->getplayer(My_ID)->SetLook(look);
+		PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
+		m_pPhysx->m_Scene->lockWrite();
+		m_pScene->getplayer(My_ID)->SetPhysController(m_pPhysx, m_pScene->getplayer(My_ID)->getCollisionCallback(), &ControllerPos);
+		m_pPhysx->m_Scene->unlockWrite();
+		m_pScene->getplayer(My_ID)->ChangeAnimation(Anim_Idle);
+		//m_pScene->getplayer(My_ID)->SetAnimFrame(0.0f);
+		m_pScene->getplayer(My_ID)->EnableLoop();
+
+		m_pScene->m_pPlayer[My_ID]->SetConnected(true);
+		//m_pScene->getplayer(My_ID)->SetLook(XMFLOAT3(0, 0, 1));
+		//m_pScene->m_pPlayer[My_ID]->SetLook(look);
+		//cout << "캐릭터 위치 : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
+		//m_pScene->m_pPlayer[My_ID]->SetLookVector(look);
+		//m_pScene->m_pPlayer[My_ID]->SetConnected(true);
+
+		cout << "Client Login sucess\n";
+
+		break;
 	}
-
-	char *ptr = m_pSocket->buf;
-	//cout << "Packet Len : " << retval << endl;
-
-	while (retval > 0)
+	case SC_PUT_PLAYER:
 	{
-		char size = ptr[0];
-		char type = ptr[1];
+		memcpy(&p_put, ptr, sizeof(p_put));
 
-		//cout << "size : " << int(size) << "type : " << int(type) << endl;
+		XMFLOAT3 pos(p_put.x, p_put.y, p_put.z);
+		XMFLOAT3 vel(p_put.vx, p_put.vy, p_put.vz);
 
-		if (type == SC_LOGIN)
+		cout << "Put Player : " << int(p_put.id) << endl;
+
+		if (true)
 		{
-			memcpy(&p_login, ptr, sizeof(p_login));
-
-			My_ID = p_login.id;
-			XMFLOAT3 pos(p_login.x, p_login.y, p_login.z);
-			XMFLOAT3 vel(p_login.vx, p_login.vy, p_login.vz);
-			//XMFLOAT3 look(0, 0, 1);
-
+			My_ID = p_put.id;
 			m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
-			cout << "ID : " << My_ID << endl;
-			m_pCamera = m_pScene->m_pPlayer[My_ID]->GetCamera();
-			m_pScene->getplayer(My_ID)->SetPosition(pos);
-			m_pScene->getplayer(My_ID)->SetVelocity(vel);
-			//m_pScene->getplayer(My_ID)->SetLook(look);
-			PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
-			m_pScene->getplayer(My_ID)->SetPhysController(m_pPhysx, m_pScene->getplayer(My_ID)->getCollisionCallback(), &ControllerPos);
-			m_pScene->getplayer(My_ID)->ChangeAnimation(Anim_Idle);
-			//m_pScene->getplayer(My_ID)->SetAnimFrame(0.0f);
-			m_pScene->getplayer(My_ID)->EnableLoop();
-
-			m_pScene->m_pPlayer[My_ID]->SetConnected(true);
-			//m_pScene->getplayer(My_ID)->SetLook(XMFLOAT3(0, 0, 1));
-			//m_pScene->m_pPlayer[My_ID]->SetLook(look);
-			//cout << "캐릭터 위치 : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
-			//m_pScene->m_pPlayer[My_ID]->SetLookVector(look);
-			//m_pScene->m_pPlayer[My_ID]->SetConnected(true);
-
-
-			cout << "Client Login sucess\n";
-
-			ptr += sizeof(p_login);
-			retval -= sizeof(p_login);
-		}
-		if (type == SC_PUT_PLAYER)
-		{
-			memcpy(&p_put, ptr, sizeof(p_put));
-
-			XMFLOAT3 pos(p_put.x, p_put.y, p_put.z);
-			XMFLOAT3 vel(p_put.vx, p_put.vy, p_put.vz);
-
-			cout << "Put Player : " << int(p_put.id) << endl;
-
-			m_pScene->getplayer(p_put.id)->SetPosition(pos);
-			m_pScene->getplayer(p_put.id)->SetVelocity(vel);
-			m_pScene->getplayer(p_pos.id)->SetDashed(p_put.dashed);
-			PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
-			m_pScene->getplayer(p_put.id)->SetPhysController(m_pPhysx, m_pScene->getplayer(p_put.id)->getCollisionCallback(), &ControllerPos);
-			m_pScene->getplayer(p_put.id)->ChangeAnimation(p_put.ani_index);
-
-			if (p_put.ani_index == Anim_Idle || p_put.ani_index == Anim_Walk || p_put.ani_index == Anim_Run) {
-				m_pScene->getplayer(p_put.id)->EnableLoop();
-			}
-			else {
-				m_pScene->getplayer(p_put.id)->DisableLoop();
-			}
-			m_pScene->m_pPlayer[p_put.id]->SetConnected(true);
-
-			ptr += sizeof(p_put);
-			retval -= sizeof(p_put);
-		}
-		if (type == SC_POS)
-		{
-			memcpy(&p_pos, m_pSocket->buf, sizeof(p_pos));
-
-			XMFLOAT3 pos(p_pos.x, p_pos.y, p_pos.z);
-			XMFLOAT3 vel(p_pos.vx, p_pos.vy, p_pos.vz);
-
-			if (p_pos.size == sizeof(sc_packet_pos))
-			{
-				m_pScene->getplayer(p_pos.id)->SetPosition(pos);
-				m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
-				m_pScene->getplayer(p_pos.id)->SetLook(vel);
-
-				// cout << int(p_pos.dashed) << endl;
-
-				m_pScene->getplayer(p_pos.id)->SetDashed(p_pos.dashed);
-
-				if (p_pos.ani_index <= Anim_Run) {
-					m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
-					m_pScene->getplayer(p_pos.id)->EnableLoop();
-					m_pScene->getplayer(p_pos.id)->SetStatus(STATUS::FREE);
-				}
-				//else {
-				//	m_pScene->getplayer(p_pos.id)->DisableLoop();
-				//}
-
-				//cout << int(p_pos.id) << "Player SC_POS : " << pos.x << "," << pos.z << endl;
-			}
-
-			ptr += sizeof(p_pos);
-			retval -= sizeof(p_pos);
-		}
-		if (type == SC_REMOVE) {
-			memcpy(&p_remove, m_pSocket->buf, sizeof(p_remove));
-
-			m_pScene->m_pPlayer[p_remove.id]->SetConnected(false);
-			m_pScene->m_pPlayer[p_remove.id]->m_PlayerController->release(); m_pScene->m_pPlayer[p_remove.id]->m_PlayerController = NULL;
-			//m_pScene->m_pPlayer[p_remove.id]->m_AttackTrigger->release();
-
-			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
-			ptr += sizeof(p_remove);
-			retval -= sizeof(p_remove);
-		}
-		if (type == SC_ANIM) {
-			memcpy(&p_anim, m_pSocket->buf, sizeof(p_anim));
-
-			cout << int(p_anim.id) << "Player SC_ANIM : " << int(p_anim.ani_index) << endl;
-
-			if (p_anim.ani_index >= Anim_Idle && p_anim.ani_index <= Anim_Lollipop_Skill) {
-				m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
-				m_pScene->getplayer(p_anim.id)->DisableLoop();
-
-				int anim_index = m_pScene->getplayer(p_anim.id)->getAnimIndex();
-
-				if (anim_index == Anim_Jump) {
-					m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
-					m_pScene->getplayer(p_anim.id)->jumpstart();
-					m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::JUMP);
-				}
-
-				if (anim_index == Anim_Guard) {
-					m_pScene->getplayer(p_anim.id)->SetAnimFrame(10);
-					m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::DEFENSE);
-				}
-				if (anim_index >= Anim_Weak_Attack1 && anim_index <= Anim_Weak_Attack3) {
-					m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::WEAK_ATTACK);
-				}
-				if (anim_index >= Anim_Hard_Attack1 && anim_index <= Anim_Hard_Attack2) {
-					m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HARD_ATTACK);
-				}
-			}
-			//if (p_anim.ani_index == Anim_Idle)	m_pScene->getplayer(p_anim.id)->EnableLoop();
-			//else m_pScene->getplayer(p_anim.id)->DisableLoop();
-			ptr += sizeof(p_anim);
-			retval -= sizeof(p_anim);
+			m_pCamera = m_pScene->getplayer(My_ID)->GetCamera();
 		}
 
-		if (type == SC_WEAPON)
-		{
-			memcpy(&p_weapon, m_pSocket->buf, sizeof(p_weapon));
+		m_pScene->getplayer(p_put.id)->SetPosition(pos);
+		m_pScene->getplayer(p_put.id)->SetVelocity(vel);
+		m_pScene->getplayer(p_put.id)->SetDashed(p_put.dashed);
+		PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
+		m_pPhysx->m_Scene->lockWrite();
+		m_pScene->getplayer(p_put.id)->SetPhysController(m_pPhysx, m_pScene->getplayer(p_put.id)->getCollisionCallback(), &ControllerPos);
+		m_pPhysx->m_Scene->unlockWrite();
+		m_pScene->getplayer(p_put.id)->ChangeAnimation(p_put.ani_index);
 
-			m_pScene->m_pPlayer[p_weapon.id]->SetWeapon(true, p_weapon.weapon_type, p_weapon.weapon_index);
-
-			cout << p_weapon.id << " Player Weapon Success\n";
-			// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
-			ptr += sizeof(p_weapon);
-			retval -= sizeof(p_weapon);
+		if (p_put.ani_index == Anim_Idle || p_put.ani_index == Anim_Walk || p_put.ani_index == Anim_Run) {
+			m_pScene->getplayer(p_put.id)->EnableLoop();
 		}
+		else {
+			m_pScene->getplayer(p_put.id)->DisableLoop();
+		}
+		m_pScene->m_pPlayer[p_put.id]->SetConnected(true);
+
+		break;
 	}
-	memset(m_pSocket->buf, 0, sizeof(MAX_PACKET_SIZE));
+	case SC_POS:
+	{
+		memcpy(&p_pos, m_pSocket->buf, sizeof(p_pos));
+
+		XMFLOAT3 pos(p_pos.x, p_pos.y, p_pos.z);
+		XMFLOAT3 vel(p_pos.vx, p_pos.vy, p_pos.vz);
+
+		if (p_pos.size == sizeof(sc_packet_pos))
+		{
+			m_pScene->getplayer(p_pos.id)->SetPosition(pos);
+			m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
+			m_pScene->getplayer(p_pos.id)->SetLook(vel);
+
+			// cout << int(p_pos.dashed) << endl;
+
+			m_pScene->getplayer(p_pos.id)->SetDashed(p_pos.dashed);
+
+			if (m_pScene->getplayer(p_pos.id)->m_Jump.mJump == false)
+			{
+				if (m_pScene->getplayer(p_pos.id)->GetStatus() == STATUS::FREE)
+				{
+					if (p_pos.ani_index <= Anim_Run) {
+						m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
+						m_pScene->getplayer(p_pos.id)->EnableLoop();
+						m_pScene->getplayer(p_pos.id)->SetStatus(STATUS::FREE);
+					}
+				}
+			}
+			//else {
+			//	m_pScene->getplayer(p_pos.id)->DisableLoop();
+			//}
+
+			//cout << int(p_pos.id) << "Player SC_POS : " << pos.x << "," << pos.z << endl;
+		}
+
+		break;
+	}
+	case SC_REMOVE:
+	{
+		memcpy(&p_remove, m_pSocket->buf, sizeof(p_remove));
+
+		m_pScene->m_pPlayer[p_remove.id]->SetConnected(false);
+		m_pPhysx->m_Scene->lockWrite();
+		m_pScene->m_pPlayer[p_remove.id]->m_PlayerController->release(); m_pScene->m_pPlayer[p_remove.id]->m_PlayerController = NULL;
+		m_pPhysx->m_Scene->unlockWrite();
+		//m_pScene->m_pPlayer[p_remove.id]->m_AttackTrigger->release();
+
+		break;
+	}
+	case SC_ANIM:
+	{
+		memcpy(&p_anim, m_pSocket->buf, sizeof(p_anim));
+
+		cout << int(p_anim.id) << "Player SC_ANIM : " << int(p_anim.ani_index) << endl;
+
+		if (p_anim.ani_index >= Anim_Idle && p_anim.ani_index <= Anim_Lollipop_Skill) {
+			m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
+			m_pScene->getplayer(p_anim.id)->DisableLoop();
+
+			int anim_index = m_pScene->getplayer(p_anim.id)->getAnimIndex();
+
+			if (anim_index == Anim_Jump) {
+
+				PxVec3 temp;
+				XMFLOAT3 Vel = m_pScene->getplayer(p_anim.id)->GetVelocity();
+
+				temp.x = Vel.x;
+				temp.y = Vel.y;
+				temp.z = Vel.z;
+
+				temp = temp.getNormalized();
+
+				if (m_pScene->getplayer(p_anim.id)->GetDashed()) {
+					temp *= 2;
+				}
+
+				m_pScene->getplayer(p_anim.id)->ChangeAnimation(p_anim.ani_index);
+				m_pScene->getplayer(p_anim.id)->jumpstart();
+				m_pScene->getplayer(p_anim.id)->SetJumpVelocity(temp);
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::JUMP);
+			}
+
+			if (anim_index == Anim_Guard) {
+				m_pScene->getplayer(p_anim.id)->SetAnimFrame(10);
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::DEFENSE);
+			}
+			if (anim_index >= Anim_Weak_Attack1 && anim_index <= Anim_Weak_Attack3) {
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::WEAK_ATTACK);
+			}
+			if (anim_index >= Anim_Hard_Attack1 && anim_index <= Anim_Hard_Attack2) {
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HARD_ATTACK);
+			}
+			if (anim_index == Anim_Small_React) {
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HITTED);
+			}
+		}
+		//if (p_anim.ani_index == Anim_Idle)	m_pScene->getplayer(p_anim.id)->EnableLoop();
+		//else m_pScene->getplayer(p_anim.id)->DisableLoop();
+
+		break;
+	}
+	case SC_WEAPON:
+	{
+		memcpy(&p_weapon, m_pSocket->buf, sizeof(p_weapon));
+
+		m_pScene->m_pPlayer[p_weapon.id]->SetWeapon(true, p_weapon.weapon_type, p_weapon.weapon_index);
+
+		m_pScene->weapon_box[p_weapon.weapon_type][p_weapon.weapon_index]->pick = true;
+
+		cout << p_weapon.id << " Player Weapon Success\n";
+		// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
+
+		break;
+	}
+	default:
+	{
+		cout << "알수 없는 패킷 type : " << int(ptr[1]) << endl;
+	}
+	}
 }
 
 //스왑체인의 각 후면 버퍼에 대한 렌더 타겟 뷰를 생성한다.
@@ -1043,12 +1075,15 @@ void CGameFramework::ProcessInput()
 			}
 
 			// 점프(space)
-			if (::GetAsyncKeyState(VK_SPACE) & 0x8000 && !jump_state) {
-				if (m_pPlayer->m_Jump.mJump == false) {
-					cout << "jump" << endl;
-					m_pSocket->sendPacket(CS_ATTACK, CS_JUMP, 0, 0);
+			if (status == STATUS::FREE)
+			{
+				if (::GetAsyncKeyState(VK_SPACE) & 0x8000 && !jump_state) {
+					if (m_pPlayer->m_Jump.mJump == false) {
+						cout << "jump" << endl;
+						m_pSocket->sendPacket(CS_ATTACK, CS_JUMP, 0, 0);
+					}
+					jump_state = true;
 				}
-				jump_state = true;
 			}
 			if (::GetAsyncKeyState(VK_SPACE) == 0 && jump_state) {
 				jump_state = false;
@@ -1638,33 +1673,22 @@ void CGameFramework::UpdateProcess()
 				if (m_pScene->m_pPlayer[i]->GetConnected())
 				{
 					char status = m_pScene->m_pPlayer[i]->GetStatus();
-					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK)
+					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK || status == STATUS::HITTED)
 					{
 						continue;
 					}
 					else
 					{
 						PxExtendedVec3 position;
+						PxVec3 vel;
+						PxVec3 velocity;
+
 						XMFLOAT3 pos = m_pScene->m_pPlayer[i]->GetPosition();
 						position.x = pos.x;
 						position.y = pos.y + 17.5;
 						position.z = pos.z;
 						m_pScene->m_pPlayer[i]->m_PlayerController->setPosition(position);
 
-						float jump_height;
-
-						if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
-							jump_height = m_pScene->m_pPlayer[i]->m_Jump.getHeight(m_GameTimer.GetTimeElapsed());
-						}
-						else {
-							m_pScene->m_pPlayer[i]->m_Fall.startJump(0);
-							jump_height = m_pScene->m_pPlayer[i]->m_Fall.getHeight(m_GameTimer.GetTimeElapsed());
-						}
-
-
-
-						PxVec3 vel;
-						PxVec3 velocity;
 						XMFLOAT3 xmf_disp = m_pScene->m_pPlayer[i]->GetVelocity();
 
 						velocity.x = xmf_disp.x;
@@ -1677,6 +1701,19 @@ void CGameFramework::UpdateProcess()
 						{
 							vel *= 2;
 						}
+
+						float jump_height;
+
+						if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
+							jump_height = m_pScene->m_pPlayer[i]->m_Jump.getHeight(m_GameTimer.GetTimeElapsed());
+							vel = m_pScene->m_pPlayer[i]->GetJumpVelocity();
+						}
+						else {
+							m_pScene->m_pPlayer[i]->m_Fall.startJump(0);
+							jump_height = m_pScene->m_pPlayer[i]->m_Fall.getHeight(m_GameTimer.GetTimeElapsed());
+						}
+
+
 						//cout << " Vel : " << vel.x << ", " << vel.y << ", " << vel.z << endl;
 
 						PxVec3 dist = vel * m_GameTimer.GetTimeElapsed() * 20.f;
@@ -1689,6 +1726,8 @@ void CGameFramework::UpdateProcess()
 							//cout << "충돌\n";
 							if (m_pScene->m_pPlayer[i]->m_Jump.mJump) {
 								m_pScene->m_pPlayer[i]->m_Jump.stopJump();
+								PxVec3 initVel = PxVec3(0, 0, 0);
+								m_pScene->m_pPlayer[i]->SetJumpVelocity(initVel);
 								if (velocity.magnitude() > 0.f)
 								{
 									if (m_pScene->m_pPlayer[i]->GetDashed())
@@ -1852,24 +1891,54 @@ void CGameFramework::FrameAdvance()
 
 	AnimateObjects();
 	
-	for (int i = 0; i < MAX_USER; ++i)
+	if (SERVER_ON)
 	{
-		if (m_pScene->m_pPlayer[i]->GetConnected())
+		for (int i = 0; i < MAX_USER; ++i)
 		{
-			if (m_pScene->m_pPlayer[i]->getAnimLoop() == LOOP_END)
+			if (m_pScene->m_pPlayer[i]->GetConnected())
 			{
-				char status = m_pScene->m_pPlayer[i]->GetStatus();
-				if (status == STATUS::WEAK_ATTACK)
+				if (m_pScene->m_pPlayer[i]->getAnimLoop() == LOOP_END)
 				{
-					m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
-					if (i == My_ID)
-						weak_attack_count = 0;
-				}
-				else if (status == STATUS::HARD_ATTACK)
-				{
-					m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
-					if (i == My_ID)
-						hard_attack_count = 0;
+					char status = m_pScene->m_pPlayer[i]->GetStatus();
+					XMFLOAT3 velocity = m_pScene->m_pPlayer[i]->GetVelocity();
+					PxVec3 vel;
+
+					vel.x = velocity.x;
+					vel.y = velocity.y;
+					vel.z = velocity.z;
+
+					vel = vel.getNormalized();
+
+					if (vel.magnitude() > 0.0f)
+					{
+						if (m_pScene->m_pPlayer[i]->GetDashed())
+						{
+							m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Run);
+						}
+						else {
+							m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Walk);
+						}
+					}
+					else {
+						m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Idle);
+					}
+
+					if (status == STATUS::WEAK_ATTACK)
+					{
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+						if (i == My_ID)
+							weak_attack_count = 0;
+					}
+					else if (status == STATUS::HARD_ATTACK)
+					{
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+						if (i == My_ID)
+							hard_attack_count = 0;
+					}
+					else if (status == STATUS::HITTED)
+					{
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+					}
 				}
 			}
 		}

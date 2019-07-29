@@ -13,10 +13,26 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 			//tmp = pairs[i].otherActor->getGlobalPose();
 			//cout << "Other Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
 
+			PxVec3 mylook;
+			PxVec3 otherlook;
+			float dot;
+
+			for (int j = 0; j < 8; ++j)
+			{
+				if (player[j])
+				{
+					if (pairs[i].triggerActor == player[j]->m_AttackTrigger)
+					{
+						mylook = player[j]->m_Look;
+						break;
+					}
+				}
+			}
+
 			for (int j = 0; j < 8; ++j)
 			{
 				//cout << j << endl;
-				if (player[j]) 
+				if (player[j])
 				{
 					if (pairs[i].triggerActor != player[j]->m_AttackTrigger)
 					{
@@ -24,8 +40,23 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 						{
 							if (pairs[i].otherActor == player[j]->getControllerActor()) {
 								//cout << j << " Player Hitted\n";
-								player[j]->setAniIndex(Anim::Small_React);
-								player[j]->hitted = true;
+								otherlook = player[j]->m_Look;
+								dot = mylook.dot(otherlook);
+
+								// -0.707... ~ -1.0 : 아머 가능
+								if (player[j]->m_status == STATUS::DEFENSE) {
+									if (dot <= -0.7f && dot >= -1.0f) {
+										continue;
+									}
+									else {
+										player[j]->setAniIndex(Anim::Small_React);
+										player[j]->hitted = true;
+									}
+								}
+								else {
+									player[j]->setAniIndex(Anim::Small_React);
+									player[j]->hitted = true;
+								}
 							}
 						}
 					}

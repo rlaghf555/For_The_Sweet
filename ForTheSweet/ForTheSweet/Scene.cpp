@@ -721,11 +721,14 @@ void CScene::CollisionProcess(int index)
 			if (m_WeaponShader[i]->getObject(j)) {
 				weapon_box[i][j]->bounding.Center = m_WeaponShader[i]->getObject(j)->GetPosition();
 				XMMATRIX tmp = XMLoadFloat4x4(&m_WeaponShader[i]->getObject(j)->m_xmf4x4World);
-				bool result = weapon_box[i][j]->bounding.Intersects(bounding_box_test[index]->bounding);
-				if (result) {
-					m_pPlayer[index]->SetWeapon(false, i, j);
-					//cout << "player "<<index<< "---"<<"무기 종류: " << i << ", 무기 번호: " << j << endl;
-					return;
+				if (weapon_box[i][j]->pick == false)
+				{
+					bool result = weapon_box[i][j]->bounding.Intersects(bounding_box_test[index]->bounding);
+					if (result) {
+						m_pPlayer[index]->SetWeapon(false, i, j);
+						//cout << "player "<<index<< "---"<<"무기 종류: " << i << ", 무기 번호: " << j << endl;
+						return;
+					}
 				}
 			}
 		}

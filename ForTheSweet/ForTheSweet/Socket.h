@@ -15,6 +15,9 @@ public:
 	SOCKADDR_IN serverAddr;
 	char buf[MAX_PACKET_SIZE];
 	char packetBuffer[MAX_PACKET_SIZE];
+	int packet_size = 0;
+	int saved_size = 0;
+
 	//char id = -1;
 	char *m_pid, *m_pip;
 public:
@@ -26,6 +29,5 @@ public:
 
 	bool init();
 	void sendPacket(char type, char key, char state, char id);
-	void recvCallBack();
 	
 };

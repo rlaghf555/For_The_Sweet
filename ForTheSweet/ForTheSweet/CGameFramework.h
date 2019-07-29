@@ -133,7 +133,7 @@ public:
 	//CPU와 GPU를 동기화하는 함수이다.
 
 	// Socket
-	void recvCallBack();
+	void processPacket(char *ptr);
 
 	void CreateRenderTargetView();
 	void CreateDepthStencilView();
