@@ -1185,6 +1185,18 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->Set_Weapon_Skill(-1);
 			}
 		}
+		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_chocolate) {
+			if (Anim_Index == Anim_chocolate_Skill && Anim_Time >= 11) {	// 초콜릿 벽만들기
+				m_pPlayer->SetWeapon(false, -1, -1);
+				m_pPlayer->Set_Weapon_Skill(-1);
+			}
+		}
+		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_chupachupse) {
+			if (Anim_Index == Anim_candy_Skill && Anim_Time >= 88) {	// 츄파춥스 사라지기
+				m_pPlayer->SetWeapon(false, -1, -1);
+				m_pPlayer->Set_Weapon_Skill(-1);
+			}
+		}
 		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_cupcake) {
 			if (Anim_Index == Anim_Cupckae_Eat && Anim_Time >= 20) {	// 컵케이크 사라지기
 				m_pPlayer->SetWeapon(false, -1, -1);
@@ -1274,6 +1286,7 @@ void CGameFramework::ProcessInput()
 				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
 						m_pPlayer->ChangeAnimation(Anim_candy_Skill);
+						m_pPlayer->Set_Weapon_Skill(M_Weapon_chupachupse);
 						m_pPlayer->DisableLoop();
 					}
 				}
@@ -1359,6 +1372,7 @@ void CGameFramework::ProcessInput()
 				//무기 번호가 WEAPON_EMPTY 가 아니면 스킬사용
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
 						m_pPlayer->ChangeAnimation(Anim_chocolate_Skill);
+						m_pPlayer->Set_Weapon_Skill(M_Weapon_chocolate);
 						m_pPlayer->DisableLoop();
 					}
 				}

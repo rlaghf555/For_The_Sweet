@@ -673,31 +673,25 @@ void CScene::AnimateWeapon(int i)
 	m_WeaponShader[weapon_type]->getObject(weapon_index)->SetWorld(bone);
 	m_WeaponShader[weapon_type]->getObject(weapon_index)->SetPosition(pos);
 //	m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 0, 90);
-	
+
 	//if (weapon_type != M_Weapon_chocolate) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 	int animindex = m_pPlayer[i]->getAnimIndex();
 	if (animindex == Anim_chocolate_Attack) {
-		if(m_pPlayer[i]->getAnimtime() > 15)
-			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-30, 0, 60);
-		else 
-			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
-
+		if (m_pPlayer[i]->getAnimtime() > 15) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-30, 0, 60);
+		else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 	}
-	else if (animindex == Anim_chocolate_HardAttack) {
-		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-20, 0, 50); 
+	else if (animindex == Anim_chocolate_HardAttack || animindex == Anim_chocolate_Skill || animindex == Anim_chocolate_Guard) {
+		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-10, 0, 55);
 	}
 	else if (animindex == Anim_candy_HardAttack) {
-		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 20, 30);
+		if (m_pPlayer[i]->getAnimtime() > 18) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-140, 20, 30);
+		else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 20, 30);
 	}
 	else if (animindex == Anim_pepero_Skill) {
-
-		if (m_pPlayer[i]->getAnimtime() > 19)
-			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-110, 0, 0);
-		else 
-			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
-
-		
+		if (m_pPlayer[i]->getAnimtime() > 19 && m_pPlayer[i]->getAnimtime() < 24) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-120, 0, 0);
+		else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 	}
+	else if (weapon_type == M_Weapon_chocolate) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-100, 10, 0);
 	else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 
 }
