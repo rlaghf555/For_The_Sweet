@@ -51,6 +51,7 @@ public:
 	virtual void ShowMessage(bool win) {};
 	virtual void SetFog() {};
 	virtual void FogOff() {};
+	virtual void SetID(wchar_t *str) {};
 
 protected:
 	unique_ptr<UploadBuffer<CB_UI_INFO>>	m_ObjectCB = nullptr;
@@ -131,7 +132,7 @@ public:
 	~UIIDShader() {};
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
-	void SetID(wchar_t *str);
+	virtual void SetID(wchar_t *str);
 };
 class UITimeShader : public UIShader
 {

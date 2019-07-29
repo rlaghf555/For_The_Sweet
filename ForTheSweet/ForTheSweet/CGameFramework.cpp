@@ -151,7 +151,7 @@ void CGameFramework::OnDestroy()
 		delete Character_Model;
 		Character_Model = NULL;
 	}
-	DestroyWindow(m_hWnd);
+	//DestroyWindow(m_hWnd);
 }
 
 void CGameFramework::CreateSwapChain()
@@ -612,6 +612,7 @@ void CGameFramework::BuildObjects()
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 		m_pScene->BuildUI(m_pd3dDevice, m_pd3dCommandList);
+		m_pScene->initUI();
 	}
 	if (SERVER_ON) {
 		if (m_pCamera == nullptr) {
