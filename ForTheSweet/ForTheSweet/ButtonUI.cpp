@@ -29,6 +29,8 @@ void ButtonUI::SetPosition(int posX, int posY)
 
 bool ButtonUI::Collsion(int mx, int my)	//마우스 좌표
 {
+	if (!render)
+		return false;
 	return (mx > x&&mx<x2&&my>y&&my < y2);
 }
 
@@ -63,4 +65,12 @@ int RoomMakeUI::Collision1(int mx, int my)
 		cout << "취소" << endl;
 		return 0;
 	}
+}
+
+characterUI::characterUI(HBITMAP bit, int posx, int posy) : ButtonUI(bit, posx, posy)
+{
+}
+
+characterUI::~characterUI()
+{
 }
