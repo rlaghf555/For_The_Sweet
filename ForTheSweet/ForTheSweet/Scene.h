@@ -41,7 +41,7 @@ public:
 	PlayerShader				*m_pPlayerShader[MAX_USER];
 	PlayerShadowShader			*m_pPlayerShadowShader[MAX_USER];
 
-	CModelShader				*m_MapShader[23] = { NULL, };
+	CModelShader				*m_MapShader[22] = { NULL, };
 	LoadModel					**Map_Model;
 
 	int							animate_flag = 0;
