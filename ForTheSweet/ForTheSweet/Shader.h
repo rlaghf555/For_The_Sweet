@@ -263,10 +263,7 @@ public:
 	virtual void Animate(float fTimeElapsed);
 	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
 
-	bool visible = false;
-	float duration_time = 0.f;
 	int spritenum;
-	float time;
 };
 
 class SkillEffectShader : public EffectShader

@@ -2774,7 +2774,7 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 1;
+	m_nObjects = 10;
 	m_ppObjects = vector<CGameObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
@@ -2801,21 +2801,26 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 		CMesh *pCubeMesh = NULL;
 		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 60, 120, 0);	// pos(x, y), Width(w, h), depth
-		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 
-		if (type == 0) m_ppObjects[i]->SetPosition(-240.f, 100.f, 110.f);
-		if (type == 1) m_ppObjects[i]->SetPosition(-120.f, 100.f, 110.f);
-		if (type == 2) m_ppObjects[i]->SetPosition(60.f, 100.f, 110.f);
-		if (type == 3) m_ppObjects[i]->SetPosition(180.f, 100.f, 110.f);
+		if (type == M_Map_3) {
 
-		if (type == 4) m_ppObjects[i]->SetPosition(-150.f, 100.f, 0.f);
-		if (type == 5) m_ppObjects[i]->SetPosition(90.f, 100.f, 0.f);
+		}
+		else {
+			if (i == 0) m_ppObjects[i]->SetPosition(-240.f, 100.f, 110.f);
+			if (i == 1) m_ppObjects[i]->SetPosition(-120.f, 100.f, 110.f);
+			if (i == 2) m_ppObjects[i]->SetPosition(60.f, 100.f, 110.f);
+			if (i == 3) m_ppObjects[i]->SetPosition(180.f, 100.f, 110.f);
 
-		if (type == 6) m_ppObjects[i]->SetPosition(-240.f, 100.f, -110.f);
-		if (type == 7) m_ppObjects[i]->SetPosition(-120.f, 100.f, -110.f);
-		if (type == 8) m_ppObjects[i]->SetPosition(60.f, 100.f, -110.f);
-		if (type == 9) m_ppObjects[i]->SetPosition(180.f, 100.f, -110.f);
+			if (i == 4) m_ppObjects[i]->SetPosition(-150.f, 100.f, 0.f);
+			if (i == 5) m_ppObjects[i]->SetPosition(90.f, 100.f, 0.f);
+
+			if (i == 6) m_ppObjects[i]->SetPosition(-240.f, 100.f, -110.f);
+			if (i == 7) m_ppObjects[i]->SetPosition(-120.f, 100.f, -110.f);
+			if (i == 8) m_ppObjects[i]->SetPosition(60.f, 100.f, -110.f);
+			if (i == 9) m_ppObjects[i]->SetPosition(180.f, 100.f, -110.f);
+		}
 	}
 	delete pTexture;
 }
@@ -2833,19 +2838,19 @@ void EffectShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommand
 void EffectShader::Animate(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nObjects; i++) {
-		if (visible == true) {
-			time += fTimeElapsed;
-			if (time > 0.08f) {
+		if (m_ppObjects[i]->visible == true) {
+			m_ppObjects[i]->start_time += fTimeElapsed;
+			if (m_ppObjects[i]->start_time > 0.08f) {
 				m_ppObjects[i]->nowsprite++;
-				time = 0;
+				m_ppObjects[i]->start_time = 0;
 				if (m_ppObjects[i]->nowsprite > spritenum + 1)
 					m_ppObjects[i]->nowsprite = 0;
 			}
-			duration_time += fTimeElapsed;
-			if (duration_time > 3.f) {
-				visible = false;
-				duration_time = 0.f;
-				time = 0.f;
+			m_ppObjects[i]->duration_time += fTimeElapsed;
+			if (m_ppObjects[i]->duration_time > 3.f) {
+				m_ppObjects[i]->visible = false;
+				m_ppObjects[i]->duration_time = 0.f;
+				m_ppObjects[i]->start_time = 0;
 			}
 		}
 	}
@@ -2932,20 +2937,19 @@ void SkillEffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCo
 void SkillEffectShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
 {
 	for (int i = 0; i < m_nObjects; i++) {
-		if (visible == true) {
-			m_ppObjects[i]->SetPosition(pos);
-			time += fTimeElapsed;
-			if (time > 0.08f) {
+		if (m_ppObjects[i]->visible == true) {
+			m_ppObjects[i]->start_time += fTimeElapsed;
+			if (m_ppObjects[i]->start_time > 0.08f) {
 				m_ppObjects[i]->nowsprite++;
-				time = 0;
+				m_ppObjects[i]->start_time = 0;
 				if (m_ppObjects[i]->nowsprite > spritenum + 1)
 					m_ppObjects[i]->nowsprite = 0;
 			}
-			duration_time += fTimeElapsed;
-			if (duration_time > 3.f) {
-				visible = false;
-				duration_time = 0.f;
-				time = 0.f;
+			m_ppObjects[i]->duration_time += fTimeElapsed;
+			if (m_ppObjects[i]->duration_time > 10.f) {
+				m_ppObjects[i]->visible = false;
+				m_ppObjects[i]->duration_time = 0.f;
+				m_ppObjects[i]->start_time = 0;
 			}
 		}
 	}

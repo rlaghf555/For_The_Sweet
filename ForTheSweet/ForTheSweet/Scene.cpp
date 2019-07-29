@@ -207,11 +207,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			}
 		}
 	}
-	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++) {
-		m_EffectShader[i] = new EffectShader();
-		m_EffectShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
-		m_EffectShader[i]->visible = true;	// test 3 sec
-	}
+	m_EffectShader = new EffectShader();
+	m_EffectShader->BuildObjects(pd3dDevice, pd3dCommandList, Selected_Map);
+	for (int i = 0; i < 10; i++)m_EffectShader->getObject(i)->visible = true;
+
 	for (int i = 0; i < MAX_USER; i++) {
 		m_SkillEffectShader[i] = new SkillEffectShader();
 		m_SkillEffectShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -488,12 +487,10 @@ void CScene::ReleaseObjects()
 		m_MessageShader->ReleaseObjects();
 		delete m_MessageShader;
 	}
-	for (int i = 0; i < PATTERN_LIGHTNING_NUM; ++i) {
-		if (m_EffectShader[i]) {
-			m_EffectShader[i]->ReleaseShaderVariables();
-			m_EffectShader[i]->ReleaseObjects();
-			delete m_EffectShader[i];
-		}
+	if (m_EffectShader) {
+		m_EffectShader->ReleaseShaderVariables();
+		m_EffectShader->ReleaseObjects();
+		delete m_EffectShader;
 	}
 	for (int i = 0; i < MAX_USER; ++i) {
 		if (m_SkillEffectShader[i]) {
@@ -602,7 +599,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_pPlayerShadowShader[i]->ChangeAnimation(m_pPlayer[i]->getAnimIndex());
 				}
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
-				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1)m_SkillEffectShader[i]->visible = true;
+				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1)m_SkillEffectShader[i]->getObject(0)->visible = true;
 				m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
@@ -641,7 +638,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		}
 	}
 	m_MessageShader->Animate(fTimeElapsed);
-	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)m_EffectShader[i]->Animate(fTimeElapsed);
+	m_EffectShader->Animate(fTimeElapsed);
 }
 
 void CScene::AnimateWeapon(int i)
@@ -831,7 +828,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)if (m_EffectShader[i]) if (m_EffectShader[i]->visible == true) m_EffectShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < 10; i++) if (m_EffectShader)if (m_EffectShader->getObject(i)->visible == true)m_EffectShader->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
 }

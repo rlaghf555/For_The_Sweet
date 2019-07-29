@@ -61,6 +61,9 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE					m_d3dCbvGPUDescriptorHandle;
 	CMaterial					*m_pMaterial;
 	int m_nRootIndex;
+	bool						visible = false;
+	float						start_time = 0.f;
+	float						duration_time = 0.f;
 
 public:
 	void ReleaseUploadBuffers();

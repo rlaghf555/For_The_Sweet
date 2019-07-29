@@ -62,7 +62,7 @@ public:
 	testBox						*door[8] = { NULL, };
 
 	MeshShader					*m_BackGroundShader[2] = { NULL, };
-	EffectShader				*m_EffectShader[PATTERN_LIGHTNING_NUM] = { NULL, };
+	EffectShader				*m_EffectShader = NULL;
 	SkillEffectShader			*m_SkillEffectShader[MAX_USER] = { NULL, };
 	WaveShader					*m_WavesShader = NULL;
 
