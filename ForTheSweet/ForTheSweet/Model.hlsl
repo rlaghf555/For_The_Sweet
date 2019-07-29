@@ -335,7 +335,8 @@ VS_MODEL_TEXTURED_OUTPUT VSDynamicShadow(VS_MODEL_INPUT input)
 	// Right + Texture
     output.normalW = mul(normalL, (float3x3) gmtxObject);
     output.positionW = (float3) mul(float4(posL, 1.0f), gmtxObject);
-    output.position = mul(mul(mul(mul(float4(posL, 1.0f), gmtxObject), gmtxView), gmtxProjection), gmtxShadowplayer);
+    output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+    //output.position = mul(mul(mul(float4(posL, 1.0f), gmtxShadowplayer), gmtxView), gmtxProjection);
     output.uv = input.uv;
 
     return (output);

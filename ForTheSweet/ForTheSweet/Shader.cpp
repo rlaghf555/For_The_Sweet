@@ -2471,6 +2471,21 @@ D3D12_DEPTH_STENCIL_DESC PlayerShadowShader::CreateDepthStencilState(int index)
 	return(d3dDepthStencilDesc);
 }
 
+void PlayerShadowShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	CB_DYNAMICOBJECT_INFO cBone;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		//cBone.m_xmf4x4World = m_ppObjects[i]->m_xmf4x4World;
+		XMStoreFloat4x4(&cBone.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World) * shadow_mat));
+		cBone.m_nMaterial = 0;
+		XMStoreFloat4x4(&cBone.m_xmf4x4ShadowTransform, XMMatrixTranspose(XMLoadFloat4x4(&m_bbObjects[i]->m_xmf4x4World) * shadow_mat));
+
+		memcpy(cBone.m_bone, m_bbObjects[i]->GetBoneData(), sizeof(XMFLOAT4X4) * m_bbObjects[i]->GetBoneNum());
+
+		m_BoneCB->CopyData(i, cBone);
+	}
+}
+
 void PlayerShadowShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
@@ -2498,7 +2513,7 @@ void PlayerShadowShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\body.dds", 0);
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth.dds", 1);
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\eye.dds", 2);
-	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 1, true);
 
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
@@ -2514,6 +2529,22 @@ void PlayerShadowShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 	player->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 	m_bbObjects[0] = player;
 	m_player = player;
+}
+
+void PlayerShadowShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
+{
+	if (IsZero(fTimeElapsed))
+		return;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		if (m_bbObjects[i]) m_bbObjects[i]->Animate(fTimeElapsed);
+
+		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
+		XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
+		XMMATRIX shadowoffset = XMMatrixTranslation(pos.x, pos.y, pos.z);
+
+		shadow_mat = S * shadowoffset;//XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.36f, 0.0f))) * XMMatrixTranslation(+0.0f, +11.0f, 0.f);
+	}
 }
 
 //////////////
@@ -2581,7 +2612,7 @@ void ShadowREverseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphics
 	BuildPSO(pd3dDevice, nRenderTargets);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\candyland.dds", 0);	//1400*788
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);	//1400*788
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -2605,6 +2636,8 @@ void ShadowREverseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphics
 		//m_ppObjects[i]->Rotate(&a, 90.f);
 	}
 }
+
+////////////////////////////////////////////////////////////////////
 
 EffectShader::EffectShader()
 {

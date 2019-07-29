@@ -439,6 +439,8 @@ public:
 	PlayerShadowShader(Model_Animation *ma);
 	~PlayerShadowShader();
 
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 pos);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList);
 	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int index);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);

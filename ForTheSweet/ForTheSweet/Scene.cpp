@@ -586,6 +586,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		if (m_pPlayer[i]) {
 			if (m_pPlayer[i]->GetConnected()) {
 				m_pPlayerShader[i]->Animate(fTimeElapsed);
+				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
 					AnimateWeapon(i);
 				}
@@ -623,7 +624,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 	m_MessageShader->Animate(fTimeElapsed);
 	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)m_EffectShader[i]->Animate(fTimeElapsed);
-
 }
 
 void CScene::AnimateWeapon(int i)
@@ -749,7 +749,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
-	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
 	
 	if (Selected_Map == M_Map_1) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
@@ -767,13 +766,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	if (Selected_Map == M_Map_3) {
 		for (int i = 0; i < 8; ++i)if (door[i]) door[i]->Render(pd3dCommandList, pCamera);
 		
-		if (m_MapShader[16]) m_MapShader[16]->Render(pd3dCommandList, pCamera);
-		if (m_MapShader[17]) m_MapShader[17]->Render(pd3dCommandList, pCamera);
-		if (m_MapShader[18]) m_MapShader[18]->Render(pd3dCommandList, pCamera);
-		if (m_MapShader[19]) m_MapShader[19]->Render(pd3dCommandList, pCamera);
-		if (m_MapShader[20]) m_MapShader[20]->Render(pd3dCommandList, pCamera);
-		if (m_MapShader[21]) m_MapShader[21]->Render(pd3dCommandList, pCamera);
-
 		if (m_MapShader[8]) m_MapShader[8]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[9]) m_MapShader[9]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[10]) m_MapShader[10]->Render(pd3dCommandList, pCamera);
@@ -782,6 +774,13 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[13]) m_MapShader[13]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[14]) m_MapShader[14]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[15]) m_MapShader[15]->Render(pd3dCommandList, pCamera);
+
+		if (m_MapShader[16]) m_MapShader[16]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[17]) m_MapShader[17]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[18]) m_MapShader[18]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[19]) m_MapShader[19]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[20]) m_MapShader[20]->Render(pd3dCommandList, pCamera);
+		if (m_MapShader[21]) m_MapShader[21]->Render(pd3dCommandList, pCamera);
 
 		m_BridgeShader->Render(pd3dCommandList, pCamera);
 		for (int i = 0; i < 2; ++i) if (m_StairShader[i]) m_StairShader[i]->Render(pd3dCommandList, pCamera);
@@ -809,6 +808,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 				weapon_box[i][j]->Render(pd3dCommandList, pCamera);
 		}
 	}
+
+	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
+
 	for (int i = 0; i < PATTERN_LIGHTNING_NUM; i++)if (m_EffectShader[i]) m_EffectShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
