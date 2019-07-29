@@ -28,7 +28,7 @@ public:
 	int max_user = 8;
 	int mode = 0;//0:팀전 1:개인전 2:대장전
 	int room_num;
-	bool playing = true;
+	bool playing = false;
 };
 
 class RoomMakeUI :public RoomUI {
