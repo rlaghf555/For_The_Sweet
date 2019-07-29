@@ -586,6 +586,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		if (m_pPlayer[i]) {
 			if (m_pPlayer[i]->GetConnected()) {
 				m_pPlayerShader[i]->Animate(fTimeElapsed);
+				if (m_pPlayer[i]->getAnimIndex() != m_pPlayerShadowShader[i]->getAnimIndex()) {
+					m_pPlayerShadowShader[i]->ChangeAnimation(m_pPlayer[i]->getAnimIndex());
+				}
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
 					AnimateWeapon(i);
