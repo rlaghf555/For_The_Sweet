@@ -297,7 +297,7 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 	FogShader *fog = new FogShader();
 	fog->BuildObjects(pDevice, pCommandList);
 	m_ppUIShaders[21] = fog;
-	m_ppUIShaders[21]->SetFog();
+	//m_ppUIShaders[21]->SetFog();
 
 	m_MessageShader = new MessageShader();
 	m_MessageShader->BuildObjects(pDevice, pCommandList);
@@ -649,7 +649,30 @@ void CScene::AnimateWeapon(int i)
 //	m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 0, 90);
 	
 	//if (weapon_type != M_Weapon_chocolate) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
-	m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
+	int animindex = m_pPlayer[i]->getAnimIndex();
+	if (animindex == Anim_chocolate_Attack) {
+		if(m_pPlayer[i]->getAnimtime() > 15)
+			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-30, 0, 60);
+		else 
+			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
+
+	}
+	else if (animindex == Anim_chocolate_HardAttack) {
+		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-20, 0, 50); 
+	}
+	else if (animindex == Anim_candy_HardAttack) {
+		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 20, 30);
+	}
+	else if (animindex == Anim_pepero_Skill) {
+
+		if (m_pPlayer[i]->getAnimtime() > 19)
+			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-110, 0, 0);
+		else 
+			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
+
+		
+	}
+	else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 
 }
 
