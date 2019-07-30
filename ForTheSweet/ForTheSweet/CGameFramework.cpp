@@ -307,7 +307,7 @@ void CGameFramework::processPacket(char *ptr)
 	sc_packet_remove p_remove;
 	sc_packet_anim p_anim;
 	sc_packet_weapon p_weapon;
-
+	sc_packet_hit p_hit;
 
 	switch (ptr[1])
 	{
@@ -461,6 +461,9 @@ void CGameFramework::processPacket(char *ptr)
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::JUMP);
 			}
 
+			if (anim_index >= Anim_Idle && anim_index <= Anim_Run) {
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::FREE);
+			}
 			if (anim_index == Anim_Guard) {
 				m_pScene->getplayer(p_anim.id)->SetAnimFrame(10);
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::DEFENSE);
@@ -471,12 +474,26 @@ void CGameFramework::processPacket(char *ptr)
 			if (anim_index >= Anim_Hard_Attack1 && anim_index <= Anim_Hard_Attack2) {
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HARD_ATTACK);
 			}
-			if (anim_index == Anim_Small_React) {
-				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HITTED);
-			}
+			//if (anim_index == Anim_Small_React) {
+			//	m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HITTED);
+			//}
 		}
 		//if (p_anim.ani_index == Anim_Idle)	m_pScene->getplayer(p_anim.id)->EnableLoop();
 		//else m_pScene->getplayer(p_anim.id)->DisableLoop();
+
+		break;
+	}
+	case SC_HIT:
+	{
+		memcpy(&p_hit, m_pSocket->buf, sizeof(p_hit));
+		m_pScene->getplayer(p_hit.id)->Set_HP(p_hit.hp);
+
+		m_pScene->getplayer(p_hit.id)->SetStatus(STATUS::HITTED);
+		m_pScene->getplayer(p_hit.id)->ChangeAnimation(Anim_Small_React);
+		m_pScene->getplayer(p_hit.id)->DisableLoop();
+
+		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_HP());	//hp
+		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_MP());	//mp
 
 		break;
 	}

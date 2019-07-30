@@ -44,7 +44,7 @@ CPlayer::CPlayer()
 
 	m_status = STATUS::FREE;
 	attack_count = 0;
-	hp = 100;
+	m_hp = 100;
 
 	m_PlayerController = nullptr;
 	//m_HitReport = nullptr;
@@ -95,6 +95,10 @@ void CPlayer::setClientNum(int num)
 	client_num = num;
 }
 
+void CPlayer::setHP(int hp)
+{
+	m_hp = hp;
+}
 
 void CPlayer::setPlayerController(CPhysx *physx)
 {

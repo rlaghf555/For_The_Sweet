@@ -521,8 +521,8 @@ ID3D12RootSignature *CScene::GetGraphicsRootSignature()
 void CScene::initUI()
 {
 	for (int i = 0; i < 8; i++) {
-		m_ppUIShaders[i]->getObejct(1)->SetHP(m_pPlayer[i]->hp);	//hp
-		m_ppUIShaders[i]->getObejct(2)->SetHP(m_pPlayer[i]->mp);	//mp
+		m_ppUIShaders[i]->getObejct(1)->SetHP(m_pPlayer[i]->Get_HP());	//hp
+		m_ppUIShaders[i]->getObejct(2)->SetHP(m_pPlayer[i]->Get_MP());	//mp
 	}
 	//time
 	m_ppUIShaders[8]->SetTime(300);

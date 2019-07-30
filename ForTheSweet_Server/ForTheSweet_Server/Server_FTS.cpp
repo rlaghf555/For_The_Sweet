@@ -254,6 +254,17 @@ void send_anim_packet(char client, char id) {
 	sendPacket(client, &p_anim);
 }
 
+void send_hit_packet(char client, char id, int hp)
+{
+	sc_packet_hit p_hit;
+	p_hit.type = SC_HIT;
+	p_hit.size = sizeof(sc_packet_hit);
+	p_hit.id = id;
+	p_hit.hp = hp;
+
+	sendPacket(client, &p_hit);
+}
+
 void send_weapon_packet(char client, char id, char wp_type, char wp_index) {
 	sc_packet_weapon p_weapon;
 	p_weapon.type = SC_WEAPON;
@@ -1194,14 +1205,11 @@ void clientUpdateProcess(int room_num)
 			{
 				if (clients[client_id].playerinfo->hitted == true)
 				{
-					clients[client_id].playerinfo->setStatus(STATUS::HITTED);
 					add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 660ms);
 
-					sc_packet_anim p_anim;
-					p_anim.type = SC_ANIM;
-					p_anim.size = sizeof(sc_packet_anim);
-					p_anim.id = client_id;
-					p_anim.ani_index = clients[client_id].playerinfo->m_AniIndex;
+					clients[client_id].playerinfo->setStatus(STATUS::HITTED);
+					int hp = clients[client_id].playerinfo->m_hp - 10;
+					clients[client_id].playerinfo->setHP(hp);
 
 					for (int j = 0; j < MAX_ROOM_USER; ++j)
 					{
@@ -1211,11 +1219,12 @@ void clientUpdateProcess(int room_num)
 							{
 								if (clients[it->clientNum[j]].connected == true)
 								{
-									send_anim_packet(it->clientNum[j], client_id);
+									send_hit_packet(it->clientNum[j], client_id, hp);
 								}
 							}
 						}
 					}
+
 					clients[client_id].playerinfo->hitted = false;
 				}
 

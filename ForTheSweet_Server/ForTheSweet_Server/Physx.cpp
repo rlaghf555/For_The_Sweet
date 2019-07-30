@@ -39,7 +39,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 						if (player[j]->m_PlayerController != nullptr)
 						{
 							if (pairs[i].otherActor == player[j]->getControllerActor()) {
-								//cout << j << " Player Hitted\n";
+								cout << j << " Player Hitted\n";
 								otherlook = player[j]->m_Look;
 								dot = mylook.dot(otherlook);
 

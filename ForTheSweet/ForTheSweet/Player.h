@@ -86,6 +86,10 @@ protected:
 	LPVOID m_pCameraUpdatedContext;	//카메라의 위치가 바뀔 때마다 호출되는 OnCameraUpdateCallback() 함수에서 사용하는 데이터이다.
 	CCamera *m_pCamera = NULL;		//플레이어에 현재 설정된 카메라이다.
 	Model_Animation *character;
+
+	int m_hp = 100;
+	int m_mp = 0;
+
 public:
 	PxCapsuleController *m_PlayerController;
 	PxControllerFilters	 m_ControllerFilter;
@@ -138,6 +142,11 @@ public:
 	int Get_Weapon_type() { return weapon_type; }
 	int Get_Weapon_index() { return weapon_index; }
 
+	void Set_HP(int hp) { m_hp = hp; }
+	void Set_MP(int mp) { m_mp = mp; }
+	int Get_HP() { return m_hp; }
+	int Get_MP() { return m_mp; }
+
 	XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
 	PxVec3& GetJumpVelocity() { return(m_JumpVelocity); }
 	float GetYaw() { return(m_fYaw); }
@@ -179,8 +188,6 @@ public:
 	
 	//플레이어의 카메라가 3인칭 카메라일 때 플레이어(메쉬)를 렌더링한다.
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
-	int hp = 100;
-	int mp = 0;
 };
 
 /* 

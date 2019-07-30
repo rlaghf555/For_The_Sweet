@@ -83,6 +83,7 @@ public:
 	void setAniIndex(char index);
 	void setStatus(char status);
 	void setClientNum(int num);
+	void setHP(int hp);
 	void jumpstart() { m_Jump.startJump(120); }
 
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
@@ -113,6 +114,6 @@ public:
 	char attack_count;
 
 	int client_num;
-	int hp;
+	int m_hp;
 };
 

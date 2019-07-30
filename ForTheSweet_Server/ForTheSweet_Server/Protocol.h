@@ -35,6 +35,7 @@ constexpr int SC_PUT_PLAYER = 3;
 constexpr int SC_REMOVE = 4;
 constexpr int SC_ANIM = 5;
 constexpr int SC_WEAPON = 6;
+constexpr int SC_HIT = 7;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
@@ -172,6 +173,7 @@ struct sc_packet_hit {
 	char size;
 	char type;
 	char id;
+	char hp;
 };
 
 struct sc_packet_weapon {
