@@ -27,6 +27,7 @@ constexpr int CS_ATTEND_ROOM = 101;
 constexpr int CS_START_ROOM = 102;
 constexpr int CS_READY_ROOM = 103;
 constexpr int CS_LOAD_COMPLETE = 104;
+constexpr int CS_UPDATE_ROOM = 105;
 
 constexpr int SC_LOGIN = 1;
 constexpr int SC_POS = 2;
@@ -37,6 +38,7 @@ constexpr int SC_WEAPON = 6;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
+constexpr int SC_ROOM_START = 102;
 
 #pragma pack(push, 1)
 
@@ -47,6 +49,11 @@ struct cs_packet_connect {
 };
 
 struct cs_packet_disconnect {
+	char size;
+	char type;
+};
+
+struct cs_packet_update_room {
 	char size;
 	char type;
 };
@@ -113,7 +120,9 @@ struct sc_packet_room_info {
 	char size;
 	char type;
 	char name[10];
+	char slot;
 	char current_num;
+	char room_mode;
 	int room_num;
 };
 
@@ -122,8 +131,14 @@ struct sc_packet_room_detail_info {
 	char type;
 	int room_num;
 	char room_index;
-	char name[15];
+	char room_mode;
+	char player_name[15];
 	char host;
+};
+
+struct sc_packet_room_start {
+	char size;
+	char type;
 };
 
 struct sc_packet_pos {

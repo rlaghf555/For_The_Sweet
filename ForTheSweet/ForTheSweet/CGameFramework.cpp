@@ -33,7 +33,7 @@ wchar_t* ConverCtoWC(char* str)
 
 CGameFramework::CGameFramework()
 {
-	
+	m_pSocket = nullptr;
 }
 
 //다음 함수는 응용 프로그램이 실행되어 주 윈도우가 생성되면 호출된다는 것에 유의하라.
@@ -354,9 +354,8 @@ void CGameFramework::processPacket(char *ptr)
 
 		cout << "Put Player : " << int(p_put.id) << endl;
 
-		if (true)
+		if (My_ID == p_put.id)
 		{
-			My_ID = p_put.id;
 			m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
 			m_pCamera = m_pScene->getplayer(My_ID)->GetCamera();
 		}

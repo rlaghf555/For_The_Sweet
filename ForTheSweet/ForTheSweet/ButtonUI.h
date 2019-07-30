@@ -15,7 +15,7 @@ class characterUI : public ButtonUI {
 public:
 	characterUI(HBITMAP bit, int posx, int poxy);
 	~characterUI();
-	wchar_t name[10] = L"TEST";
+	wchar_t name[10];
 	bool master = false;
 };
 class RoomUI : public ButtonUI {
@@ -29,6 +29,7 @@ public:
 	int mode = 0;//0:팀전 1:개인전 2:대장전
 	int room_num;
 	bool playing = false;
+	bool exist = false;
 };
 
 class RoomMakeUI :public RoomUI {
@@ -41,6 +42,7 @@ public:
 #define MODE_INDIVIDUAL 1
 #define MODE_KING 2
 struct RoomStatus {
+	wchar_t name[10];
 	int max_user = 8;
 	int mode = MODE_TEAM;
 	int map = 0;

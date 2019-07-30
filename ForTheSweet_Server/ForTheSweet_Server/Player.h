@@ -73,8 +73,6 @@ public:
 	CPlayer();
 	~CPlayer();
 
-	void move(int direction, float distance);
-
 	void setPlayerController(CPhysx *physx);
 	void setTrigger(CPhysx *physx);
 	void setPosition(PxVec3 pos);
@@ -115,5 +113,6 @@ public:
 	char attack_count;
 
 	int client_num;
+	int hp;
 };
 

@@ -32,7 +32,7 @@ public:
 	char current_num;				// 현재 인원
 	char max_num;					// 최대 인원
 	char host_num;					// host의 slot
-	char room_mode;					// 0 : 웨하스, 1 : 오레오, 2 : 케이크
+	char room_mode;					// 0 : 팀전, 1 : 개인전, 2 : 대장전
 
 	char room_status;				// 방 상태 (대기 = 0, 게임 로딩 = 1, 게임 중 = 2)
 

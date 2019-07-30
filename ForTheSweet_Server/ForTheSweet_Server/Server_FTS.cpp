@@ -169,29 +169,41 @@ void send_login_packet(char client) {
 	sendPacket(client, &p_login);
 }
 
-void send_room_info_packet(char client, const CRoom& room)
+void send_room_info_packet(char client, const CRoom& room, int slot)
 {
 	sc_packet_room_info p_room_info;
 	p_room_info.size = sizeof(sc_packet_room_info);
 	p_room_info.type = SC_ROOM_INFO;
+	p_room_info.slot = slot;
 	strcpy_s(p_room_info.name, _countof(p_room_info.name), room.name);
 	p_room_info.current_num = room.current_num;
 	p_room_info.room_num = room.room_num;
+	p_room_info.room_mode = room.room_mode;
 
 	sendPacket(client, &p_room_info);
 }
 
-void send_room_datail_info_packet(int client, int player, char slot, int room_num, char host)
+void send_room_datail_info_packet(int client, int player, char slot, int room_num, char room_mode, char host)
 {
 	sc_packet_room_detail_info p_room_detail_info;
 	p_room_detail_info.size = sizeof(sc_packet_room_detail_info);
 	p_room_detail_info.type = SC_ROOM_DETAIL_INFO;
 	p_room_detail_info.room_num = room_num;
 	p_room_detail_info.room_index = slot;
+	p_room_detail_info.room_mode = room_mode;
 	p_room_detail_info.host = host;
-	strcpy_s(p_room_detail_info.name, _countof(p_room_detail_info.name), clients[player].id);
+	strcpy_s(p_room_detail_info.player_name, _countof(p_room_detail_info.player_name), clients[player].id);
 
 	sendPacket(client, &p_room_detail_info);
+}
+
+void send_start_room_packet(int client)
+{
+	sc_packet_room_start p_room_start;
+	p_room_start.size = sizeof(sc_packet_room_start);
+	p_room_start.type = SC_ROOM_START;
+
+	sendPacket(client, &p_room_start);
 }
 
 void send_put_player_packet(char client, char new_id) {
@@ -312,65 +324,55 @@ void process_packet(char key, char *buffer)
 		gLobby.insert(key);
 		lobby_l.unlock();
 
-		//room_l.lock();
-		//auto room = gRoom;
-		//room_l.unlock();
+		cout << "room num : " << gRoom.size() << endl;
 
 		int count = 0;
 
+		room_l.lock();
 		for (auto it = gRoom.begin(); it != gRoom.end(); ++it)
 		{
 			if (count < 6)
 			{
-				send_room_info_packet(key, *it);
+				cout << "send lobby : " << it->room_num << endl;
+				send_room_info_packet(key, *it, count);
 				count++;
 			}
 			else {
 				break;
 			}
 		}
+		cout << "count : " << count << endl;
 
-		//clients[key].playerinfo->setPosition(PlayerInitPosition[key]);
-		//clients[key].playerinfo->setVelocity(PxVec3(0, 0, 0));
-		//clients[key].playerinfo->setLook(PxVec3(0, 0, 1));
-		//clients[key].playerinfo->setDashed(false);
-		//gPhysx->m_Scene->lockWrite();
-		//clients[key].playerinfo->setPlayerController(gPhysx);
-		//clients[key].playerinfo->setTrigger(gPhysx);
-		//gPhysx->m_Scene->unlockWrite();
-		//gPhysx->registerPlayer(clients[key].playerinfo, key);
-		//clients[key].connected = true;
-		//
-		//send_login_packet(key);
-		//
-		//// 자신(key)과 다른 클라에게 자기 위치 정보 Send
-		//for (int i = 0; i < MAX_USER; ++i)
-		//{
-		//	if (clients[i].connected == true)
-		//	{
-		//		if (i != key)
-		//		{
-		//			//cout << "Put Packet Send\n";
-		//			send_put_player_packet(i, key);
-		//		}
-		//	}
-		//}
-		//// 로그인 시, 접속 중인 다른 클라 위치 정보를 자신에게 Send
-		//for (int i = 0; i < MAX_USER; ++i)
-		//{
-		//	if (clients[i].connected == true)
-		//	{
-		//		if (i != key)
-		//		{
-		//			send_put_player_packet(key, i);
-		//		}
-		//	}
-		//}
-		//break;
+		room_l.unlock();
+		break;
 	}
 	case CS_DISCONNECT:
 	{
 		cout << "[" << int(key) << "] Clients Disconnect\n";
+		break;
+	}
+
+	case CS_UPDATE_ROOM:
+	{
+		cout << "Update Room\n";
+		int count = 0;
+
+		room_l.lock();
+		for (auto it = gRoom.begin(); it != gRoom.end(); ++it)
+		{
+			if (count < 6)
+			{
+				cout << "send lobby\n";
+				send_room_info_packet(key, *it, count);
+				count++;
+			}
+			else {
+				break;
+			}
+		}
+		room_l.unlock();
+
+		cout << "count : " << count << endl;
 		break;
 	}
 
@@ -379,23 +381,22 @@ void process_packet(char key, char *buffer)
 		cs_packet_make_room *p_make_room;
 		p_make_room = reinterpret_cast<cs_packet_make_room*>(buffer);
 
-		CRoom *room = new CRoom();
-		room->init(p_make_room->name, key, roomNum);
+		CRoom room;
+		room.init(p_make_room->name, key, roomNum);
 
 		clients[key].room_num = roomNum;
 
 		roomNum++;
 
 		room_l.lock();
-		gRoom.push_back(*room);
+		gRoom.push_back(room);
 		room_l.unlock();
 
 		lobby_l.lock();
 		gLobby.erase(key);
-		auto lobby = gLobby;
 		lobby_l.unlock();
 
-		send_room_datail_info_packet(key, key, 0, room->room_num, 1);
+		send_room_datail_info_packet(key, key, 0, room.room_num, room.room_mode, 1);
 
 
 		break;
@@ -417,37 +418,39 @@ void process_packet(char key, char *buffer)
 		}
 		room_l.unlock();
 
+		lobby_l.lock();
+		gLobby.erase(key);
+		lobby_l.unlock();
 
-		int count = 0;
+		char room_mode = it->room_mode;
+
+		char my_slot;
+
 		// 참가한 플레이어에게 자신을 제외한 클라의 정보를 전송
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
 			char host = 0;
-			if (count < it->current_num)
+			int client_id = it->clientNum[i];
+			if (client_id != -1)
 			{
-				if (it->clientNum[i] != -1)
+				if (client_id != key)
 				{
 					if (i == it->host_num) host = 1;
-					send_room_datail_info_packet(key, it->clientNum[i], i, room_num, host);
-					count++;
+					send_room_datail_info_packet(key, client_id, i, room_num, room_mode, host);
+				}
+				else {
+					my_slot = i;
 				}
 			}
 		}
 
-		count = 0;
-		// 참가한 플레이어의 정보를 방 내부 클라에게 전송
+		// 참가한 플레이어의 정보를 방 내부 클라(자신도 포함)에게 전송
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
-			if (count < it->current_num - 1)
+			int client_id = it->clientNum[i];
+			if (client_id != -1)
 			{
-				if (it->clientNum[i] != -1)
-				{
-					if (it->clientNum[i] != key)
-					{
-						send_room_datail_info_packet(it->clientNum[i], key, i, room_num, 0);
-						count++;
-					}
-				}
+				send_room_datail_info_packet(client_id, key, my_slot, room_num, room_mode, 0);
 			}
 		}
 
@@ -475,6 +478,9 @@ void process_packet(char key, char *buffer)
 			{
 				if (clients[client_id].connected == true)
 				{
+					// 자신을 제외한 다른 클라도 게임 업로드 시작하도록 packet send
+					send_start_room_packet(client_id);
+
 					clients[client_id].playerinfo = new CPlayer();
 
 					clients[client_id].playerinfo->setPosition(PlayerInitPosition[key]);
@@ -486,7 +492,7 @@ void process_packet(char key, char *buffer)
 					clients[client_id].playerinfo->setPlayerController(it->m_pPhysx);
 					clients[client_id].playerinfo->setTrigger(it->m_pPhysx);
 					it->m_pPhysx->m_Scene->unlockWrite();
-					it->m_pPhysx->registerPlayer(clients[client_id].playerinfo, key);
+					it->m_pPhysx->registerPlayer(clients[client_id].playerinfo, i);
 				}
 			}
 		}

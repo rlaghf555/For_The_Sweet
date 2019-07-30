@@ -16,3 +16,7 @@ constexpr int MAX_ANIM = 18;
 // ROOM
 constexpr int MAX_ROOM_NAME_LEN = 10;
 constexpr int MAX_ROOM_USER = 8;
+
+constexpr int ROOM_MODE_TEAM = 0;
+constexpr int ROOM_MODE_INDIVIDUAL = 1;
+constexpr int ROOM_MOVE_KING = 2;

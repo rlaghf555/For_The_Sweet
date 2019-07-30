@@ -7,7 +7,7 @@ CRoom::CRoom()
 	max_num = MAX_ROOM_USER;
 	
 	room_status = 0;
-	room_mode = 0;
+	room_mode = ROOM_MODE_INDIVIDUAL;
 
 	weapon_num = 0;
 
@@ -37,7 +37,7 @@ CRoom::CRoom(const CRoom& other) {
 	current_num = other.current_num;
 	max_num = other.max_num;
 	host_num = other.host_num;
-	room_mode = other.host_num;
+	room_mode = other.room_mode;
 	room_status = other.room_status;
 	weapon_num = other.weapon_num;
 
@@ -64,6 +64,7 @@ void CRoom::init(char *nm, int hostId, int roomNum)
 	host_num = 0;
 	current_num = 1;
 	room_num = roomNum;
+	room_mode = ROOM_MODE_INDIVIDUAL;
 
 	clientNum[0] = hostId;
 }
