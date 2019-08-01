@@ -89,8 +89,8 @@ protected:
 
 	int m_hp = 100;
 	int m_mp = 0;
-
 public:
+	int selected_skill = 0;
 	PxCapsuleController *m_PlayerController;
 	PxControllerFilters	 m_ControllerFilter;
 	PlayerHitReport m_HitReport;

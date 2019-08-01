@@ -2954,3 +2954,131 @@ void SkillEffectShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
 		}
 	}
 }
+
+D3D12_SHADER_BYTECODE SkillParticleShader::CreateVertexShader(ID3DBlob ** ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "VSDiffused", "vs_5_1", ppd3dShaderBlob));
+}
+
+void SkillParticleShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 10;
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if(type==0)
+		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\skill_attack.dds", 0);
+	else if (type == 1)
+		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\skill_speed.dds", 0);
+	else if (type == 2)
+		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\skill_health.dds", 0);
+
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		CGameObject *effect_object = NULL;
+		effect_object = new CGameObject();
+		m_ppObjects[i] = effect_object;
+
+		CMesh *pCubeMesh = NULL;
+		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 5, 5, 0);	// pos(x, y), Width(w, h), depth
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_ppObjects[i]->SetMesh(pCubeMesh);	
+	}
+	delete pTexture;
+}
+
+void SkillParticleShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	CB_GAMEOBJECT_INFO cBuffer;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[i]->m_xmf4x4World)));
+		cBuffer.m_nMaterial = 0;
+		m_ObjectCB->CopyData(i, cBuffer);
+	}
+}
+
+void SkillParticleShader::Animate(float fTimeElapsed)
+{
+	if (!visible) {
+		return;
+	}
+	if (IsZero(fTimeElapsed))
+		return;
+	ftime += fTimeElapsed;
+	if (ftime > 0.05f) {
+		ftime = 0.f;
+		for (int i = 0; i < m_nObjects; ++i) {
+				auto pos = m_ppObjects[i]->GetPosition();
+				pos.x += rand() % 2-1;
+				pos.z += rand() % 2-1;
+				pos.y += 3;
+				m_ppObjects[i]->SetPosition(pos);
+				if (pos.y > startpos.y + 50) {
+					m_ppObjects[i]->visible = false;
+					for (int j = 0; j < m_nObjects; ++j) {
+						if (m_ppObjects[j]->visible == false) {
+							if (j == m_nObjects - 1)
+								visible = false;
+						}
+						else break;
+					}
+				}
+			}
+		}
+
+}
+
+
+void SkillParticleShader::ShowParticle(bool show, XMFLOAT3 pos)
+{
+	if (show) {
+		visible = true;
+		startpos = pos;
+		for (int i = 0; i < m_nObjects; ++i) {
+			pos.x += rand() % 10 - 5;
+			pos.y += rand() % 10;
+			pos.z += rand() % 10 - 5;
+			m_ppObjects[i]->SetPosition(pos);
+			m_ppObjects[i]->visible = true;
+		}
+	}
+	else {
+		visible = false;
+		for (int i = 0; i < m_nObjects; ++i) {
+			m_ppObjects[i]->visible = false;
+		}
+	}
+}
+
+void SkillParticleShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
+{
+	if (!visible)
+		return;
+	CModelShader::OnPrepareRender(pd3dCommandList, 0);
+
+	if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
+
+	for (UINT j = 0; j < m_nObjects; j++)
+	{
+		if (m_ppObjects[j]&& m_ppObjects[j]->visible)
+		{
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
+}

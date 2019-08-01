@@ -30,6 +30,7 @@ public:
 	void SetMap(LoadModel **mapmodel) { Map_Model = mapmodel; }
 	void SetWeapon(LoadModel **weaponmodel) { weapon_Model = weaponmodel; }
 	void initUI();
+	void initObject();
 	CCamera* GetCamera() { return m_Camera.get(); }
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
@@ -64,6 +65,7 @@ public:
 	MeshShader					*m_BackGroundShader[2] = { NULL, };
 	EffectShader				*m_EffectShader = NULL;
 	SkillEffectShader			*m_SkillEffectShader[MAX_USER] = { NULL, };
+	SkillParticleShader			*m_SkillParticleShader[3] = { NULL, };
 	WaveShader					*m_WavesShader = NULL;
 
 	unique_ptr<CCamera>			m_Camera = nullptr;

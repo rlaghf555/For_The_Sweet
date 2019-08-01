@@ -157,15 +157,15 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
 		m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
 
-		m_ShadowShader[0] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
-		m_ShadowShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2);
 		m_ShadowShader[1] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
-		m_ShadowShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2_2);
+		m_ShadowShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2);
+		m_ShadowShader[2] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
+		m_ShadowShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2_2);
 
-		m_ShadowShader[2] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
-		m_ShadowShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3);
 		m_ShadowShader[3] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
-		m_ShadowShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3_2);
+		m_ShadowShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3);
+		m_ShadowShader[4] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
+		m_ShadowShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3_2);
 
 		m_ShadowReverseShader = new ShadowREverseShader();
 		m_ShadowReverseShader->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -215,6 +215,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_SkillEffectShader[i] = new SkillEffectShader();
 		m_SkillEffectShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
 	}
+	
+	for (int i = 0; i < 3; i++) {
+		m_SkillParticleShader[i] = new SkillParticleShader();
+		m_SkillParticleShader[i]->BuildObjects(pd3dDevice, pd3dCommandList,i);
+	}
+	m_pPlayer[0]->selected_skill = SKILL_ATTACK;		//각 플레이어 별로 방에서 고른 스킬이 뭔지 넣어주면 스킬키 눌럿을때 해당 파티클 출력 default SKILL_ATTACK
 }
 
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
@@ -499,6 +505,13 @@ void CScene::ReleaseObjects()
 			delete m_SkillEffectShader[i];
 		}
 	}
+	for (int i = 0; i < 3; ++i) {
+		if (m_SkillParticleShader[i]) {
+			m_SkillParticleShader[i]->ReleaseShaderVariables();
+			m_SkillParticleShader[i]->ReleaseObjects();
+			delete m_SkillParticleShader[i];
+		}
+	}
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -540,10 +553,40 @@ void CScene::initUI()
 
 //	m_ppUIShaders[20]->ShowMessage(false);   //true면 win false면 lose
 
-	m_ppUIShaders[21]->SetFog();
+	//m_ppUIShaders[21]->SetFog();
 	
 	m_MessageShader->ShowMessage(MESSAGE_LIGHTING);
 
+}
+
+void CScene::initObject()
+{
+	for (int i = 0; i < MAX_USER; i++) {
+		//m_pPlayer[i]->SetPosition();
+		//m_pPlayer[i]->selected_skill = ;
+	}
+	for (int i = 0; i < 10; i++) {//번개 위치
+		m_EffectShader->getObject(i)->visible = true;
+		//m_EffectShader->setPosition();
+	}
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+			m_WeaponShader[i]->getObject(j)->init();
+			//m_WeaponShader[i]->getObject(j)->SetPosition();
+			if (i == 4) {
+				j = WEAPON_EACH_NUM;
+			}
+		}
+	}
+	if (Selected_Map == M_Map_1) {
+
+	}
+	else if (Selected_Map == M_Map_2) {
+
+	}
+	else if (Selected_Map == M_Map_3) {
+
+	}
 }
 
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice)
@@ -599,8 +642,13 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_pPlayerShadowShader[i]->ChangeAnimation(m_pPlayer[i]->getAnimIndex());
 				}
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
-				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1)m_SkillEffectShader[i]->getObject(0)->visible = true;
-				m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1) {
+					m_SkillEffectShader[i]->getObject(0)->visible = true;
+					m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+
+					m_SkillParticleShader[m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
+
+				}
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
 					AnimateWeapon(i);
@@ -611,6 +659,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			}
 		}
 	}
+	for (int i = 0; i < 3; i++) {
+		m_SkillParticleShader[i]->Animate(fTimeElapsed);
+	}
+
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 			if (i == 4 && j == 1)//컵케익 1개
@@ -813,19 +865,19 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	if (Selected_Map == M_Map_3) {
 		if (m_ShadowReverseShader) m_ShadowReverseShader->Render(pd3dCommandList, pCamera);
 
-		if (m_ShadowShader[0]) m_ShadowShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowShader[1]) m_ShadowShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowShader[2]) m_ShadowShader[2]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowShader[3]) m_ShadowShader[3]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowShader[4]) m_ShadowShader[4]->Render(pd3dCommandList, pCamera);
 
 		if (m_BackGroundShader[1]) m_BackGroundShader[1]->Render(pd3dCommandList, pCamera);
 	}
-	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
-			if (weapon_box[i][j])
-				weapon_box[i][j]->Render(pd3dCommandList, pCamera);
-		}
-	}
+	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+	//	for (int j = 0; j < WEAPON_EACH_NUM; j++) {
+	//		if (weapon_box[i][j])
+	//			weapon_box[i][j]->Render(pd3dCommandList, pCamera);
+	//	}
+	//}
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
 
@@ -833,7 +885,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < 10; i++) if (m_EffectShader)if (m_EffectShader->getObject(i)->visible == true)m_EffectShader->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
+	//for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
+	
+	for (int i = 0; i < 3; i++)if (m_SkillParticleShader[i])m_SkillParticleShader[i]->Render(pd3dCommandList, pCamera);
 }
 
 void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
