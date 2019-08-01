@@ -90,6 +90,15 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		m_ShadowShader[0] = new ShadowDebugShader(Map_Model[M_Map_1_Shadow_test]);
 		m_ShadowShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
+
+		m_ShadowReverseShader[0] = new ShadowREverseShader();
+		m_ShadowReverseShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+		m_ShadowReverseShader[1] = new ShadowREverseShader();
+		m_ShadowReverseShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+		m_ShadowReverseShader[2] = new ShadowREverseShader();
+		m_ShadowReverseShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
+		m_ShadowReverseShader[3] = new ShadowREverseShader();
+		m_ShadowReverseShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, 3);
 	}
 	//m_mapshader 2까지 map 1
 	if (Selected_Map == M_Map_2) {
@@ -110,9 +119,15 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
 			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
 		}
+
+		m_ShadowReverseModelShader[0] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test]);
+		m_ShadowReverseModelShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+		m_ShadowReverseModelShader[1] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_1]);
+		m_ShadowReverseModelShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+		m_ShadowReverseModelShader[2] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_2]);
+		m_ShadowReverseModelShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
 	}
 	//m_mapshader 3~8까지 map 2
-
 	if (Selected_Map == M_Map_3) {
 		for (int i = 0; i < 8; i++) {
 			door[i] = new testBox();
@@ -167,8 +182,14 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ShadowShader[4] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
 		m_ShadowShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3_2);
 
-		m_ShadowReverseShader = new ShadowREverseShader();
-		m_ShadowReverseShader->BuildObjects(pd3dDevice, pd3dCommandList);
+		m_ShadowReverseShader[4] = new ShadowREverseShader();
+		m_ShadowReverseShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, 4);
+		m_ShadowReverseShader[5] = new ShadowREverseShader();
+		m_ShadowReverseShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, 5);
+		m_ShadowReverseShader[6] = new ShadowREverseShader();
+		m_ShadowReverseShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, 6);
+		m_ShadowReverseShader[7] = new ShadowREverseShader();
+		m_ShadowReverseShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, 7);
 
 		for (int i = 0; i < 2; i++) {
 			m_StairShader[i] = new StairShader(Map_Model[M_Map_3_stair]);
@@ -420,10 +441,19 @@ void CScene::ReleaseObjects()
 			delete m_ShadowShader[i];
 		}
 	}
-	if (m_ShadowReverseShader) {
-		m_ShadowReverseShader->ReleaseShaderVariables();
-		m_ShadowReverseShader->ReleaseObjects();
-		delete m_ShadowReverseShader;
+	for (int i = 0; i < 8; ++i) {
+		if (m_ShadowReverseShader[i]) {
+			m_ShadowReverseShader[i]->ReleaseShaderVariables();
+			m_ShadowReverseShader[i]->ReleaseObjects();
+			delete m_ShadowReverseShader[i];
+		}
+	}
+	for (int i = 0; i < 3; ++i) {
+		if (m_ShadowReverseModelShader[i]) {
+			m_ShadowReverseModelShader[i]->ReleaseShaderVariables();
+			m_ShadowReverseModelShader[i]->ReleaseObjects();
+			delete m_ShadowReverseModelShader[i];
+		}
 	}
 	if (m_BridgeShader) {
 		m_BridgeShader->ReleaseShaderVariables();
@@ -861,9 +891,21 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
 	if (Selected_Map == M_Map_1) {
 		for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[0]) m_ShadowReverseShader[0]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[1]) m_ShadowReverseShader[1]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[2]) m_ShadowReverseShader[2]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[3]) m_ShadowReverseShader[3]->Render(pd3dCommandList, pCamera);
+	}
+	if (Selected_Map == M_Map_2) {
+		if (m_ShadowReverseModelShader[0]) m_ShadowReverseModelShader[0]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseModelShader[1]) m_ShadowReverseModelShader[1]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseModelShader[2]) m_ShadowReverseModelShader[2]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_3) {
-		if (m_ShadowReverseShader) m_ShadowReverseShader->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[4]) m_ShadowReverseShader[4]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[5]) m_ShadowReverseShader[5]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[6]) m_ShadowReverseShader[6]->Render(pd3dCommandList, pCamera);
+		if (m_ShadowReverseShader[7]) m_ShadowReverseShader[7]->Render(pd3dCommandList, pCamera);
 
 		if (m_ShadowShader[1]) m_ShadowShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowShader[2]) m_ShadowShader[2]->Render(pd3dCommandList, pCamera);

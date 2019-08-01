@@ -629,6 +629,10 @@ void CGameFramework::LoadModels()
 	Map_Model[14] = new LoadModel("./resource/map/map_3_in_stair_1.FBX", true);	// map_3_in_stair_1
 	Map_Model[15] = new LoadModel("./resource/map/map_3_in_stair_2.FBX", true);	// map_3_in_stair_2
 
+	Map_Model[16] = new LoadModel("./resource/map/map_2_shadow_reverse_test.FBX", true);	// map_2_shadow_reverse_test
+	Map_Model[17] = new LoadModel("./resource/map/map_2_shadow_reverse_test_1.FBX", true);	// map_2_shadow_reverse_test
+	Map_Model[18] = new LoadModel("./resource/map/map_2_shadow_reverse_test_2.FBX", true);	// map_2_shadow_reverse_test
+	
 	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);			// M_Weapon_Lollipop
 	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);				// M_Weapon_chupachupse
 	weapon[2] = new LoadModel("./resource/weapon/pepero.FBX", true);			// M_Weapon_pepero

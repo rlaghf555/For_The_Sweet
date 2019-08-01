@@ -444,6 +444,19 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList);
 };
 
+class ShadowReverseModelShader : public CModelShader
+{
+public:
+	ShadowReverseModelShader() {};
+	ShadowReverseModelShader(LoadModel *ma);
+	~ShadowReverseModelShader() {};
+
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int index);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
+};
+
 class ShadowREverseShader : public MeshShader
 {
 public:
@@ -453,7 +466,7 @@ public:
 	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int index);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
 };
 
 class PlayerShadowShader : public PlayerShader

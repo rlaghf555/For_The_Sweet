@@ -77,7 +77,8 @@ public:
 
 	ShadowDebugShader			*m_ShadowShader[5] = { NULL, };
 
-	ShadowREverseShader			*m_ShadowReverseShader = NULL;
+	ShadowREverseShader			*m_ShadowReverseShader[8] = { NULL, };
+	ShadowReverseModelShader	*m_ShadowReverseModelShader[3] = { NULL, };
 
 	int Selected_Map = 0;
 

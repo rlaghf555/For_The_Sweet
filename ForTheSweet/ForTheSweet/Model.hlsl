@@ -341,7 +341,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSReverseShadow(VS_MODEL_TEXTURED_OUTPUT input
 	    
     input.normalW = normalize(input.normalW);
        
-    output.color = float4(0.f, 0.f, 0.f, 0.0f); // 그림자 이므로 반투명한 검은색
+    output.color = float4(0.0f, 0.f, 0.f, 0.0f); // 그림자 이므로 반투명한 검은색
     output.nrmoutline = float4(input.normalW, 1.0f);
     output.nrm = output.nrmoutline;
     output.pos = float4(input.positionW, 1.0f);
