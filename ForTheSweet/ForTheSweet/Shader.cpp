@@ -2920,10 +2920,8 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 			if (i == 1) m_ppObjects[i]->SetPosition(-120.f, 100.f, 110.f);
 			if (i == 2) m_ppObjects[i]->SetPosition(60.f, 100.f, 110.f);
 			if (i == 3) m_ppObjects[i]->SetPosition(180.f, 100.f, 110.f);
-
 			if (i == 4) m_ppObjects[i]->SetPosition(-150.f, 100.f, 0.f);
 			if (i == 5) m_ppObjects[i]->SetPosition(90.f, 100.f, 0.f);
-
 			if (i == 6) m_ppObjects[i]->SetPosition(-240.f, 100.f, -110.f);
 			if (i == 7) m_ppObjects[i]->SetPosition(-120.f, 100.f, -110.f);
 			if (i == 8) m_ppObjects[i]->SetPosition(60.f, 100.f, -110.f);

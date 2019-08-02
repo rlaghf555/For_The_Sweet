@@ -15,7 +15,6 @@ class CGameFramework
 {
 public:
 	CSocket *m_pSocket;
-
 	bool move_state[5] = { false, false, false, false, false }; // ╩С, го, аб, ©Л, shift
 
 	bool weak_attack_state = false;
@@ -109,6 +108,7 @@ public:
 	void OnResizeBackBuffers();
 
 	void OnDestroy();
+	bool Restart();
 
 	void CreateSwapChain();
 	void CreateDirect3DDevice();

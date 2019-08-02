@@ -15,6 +15,7 @@ public:
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, CPhysx* physx);
+	void ReBuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, CPhysx* physx);
 	void BuildUI(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
 	void BuildRootSignature(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);
 	void ReleaseObjects();
@@ -81,7 +82,9 @@ public:
 	ShadowReverseModelShader	*m_ShadowReverseModelShader[3] = { NULL, };
 
 	int Selected_Map = 0;
-
+	bool Map_1_Build = false;
+	bool Map_2_Build = false;
+	bool Map_3_Build = false;
 protected:
 	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다.
 	//CGameObject * *m_ppObjects = NULL;

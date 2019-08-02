@@ -99,6 +99,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ShadowReverseShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
 		m_ShadowReverseShader[3] = new ShadowREverseShader();
 		m_ShadowReverseShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, 3);
+		Map_1_Build = true;
 	}
 	//m_mapshader 2까지 map 1
 	if (Selected_Map == M_Map_2) {
@@ -126,6 +127,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ShadowReverseModelShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
 		m_ShadowReverseModelShader[2] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_2]);
 		m_ShadowReverseModelShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
+		Map_2_Build = true;
+
 	}
 	//m_mapshader 3~8까지 map 2
 	if (Selected_Map == M_Map_3) {
@@ -200,6 +203,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
 			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
 		}
+		Map_3_Build = true;
 	}
 	//m_mapshader 9~22까지 map3
 
@@ -242,6 +246,150 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_SkillParticleShader[i]->BuildObjects(pd3dDevice, pd3dCommandList,i);
 	}
 	m_pPlayer[0]->selected_skill = SKILL_ATTACK;		//각 플레이어 별로 방에서 고른 스킬이 뭔지 넣어주면 스킬키 눌럿을때 해당 파티클 출력 default SKILL_ATTACK
+}
+
+void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx * physx)
+{
+	animate_flag = Selected_Map;
+	if (Selected_Map == M_Map_1 && Map_1_Build == false) {
+		m_MapShader[0] = new CModelShader(Map_Model[M_Map_1]);
+		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1);
+
+		m_MapShader[1] = new CModelShader(Map_Model[M_Map_1_wall]);
+		m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
+
+		for (int i = 0; i < 2; i++) {
+			m_CottonShader[i] = new CottonCloudShader(Map_Model[M_Map_1_cotton]);
+			m_CottonShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+		}
+
+		m_MapShader[2] = new CModelShader(Map_Model[M_Map_1_macaron]);
+		m_MapShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_1);
+
+		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_1);
+		//}
+
+		m_ShadowShader[0] = new ShadowDebugShader(Map_Model[M_Map_1_Shadow_test]);
+		m_ShadowShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
+
+		m_ShadowReverseShader[0] = new ShadowREverseShader();
+		m_ShadowReverseShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+		m_ShadowReverseShader[1] = new ShadowREverseShader();
+		m_ShadowReverseShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+		m_ShadowReverseShader[2] = new ShadowREverseShader();
+		m_ShadowReverseShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
+		m_ShadowReverseShader[3] = new ShadowREverseShader();
+		m_ShadowReverseShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, 3);
+		Map_1_Build = true;
+	}
+	//m_mapshader 2까지 map 1
+	if (Selected_Map == M_Map_2 && Map_2_Build == false) {
+		m_MapShader[3] = new CModelShader(Map_Model[M_Map_2]);
+		m_MapShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2);
+
+		m_MapShader[4] = new CModelShader(Map_Model[M_Map_1_macaron]);
+		m_MapShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron);
+		m_MapShader[5] = new CModelShader(Map_Model[M_Map_1_macaron]);
+		m_MapShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_2);
+
+		m_MapShader[6] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
+		m_MapShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar);
+		m_MapShader[7] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
+		m_MapShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar_2);
+
+		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
+		//}
+
+		m_ShadowReverseModelShader[0] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test]);
+		m_ShadowReverseModelShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+		m_ShadowReverseModelShader[1] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_1]);
+		m_ShadowReverseModelShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+		m_ShadowReverseModelShader[2] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_2]);
+		m_ShadowReverseModelShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
+		Map_2_Build = true;
+
+	}
+	//m_mapshader 3~8까지 map 2
+	if (Selected_Map == M_Map_3 && Map_3_Build == false) {
+		for (int i = 0; i < 8; i++) {
+			door[i] = new testBox();
+			door[i]->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[i], 11 + i);
+		}
+
+		m_MapShader[8] = new CModelShader(Map_Model[M_Map_3]);
+		m_MapShader[8]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3);
+		m_MapShader[9] = new CModelShader(Map_Model[M_Map_3]);
+		m_MapShader[9]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_2);
+
+		m_MapShader[10] = new CModelShader(Map_Model[M_Map_3_cake_2]);
+		m_MapShader[10]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2);
+		m_MapShader[11] = new CModelShader(Map_Model[M_Map_3_cake_2]);
+		m_MapShader[11]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2_2);
+
+		m_MapShader[12] = new CModelShader(Map_Model[M_Map_3_cake_3]);
+		m_MapShader[12]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3);
+		m_MapShader[13] = new CModelShader(Map_Model[M_Map_3_cake_3]);
+		m_MapShader[13]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3_2);
+
+		m_MapShader[14] = new CModelShader(Map_Model[M_Map_3_in_black]);
+		m_MapShader[14]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3);
+
+		m_MapShader[15] = new CModelShader(Map_Model[M_Map_1_macaron]);
+		m_MapShader[15]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_3);
+
+		m_MapShader[16] = new CModelShader(Map_Model[M_Map_3_in]);
+		m_MapShader[16]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in);
+		m_MapShader[17] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
+		m_MapShader[17]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1);
+		m_MapShader[18] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
+		m_MapShader[18]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2);
+
+		m_MapShader[19] = new CModelShader(Map_Model[M_Map_3_in]);
+		m_MapShader[19]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_2);
+		m_MapShader[20] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
+		m_MapShader[20]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1_2);
+		m_MapShader[21] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
+		m_MapShader[21]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2_2);
+
+		m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
+		m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
+
+		m_ShadowShader[1] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
+		m_ShadowShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2);
+		m_ShadowShader[2] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
+		m_ShadowShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2_2);
+
+		m_ShadowShader[3] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
+		m_ShadowShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3);
+		m_ShadowShader[4] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
+		m_ShadowShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3_2);
+
+		m_ShadowReverseShader[4] = new ShadowREverseShader();
+		m_ShadowReverseShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, 4);
+		m_ShadowReverseShader[5] = new ShadowREverseShader();
+		m_ShadowReverseShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, 5);
+		m_ShadowReverseShader[6] = new ShadowREverseShader();
+		m_ShadowReverseShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, 6);
+		m_ShadowReverseShader[7] = new ShadowREverseShader();
+		m_ShadowReverseShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, 7);
+
+		for (int i = 0; i < 2; i++) {
+			m_StairShader[i] = new StairShader(Map_Model[M_Map_3_stair]);
+			m_StairShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, physx, i);
+		}
+
+		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
+		//}
+		m_BackGroundShader[1] = new MeshShader();
+		m_BackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+		Map_3_Build = true;
+	}
 }
 
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
@@ -591,31 +739,120 @@ void CScene::initUI()
 
 void CScene::initObject()
 {
-	for (int i = 0; i < MAX_USER; i++) {
-		//m_pPlayer[i]->SetPosition();
-		//m_pPlayer[i]->selected_skill = ;
-	}
-	for (int i = 0; i < 10; i++) {//번개 위치
-		m_EffectShader->getObject(i)->visible = true;
-		//m_EffectShader->setPosition();
-	}
+	
+	//무기 매트릭스 초기화
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; i++) {
 			m_WeaponShader[i]->getObject(j)->init();
-			//m_WeaponShader[i]->getObject(j)->SetPosition();
 			if (i == 4) {
 				j = WEAPON_EACH_NUM;
 			}
 		}
 	}
-	if (Selected_Map == M_Map_1) {
 
+	if (Selected_Map == M_Map_1) {
+		//캐릭터 좌표 및 스킬 초기화
+		for (int i = 0; i < MAX_USER; i++) {
+			XMFLOAT3 pos(0, 0, 0);
+			m_pPlayer[i]->init();
+			m_pPlayer[i]->SetPosition(pos);
+
+			//m_pPlayer[i]->selected_skill = ;
+		}
+		//번개 위치
+		for (int i = 0; i < 10; i++) {
+			m_EffectShader->getObject(i)->visible = true;
+			//m_EffectShader->setPosition();
+		}
+		m_EffectShader->getObject(0)->SetPosition(-240.f, 100.f, 110.f);
+		m_EffectShader->getObject(1)->SetPosition(-120.f, 100.f, 110.f);
+		m_EffectShader->getObject(2)->SetPosition(60.f, 100.f, 110.f);
+		m_EffectShader->getObject(3)->SetPosition(180.f, 100.f, 110.f);
+		m_EffectShader->getObject(4)->SetPosition(-150.f, 100.f, 0.f);
+		m_EffectShader->getObject(5)->SetPosition(90.f, 100.f, 0.f);
+		m_EffectShader->getObject(6)->SetPosition(-240.f, 100.f, -110.f);
+		m_EffectShader->getObject(7)->SetPosition(-120.f, 100.f, -110.f);
+		m_EffectShader->getObject(8)->SetPosition(60.f, 100.f, -110.f);
+		m_EffectShader->getObject(9)->SetPosition(180.f, 100.f, -110.f);
+		//무기 좌표
+		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+				//m_WeaponShader[i]->getObject(j)->SetPosition();
+				if (i == 4) {
+					j = WEAPON_EACH_NUM;
+				}
+			}
+		}
 	}
 	else if (Selected_Map == M_Map_2) {
+		//캐릭터 좌표 및 스킬 초기화
+		for (int i = 0; i < MAX_USER; i++) {
+			XMFLOAT3 pos(0, 0, 0);
+			m_pPlayer[i]->init();
+			m_pPlayer[i]->SetPosition(pos);
 
+			//m_pPlayer[i]->selected_skill = ;
+		}
+		//번개 위치
+		for (int i = 0; i < 10; i++) {
+			m_EffectShader->getObject(i)->visible = true;
+			//m_EffectShader->setPosition();
+		}
+		m_EffectShader->getObject(0)->SetPosition(-240.f, 100.f, 110.f);
+		m_EffectShader->getObject(1)->SetPosition(-120.f, 100.f, 110.f);
+		m_EffectShader->getObject(2)->SetPosition(60.f, 100.f, 110.f);
+		m_EffectShader->getObject(3)->SetPosition(180.f, 100.f, 110.f);
+		m_EffectShader->getObject(4)->SetPosition(-150.f, 100.f, 0.f);
+		m_EffectShader->getObject(5)->SetPosition(90.f, 100.f, 0.f);
+		m_EffectShader->getObject(6)->SetPosition(-240.f, 100.f, -110.f);
+		m_EffectShader->getObject(7)->SetPosition(-120.f, 100.f, -110.f);
+		m_EffectShader->getObject(8)->SetPosition(60.f, 100.f, -110.f);
+		m_EffectShader->getObject(9)->SetPosition(180.f, 100.f, -110.f);
+
+		//무기 좌표
+		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+				//m_WeaponShader[i]->getObject(j)->SetPosition();
+				if (i == 4) {
+					j = WEAPON_EACH_NUM;
+				}
+			}
+		}
 	}
 	else if (Selected_Map == M_Map_3) {
+		//캐릭터 좌표 및 스킬 초기화
+		for (int i = 0; i < MAX_USER; i++) {
+			XMFLOAT3 pos(0, 0, 0);
+			m_pPlayer[i]->init();
+			m_pPlayer[i]->SetPosition(pos);
+			//m_pPlayer[i]->selected_skill = ;
+		}
 
+		//번개 위치
+		for (int i = 0; i < 10; i++) {
+			m_EffectShader->getObject(i)->visible = true;
+			//m_EffectShader->setPosition();
+		}
+		m_EffectShader->getObject(0)->SetPosition(-240.f, 100.f, 110.f);
+		m_EffectShader->getObject(1)->SetPosition(-120.f, 100.f, 110.f);
+		m_EffectShader->getObject(2)->SetPosition(60.f, 100.f, 110.f);
+		m_EffectShader->getObject(3)->SetPosition(180.f, 100.f, 110.f);
+		m_EffectShader->getObject(4)->SetPosition(-150.f, 100.f, 0.f);
+		m_EffectShader->getObject(5)->SetPosition(90.f, 100.f, 0.f);
+		m_EffectShader->getObject(6)->SetPosition(-240.f, 100.f, -110.f);
+		m_EffectShader->getObject(7)->SetPosition(-120.f, 100.f, -110.f);
+		m_EffectShader->getObject(8)->SetPosition(60.f, 100.f, -110.f);
+		m_EffectShader->getObject(9)->SetPosition(180.f, 100.f, -110.f);
+
+		//무기 좌표
+		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+				//m_WeaponShader[i]->getObject(j)->SetPosition();
+				if (i == 4) {
+					j = WEAPON_EACH_NUM;
+				}
+			}
+		}
 	}
 }
 

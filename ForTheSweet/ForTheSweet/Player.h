@@ -107,6 +107,7 @@ public:
 	// Physx
 	void SetPhysController(CPhysx* physx, PxUserControllerHitReport* callback, PxExtendedVec3* pos);
 	void move();
+	void init();
 	PlayerHitReport* getCollisionCallback() { return &m_HitReport; }
 	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }

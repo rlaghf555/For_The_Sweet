@@ -108,6 +108,21 @@ void CPlayer::move()
 	}
 }
 
+void CPlayer::init()
+{
+	m_hp = 100;
+	m_mp = 0;
+	weapon_skill = -1;
+	weapon_index = -1;
+	weapon_type = -1;
+
+	m_dashed = false;
+	weapon_grab = false;
+	Scale_flag = false;
+	m_status = STATUS::FREE;
+	Scale_time = 0.3f;
+}
+
 /*플레이어의 위치를 변경하는 함수이다. 플레이어의 위치는 기본적으로 사용자가 플레이어를 이동하기 위한 키보드를
 누를 때 변경된다. 플레이어의 이동 방향(dwDirection)에 따라 플레이어를 fDistance 만큼 이동한다.*/
 void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)

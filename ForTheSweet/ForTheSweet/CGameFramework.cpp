@@ -167,6 +167,57 @@ void CGameFramework::OnDestroy()
 	//DestroyWindow(m_hWnd);
 }
 
+bool CGameFramework::Restart()
+{
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+	if (m_pScene) {
+		if (selected_map == 1)
+			selected_map = M_Map_2;
+		else if (selected_map == 2)
+			selected_map = M_Map_3;
+		m_pScene->Selected_Map = selected_map;
+		m_pScene->ReBuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
+		m_pScene->initObject();
+		m_pScene->initUI();
+	}	
+
+
+	if (SERVER_ON) {
+		if (UI_ON) {
+			cs_packet_load_complete p_load_complete;
+			p_load_complete.type = CS_LOAD_COMPLETE;
+			p_load_complete.size = sizeof(cs_packet_load_complete);
+
+			cout << "send load complete packet\n";
+
+			send(m_pSocket->clientSocket, (char *)&p_load_complete, sizeof(cs_packet_load_complete), 0);
+		}
+		else if (UI_ON == false) {
+			char tmpip[15];
+			cout << "ip:";
+			cin >> tmpip;
+			m_pSocket = new CSocket(m_pid, tmpip);
+			if (m_pSocket) {
+				if (m_pSocket->init())
+				{
+					m_pSocket->sendPacket(CS_CONNECT, 0, 0, 0);
+					cout << "CONNECT ÆÐÅ¶ º¸³¿\n";
+				}
+				else
+					return false;
+			}
+		}
+	}
+
+	m_pd3dCommandList->Close();
+	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+	WaitForGpuComplete();
+	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+
+	return(true);
+}
+
 void CGameFramework::CreateSwapChain()
 {
 	RECT rcClient;
@@ -663,6 +714,7 @@ void CGameFramework::BuildObjects()
 		m_pScene->Selected_Map = selected_map;
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
+		m_pScene->initObject();
 		m_pScene->BuildUI(m_pd3dDevice, m_pd3dCommandList);
 		m_pScene->initUI();
 	}
@@ -1832,9 +1884,11 @@ void CGameFramework::MoveToNextFrame()
 //#define _WITH_PLAYER_TOP
 void CGameFramework::FrameAdvance()
 {
+
 	m_GameTimer.Tick(60.0f);
 	
 	ProcessInput();
+
 	UpdateProcess();
 	
 	if (SERVER_ON) {
