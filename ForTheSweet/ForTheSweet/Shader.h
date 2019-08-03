@@ -485,3 +485,36 @@ public:
 	virtual void ChangeAnimation(int m_animindex);
 	virtual int getAnimIndex();
 };
+
+
+class ExplosionShader : public MeshShader
+{
+public:
+	XMFLOAT3					m_pxmf3SphereVectors[EXPLOSION_DEBRISES];
+
+	bool						m_bBlowingUp = false;
+
+	float						m_fElapsedTimes = 0.0f;
+	float						m_fDuration = 3.0f;					// Æø¹ß½Ã°£
+	float						m_fExplosionSpeed = 15.0f;
+	float						m_fExplosionRotation = 720.0f;
+
+public:
+	ExplosionShader() {};
+	~ExplosionShader() {};
+
+	//virtual D3D12_INPUT_LAYOUT_DESC		CreateInputLayout(int index = 0);
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+
+	//virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
+
+	XMVECTOR RandomUnitVectorOnSphere();
+
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 pos);
+	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
+};

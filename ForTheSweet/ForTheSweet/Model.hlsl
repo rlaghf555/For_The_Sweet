@@ -241,13 +241,32 @@ VS_MODEL_TEXTURED_OUTPUT VSDiffused(VS_INPUT input)
 {
     VS_MODEL_TEXTURED_OUTPUT output;
     
-    output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
+    output.normalW = input.normal; //mul(input.normal, (float3x3) gmtxGameObject);
     output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
     output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
     output.uv = input.uv;
 
     return (output);
 }
+
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSDiffused(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)   // nPrimitiveID : 삼각형의 정보 
+{
+    PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+    	
+    float3 uvw = float3(input.uv, nPrimitiveID / 2);
+    //float4 cColor = gBoxTextured.Sample(gDefaultSamplerState, uvw);
+	
+    //input.normalW = normalize(input.normalW);
+	
+    float4 cColor = float4(input.normalW, 1.f);
+
+    output.color = float4(1.f, 0.5f, 0.f, 1.0f); // cColor;
+    output.nrmoutline = float4(input.normalW, 1.0f);
+    output.nrm = output.nrmoutline;
+    output.pos = float4(input.positionW, 1.0f);
+	
+    return (output);
+};
 
 PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSBoundBox(VS_MODEL_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID)
 {

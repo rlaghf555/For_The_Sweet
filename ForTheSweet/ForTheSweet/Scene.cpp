@@ -246,6 +246,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_SkillParticleShader[i]->BuildObjects(pd3dDevice, pd3dCommandList,i);
 	}
 	m_pPlayer[0]->selected_skill = SKILL_ATTACK;		//각 플레이어 별로 방에서 고른 스킬이 뭔지 넣어주면 스킬키 눌럿을때 해당 파티클 출력 default SKILL_ATTACK
+	
+	for (int i = 0; i < MAX_USER; i++) {
+		m_ExplosionShader[i] = new ExplosionShader();
+		m_ExplosionShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
+		m_ExplosionShader[i]->m_bBlowingUp = true;
+	}
 }
 
 void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx * physx)
@@ -694,6 +700,13 @@ void CScene::ReleaseObjects()
 			delete m_SkillParticleShader[i];
 		}
 	}
+	for (int i = 0; i < MAX_USER; ++i) {
+		if (m_ExplosionShader[i]) {
+			m_ExplosionShader[i]->ReleaseShaderVariables();
+			m_ExplosionShader[i]->ReleaseObjects();
+			delete m_ExplosionShader[i];
+		}
+	}
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -913,12 +926,14 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_pPlayerShadowShader[i]->ChangeAnimation(m_pPlayer[i]->getAnimIndex());
 				}
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+				m_ExplosionShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+				//if (m_ExplosionShader[i]->m_bBlowingUp == false) m_ExplosionShader[i]->m_bBlowingUp = true;
+
 				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1) {
 					m_SkillEffectShader[i]->getObject(0)->visible = true;
 					m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 
 					m_SkillParticleShader[m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
-
 				}
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
@@ -1163,6 +1178,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//}
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < MAX_USER; i++)if (m_ExplosionShader[i])if (m_ExplosionShader[i]->m_bBlowingUp)m_ExplosionShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);
 

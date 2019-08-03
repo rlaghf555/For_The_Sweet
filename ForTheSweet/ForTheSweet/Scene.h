@@ -82,6 +82,8 @@ public:
 	ShadowREverseShader			*m_ShadowReverseShader[8] = { NULL, };
 	ShadowReverseModelShader	*m_ShadowReverseModelShader[3] = { NULL, };
 
+	ExplosionShader				*m_ExplosionShader[MAX_USER] = { NULL, };
+
 	int Selected_Map = 0;
 	bool Map_1_Build = false;
 	bool Map_2_Build = false;
