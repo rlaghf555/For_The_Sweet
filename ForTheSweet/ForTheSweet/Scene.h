@@ -26,6 +26,7 @@ public:
 	void Collision_telleport(int index);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList);
+	void RenderLoading(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList);
 	void ReleaseUploadBuffers();
 	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }
 	void SetMap(LoadModel **mapmodel) { Map_Model = mapmodel; }

@@ -180,7 +180,7 @@ bool CGameFramework::Restart()
 		m_pScene->initObject();
 		m_pScene->initUI();
 	}	
-
+	playing = true;
 
 	if (SERVER_ON) {
 		if (UI_ON) {
@@ -718,6 +718,7 @@ void CGameFramework::BuildObjects()
 		m_pScene->BuildUI(m_pd3dDevice, m_pd3dCommandList);
 		m_pScene->initUI();
 	}
+	playing = true;
 	if (SERVER_ON) {
 		if (m_pCamera == nullptr) {
 			m_pCamera = new CCamera();
@@ -2046,8 +2047,14 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 	
 	if (m_pScene) {
-		m_pScene->Render(m_pd3dCommandList, m_pCamera);
-		m_pScene->RenderUI(m_pd3dDevice, m_pd3dCommandList);
+		if (playing) {
+			m_pScene->Render(m_pd3dCommandList, m_pCamera);
+			m_pScene->RenderUI(m_pd3dDevice, m_pd3dCommandList);
+		}
+		else {
+			m_pScene->Render(m_pd3dCommandList, m_pCamera);
+			m_pScene->RenderLoading(m_pd3dDevice, m_pd3dCommandList);
+		}
 	}
 	//3인칭 카메라일 때 플레이어가 항상 보이도록 렌더링한다.
 #ifdef _WITH_PLAYER_TOP

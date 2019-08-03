@@ -1111,7 +1111,7 @@ void UIIDShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	m_pMaterial->SetReflection(1);
 
 	XMFLOAT2 pos = XMFLOAT2(0, 0);
-	XMFLOAT2 scale = XMFLOAT2(0.8, 0.1f);
+	XMFLOAT2 scale = XMFLOAT2(0.8, 0.08f);
 	
 	//ID
 	UIObject* text[10];
@@ -1239,3 +1239,58 @@ void WinLoseShader::ShowMessage(bool win)
 	}
 }
 
+void UILoadingShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	UINT nTextures = 1;
+	m_nObjects = 1;
+	m_nPSO = 1;
+
+	CreatePipelineParts();
+
+	m_VSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "VSUITextured", "vs_5_1");
+	m_PSByteCode[0] = D3DUtil::CompileShader(L"UIShader.hlsl", nullptr, "PSDefaultUI", "ps_5_1");
+
+	CTexture *pTexture = new CTexture(nTextures, RESOURCE_TEXTURE2D, 0);
+
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Loading.dds", 0);
+
+	UINT ncbElementBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(CB_UI_INFO));
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, pTexture->GetTextureCount());
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), ncbElementBytes);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 1, true);
+
+	CreateGraphicsRootSignature(pd3dDevice);
+
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	m_pUIObjects = vector<UIObject*>(m_nObjects);
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT2 pos = XMFLOAT2(FRAME_BUFFER_WIDTH/2, FRAME_BUFFER_HEIGHT/2);	//570,680;
+	XMFLOAT2 scale = XMFLOAT2(1.f, 1.f);
+
+	UIObject* image;
+	image = new UIObject();
+	image->SetPosition(pos);
+	image->SetScale(scale);
+	image->SetAlpha(1.f);
+	m_pUIObjects[0] = image;
+
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		m_pUIObjects[i]->SetScreenSize(XMFLOAT2(static_cast<float>(FRAME_BUFFER_WIDTH), static_cast<float>(FRAME_BUFFER_HEIGHT)));
+		XMUINT2 sizetmp(1, 1);
+		sizetmp = GetSpriteSize(i, pTexture, sizetmp);
+		m_pUIObjects[i]->SetSize(sizetmp);
+		m_pUIObjects[i]->SetType(i);
+		XMUINT2 numsprite(1, 1);
+		XMUINT2 nowsprite(0, 0);
+		m_pUIObjects[i]->SetNumSprite(numsprite, nowsprite);
+		m_pUIObjects[i]->CreateCollisionBox();
+		m_pUIObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+	}
+	//delete pTexture;
+}

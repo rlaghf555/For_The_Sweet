@@ -1,21 +1,21 @@
 ﻿  CGameFramework.cpp
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(546): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(547): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1594): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1595): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1596): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1248): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1795): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1914): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1597): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1249): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1796): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1915): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1916): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1940): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1945): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1917): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1941): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1946): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1947): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1955): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1948): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1956): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1957): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\졸작\forthesweet\forthesweet\cgameframework.cpp(1958): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(240): warning C4244: '초기화 중': '_Ty'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
@@ -52,9 +52,9 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               _Ty=std::pair<std::string,float>
           ]
   코드를 생성하고 있습니다.
-  2 of 3962 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  3 of 3993 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    3 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
 PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\졸작\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
 PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\졸작\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.

@@ -176,7 +176,11 @@ public:
 public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 };
-
+class UILoadingShader : public UIShader
+{
+public :
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+};
 class MessageShader : public UIShader
 {
 	float ShowTime = 0.f;

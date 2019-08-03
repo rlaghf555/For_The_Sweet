@@ -395,7 +395,7 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
 {
 	m_ppUIShaders.clear();
-	m_nUIShaders = 22;
+	m_nUIShaders = 23;
 	m_ppUIShaders.resize(m_nUIShaders);
 
 	//UIShader* pSample = new UIShader();
@@ -475,6 +475,10 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 	fog->BuildObjects(pDevice, pCommandList);
 	m_ppUIShaders[21] = fog;
 	//m_ppUIShaders[21]->SetFog();
+
+	UILoadingShader *load = new UILoadingShader();
+	load->BuildObjects(pDevice, pCommandList);
+	m_ppUIShaders[22] = load;
 
 	m_MessageShader = new MessageShader();
 	m_MessageShader->BuildObjects(pDevice, pCommandList);
@@ -1173,8 +1177,13 @@ void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComma
 {
 	//for (UINT i = 0; i < m_nUIShaders - 2; ++i)
 	//	m_ppUIShaders[i]->Render(pCommandList);
-	for (int i = m_nUIShaders-1; i >= 0; i--) {
+	for (int i = m_nUIShaders-2; i >= 0; i--) {	//22¹ø Á¦¿Ü
 		m_ppUIShaders[i]->Render(pCommandList);
 	}
 	if(m_MessageShader) m_MessageShader->Render(pCommandList);
+}
+
+void CScene::RenderLoading(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)
+{
+	m_ppUIShaders[22]->Render(pCommandList);
 }
