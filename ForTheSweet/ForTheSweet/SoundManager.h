@@ -6,6 +6,10 @@ using namespace FMOD;
 enum SOUNDKIND {
 	SOUND_1,
 	SOUND_2,
+	BACKGROUND,
+	FEVERTIME,
+	HIT,
+	LIGHTING,
 	SOUND_END
 };
 class SoundManager
@@ -18,6 +22,7 @@ private:
 	System* g_pSystem;
 	Sound* g_pSound[SOUND_END];
 	Channel* g_pChannel[10];
+	Channel* background;
 public:
 	void Setup();
 	void Release();
@@ -28,5 +33,8 @@ public:
 	}
 	void PlaySounds(SOUNDKIND eSound);
 	void PlayBackGroundSounds(SOUNDKIND eSound);
-	void StopBackGroundSounds();
+	void StopBackGroundSounds(SOUNDKIND eSound);
+	void FadeOutBackGroundSounds();
+	void FadeINBackGroundSounds();
+
 };

@@ -15,6 +15,7 @@ class CGameFramework
 {
 public:
 	CSocket *m_pSocket;
+	wchar_t *Characters_ID[MAX_USER];
 	bool move_state[5] = { false, false, false, false, false }; // ╩С, го, аб, ©Л, shift
 
 	bool weak_attack_state = false;

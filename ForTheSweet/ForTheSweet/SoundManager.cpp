@@ -11,8 +11,10 @@ void SoundManager::Setup()
 	g_pSystem->init(10, FMOD_INIT_NORMAL, nullptr);
 	g_pSystem->createSound("resource\\sound\\Soundtest.mp3", FMOD_LOOP_NORMAL, 0, &g_pSound[SOUND_1]);
 	g_pSystem->createSound("resource\\sound\\effectsoundtest.mp3", FMOD_DEFAULT, 0, &g_pSound[SOUND_2]);
-
-	
+	g_pSystem->createSound("resource\\sound\\bgm.mp3", FMOD_DEFAULT, 0, &g_pSound[BACKGROUND]);
+	g_pSystem->createSound("resource\\sound\\fevertime.mp3", FMOD_DEFAULT, 0, &g_pSound[FEVERTIME]);
+	g_pSystem->createSound("resource\\sound\\hit.mp3", FMOD_DEFAULT, 0, &g_pSound[HIT]);
+	g_pSystem->createSound("resource\\sound\\lightning.mp3", FMOD_DEFAULT, 0, &g_pSound[LIGHTING]);	
 }
 void SoundManager::Release()
 {
@@ -35,10 +37,43 @@ void SoundManager::PlaySounds(SOUNDKIND eSound)
 
 void SoundManager::PlayBackGroundSounds(SOUNDKIND eSound)
 {
-	//g_pSystem->playSound(g_pSound[eSound], NULL, false, &g_pChannel[0]);
+	g_pSystem->playSound(g_pSound[eSound], NULL, false, &background);
 }
 
-void SoundManager::StopBackGroundSounds()
+void SoundManager::StopBackGroundSounds(SOUNDKIND eSound)
 {
-	g_pChannel[0]->stop();
+	background->stop();
+}
+
+void SoundManager::FadeOutBackGroundSounds()
+{
+	unsigned long long dspclock;
+	FMOD::System *sys;
+	int rate;
+	background->getSystemObject(&sys);                        // OPTIONAL : Get System object	
+	sys->getSoftwareFormat(&rate, 0, 0);                // Get mixer rate	
+
+	background->getDSPClock(0, &dspclock);                    // Get the reference clock, which is the parent channel group
+	
+	background->addFadePoint(dspclock, 1.0f);                 // Add a fade point at 'now' with full volume.
+	
+	background->addFadePoint(dspclock + (rate * 5), 0.f);    // Add a fade point 5 seconds later at 0 volume.
+
+	background->setDelay(0, dspclock + (rate * 5), true);
+}
+
+void SoundManager::FadeINBackGroundSounds()
+{
+	unsigned long long dspclock;
+	FMOD::System *sys;
+	int rate;
+	background->getSystemObject(&sys);                        // OPTIONAL : Get System object	
+	sys->getSoftwareFormat(&rate, 0, 0);                // Get mixer rate	
+
+	background->getDSPClock(0, &dspclock);                    // Get the reference clock, which is the parent channel group
+
+	background->addFadePoint(dspclock, 0.0f);                 // Add a fade point at 'now' with full volume.
+
+	background->addFadePoint(dspclock + (rate * 5), 1.f);    // Add a fade point 5 seconds later at 0 volume.
+
 }

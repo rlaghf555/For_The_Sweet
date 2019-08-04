@@ -31,7 +31,7 @@ public:
 	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }
 	void SetMap(LoadModel **mapmodel) { Map_Model = mapmodel; }
 	void SetWeapon(LoadModel **weaponmodel) { weapon_Model = weaponmodel; }
-	void initUI();
+	void initUI(wchar_t *character_id[]);
 	void initObject();
 	CCamera* GetCamera() { return m_Camera.get(); }
 	//그래픽 루트 시그너쳐를 생성한다.

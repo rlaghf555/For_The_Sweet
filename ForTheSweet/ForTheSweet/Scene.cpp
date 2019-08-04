@@ -726,7 +726,7 @@ ID3D12RootSignature *CScene::GetGraphicsRootSignature()
 	return(m_pd3dGraphicsRootSignature);
 }
 
-void CScene::initUI()
+void CScene::initUI(wchar_t *character_id[])
 {
 	for (int i = 0; i < 8; i++) {
 		m_ppUIShaders[i]->getObejct(1)->SetHP(m_pPlayer[i]->Get_HP());	//hp
@@ -742,8 +742,13 @@ void CScene::initUI()
 	pos = XMFLOAT2(1280, 400);
 	m_ppUIShaders[11]->SetPos(&pos, 0);
 	for (int i = 12; i < 20; i++) {
-		wchar_t tmp[10] = L"ABCD4";			//플레이어 아이디 입력하자		
-		m_ppUIShaders[i]->SetID(tmp);
+		//wchar_t tmp[10] = L"ABCD4";			//플레이어 아이디 입력하자			
+		m_ppUIShaders[i]->SetID(character_id[i - 12]);
+		if (character_id[i - 12] == nullptr) {
+			m_ppUIShaders[i - 12]->SetEnable(false,0);
+			m_ppUIShaders[i - 12]->SetEnable(false,1);
+			m_ppUIShaders[i - 12]->SetEnable(false,2);
+		}
 	}
 
 //	m_ppUIShaders[20]->ShowMessage(false);   //true면 win false면 lose

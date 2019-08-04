@@ -1,17 +1,1 @@
-﻿  Server_FTS.cpp
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(88): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(31): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(32): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1022): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1023): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1024): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1144): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1237): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1238): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0731\for_the_sweet\forthesweet_server\forthesweet_server\server_fts.cpp(1239): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  코드를 생성하고 있습니다.
-  2 of 1573 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
-  코드를 생성했습니다.
-  ForTheSweet_Server.vcxproj -> C:\Users\KYH\Desktop\0731\For_The_Sweet\ForTheSweet_Server\x64\Release\ForTheSweet_Server.exe
+﻿  ForTheSweet_Server.vcxproj -> C:\Users\Hol\Desktop\졸작\ForTheSweet_Server\x64\Release\ForTheSweet_Server.exe

@@ -1111,7 +1111,7 @@ void UIIDShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	m_pMaterial->SetReflection(1);
 
 	XMFLOAT2 pos = XMFLOAT2(0, 0);
-	XMFLOAT2 scale = XMFLOAT2(0.8, 0.08f);
+	XMFLOAT2 scale = XMFLOAT2(1, 0.08f);
 	
 	//ID
 	UIObject* text[10];
@@ -1143,9 +1143,11 @@ void UIIDShader::SetID(wchar_t * str)
 	//cout << "idlen:" << ID_Len << endl;
 	XMUINT2 numsprite(1, 36);
 	XMUINT2 nowsprite(0, 0);
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < m_nObjects; ++i) {
 		m_pUIObjects[i]->m_bEnabled = false;
 	}
+	if (ID_Len == 0)
+		return;
 	for (int i = 0; i <= ID_Len; ++i) {
 
 		if (str[i] >= L'0'&&str[i] <= L'9') {

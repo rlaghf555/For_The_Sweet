@@ -178,7 +178,7 @@ bool CGameFramework::Restart()
 		m_pScene->Selected_Map = selected_map;
 		m_pScene->ReBuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 		m_pScene->initObject();
-		m_pScene->initUI();
+		m_pScene->initUI(Characters_ID);
 	}	
 	playing = true;
 
@@ -716,7 +716,7 @@ void CGameFramework::BuildObjects()
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 		m_pScene->initObject();
 		m_pScene->BuildUI(m_pd3dDevice, m_pd3dCommandList);
-		m_pScene->initUI();
+		m_pScene->initUI(Characters_ID);
 	}
 	playing = true;
 	if (SERVER_ON) {
@@ -1617,6 +1617,8 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->DisableLoop();
 				m_pPlayer->jumpstart();
 				SoundManager::GetInstance()->PlaySounds(SOUND_2);	//soundeffect 테스트
+				SoundManager::GetInstance()->FadeOutBackGroundSounds();	//soundeffect 테스트
+				
 				m_pPlayer->SetWeapon(false, -1,-1);
 			}
 		}
