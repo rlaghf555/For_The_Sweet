@@ -494,7 +494,7 @@ void process_packet(char key, char *buffer)
 
 					clients[client_id].playerinfo = new CPlayer();
 
-					clients[client_id].playerinfo->setPosition(PlayerInitPosition[key]);
+					clients[client_id].playerinfo->setPosition(PlayerInitPosition[client_id]);
 					clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 					clients[client_id].playerinfo->setLook(PxVec3(0, 0, 1));
 					clients[client_id].playerinfo->setDashed(false);
@@ -665,46 +665,124 @@ void process_packet(char key, char *buffer)
 		}
 
 		if (p_anim->key == CS_WEAK) {
-			cout << "weak attack ";
-			if (p_anim->count == 0) {
-				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
-				clients[key].playerinfo->attack_time = high_resolution_clock::now();			// 최초 공격 시작
-				clients[key].playerinfo->attack_count = 1;
-				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
-				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 400ms, 0);
+			if (clients[key].playerinfo->weapon_type == -1)
+			{
+				cout << "Idle weak attack ";
+				if (p_anim->count == 0) {
+					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
+					clients[key].playerinfo->attack_time = high_resolution_clock::now();			// 최초 공격 시작
+					clients[key].playerinfo->attack_count = 1;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 400ms, 0);
+				}
+				else if (p_anim->count == 1) {
+					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
+					clients[key].playerinfo->attack_count = 2;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 2);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 800ms, 0);
+				}
+				else if (p_anim->count == 2) {
+					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
+					clients[key].playerinfo->attack_count = 3;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 3);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 1160ms, 0);
+				}
 			}
-			else if (p_anim->count == 1) {
-				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
-				clients[key].playerinfo->attack_count = 2;
-				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 2);
-				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 800ms, 0);
+			else if (clients[key].playerinfo->weapon_type >= Weapon_Lollipop && clients[key].playerinfo->weapon_type <= Weapon_pepero)
+			{
+				cout << "Lollipop weak attack ";
+				if (p_anim->count == 0) {
+					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack1);
+					clients[key].playerinfo->attack_time = high_resolution_clock::now();			// 최초 공격 시작
+					clients[key].playerinfo->attack_count = 1;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 500ms, 0);
+				}
+				else if (p_anim->count == 1) {
+					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack2);
+					clients[key].playerinfo->attack_count = 2;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 2);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 1130ms, 0);
+				}
 			}
-			else if (p_anim->count == 2) {
-				clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
-				clients[key].playerinfo->attack_count = 3;
-				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 3);
-				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 1160ms, 0);
+			else if (clients[key].playerinfo->weapon_type == Weapon_chocolate)
+			{
+				cout << "Chocolate weak attack ";
+				if (p_anim->count == 0) {
+					clients[key].playerinfo->setAniIndex(Anim::Chocolate_Attack);
+					clients[key].playerinfo->attack_time = high_resolution_clock::now();			// 최초 공격 시작
+					clients[key].playerinfo->attack_count = 1;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 800ms, 1);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 530ms, 0);
+				}
+			}
+			else if (clients[key].playerinfo->weapon_type == Weapon_cupcake)
+			{
+
 			}
 			clients[key].playerinfo->setStatus(STATUS::WEAK_ATTACK);
 			cout << int(p_anim->count) << endl;
-
 		}
 
 		if (p_anim->key == CS_HARD) {
-			cout << "hard attack ";
-			if (p_anim->count == 0) {
-				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
+			if (clients[key].playerinfo->weapon_type == -1)
+			{
+				cout << "Idle hard attack ";
+				if (p_anim->count == 0) {
+					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
+					clients[key].playerinfo->attack_time = high_resolution_clock::now();
+					clients[key].playerinfo->attack_count = 1;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 500ms, 0);
+				}
+				else if (p_anim->count == 1) {
+					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
+					clients[key].playerinfo->attack_count = 2;
+					add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 2);
+					add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 1000ms, 0);
+				}
+			}
+			else if (clients[key].playerinfo->weapon_type == Weapon_Lollipop)
+			{
+				cout << "Lollipop hard attack ";
+				clients[key].playerinfo->setAniIndex(Anim::Lollipop_Hard_Attack);
+				clients[key].playerinfo->attack_time = high_resolution_clock::now();
+				clients[key].playerinfo->attack_count = 1;
+				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1000ms, 1);
+				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 500ms, 0);
+			}
+			else if (clients[key].playerinfo->weapon_type == Weapon_chupachupse)
+			{
+				cout << "Candy hard attack ";
+				clients[key].playerinfo->setAniIndex(Anim::Candy_Hard_Attack);
+				clients[key].playerinfo->attack_time = high_resolution_clock::now();
+				clients[key].playerinfo->attack_count = 1;
+				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1000ms, 1);
+				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 600ms, 0);
+			}
+			else if (clients[key].playerinfo->weapon_type == Weapon_pepero)
+			{
+				cout << "Pepero hard attack ";
+				clients[key].playerinfo->setAniIndex(Anim::Pepero_Hard_Attack1);
+				clients[key].playerinfo->attack_time = high_resolution_clock::now();
+				clients[key].playerinfo->attack_count = 1;
+				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1000ms, 1);
+				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 500ms, 0);
+			}
+			else if (clients[key].playerinfo->weapon_type == Weapon_chocolate)
+			{
+				cout << "Chocolate hard attack ";
+				clients[key].playerinfo->setAniIndex(Anim::Chocolate_Hard_Attack);
 				clients[key].playerinfo->attack_time = high_resolution_clock::now();
 				clients[key].playerinfo->attack_count = 1;
 				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
 				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 500ms, 0);
 			}
-			else if (p_anim->count == 1) {
-				clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
-				clients[key].playerinfo->attack_count = 2;
-				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 1330ms, 2);
-				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 1000ms, 0);
+			else if (clients[key].playerinfo->weapon_type == Weapon_cupcake)
+			{
+		
 			}
+
 			clients[key].playerinfo->setStatus(STATUS::HARD_ATTACK);
 			cout << int(p_anim->count) << endl;
 		}
@@ -1015,13 +1093,27 @@ void process_event(EVENT_ST &ev)
 		{
 			clients[ev.id].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
 
+			float hit_dist = 10.f;
+
+			int type = clients[ev.id].playerinfo->weapon_type;
+			if (type == Weapon_Lollipop || type == Weapon_chupachupse) {
+				hit_dist = 20.f;
+			}
+			else if (type == Weapon_pepero) {
+				hit_dist = 30.f;
+			}
+			else if (type == Weapon_chocolate) {
+				hit_dist = 10.f;
+			}
+
 			PxTransform triggerpos(PxVec3(0, 0, 0));
 			PxExtendedVec3 playerpos = clients[ev.id].playerinfo->m_PlayerController->getPosition();
+
 			PxVec3 look = clients[ev.id].playerinfo->m_Look;
 
-			triggerpos.p.x = playerpos.x + (look.x * 10);
-			triggerpos.p.y = playerpos.y + (look.y * 10);
-			triggerpos.p.z = playerpos.z + (look.z * 10);
+			triggerpos.p.x = playerpos.x + (look.x * hit_dist);
+			triggerpos.p.y = playerpos.y + (look.y * hit_dist);
+			triggerpos.p.z = playerpos.z + (look.z * hit_dist);
 
 			clients[ev.id].playerinfo->m_AttackTrigger->setGlobalPose(triggerpos);
 		}

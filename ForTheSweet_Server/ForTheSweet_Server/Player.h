@@ -36,7 +36,16 @@ enum Anim {
 	Lollipop_Attack2,
 	Lollipop_Guard,
 	Lollipop_Hard_Attack,
-	Lollipop_Skill
+	Lollipop_Skill,
+	Pepero_Hard_Attack1,
+	Pepero_Hard_Attack2,
+	Pepero_Skill,
+	Candy_Hard_Attack,
+	Candy_Skill,
+	Chocolate_Attack,
+	Chocolate_Hard_Attack,
+	Chocolate_Guard,
+	Chocolate_Skill,
 };
 
 class PlayerHitReport : public PxUserControllerHitReport {

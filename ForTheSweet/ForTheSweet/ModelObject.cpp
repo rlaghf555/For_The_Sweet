@@ -126,7 +126,8 @@ void ModelObject::ChangeAnimation(UINT nextIndex)
 	if (nextIndex == m_AnimIndex)
 		if (nextIndex != Anim_Small_React)
 			return;
-	if (nextIndex == Anim_Weak_Attack2 || nextIndex == Anim_Weak_Attack3 || nextIndex == Anim_Hard_Attack2)
+	if (nextIndex == Anim_Weak_Attack2 || nextIndex == Anim_Weak_Attack3 || nextIndex == Anim_Hard_Attack2
+		 || nextIndex == Anim_Lollipop_Attack2)
 	{
 		//cout << "~~~" << endl;
 		m_ani[nextIndex]->SetAnimFrame(m_ani[m_AnimIndex]->getAnimTime());

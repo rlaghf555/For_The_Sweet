@@ -11,7 +11,7 @@ constexpr int MAP_1_MAX_WEAPON_NUM = 30;
 constexpr int MAP_2_MAX_WEAPON_NUM = 30;
 constexpr int MAP_3_MAX_WEAPON_NUM = 30;
 
-constexpr int MAX_ANIM = 18;
+constexpr int MAX_ANIM = 28;
 
 // ROOM
 constexpr int MAX_ROOM_NAME_LEN = 10;
@@ -20,3 +20,10 @@ constexpr int MAX_ROOM_USER = 8;
 constexpr int ROOM_MODE_TEAM = 0;
 constexpr int ROOM_MODE_INDIVIDUAL = 1;
 constexpr int ROOM_MOVE_KING = 2;
+
+// Weapon
+constexpr int Weapon_Lollipop = 0;
+constexpr int Weapon_chupachupse = 1;
+constexpr int Weapon_pepero = 2;
+constexpr int Weapon_chocolate = 3;
+constexpr int Weapon_cupcake = 4;
