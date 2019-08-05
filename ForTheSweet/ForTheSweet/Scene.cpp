@@ -252,6 +252,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ExplosionShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
 		m_ExplosionShader[i]->m_bBlowingUp = true;
 	}
+	m_TeamShader = new TeamShader();
+	m_TeamShader->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+	m_EnemyShader = new TeamShader();
+	m_EnemyShader->BuildObjects(pd3dDevice, pd3dCommandList, 1);
 }
 
 void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx * physx)
@@ -707,6 +711,16 @@ void CScene::ReleaseObjects()
 			delete m_ExplosionShader[i];
 		}
 	}
+	if (m_TeamShader) {
+		m_TeamShader->ReleaseShaderVariables();
+		m_TeamShader->ReleaseObjects();
+		delete m_TeamShader;
+	}
+	if (m_EnemyShader) {
+		m_EnemyShader->ReleaseShaderVariables();
+		m_EnemyShader->ReleaseObjects();
+		delete m_EnemyShader;
+	}
 }
 
 void CScene::ReleaseUploadBuffers()
@@ -760,8 +774,7 @@ void CScene::initUI(wchar_t *character_id[])
 }
 
 void CScene::initObject()
-{
-	
+{	
 	//무기 매트릭스 초기화
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; i++) {
@@ -771,6 +784,7 @@ void CScene::initObject()
 			}
 		}
 	}
+	SetTeamUI();
 
 	if (Selected_Map == M_Map_1) {
 		//캐릭터 좌표 및 스킬 초기화
@@ -878,6 +892,30 @@ void CScene::initObject()
 	}
 }
 
+void CScene::SetTeamUI()
+{
+	for (int i = 0; i < MAX_USER; i++) {
+		m_TeamShader->getObject(i)->visible = false;
+		m_EnemyShader->getObject(i)->visible = false;
+	}
+	if (mode == MODE_TEAM || mode == MODE_KING) {
+		if (myid < 4) {
+			for (int i = 0; i < 4; i++)
+				m_TeamShader->getObject(i)->visible = true;
+
+			for (int i = 4; i < MAX_USER; i++)
+				m_EnemyShader->getObject(i)->visible = true;
+		}
+	}
+	else {
+		for (int i = 0; i < MAX_USER; i++) {
+			if (myid != i)
+				m_EnemyShader->getObject(i)->visible = true;
+			else m_TeamShader->getObject(i)->visible = true;
+		}
+	}
+}
+
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice)
 {
 	ID3D12RootSignature *pd3dGraphicsRootSignature = NULL;
@@ -947,6 +985,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				XMFLOAT3 tmp = m_pPlayer[i]->GetPosition();
 
 				bounding_box_test[i]->getObjects()->m_xmf4x4World = m_pPlayer[i]->m_xmf4x4World;
+				tmp.y += 40;
+				tmp.x -= 2.5;
+				m_TeamShader->getObject(i)->SetPosition(tmp);
+				m_EnemyShader->getObject(i)->SetPosition(tmp);
 			}
 		}
 	}
@@ -1110,7 +1152,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
-	
+
 	if (Selected_Map == M_Map_1) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
@@ -1148,6 +1190,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 
+
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
 	if (Selected_Map == M_Map_1) {
@@ -1175,6 +1218,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 		if (m_BackGroundShader[1]) m_BackGroundShader[1]->Render(pd3dCommandList, pCamera);
 	}
+	if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera);
+	if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera);
 	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 	//	for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 	//		if (weapon_box[i][j])
@@ -1192,6 +1237,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
 	
 	for (int i = 0; i < 3; i++)if (m_SkillParticleShader[i])m_SkillParticleShader[i]->Render(pd3dCommandList, pCamera);
+
 }
 
 void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList)

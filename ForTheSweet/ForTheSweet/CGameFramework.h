@@ -45,7 +45,7 @@ public:
 	int My_ID = -1;
 	int time = 0;
 	int selected_map = 0;
-
+	int mode;
 	//마지막으로 마우스 버튼을 클릭할 때의 마우스 커서의 위치이다.
 	POINT m_ptOldCursorPos;
 

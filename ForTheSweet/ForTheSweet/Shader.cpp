@@ -3360,3 +3360,79 @@ void ExplosionShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
 		}
 	}
 }
+
+D3D12_SHADER_BYTECODE TeamShader::CreateVertexShader(ID3DBlob ** ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "VSDiffused", "vs_5_1", ppd3dShaderBlob));
+}
+
+void TeamShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList,int type, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 8;
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if(type ==0)
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Team.dds", 0);
+	else if(type==1)
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Enemy.dds", 0);
+	
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		CGameObject *effect_object = NULL;
+		effect_object = new CGameObject();
+		effect_object->visible = true;
+		m_ppObjects[i] = effect_object;
+
+		CMesh *pCubeMesh = NULL;
+		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 5, 5, 0);	// pos(x, y), Width(w, h), depth
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_ppObjects[i]->SetMesh(pCubeMesh);
+	}
+	delete pTexture;
+}
+
+void TeamShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	CB_GAMEOBJECT_INFO cBuffer;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[i]->m_xmf4x4World)));
+		cBuffer.m_nMaterial = 0;
+		m_ObjectCB->CopyData(i, cBuffer);
+	}
+}
+
+void TeamShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
+{
+	CModelShader::OnPrepareRender(pd3dCommandList, 0);
+
+	if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
+
+	for (UINT j = 0; j < m_nObjects; j++)
+	{
+		if (m_ppObjects[j] && m_ppObjects[j]->visible)
+		{
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
+}
+
+void TeamShader::Animate(float fTimeElapsed)
+{
+}

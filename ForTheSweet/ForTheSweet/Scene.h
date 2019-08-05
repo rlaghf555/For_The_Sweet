@@ -6,6 +6,9 @@
 #include "Physx.h"
 #include "Protocol.h"
 #include "UIShader.h"
+#define MODE_TEAM 0 
+#define MODE_INDIVIDUAL 1
+#define MODE_KING 2
 class CScene
 {
 public:
@@ -33,6 +36,7 @@ public:
 	void SetWeapon(LoadModel **weaponmodel) { weapon_Model = weaponmodel; }
 	void initUI(wchar_t *character_id[]);
 	void initObject();
+	void SetTeamUI();
 	CCamera* GetCamera() { return m_Camera.get(); }
 	//그래픽 루트 시그너쳐를 생성한다.
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
@@ -83,8 +87,11 @@ public:
 	ShadowReverseModelShader	*m_ShadowReverseModelShader[3] = { NULL, };
 
 	ExplosionShader				*m_ExplosionShader[MAX_USER] = { NULL, };
-
+	TeamShader					*m_TeamShader = NULL;
+	TeamShader					*m_EnemyShader = NULL;
 	int Selected_Map = 0;
+	int mode = MODE_TEAM;
+	int myid;
 	bool Map_1_Build = false;
 	bool Map_2_Build = false;
 	bool Map_3_Build = false;

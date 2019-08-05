@@ -177,8 +177,11 @@ bool CGameFramework::Restart()
 			selected_map = M_Map_3;
 		m_pScene->Selected_Map = selected_map;
 		m_pScene->ReBuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
+		m_pScene->myid = My_ID;
+		m_pScene->mode = mode;
 		m_pScene->initObject();
 		m_pScene->initUI(Characters_ID);
+		
 	}	
 	playing = true;
 
@@ -722,6 +725,8 @@ void CGameFramework::BuildObjects()
 		m_pScene->Selected_Map = selected_map;
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
+		m_pScene->myid = My_ID;
+		m_pScene->mode = mode;
 		m_pScene->initObject();
 		m_pScene->BuildUI(m_pd3dDevice, m_pd3dCommandList);
 		m_pScene->initUI(Characters_ID);
