@@ -47,4 +47,5 @@ struct RoomStatus {
 	int mode = MODE_TEAM;
 	int map = 0;
 	int room_num = 0;
+	int current_num = 0;
 };

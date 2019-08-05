@@ -22,6 +22,9 @@
     <Filter Include="소스 파일\Room">
       <UniqueIdentifier>{b717bc6e-af18-43c8-bcc8-515fa3155211}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Weapon">
+      <UniqueIdentifier>{70cfd4fc-50f8-46ae-a933-629efd05512b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server_FTS.cpp">
@@ -38,6 +41,9 @@
     </ClCompile>
     <ClCompile Include="Room.cpp">
       <Filter>소스 파일\Room</Filter>
+    </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <Filter>소스 파일\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="Room.h">
       <Filter>소스 파일\Room</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.h">
+      <Filter>소스 파일\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

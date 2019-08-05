@@ -129,6 +129,7 @@
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Server_FTS.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h" />
@@ -138,6 +139,7 @@
     <ClInclude Include="Util.h" />
     <ClInclude Include="Physx.h" />
     <ClInclude Include="Protocol.h" />
+    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

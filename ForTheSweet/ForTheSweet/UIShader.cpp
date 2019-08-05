@@ -815,8 +815,8 @@ void UITimeShader::SetTime(int t)
 
 void UITimeShader::Animate(float fTimeElapsed)
 {
-	Time -= fTimeElapsed;
-	SetTime(Time);
+	//Time -= fTimeElapsed;
+	//SetTime(Time);
 }
 
 void UIDotShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)

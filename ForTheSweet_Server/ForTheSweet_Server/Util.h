@@ -7,11 +7,11 @@ constexpr float CH_CAPSULE_HEIGHT = 15.f;
 constexpr float CH_CAPSULE_RADIUS = 10.f;
 
 constexpr int MAX_WEAPON_TYPE = 5;
-constexpr int MAP_1_MAX_WEAPON_NUM = 30;
-constexpr int MAP_2_MAX_WEAPON_NUM = 30;
-constexpr int MAP_3_MAX_WEAPON_NUM = 30;
+constexpr int MAX_WEAPON_NUM = 30;
+constexpr int RESPAWN_WEAPON_NUM = 10;
 
-constexpr int MAX_ANIM = 28;
+
+constexpr int MAX_ANIM = 29;
 
 // ROOM
 constexpr int MAX_ROOM_NAME_LEN = 10;
@@ -20,6 +20,8 @@ constexpr int MAX_ROOM_USER = 8;
 constexpr int ROOM_MODE_TEAM = 0;
 constexpr int ROOM_MODE_INDIVIDUAL = 1;
 constexpr int ROOM_MOVE_KING = 2;
+
+constexpr int ROOM_TIMER_START = 1000;
 
 // Weapon
 constexpr int Weapon_Lollipop = 0;

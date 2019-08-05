@@ -783,6 +783,12 @@ void CScene::initObject()
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; i++) {
 			m_WeaponShader[i]->getObject(j)->init();
+			m_WeaponShader[i]->getObject(j)->visible = true;
+
+			if (SERVER_ON) {
+				m_WeaponShader[i]->getObject(j)->visible = false;
+				m_WeaponShader[i]->getObject(j)->SetPosition(1000.f, 1000.f, 1000.f);
+			}
 			if (i == 4) {
 				j = WEAPON_EACH_NUM;
 			}

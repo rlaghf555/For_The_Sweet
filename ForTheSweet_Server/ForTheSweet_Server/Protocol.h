@@ -21,6 +21,7 @@ constexpr int CS_HARD = 16;
 constexpr int CS_JUMP = 17;
 constexpr int CS_DASH = 18;
 constexpr int CS_GUARD_OFF = 19;
+constexpr int CS_WEAPON_SKILL = 20;
 
 constexpr int CS_MAKE_ROOM = 100;
 constexpr int CS_ATTEND_ROOM = 101;
@@ -28,18 +29,22 @@ constexpr int CS_START_ROOM = 102;
 constexpr int CS_READY_ROOM = 103;
 constexpr int CS_LOAD_COMPLETE = 104;
 constexpr int CS_UPDATE_ROOM = 105;
+constexpr int CS_SETTING_COMPLETE = 106;
 
 constexpr int SC_LOGIN = 1;
 constexpr int SC_POS = 2;
 constexpr int SC_PUT_PLAYER = 3;
 constexpr int SC_REMOVE = 4;
 constexpr int SC_ANIM = 5;
-constexpr int SC_WEAPON = 6;
+constexpr int SC_PICK_WEAPON = 6;
 constexpr int SC_HIT = 7;
+constexpr int SC_PUT_WEAPON = 8;
+constexpr int SC_TIMER = 9;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
-constexpr int SC_ROOM_START = 102;
+constexpr int SC_ROOM_LOAD = 102;
+constexpr int SC_ROOM_START = 103;
 
 #pragma pack(push, 1)
 
@@ -88,6 +93,11 @@ struct cs_packet_load_complete {
 	char type;
 };
 
+struct cs_packet_settting_complete {
+	char size;
+	char type;
+};
+
 struct cs_packet_move {
 	char size;
 	char type;
@@ -107,6 +117,12 @@ struct cs_packet_weapon {
 	char type;
 	char weapon_type;
 	char weapon_index;
+};
+
+struct cs_packet_weapon_skill {
+	char size;
+	char type;
+	//char weapon_type;
 };
 
 struct sc_packet_login {
@@ -135,6 +151,11 @@ struct sc_packet_room_detail_info {
 	char room_mode;
 	char player_name[15];
 	char host;
+};
+
+struct sc_packet_room_load {
+	char size;
+	char type;
 };
 
 struct sc_packet_room_start {
@@ -176,7 +197,15 @@ struct sc_packet_hit {
 	char hp;
 };
 
-struct sc_packet_weapon {
+struct sc_packet_put_weapon {
+	char size;
+	char type;
+	char weapon_type;
+	char weapon_index;
+	float x, y, z;
+};
+
+struct sc_packet_pick_weapon {
 	char size;
 	char type;
 	char id;
@@ -188,6 +217,12 @@ struct sc_packet_remove {
 	char size;
 	char type;
 	char id;
+};
+
+struct sc_packet_timer {
+	char size;
+	char type;
+	int timer;
 };
 
 

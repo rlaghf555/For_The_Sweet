@@ -90,11 +90,6 @@ void CPlayer::setStatus(char status)
 	m_status = status;
 }
 
-void CPlayer::setClientNum(int num)
-{
-	client_num = num;
-}
-
 void CPlayer::setHP(int hp)
 {
 	m_hp = hp;

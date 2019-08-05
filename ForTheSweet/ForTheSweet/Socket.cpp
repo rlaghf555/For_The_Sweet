@@ -65,13 +65,15 @@ void CSocket::sendPacket(char type, char key, char state, char id)
 	switch (type)
 	{
 	case CS_CONNECT:
+	{
 		cs_packet_connect p_connect;
 		p_connect.type = CS_CONNECT;
 		p_connect.size = sizeof(cs_packet_connect);
 		send(clientSocket, (char *)&p_connect, sizeof(cs_packet_connect), 0);
 		break;
-
+	}
 	case CS_MOVE:
+	{
 		//cout << "MOVE~~~~~~~~~~~~~~~~~~\n";
 		cs_packet_move p_move;
 		p_move.type = CS_MOVE;
@@ -80,15 +82,18 @@ void CSocket::sendPacket(char type, char key, char state, char id)
 		p_move.size = sizeof(cs_packet_move);
 		send(clientSocket, (char *)&p_move, sizeof(cs_packet_move), 0);
 		break;
+	}
 
 	case CS_DISCONNECT:
+	{
 		cs_packet_disconnect p_disconnect;
 		p_disconnect.type = CS_DISCONNECT;
 		p_disconnect.size = sizeof(cs_packet_disconnect);
 		//send(clientSocket, (char *)moveflag, sizeof(cs_packet_disconnect), 0);
 		break;
-
+	}
 	case CS_ATTACK:
+	{
 		cs_packet_anim p_anim;
 		p_anim.type = CS_ATTACK;
 		p_anim.size = sizeof(cs_packet_anim);
@@ -96,8 +101,9 @@ void CSocket::sendPacket(char type, char key, char state, char id)
 		p_anim.count = state;
 		send(clientSocket, (char *)&p_anim, sizeof(cs_packet_anim), 0);
 		break;
-
+	}
 	case CS_WEAPON:
+	{
 		cs_packet_weapon p_weapon;
 		p_weapon.type = CS_WEAPON;
 		p_weapon.size = sizeof(cs_packet_weapon);
@@ -105,5 +111,14 @@ void CSocket::sendPacket(char type, char key, char state, char id)
 		p_weapon.weapon_index = state;
 		send(clientSocket, (char *)&p_weapon, sizeof(cs_packet_weapon), 0);
 		break;
+	}
+	case CS_WEAPON_SKILL:
+	{
+		cs_packet_weapon_skill p_weapon_skill;
+		p_weapon_skill.type = CS_WEAPON_SKILL;
+		p_weapon_skill.size = sizeof(cs_packet_weapon_skill);
+		send(clientSocket, (char *)&p_weapon_skill, sizeof(cs_packet_weapon_skill), 0);
+		break;
+	}
 	}
 }

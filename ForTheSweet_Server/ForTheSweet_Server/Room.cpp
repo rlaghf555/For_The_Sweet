@@ -5,11 +5,9 @@ CRoom::CRoom()
 	room_num = 0;
 	current_num = 0;
 	max_num = MAX_ROOM_USER;
-	
+
 	room_status = 0;
 	room_mode = ROOM_MODE_INDIVIDUAL;
-
-	weapon_num = 0;
 
 	m_pPhysx = nullptr;
 
@@ -19,13 +17,22 @@ CRoom::CRoom()
 	{
 		clientNum[i] = -1;
 		load_complete[i] = false;
+		setting_complete[i] = false;
+	}
+
+	for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i)
+	{
+		weapon_respawn[i].respawn_able = true;
+		weapon_respawn[i].type = 0;
+		weapon_respawn[i].index = 0;
 	}
 
 	for (int i = 0; i < MAX_WEAPON_TYPE; ++i)
 	{
-		for (int j = 0; j < MAP_1_MAX_WEAPON_NUM; ++j)
+		for (int j = 0; j < MAX_WEAPON_NUM; ++j)
 		{
-			weapon_list[i][j] = -1;
+			weapon_list[i][j].SetEmpty(true);
+			weapon_list[i][j].SetOwner(-1);
 		}
 	}
 }
@@ -39,7 +46,6 @@ CRoom::CRoom(const CRoom& other) {
 	host_num = other.host_num;
 	room_mode = other.room_mode;
 	room_status = other.room_status;
-	weapon_num = other.weapon_num;
 
 	PosBroadCastTime = other.PosBroadCastTime;
 
@@ -47,11 +53,19 @@ CRoom::CRoom(const CRoom& other) {
 	{
 		clientNum[i] = other.clientNum[i];
 		load_complete[i] = other.load_complete[i];
+		setting_complete[i] = other.setting_complete[i];
+	}
+
+	for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i)
+	{
+		weapon_respawn[i].respawn_able = other.weapon_respawn[i].respawn_able;
+		weapon_respawn[i].type = other.weapon_respawn[i].type;
+		weapon_respawn[i].index = other.weapon_respawn[i].index;
 	}
 
 	for (int i = 0; i < MAX_WEAPON_TYPE; ++i)
 	{
-		for (int j = 0; j < MAP_1_MAX_WEAPON_NUM; ++j)
+		for (int j = 0; j < MAX_WEAPON_NUM; ++j)
 		{
 			weapon_list[i][j] = other.weapon_list[i][j];
 		}
@@ -119,6 +133,7 @@ void CRoom::start(const vector<PxVec3>& vectex, const vector<int>& index)
 	// ¼¼ÆÃ
 	room_mode = 0;
 	room_status = 1;
+	timer = 300;
 }
 
 bool CRoom::all_load_complete()
@@ -128,6 +143,30 @@ bool CRoom::all_load_complete()
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		if (load_complete[i] == true)
+		{
+			count++;
+		}
+	}
+
+	if (count == current_num)
+	{
+		cout << "ALL load\n";
+		return true;
+	}
+	else
+	{
+		//cout << "ALL not yet load\n";
+		return false;
+	}
+}
+
+bool CRoom::all_setting_complete()
+{
+	int count = 0;
+
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		if (setting_complete[i] == true)
 		{
 			count++;
 		}

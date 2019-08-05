@@ -14,24 +14,47 @@ struct KEY {
 class CGameFramework
 {
 public:
+	// Socket
 	CSocket *m_pSocket;
+
+	int current_player_num;
+	int current_weapon_num;
+
+	int max_player_num;
+	int max_weapon_num;
+
+	bool setting_player;
+	bool setting_weapon;
+
+	bool setting_send;
+
+	bool input_able = false;
+
 	wchar_t *Characters_ID[MAX_USER];
+	// 이동관련 
 	bool move_state[5] = { false, false, false, false, false }; // 상, 하, 좌, 우, shift
 
+	// 약공격 관련
 	bool weak_attack_state = false;
 	char weak_attack_count = 0;
 	high_resolution_clock::time_point weak_attack_time;
 
+	// 강공격 관련
 	bool hard_attack_state = false;
 	char hard_attack_count = 0;
 	high_resolution_clock::time_point hard_attack_time;
 
+	// 점프 관련
 	bool jump_state = false;
 
+	// 방어 관련
 	bool defense_state = false;
 	bool defense_check = false;
 	bool defense_key;
 	high_resolution_clock::time_point defense_time;
+
+	// 스킬 관련
+	bool skill_state = false;
 
 	vector<KEY> key_buffer;
 

@@ -46,6 +46,7 @@ enum Anim {
 	Chocolate_Hard_Attack,
 	Chocolate_Guard,
 	Chocolate_Skill,
+	Hard_React
 };
 
 class PlayerHitReport : public PxUserControllerHitReport {
@@ -91,7 +92,6 @@ public:
 	void setLook(PxVec3 look);
 	void setAniIndex(char index);
 	void setStatus(char status);
-	void setClientNum(int num);
 	void setHP(int hp);
 	void jumpstart() { m_Jump.startJump(120); }
 
@@ -122,7 +122,6 @@ public:
 	high_resolution_clock::time_point attack_time;
 	char attack_count;
 
-	int client_num;
 	int m_hp;
 };
 

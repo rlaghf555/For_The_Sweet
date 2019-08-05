@@ -32,6 +32,11 @@ PxVec3 PlayerInitPosition[8] = {
    PxVec3(150, 10.1, 100), PxVec3(-150, 10.1, 100), PxVec3(200, 10.1, 100)
 };
 
+PxVec3 WeaponInitPosition[10] = {
+   PxVec3(-200, 10, -100), PxVec3(-200, 10, 0), PxVec3(-200, 10, 100), PxVec3(-100, 10, -50), PxVec3(-100, 10, 50),
+   PxVec3(100, 10, -50), PxVec3(100, 10, 50), PxVec3(200, 10, -100), PxVec3(200, 10, 0), PxVec3(200, 10, 100)
+};
+
 enum SITUATION
 {
 	ST_LOBBY, ST_ROOM
@@ -60,6 +65,7 @@ public:
 	volatile bool connected;
 	char id[15];
 	char situation;
+	char slot;
 	int room_num;
 
 	SOCKETINFO() {
@@ -197,7 +203,16 @@ void send_room_datail_info_packet(int client, int player, char slot, int room_nu
 	sendPacket(client, &p_room_detail_info);
 }
 
-void send_start_room_packet(int client)
+void send_start_load_room_packet(int client)
+{
+	sc_packet_room_load p_room_load;
+	p_room_load.size = sizeof(sc_packet_room_load);
+	p_room_load.type = SC_ROOM_LOAD;
+
+	sendPacket(client, &p_room_load);
+}
+
+void send_start_game_packet(int client)
 {
 	sc_packet_room_start p_room_start;
 	p_room_start.size = sizeof(sc_packet_room_start);
@@ -265,20 +280,67 @@ void send_hit_packet(char client, char id, int hp)
 	sendPacket(client, &p_hit);
 }
 
-void send_weapon_packet(char client, char id, char wp_type, char wp_index) {
-	sc_packet_weapon p_weapon;
-	p_weapon.type = SC_WEAPON;
-	p_weapon.size = sizeof(sc_packet_weapon);
-	p_weapon.id = id;
-	p_weapon.weapon_type = wp_type;
-	p_weapon.weapon_index = wp_index;
+void send_put_weapon_packet(char client, char wp_type, char wp_index, float x, float y, float z) {
+	sc_packet_put_weapon p_put_weapon;
 
-	sendPacket(client, &p_weapon);
+	p_put_weapon.type = SC_PUT_WEAPON;
+	p_put_weapon.size = sizeof(sc_packet_put_weapon);
+	p_put_weapon.weapon_type = wp_type;
+	p_put_weapon.weapon_index = wp_index;
+	p_put_weapon.x = x;
+	p_put_weapon.y = y;
+	p_put_weapon.z = z;
+
+	sendPacket(client, &p_put_weapon);
+}
+
+void send_pick_weapon_packet(char client, char id, char wp_type, char wp_index) {
+	sc_packet_pick_weapon p_pick_weapon;
+	p_pick_weapon.type = SC_PICK_WEAPON;
+	p_pick_weapon.size = sizeof(sc_packet_pick_weapon);
+	p_pick_weapon.id = id;
+	p_pick_weapon.weapon_type = wp_type;
+	p_pick_weapon.weapon_index = wp_index;
+
+	sendPacket(client, &p_pick_weapon);
+}
+
+void send_time_packet(char client, int timer)
+{
+	sc_packet_timer p_time;
+	p_time.type = SC_TIMER;
+	p_time.size = sizeof(sc_packet_timer);
+	p_time.timer = timer;
+
+	sendPacket(client, &p_time);
 }
 
 void send_room_setting_weapon(int room_num)
 {
+	room_l.lock();
+	auto it = find(gRoom.begin(), gRoom.end(), room_num);
+	room_l.unlock();
 
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		int client_id = it->clientNum[i];
+
+		if (client_id != -1)
+		{
+			if (clients[client_id].connected == true)
+			{
+				for (int j = 0; j < RESPAWN_WEAPON_NUM; ++j)
+				{
+					char type = it->weapon_respawn[j].type;
+					char index = it->weapon_respawn[j].index;
+					const PxVec3 pos = it->weapon_list[type][index].pos;
+
+					send_put_weapon_packet(client_id, type, index, pos.x, pos.y, pos.z);
+				}
+			}
+		}
+	}
+	cout << "put weapon packet setting end\n";
 }
 
 void send_room_setting_player(int room_num)
@@ -313,6 +375,26 @@ void send_room_setting_player(int room_num)
 	cout << "put player packet setting end\n";
 }
 
+void send_room_start_game(int room_num)
+{
+	room_l.lock();
+	auto it = find(gRoom.begin(), gRoom.end(), room_num);
+	room_l.unlock();
+
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		int client_id = it->clientNum[i];
+
+		if (client_id != -1)
+		{
+			if (clients[client_id].connected == true)
+			{
+				send_start_game_packet(client_id);
+			}
+		}
+	}
+	cout << "[" << it->room_num << "] room game start\n";
+}
 
 void process_packet(char key, char *buffer)
 {
@@ -352,7 +434,6 @@ void process_packet(char key, char *buffer)
 				break;
 			}
 		}
-		cout << "count : " << count << endl;
 
 		room_l.unlock();
 		break;
@@ -373,7 +454,6 @@ void process_packet(char key, char *buffer)
 		{
 			if (count < 6)
 			{
-				cout << "send lobby\n";
 				send_room_info_packet(key, *it, count);
 				count++;
 			}
@@ -383,7 +463,6 @@ void process_packet(char key, char *buffer)
 		}
 		room_l.unlock();
 
-		cout << "count : " << count << endl;
 		break;
 	}
 
@@ -396,6 +475,7 @@ void process_packet(char key, char *buffer)
 		room.init(p_make_room->name, key, roomNum);
 
 		clients[key].room_num = roomNum;
+		clients[key].slot = 0;
 
 		roomNum++;
 
@@ -465,6 +545,8 @@ void process_packet(char key, char *buffer)
 			}
 		}
 
+		clients[key].slot = my_slot;
+
 		cout << "ATTEND ROOM : " << int(it->current_num) << endl;
 		break;
 	}
@@ -480,9 +562,35 @@ void process_packet(char key, char *buffer)
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
 
-		it->start(gMapVertex, gMapIndex);			// Physx에 초기화 및 맵 / 무기
+		// Physx에 맵 초기화
+		it->start(gMapVertex, gMapIndex);
 
-		for (int i = 0; i < MAX_ROOM_USER; ++i)		// 플레이어 Physx Capsule 적용
+		// 무기 초기화
+		for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i) {
+			if (it->weapon_respawn[i].respawn_able == true) {
+
+				it->weapon_respawn[i].respawn_able = false;
+
+				int type = rand() % (MAX_WEAPON_TYPE - 1);
+
+				it->weapon_respawn[i].type = type;
+
+				for (int j = 0; j < MAX_WEAPON_NUM; ++j) {
+					if (it->weapon_list[type][j].empty == true) {
+						it->weapon_respawn[i].index = j;
+
+						it->weapon_list[type][j].empty = false;
+						it->weapon_list[type][j].owner = -1;
+						it->weapon_list[type][j].pos = WeaponInitPosition[i];
+
+						break;
+					}
+				}
+			}
+		}
+
+		// 플레이어 Physx Capsule 적용
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
 			int client_id = it->clientNum[i];
 			if (client_id != -1)
@@ -490,7 +598,7 @@ void process_packet(char key, char *buffer)
 				if (clients[client_id].connected == true)
 				{
 					// 자신을 제외한 다른 클라도 게임 업로드 시작하도록 packet send
-					send_start_room_packet(client_id);
+					send_start_load_room_packet(client_id);
 
 					clients[client_id].playerinfo = new CPlayer();
 
@@ -508,7 +616,7 @@ void process_packet(char key, char *buffer)
 			}
 		}
 
-		cout << "Map loading complete\n";
+		cout << "Map, Weapon, Player Init complete\n";
 
 		break;
 	}
@@ -534,7 +642,24 @@ void process_packet(char key, char *buffer)
 			}
 		}
 
-		cout << "load_complete\n";
+		break;
+	}
+
+	case CS_SETTING_COMPLETE:
+	{
+		int room_num = clients[key].room_num;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			if (it->clientNum[i] == key)
+			{
+				it->setting_complete[i] = true;
+			}
+		}
 		break;
 	}
 
@@ -654,8 +779,19 @@ void process_packet(char key, char *buffer)
 
 		if (p_anim->key == CS_GUARD) {
 			cout << "guard" << endl;
-			clients[key].playerinfo->setAniIndex(Anim::Guard);
+
+			if (clients[key].playerinfo->weapon_type == -1) {
+				clients[key].playerinfo->setAniIndex(Anim::Guard);
+			}
+			else if (clients[key].playerinfo->weapon_type >= Weapon_Lollipop && clients[key].playerinfo->weapon_type <= Weapon_pepero) {
+				clients[key].playerinfo->setAniIndex(Anim::Lollipop_Guard);
+			}
+			else if (clients[key].playerinfo->weapon_type == Weapon_chocolate) {
+				clients[key].playerinfo->setAniIndex(Anim::Chocolate_Guard);
+			}
 			clients[key].playerinfo->setStatus(STATUS::DEFENSE);
+
+
 		}
 
 		if (p_anim->key == CS_GUARD_OFF) {
@@ -780,50 +916,12 @@ void process_packet(char key, char *buffer)
 			}
 			else if (clients[key].playerinfo->weapon_type == Weapon_cupcake)
 			{
-		
+
 			}
 
 			clients[key].playerinfo->setStatus(STATUS::HARD_ATTACK);
 			cout << int(p_anim->count) << endl;
 		}
-
-		/*if (p_anim->key == CS_WEAK) {
-			if (clients[key].playerinfo->weapon_type == -1) {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
-					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack1);
-				}
-				if (Anim_Index == Anim::Weak_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
-					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack2);
-				}
-				if (Anim_Index == Anim::Weak_Attack2 && (Anim_Time > 20 && Anim_Time < 25)) {
-					clients[key].playerinfo->setAniIndex(Anim::Weak_Attack3);
-				}
-			}
-			else {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
-					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack1);
-				}
-				if (Anim_Index == Anim::Lollipop_Attack1 && (Anim_Time > 10 && Anim_Time < 15)) {
-					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Attack2);
-				}
-
-			}
-		}
-		if (p_anim->key == CS_HARD) {
-			if (clients[key].playerinfo->weapon_type == -1) {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
-					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack1);
-				}
-				if (Anim_Index == Anim::Hard_Attack1 && (Anim_Time > 10 && Anim_Time < 20)) {
-					clients[key].playerinfo->setAniIndex(Anim::Hard_Attack2);
-				}
-			}
-			else {
-				if (Anim_Index == Anim::Idle || Anim_Index == Anim::Walk || Anim_Index == Anim::Run) {
-					clients[key].playerinfo->setAniIndex(Anim::Lollipop_Hard_Attack);
-				}
-			}
-		}*/
 
 		room_l.lock();
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
@@ -874,6 +972,46 @@ void process_packet(char key, char *buffer)
 				}
 			}
 		}
+		break;
+	}
+	case CS_WEAPON_SKILL:
+	{
+		cs_packet_weapon_skill *p_weapon_skill;
+		p_weapon_skill = reinterpret_cast<cs_packet_weapon_skill*>(buffer);
+
+		int weapon_type = clients[key].playerinfo->weapon_type;
+		if (weapon_type == Weapon_Lollipop) {
+			clients[key].playerinfo->setAniIndex(Anim::Lollipop_Skill);
+		}
+		else if (weapon_type == Weapon_chupachupse) {
+			clients[key].playerinfo->setAniIndex(Anim::Candy_Skill);
+		}
+		else if (weapon_type == Weapon_pepero) {
+			clients[key].playerinfo->setAniIndex(Anim::Pepero_Skill);
+		}
+		else if (weapon_type == Weapon_chocolate) {
+			clients[key].playerinfo->setAniIndex(Anim::Chocolate_Skill);
+		}
+
+		int room_num = clients[key].room_num;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_anim_packet(client_id, key);
+				}
+			}
+		}
+
 		break;
 	}
 	}
@@ -1130,9 +1268,11 @@ void process_event(EVENT_ST &ev)
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
 
-		if (it->weapon_list[wp_type][wp_index] == -1)
+		int my_slot = clients[ev.id].slot;
+
+		if (it->weapon_list[wp_type][wp_index].owner == -1)
 		{
-			it->weapon_list[wp_type][wp_index] = ev.id;
+			it->weapon_list[wp_type][wp_index].SetOwner(my_slot);
 
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
@@ -1142,14 +1282,17 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
-						send_weapon_packet(i, ev.id, wp_type, wp_index);
+						send_pick_weapon_packet(i, my_slot, wp_type, wp_index);
 					}
 				}
 			}
 		}
 		else {
-			clients[ev.id].playerinfo->weapon_index = -1;
-			clients[ev.id].playerinfo->weapon_type = -1;
+			if (it->weapon_list[wp_type][wp_index].owner != my_slot)
+			{
+				clients[ev.id].playerinfo->weapon_index = -1;
+				clients[ev.id].playerinfo->weapon_type = -1;
+			}
 		}
 		break;
 	}
@@ -1172,6 +1315,33 @@ void process_event(EVENT_ST &ev)
 	}
 	case EV_SLIME:
 	{
+		break;
+	}
+	case EV_TIME:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		it->timer -= 1;
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_time_packet(client_id, it->timer);
+				}
+			}
+		}
+
+		add_timer(room_num, room_num + ROOM_TIMER_START, EV_TIME, high_resolution_clock::now() + 1s, 0);
+
 		break;
 	}
 	default:
@@ -1392,6 +1562,16 @@ void logic()
 				}
 			}
 			else if (it->room_status == 2)
+			{
+				bool result = it->all_setting_complete();
+
+				send_room_start_game(it->room_num);
+
+				add_timer(it->room_num, it->room_num + ROOM_TIMER_START, EV_TIME, high_resolution_clock::now() + 5s, 0);
+
+				it->room_status = 3;
+			}
+			else if (it->room_status == 3)
 			{
 				clientInputProcess(it->room_num);
 

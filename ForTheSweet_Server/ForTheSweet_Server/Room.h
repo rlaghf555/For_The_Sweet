@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "Weapon.h"
 #include "Physx.h"
 #include "Timer.h"
 
@@ -44,8 +45,12 @@ public:
 	mutex m_timer_l;
 
 	bool load_complete[MAX_ROOM_USER];
-	char weapon_num;
-	char weapon_list[MAX_WEAPON_TYPE][MAP_1_MAX_WEAPON_NUM];
+	bool setting_complete[MAX_ROOM_USER];
+
+	CWeapon weapon_list[MAX_WEAPON_TYPE][MAX_WEAPON_NUM];
+	CWeapon_Respawn weapon_respawn[RESPAWN_WEAPON_NUM];
+
+	int timer;
 
 public:
 	CRoom();
@@ -55,6 +60,7 @@ public:
 	void start(const vector<PxVec3>& vectex, const vector<int>& index);
 	bool operator==(const int num) { return (num == room_num); }
 	bool all_load_complete();
+	bool all_setting_complete();
 	~CRoom();
 };
 
