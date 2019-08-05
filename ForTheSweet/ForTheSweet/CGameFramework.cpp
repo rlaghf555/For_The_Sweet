@@ -2010,6 +2010,7 @@ void CGameFramework::CollisionProcess()
 				}
 			}
 		}
+		m_pScene->Collision_Cotton();
 	}
 }
 

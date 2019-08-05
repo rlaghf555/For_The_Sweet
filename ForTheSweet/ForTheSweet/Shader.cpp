@@ -1850,6 +1850,23 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	}
 }
 
+void WeaponShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
+{
+	CModelShader::OnPrepareRender(pd3dCommandList, 0);
+	//pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+
+	if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
+
+	for (UINT j = 0; j < m_nObjects; j++)
+	{
+		if (m_bbObjects[j]&&m_bbObjects[j]->visible)
+		{
+			//m_bbObjects[j]->G
+			m_bbObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
+}
+
 void WeaponShader::Animate(float fTimeElapsed, int flag_up, int weapon_num)
 {
 	if (IsZero(fTimeElapsed)) return;
@@ -2182,6 +2199,23 @@ void PlayerShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommand
 
 		m_BoneCB->CopyData(i, cBone);
 	}
+}
+
+void PlayerShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
+{
+	CModelShader::OnPrepareRender(pd3dCommandList, 0);
+	//pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+
+	if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
+	if(render)
+		for (UINT j = 0; j < m_nObjects; j++)
+		{
+			if (m_bbObjects[j])
+			{
+				//m_bbObjects[j]->G
+				m_bbObjects[j]->Render(pd3dCommandList, pCamera);
+			}
+		}
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3418,7 +3452,7 @@ void TeamShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandLi
 	}
 }
 
-void TeamShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
+void TeamShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera, PlayerShader **ps)
 {
 	CModelShader::OnPrepareRender(pd3dCommandList, 0);
 
@@ -3426,7 +3460,7 @@ void TeamShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * p
 
 	for (UINT j = 0; j < m_nObjects; j++)
 	{
-		if (m_ppObjects[j] && m_ppObjects[j]->visible)
+		if (m_ppObjects[j] && m_ppObjects[j]->visible && ps[j]->render)
 		{
 			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
 		}

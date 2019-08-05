@@ -206,6 +206,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		Map_3_Build = true;
 	}
 	//m_mapshader 9~22±îÁö map3
+	Cotton_box[0].Center = XMFLOAT3(0, 10, -120);
+	Cotton_box[0].Extents = XMFLOAT3(58, 30, 58);
+	Cotton_box[1].Center = XMFLOAT3(0, 10, 120);
+	Cotton_box[1].Extents = XMFLOAT3(58, 30, 58);
 
 	m_WavesShader = new WaveShader();
 	m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList, Map_SELECT);
@@ -1118,6 +1122,7 @@ void CScene::CollisionProcess(int index)
 			}
 		}
 	}
+
 	m_pPlayer[index]->SetWeapon(false, -1, -1);
 }
 
@@ -1145,6 +1150,64 @@ void CScene::Collision_telleport(int index)
 	}
 }
 
+void CScene::Collision_Cotton()
+{	
+	if (Selected_Map == M_Map_1) {
+		for (int i = 0; i < MAX_USER; ++i) {
+			bounding_box_test[i]->bounding.Center = m_pPlayer[i]->GetPosition();
+			m_pPlayerShader[i]->render = true;
+			if (m_pPlayer[i]->Get_Weapon_grab())
+				m_WeaponShader[m_pPlayer[i]->Get_Weapon_type()]->getObject(m_pPlayer[i]->Get_Weapon_index())->visible = true;
+			if (bounding_box_test[i]->bounding.Intersects(Cotton_box[0])) {
+				m_pPlayerShader[i]->render = false;		
+				if(m_pPlayer[i]->Get_Weapon_grab())
+					m_WeaponShader[m_pPlayer[i]->Get_Weapon_type()]->getObject(m_pPlayer[i]->Get_Weapon_index())->visible = false;
+				if (myid == i) {
+					m_pPlayerShader[i]->render = true;
+					if (m_pPlayer[i]->Get_Weapon_grab())
+						m_WeaponShader[m_pPlayer[i]->Get_Weapon_type()]->getObject(m_pPlayer[i]->Get_Weapon_index())->visible = true;
+				}
+				continue;
+			}
+
+			if (bounding_box_test[i]->bounding.Intersects(Cotton_box[1])) {
+				m_pPlayerShader[i]->render = false;
+				if (m_pPlayer[i]->Get_Weapon_grab())
+					m_WeaponShader[m_pPlayer[i]->Get_Weapon_type()]->getObject(m_pPlayer[i]->Get_Weapon_index())->visible = false;
+				if (myid == i) {
+					m_pPlayerShader[i]->render = true;
+					if (m_pPlayer[i]->Get_Weapon_grab())
+						m_WeaponShader[m_pPlayer[i]->Get_Weapon_type()]->getObject(m_pPlayer[i]->Get_Weapon_index())->visible = true;
+				}
+				continue;
+			}
+		}
+
+		if (bounding_box_test[myid]->bounding.Intersects(Cotton_box[0])) {
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (myid == i)
+					continue;
+				if (bounding_box_test[i]->bounding.Intersects(Cotton_box[0])) {
+					m_pPlayerShader[i]->render = true;
+					if (m_pPlayer[i]->Get_Weapon_grab())
+						m_WeaponShader[m_pPlayer[i]->Get_Weapon_type()]->getObject(m_pPlayer[i]->Get_Weapon_index())->visible = true;
+				}
+			}
+		}
+		if (bounding_box_test[myid]->bounding.Intersects(Cotton_box[1])) {
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (myid == i)
+					continue;
+				if (bounding_box_test[i]->bounding.Intersects(Cotton_box[1])) {
+					m_pPlayerShader[i]->render = true;
+					if (m_pPlayer[i]->Get_Weapon_grab())
+						m_WeaponShader[m_pPlayer[i]->Get_Weapon_type()]->getObject(m_pPlayer[i]->Get_Weapon_index())->visible = true;
+				}
+			}
+		}
+	}
+}
+
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
@@ -1152,6 +1215,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected() && m_pPlayerShader[i]->render) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
 
 	if (Selected_Map == M_Map_1) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
@@ -1218,8 +1282,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 		if (m_BackGroundShader[1]) m_BackGroundShader[1]->Render(pd3dCommandList, pCamera);
 	}
-	if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera);
-	if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera);
+	if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
+	if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 	//	for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 	//		if (weapon_box[i][j])
@@ -1227,7 +1291,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//	}
 	//}
 
-	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < MAX_USER; i++)if (m_ExplosionShader[i])if (m_ExplosionShader[i]->m_bBlowingUp)m_ExplosionShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);

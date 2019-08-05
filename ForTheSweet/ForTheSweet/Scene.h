@@ -27,6 +27,7 @@ public:
 	void AnimateWeapon(int i);
 	void CollisionProcess(int index);
 	void Collision_telleport(int index);
+	void Collision_Cotton();
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList);
 	void RenderLoading(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList);
@@ -67,7 +68,7 @@ public:
 	testBox						*bounding_box_test[MAX_USER] = { NULL, };
 	testBox						*weapon_box[WEAPON_MAX_NUM][WEAPON_EACH_NUM] = { NULL, };
 	testBox						*door[8] = { NULL, };
-
+	BoundingOrientedBox			Cotton_box[2];
 	MeshShader					*m_BackGroundShader[2] = { NULL, };
 	EffectShader				*m_EffectShader = NULL;
 	SkillEffectShader			*m_SkillEffectShader[MAX_USER] = { NULL, };

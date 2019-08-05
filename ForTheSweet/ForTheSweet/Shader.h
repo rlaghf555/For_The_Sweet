@@ -278,12 +278,13 @@ public:
 	bool visible = false;
 	XMFLOAT3 startpos;
 };
+class PlayerShader;
 class TeamShader : public EffectShader {
 public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList,int type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
-	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera);
+	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera, PlayerShader **ps);
 	virtual void Animate(float fTimeElapsed);
 };
 class SkillEffectShader : public EffectShader
@@ -326,6 +327,7 @@ public:
 
 	virtual void Animate(float fTimeElapsed, int flag_up, int weapon_num);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int mpa_type, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera);
 	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 	bool get_cupcake_up_flag() { return cupcake_up_flag; }
 };
@@ -406,9 +408,10 @@ public:
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Animate(float fTimeElapsed);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList);
+	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera);
 
 	virtual  CGameObject* getPlayer() { return m_bbObjects[0]; }
-
+	bool render = true;
 };
 
 class testBox : public MeshShader
