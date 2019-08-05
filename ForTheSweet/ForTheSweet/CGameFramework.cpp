@@ -593,7 +593,7 @@ void CGameFramework::processPacket(char *ptr)
 			}
 		}
 
-		//cout << "Put Weapon (" << type << "," << index << ") : " << x << "," << y << "," << z << endl;
+		cout << "Put Weapon (" << type << "," << index << ") : " << x << "," << y << "," << z << endl;
 
 		m_pScene->m_WeaponShader[type]->getObject(index)->visible = true;
 		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);

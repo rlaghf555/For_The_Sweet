@@ -130,8 +130,11 @@ UINT LoadAnimation::BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& 
 	}
 
 	// 미리 정해진 프레임 내에서 애니메이션 수행
-	if (index != Anim_Guard)
-		now_time += m_animSpeed * fTime;
+	if (index == Anim_Guard || index == Anim_chocolate_Guard || index == Anim_Lollipop_Guard)
+	{
+		;
+	}
+	else now_time += m_animSpeed * fTime;
 	if (now_time > end_time) {
 		now_time = start_time;
 		if (!animation_loop) {

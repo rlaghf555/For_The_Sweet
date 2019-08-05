@@ -781,13 +781,14 @@ void CScene::initObject()
 {	
 	//무기 매트릭스 초기화
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 			m_WeaponShader[i]->getObject(j)->init();
-			m_WeaponShader[i]->getObject(j)->visible = true;
+			m_WeaponShader[i]->getObject(j)->visible = false;
 
 			if (SERVER_ON) {
 				m_WeaponShader[i]->getObject(j)->visible = false;
 				m_WeaponShader[i]->getObject(j)->SetPosition(1000.f, 1000.f, 1000.f);
+				
 			}
 			if (i == 4) {
 				j = WEAPON_EACH_NUM;
@@ -822,7 +823,7 @@ void CScene::initObject()
 		m_EffectShader->getObject(9)->SetPosition(180.f, 100.f, -110.f);
 		//무기 좌표
 		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-			for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+			for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 				//m_WeaponShader[i]->getObject(j)->SetPosition();
 				if (i == 4) {
 					j = WEAPON_EACH_NUM;
@@ -857,7 +858,7 @@ void CScene::initObject()
 
 		//무기 좌표
 		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-			for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+			for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 				//m_WeaponShader[i]->getObject(j)->SetPosition();
 				if (i == 4) {
 					j = WEAPON_EACH_NUM;
@@ -892,7 +893,7 @@ void CScene::initObject()
 
 		//무기 좌표
 		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-			for (int j = 0; j < WEAPON_EACH_NUM; i++) {
+			for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 				//m_WeaponShader[i]->getObject(j)->SetPosition();
 				if (i == 4) {
 					j = WEAPON_EACH_NUM;
