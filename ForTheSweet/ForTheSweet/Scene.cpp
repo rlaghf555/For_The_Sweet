@@ -1258,6 +1258,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
 	if (Selected_Map == M_Map_1) {
+		if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
+		if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowReverseShader[0]) m_ShadowReverseShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowReverseShader[1]) m_ShadowReverseShader[1]->Render(pd3dCommandList, pCamera);
@@ -1265,11 +1267,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_ShadowReverseShader[3]) m_ShadowReverseShader[3]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_2) {
+		if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
+		if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_ShadowReverseModelShader[0]) m_ShadowReverseModelShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowReverseModelShader[1]) m_ShadowReverseModelShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowReverseModelShader[2]) m_ShadowReverseModelShader[2]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_3) {
+		if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
+		if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_ShadowReverseShader[4]) m_ShadowReverseShader[4]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowReverseShader[5]) m_ShadowReverseShader[5]->Render(pd3dCommandList, pCamera);
 		if (m_ShadowReverseShader[6]) m_ShadowReverseShader[6]->Render(pd3dCommandList, pCamera);
@@ -1282,8 +1288,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 		if (m_BackGroundShader[1]) m_BackGroundShader[1]->Render(pd3dCommandList, pCamera);
 	}
-	if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
-	if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
+
 	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 	//	for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 	//		if (weapon_box[i][j])
