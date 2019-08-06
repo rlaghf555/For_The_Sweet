@@ -257,10 +257,16 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	}
 
 	for (int i = 0; i < MAX_USER; i++) {
+		m_MagicShader[i] = new MagicShader();
+		m_MagicShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
+	}
+
+	for (int i = 0; i < MAX_USER; i++) {
 		m_ExplosionShader[i] = new ExplosionShader();
 		m_ExplosionShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
 		m_ExplosionShader[i]->m_bBlowingUp = true;
 	}
+		
 	m_TeamShader = new TeamShader();
 	m_TeamShader->BuildObjects(pd3dDevice, pd3dCommandList, 0);
 	m_EnemyShader = new TeamShader();
@@ -405,7 +411,7 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
 		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
 		//}
-		m_BackGroundShader[1] = new MeshShader();
+		m_BackGroundShader[1] = new MeshShader();					// 맵 3 내부 감싸는 검은바탕
 		m_BackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
 		Map_3_Build = true;
 	}
@@ -675,6 +681,13 @@ void CScene::ReleaseObjects()
 			delete bounding_box_test[i];
 		}
 	}
+	for (int i = 0; i < MAX_USER; ++i) {
+		if (m_MagicShader[i]) {
+			m_MagicShader[i]->ReleaseShaderVariables();
+			m_MagicShader[i]->ReleaseObjects();
+			delete m_MagicShader[i];
+		}
+	}
 	for (int i = 0; i < 8; ++i) {
 		if (door[i]) {
 			door[i]->ReleaseShaderVariables();
@@ -847,7 +860,7 @@ void CScene::initObject()
 		}
 	}
 	SetTeamUI();
-
+	
 	if (Selected_Map == M_Map_1) {
 		//캐릭터 좌표 및 스킬 초기화
 		for (int i = 0; i < MAX_USER; i++) {
@@ -952,6 +965,7 @@ void CScene::initObject()
 			}
 		}
 	}
+	//m_pPlayer[0]->SetWeapon(true, M_Weapon_Lollipop, 0);	// test
 }
 
 void CScene::SetTeamUI()
@@ -1033,6 +1047,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				m_ExplosionShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				//if (m_ExplosionShader[i]->m_bBlowingUp == false) m_ExplosionShader[i]->m_bBlowingUp = true;
+				
+				if(m_MagicShader[i]->visible)m_MagicShader[i]->Animate(fTimeElapsed);
 
 				if (m_pPlayer[i]->getAnimIndex() == Anim_Stun) {	//Anim_Jump
 					m_StunShader[i]->visible = true;
@@ -1173,6 +1189,14 @@ void CScene::AnimateWeapon(int i)
 	else if (weapon_type == M_Weapon_chocolate) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-100, 10, 0);
 	else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 
+	if (animindex == Anim_Lollipop_Skill && m_pPlayer[i]->getAnimtime() >= 23) {
+		m_MagicShader[i]->visible = true;//마법진
+		XMFLOAT3 aa = m_WeaponShader[weapon_type]->getObject(weapon_index)->GetPosition();
+		m_WeaponShader[weapon_type]->getObject(weapon_index)->init(aa);
+		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 90.f, 0);
+		//m_WeaponShader[weapon_type]->getObject(weapon_index)->SetScale(1.5f);
+		m_MagicShader[i]->getObjects()->SetPosition(aa);
+	}
 }
 
 void CScene::CollisionProcess(int index)
@@ -1362,7 +1386,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 		if (m_BackGroundShader[1]) m_BackGroundShader[1]->Render(pd3dCommandList, pCamera);
 	}
-
+	
 	//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 	//	for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 	//		if (weapon_box[i][j])
@@ -1371,6 +1395,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//}
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected() && m_pPlayerShader[i]->render) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
+
+	for (int i = 0; i < MAX_USER; i++) if (m_pPlayer[i]->GetConnected()) if (m_MagicShader[i])if (m_MagicShader[i]->visible) m_MagicShader[i]->Render(pd3dCommandList, pCamera);
 	
 	for (int i = 0; i < MAX_USER; i++)if (m_ExplosionShader[i])if (m_ExplosionShader[i]->m_bBlowingUp)m_ExplosionShader[i]->Render(pd3dCommandList, pCamera);
 

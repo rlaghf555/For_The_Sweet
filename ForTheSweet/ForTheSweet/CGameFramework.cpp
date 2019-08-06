@@ -1578,6 +1578,7 @@ void CGameFramework::ProcessInput()
 			if (Anim_Index == Anim_Lollipop_Skill && Anim_Time >= 23) {	// 费府扑 荐流栏肺 技快扁
 				m_pPlayer->SetWeapon(false, -1, -1);
 				m_pPlayer->Set_Weapon_Skill(-1);
+
 			}
 		}
 		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_pepero) {

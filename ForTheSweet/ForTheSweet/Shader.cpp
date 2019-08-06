@@ -1319,14 +1319,15 @@ void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	BuildPSO(pd3dDevice, nRenderTargets);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	if(type == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\candyland.dds", 0);	//1400*788
-	if(type == 1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
+	if (type == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\candyland.dds", 0);	//1400*788
+	if (type == 1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 	
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 	
+	XMFLOAT3 aa = XMFLOAT3(1, 0, 0);
 	for (UINT i = 0; i < m_nObjects; i++) {
 
 		CGameObject *Map_Object = NULL;
@@ -1366,8 +1367,7 @@ void MeshShader::Animate(float fTimeElapsed)
 	if (IsZero(fTimeElapsed))
 		return;
 	for (UINT i = 0; i < m_nObjects; ++i) {
-		if (m_ppObjects[i])
-			m_ppObjects[i]->Animate(fTimeElapsed);
+		if (m_ppObjects[i]) m_ppObjects[i]->Animate(fTimeElapsed);
 	}
 }
 
@@ -3525,5 +3525,84 @@ void StunShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
 			m_bbObjects[i]->SetPosition(x, pos.y + 38, z);
 			m_bbObjects[i]->Rotate(&rotate_y_check, 3.f);
 		}
+	}
+}
+
+//////////////////////////
+
+D3D12_SHADER_BYTECODE MagicShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
+	wchar_t filename[100] = L"Model.hlsl";
+	return(CShader::CompileShaderFromFile(filename, "PSMagic", "ps_5_1", ppd3dShaderBlob));
+}
+
+D3D12_BLEND_DESC MagicShader::CreateBlendState(int index)
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+	d3dBlendDesc.AlphaToCoverageEnable = FALSE;			// FALSE
+	d3dBlendDesc.IndependentBlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;	// FALSE
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;	//D3D12_BLEND_ONE
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//D3D12_BLEND_ZERO
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	return(d3dBlendDesc);
+}
+
+void MagicShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 1;
+	m_ppObjects = vector<CGameObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\magic_skill.dds", 0);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	XMFLOAT3 aa = XMFLOAT3(1, 0, 0);
+	for (UINT i = 0; i < m_nObjects; i++) {
+		CGameObject *Map_Object = NULL;
+
+		Map_Object = new CGameObject();
+		Map_Object->SetPosition(0.f, 0.f, 0.f);
+		m_ppObjects[i] = Map_Object;
+
+		CMesh *pCubeMesh = NULL;
+		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -50, 50, 100, 100, 0);	// pos(x, y), Width(w, h), depth
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+		m_ppObjects[i]->SetMesh(pCubeMesh);
+		m_ppObjects[i]->Rotate(&aa, 90.f);
+	}
+	delete pTexture;
+}
+
+void MagicShader::Animate(float fTimeElapsed)
+{
+	if (IsZero(fTimeElapsed))
+		return;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		XMFLOAT3 aa = XMFLOAT3(0, 0, 1);
+		m_ppObjects[i]->Rotate(&aa, 3.f);
+		if (m_ppObjects[i]) m_ppObjects[i]->Animate(fTimeElapsed);
 	}
 }

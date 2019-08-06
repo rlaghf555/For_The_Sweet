@@ -246,6 +246,20 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	virtual void Animate(float fTimeElapsed);
 	virtual void setScale(float scale);
+	virtual CGameObject* getObjects() { return m_ppObjects[0]; }
+};
+
+class MagicShader : public MeshShader
+{
+public:
+	bool visible = false;
+	MagicShader() {};
+	~MagicShader() {};
+
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Animate(float fTimeElapsed);
 };
 
 class EffectShader : public MeshShader

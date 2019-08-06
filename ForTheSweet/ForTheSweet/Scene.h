@@ -91,6 +91,8 @@ public:
 	StunShader					*m_StunShader[MAX_USER] = { NULL, };
 	LoadModel					**effect_Model;
 
+	MagicShader					*m_MagicShader[MAX_USER] = { NULL, };
+
 	ExplosionShader				*m_ExplosionShader[MAX_USER] = { NULL, };
 	TeamShader					*m_TeamShader = NULL;
 	TeamShader					*m_EnemyShader = NULL;
