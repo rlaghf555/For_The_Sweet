@@ -750,6 +750,23 @@ void CScene::initUI(wchar_t *character_id[])
 		m_ppUIShaders[i]->getObejct(1)->SetHP(m_pPlayer[i]->Get_HP());	//hp
 		m_ppUIShaders[i]->getObejct(2)->SetHP(m_pPlayer[i]->Get_MP());	//mp
 	}
+	for (int i = 0; i < 4; i++) {
+		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 150);
+		m_ppUIShaders[i]->SetPos(&pos, 0);
+		pos = XMFLOAT2(172 + i * 313, 156);
+		m_ppUIShaders[i]->SetPos(&pos, 1);
+		pos = XMFLOAT2(172 + i * 313, 136);
+		m_ppUIShaders[i]->SetPos(&pos, 2);
+	}
+	for (int i = 0; i < 4; i++) {
+		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 40);
+		m_ppUIShaders[i + 4]->SetPos(&pos, 0);
+		pos = XMFLOAT2(172 + i * 313, 46);
+		m_ppUIShaders[i + 4]->SetPos(&pos, 1);
+		pos = XMFLOAT2(172 + i * 313, 26);
+		m_ppUIShaders[i + 4]->SetPos(&pos, 2);
+	}
+
 	//time
 	m_ppUIShaders[8]->SetTime(300);
 	//m_ppUIShaders[9]   --- :
@@ -759,6 +776,8 @@ void CScene::initUI(wchar_t *character_id[])
 	//Fight
 	pos = XMFLOAT2(1280, 400);
 	m_ppUIShaders[11]->SetPos(&pos, 0);
+
+	//id 초기화
 	for (int i = 12; i < 20; i++) {
 		//wchar_t tmp[10] = L"ABCD4";			//플레이어 아이디 입력하자			
 		m_ppUIShaders[i]->SetID(character_id[i - 12]);
@@ -768,11 +787,31 @@ void CScene::initUI(wchar_t *character_id[])
 			m_ppUIShaders[i - 12]->SetEnable(false,2);
 		}
 	}
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 10; j++) {
+			pos = XMFLOAT2(50 + j * 10 + i * 313, 200);
+			m_ppUIShaders[12 + i]->SetPos(&pos, j);
+		}
+	}
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 10; j++) {
+			pos = XMFLOAT2(50 + j * 10 + i * 313, 90);
+			m_ppUIShaders[12 + i + 4]->SetPos(&pos, j);
+		}
+	}
 
 //	m_ppUIShaders[20]->ShowMessage(false);   //true면 win false면 lose
 
+	//-------------------------------안개생성하기
 	//m_ppUIShaders[21]->SetFog();
-	
+	//for (int i = 0; i < 8; i++) {
+	//	m_ppUIShaders[i]->FogOn(true);
+	//}
+	//for (int i = 12; i < 20; i++) {
+	//	m_ppUIShaders[i]->FogOn(true);
+	//}
+	//--------------------------------여기까지
+
 	m_MessageShader->ShowMessage(MESSAGE_LIGHTING);
 
 }
@@ -998,6 +1037,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				bounding_box_test[i]->getObjects()->m_xmf4x4World = m_pPlayer[i]->m_xmf4x4World;
 				tmp.y += 40;
 				tmp.x -= 2.5;
+				if (m_ppUIShaders[21]->Get_Fog_Flag()) {
+					tmp.y -= 10000;
+				}
 				m_TeamShader->getObject(i)->SetPosition(tmp);
 				m_EnemyShader->getObject(i)->SetPosition(tmp);
 			}
@@ -1031,6 +1073,14 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		if (m_ppUIShaders[i]) {
 			m_ppUIShaders[i]->UpdateState(ready_state);
 			m_ppUIShaders[i]->Animate(fTimeElapsed);
+		}
+	}
+	if (m_ppUIShaders[21]->Get_Fog_Flag()&&m_ppUIShaders[21]->Get_Fog_Off_Flag()) {
+		for (int i = 0; i < 8; i++) {
+			m_ppUIShaders[i]->FogOn(false);
+		}
+		for (int i = 12; i < 20; i++) {
+			m_ppUIShaders[i]->FogOn(false);
 		}
 	}
 	m_MessageShader->Animate(fTimeElapsed);

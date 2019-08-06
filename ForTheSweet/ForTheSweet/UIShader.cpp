@@ -722,6 +722,41 @@ void UIHPBarShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	delete pTexture;
 }
 
+void UIHPBarShader::Animate(float fTimeElapsed)
+{
+	if (IsZero(fTimeElapsed))
+		return;
+	ftime += fTimeElapsed;
+	if (ftime > 0.01f) {
+		ftime = 0.f;
+		if (Fog_Flag) {
+			if (ypos >= -250) {
+				for (int i = 0; i < m_nObjects; i++) {
+					XMFLOAT2 tmp = m_pUIObjects[i]->GetPos();
+					tmp.y -= 2.5;
+					m_pUIObjects[i]->SetPosition(tmp);
+				}
+				ypos -= 2.5;
+			}
+		}
+		else {
+			if (ypos <= 0) {
+				for (int i = 0; i < m_nObjects; i++) {
+					XMFLOAT2 tmp = m_pUIObjects[i]->GetPos();
+					tmp.y += 2.5;
+					m_pUIObjects[i]->SetPosition(tmp);
+				}
+				ypos += 2.5;
+			}
+		}
+	}
+}
+
+void UIHPBarShader::FogOn(bool flag)
+{
+	Fog_Flag = flag;
+}
+
 
 void UITimeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
 {
@@ -1165,6 +1200,41 @@ void UIIDShader::SetID(wchar_t * str)
 		}
 
 	}
+}
+
+void UIIDShader::Animate(float fTimeElapsed)
+{
+	if (IsZero(fTimeElapsed))
+		return;
+	ftime += fTimeElapsed;
+	if (ftime > 0.01f) {
+		ftime = 0.f;
+		if (Fog_Flag) {
+			if (ypos >= -250) {
+				for (int i = 0; i < m_nObjects; i++) {
+					XMFLOAT2 tmp = m_pUIObjects[i]->GetPos();
+					tmp.y -= 2.5;
+					m_pUIObjects[i]->SetPosition(tmp);
+				}
+				ypos -= 2.5;
+			}
+		}
+		else {
+			if (ypos <= 0) {
+				for (int i = 0; i < m_nObjects; i++) {
+					XMFLOAT2 tmp = m_pUIObjects[i]->GetPos();
+					tmp.y += 2.5;
+					m_pUIObjects[i]->SetPosition(tmp);
+				}
+				ypos += 2.5;
+			}
+		}
+	}
+}
+
+void UIIDShader::FogOn(bool flag)
+{
+	Fog_Flag = flag;
 }
 
 void WinLoseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)

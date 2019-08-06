@@ -49,8 +49,12 @@ public:
 	virtual void SetTime(int t) {}
 	virtual void CreatePipelineParts();
 	virtual void ShowMessage(bool win) {};
-	virtual void SetFog() {};
-	virtual void FogOff() {};
+	virtual void SetFog() {}		//fog Shader전용
+	virtual void FogOff() {}		//fog Shader전용
+	virtual bool Get_Fog_Off_Flag() { return false; } //fog Shader전용
+	virtual bool Get_Fog_Flag() { return false; }
+	virtual void FogOn(bool flag) {};	//IDshader hpbarshader 전용
+
 	virtual void SetID(wchar_t *str) {};
 
 protected:
@@ -110,6 +114,8 @@ public:
 	virtual void SetFog();
 	virtual void FogOff();
 	virtual void Animate(float fTimeElapsed);
+	virtual bool Get_Fog_Off_Flag() { return Fog_Off_Flag; }
+	virtual bool Get_Fog_Flag() { return Fog_Flag; }
 	bool Fog_Flag = false;
 	bool Fog_Off_Flag = false;
 	float ftime;
@@ -123,6 +129,12 @@ public:
 
 public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+	virtual void Animate(float fTimeElapsed);
+	virtual void FogOn(bool flag);
+	bool Fog_Flag = false;
+	float ftime;
+	float ypos = 0.f;
+
 };
 class UIIDShader : public UIShader
 {
@@ -133,6 +145,11 @@ public:
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 	virtual void SetID(wchar_t *str);
+	virtual void Animate(float fTimeElapsed);
+	virtual void FogOn(bool flag);
+	bool Fog_Flag = false;
+	float ftime;
+	float ypos = 0.f;
 };
 class UITimeShader : public UIShader
 {

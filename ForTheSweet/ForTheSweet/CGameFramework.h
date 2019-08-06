@@ -66,6 +66,8 @@ public:
 	CPlayer * m_pPlayer;
 	CCamera* m_pCamera;
 	int My_ID = -1;
+	int Camera_ID = 0;
+	float ftime = 0;
 	int time = 0;
 	int selected_map = 0;
 	int mode;
@@ -148,6 +150,7 @@ public:
 
 	//프레임워크의 핵심(사용자 입력, 애니메이션, 렌더링)을 구성하는 함수이다.
 	void ProcessInput();
+	void CameraChange();
 	void AnimateObjects();
 	void UpdateProcess();
 	void CollisionProcess();

@@ -189,6 +189,7 @@ bool CGameFramework::Restart()
 		m_pScene->Selected_Map = selected_map;
 		m_pScene->ReBuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 		m_pScene->myid = My_ID;
+		Camera_ID = My_ID;
 		m_pScene->mode = mode;
 		m_pScene->initObject();
 		m_pScene->initUI(Characters_ID);
@@ -381,6 +382,7 @@ void CGameFramework::processPacket(char *ptr)
 		m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
 		cout << "ID : " << My_ID << endl;
 		m_pCamera = m_pScene->m_pPlayer[My_ID]->GetCamera();
+		Camera_ID = My_ID;
 		m_pScene->getplayer(My_ID)->SetPosition(pos);
 		m_pScene->getplayer(My_ID)->SetVelocity(vel);
 		//m_pScene->getplayer(My_ID)->SetLook(look);
@@ -788,6 +790,7 @@ void CGameFramework::BuildObjects()
 
 		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pPhysx);
 		m_pScene->myid = My_ID;
+		Camera_ID = My_ID;
 		m_pScene->mode = mode;
 		m_pScene->initObject();
 		m_pScene->BuildUI(m_pd3dDevice, m_pd3dCommandList);
@@ -803,6 +806,7 @@ void CGameFramework::BuildObjects()
 	if (!SERVER_ON) {
 		playing = true;
 		My_ID = 0;
+		Camera_ID = 0;
 		m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
 		cout << "ID : " << My_ID << endl;
 		m_pCamera = m_pPlayer->GetCamera();
@@ -938,6 +942,35 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			OnResizeBackBuffers();
 			break;
 		}
+		case VK_LEFT:
+			if(m_pPlayer)
+			while (true) {
+				if(m_pPlayer->Get_HP()>0)
+					break;
+				Camera_ID -= 1;
+				if (Camera_ID < 0)
+					Camera_ID = MAX_USER - 1;
+				if (m_pScene->getplayer(Camera_ID)->GetConnected()) {
+					cout << "camera:" << Camera_ID << endl;
+					break;
+				}
+			}
+			break;
+		case VK_RIGHT:
+			if (m_pPlayer)
+			while (true) {
+				if (m_pPlayer->Get_HP() > 0)
+					break;
+				Camera_ID += 1;
+				if (Camera_ID >= MAX_USER)
+					Camera_ID = 0;
+				if (m_pScene->getplayer(Camera_ID)->GetConnected()) {
+					cout << "camera:" << Camera_ID << endl;
+					break;
+				}
+			}
+			break;
+			
 		default:
 			break;
 		}
@@ -999,7 +1032,7 @@ void CGameFramework::ProcessInput()
 	// 0x0001 : 이전에 누른적이 있고, 호출 시점에도 눌려있지 않은 상태
 	// 0x8000 : 이전에 누른적이 없고, 호출 시점에는 눌려있는 상태
 	// 0x8001 : 이전에 누른적이 있고, 호출 시점에도 눌려있는 상태
-	
+
 	//UI 시간 임시
 	if (m_pScene->ready_state != UI_NONE) {
 		if (m_pScene->ready_state == UI_READY) {
@@ -1023,7 +1056,7 @@ void CGameFramework::ProcessInput()
 
 	if (SERVER_ON)
 	{
-		if (m_pPlayer)		
+		if (m_pPlayer)
 		{
 			if (input_able)	// 나중에 input_able로 대체하기!!!!!!!!!!!!!!!!!!!!!
 			{
@@ -1470,8 +1503,8 @@ void CGameFramework::ProcessInput()
 
 	else
 	{
-	int type = m_pPlayer->Get_Weapon_type();
-	int index = m_pPlayer->Get_Weapon_index();
+		int type = m_pPlayer->Get_Weapon_type();
+		int index = m_pPlayer->Get_Weapon_index();
 
 		if (::GetKeyboardState(pKeyBuffer))
 		{
@@ -1526,7 +1559,7 @@ void CGameFramework::ProcessInput()
 			}
 		}
 		else m_pPlayer->SetScale(1.0f);
-		
+
 		if (m_pPlayer->Get_Weapon_Skill() == M_Weapon_Lollipop) {
 			if (Anim_Index == Anim_Lollipop_Skill && Anim_Time >= 23) {	// 롤리팝 수직으로 세우기
 				m_pPlayer->SetWeapon(false, -1, -1);
@@ -1778,9 +1811,9 @@ void CGameFramework::ProcessInput()
 		}
 		else {
 			if (type != -1 && index != -1) {
-				if(Anim_Index==Anim_Pick_up)
-				if (Anim_Time >= 20 && Anim_Time <= 21)
-					m_pPlayer->SetWeapon(true, type, index);
+				if (Anim_Index == Anim_Pick_up)
+					if (Anim_Time >= 20 && Anim_Time <= 21)
+						m_pPlayer->SetWeapon(true, type, index);
 			}
 
 			if (Key_A || Key_S) {
@@ -1796,11 +1829,11 @@ void CGameFramework::ProcessInput()
 					if (type != -1 && index != -1) {
 						m_pPlayer->ChangeAnimation(Anim_Pick_up);
 						m_pPlayer->DisableLoop();
-					//	m_pPlayer->SetWeapon(true, type, index);
+						//	m_pPlayer->SetWeapon(true, type, index);
 						Anim_Index = m_pPlayer->getAnimIndex();
 					}
 
-				   //아니면 약공격
+					//아니면 약공격
 					if (Anim_Index == Anim_Idle || Anim_Index == Anim_Walk) {
 						m_pPlayer->ChangeAnimation(Anim_Weak_Attack1);
 						m_pPlayer->DisableLoop();
@@ -1864,8 +1897,8 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->jumpstart();
 				SoundManager::GetInstance()->PlaySounds(SOUND_2);	//soundeffect 테스트
 				SoundManager::GetInstance()->FadeOutBackGroundSounds();	//soundeffect 테스트
-				
-				m_pPlayer->SetWeapon(false, -1,-1);
+
+				m_pPlayer->SetWeapon(false, -1, -1);
 			}
 		}
 		if (Key_LShift) { //구르기
@@ -2136,8 +2169,10 @@ void CGameFramework::FrameAdvance()
 {
 
 	m_GameTimer.Tick(60.0f);
-	
-	ProcessInput();
+	if (m_pPlayer) {
+		if (m_pPlayer->Get_HP() > 0)
+			ProcessInput();
+	}
 
 	UpdateProcess();
 	
@@ -2177,6 +2212,8 @@ void CGameFramework::FrameAdvance()
 				position.x = m_pPlayer->GetPosition().x;
 				position.y = m_pPlayer->GetPosition().y;
 				position.z = m_pPlayer->GetPosition().z;
+				if(m_pScene->getplayer(Camera_ID)->GetConnected())
+				position = m_pScene->getplayer(Camera_ID)->GetPosition();
 				if (position.y < 0) position.y = 0;
 				m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 				m_pCamera->SetLookAt(position);
