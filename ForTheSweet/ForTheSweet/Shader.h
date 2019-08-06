@@ -529,3 +529,19 @@ public:
 	virtual void Animate(float fTimeElapsed, XMFLOAT3 pos);
 	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
 };
+
+class StunShader : public CModelShader
+{
+public:
+	float rotate_time = 0.f;
+	float rotate_time_2 = 0.f;
+	bool visible = false;
+	XMFLOAT3 rotate_y_check = XMFLOAT3(0.f, 1.f, 0.f);
+
+	StunShader() {};
+	StunShader(LoadModel *ma) { static_model = ma; };
+	~StunShader() {};
+
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 pos);
+};

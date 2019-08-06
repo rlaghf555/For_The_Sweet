@@ -25,7 +25,6 @@ protected:
 	CMaterial*						m_pMaterial = NULL;
 
 	XMFLOAT4						m_handpos;
-
 public:
 	ModelObject(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	ModelObject(LoadModel* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);

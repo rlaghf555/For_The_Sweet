@@ -115,6 +115,7 @@ private:
 	Model_Animation *Character_Model;
 	LoadModel		*Map_Model[19];
 	LoadModel		*weapon[7];
+	LoadModel		*effect[2];
 #if defined(_DEBUG)
 	ID3D12Debug *m_pd3dDebugController;
 

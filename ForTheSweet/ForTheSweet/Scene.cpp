@@ -250,7 +250,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_SkillParticleShader[i]->BuildObjects(pd3dDevice, pd3dCommandList,i);
 	}
 	m_pPlayer[0]->selected_skill = SKILL_ATTACK;		//각 플레이어 별로 방에서 고른 스킬이 뭔지 넣어주면 스킬키 눌럿을때 해당 파티클 출력 default SKILL_ATTACK
-	
+
+	for (int i = 0; i < MAX_USER; i++) {
+		m_StunShader[i] = new StunShader(effect_Model[M_Effect_Head_Star]);
+		m_StunShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
+	}
+
 	for (int i = 0; i < MAX_USER; i++) {
 		m_ExplosionShader[i] = new ExplosionShader();
 		m_ExplosionShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -715,6 +720,13 @@ void CScene::ReleaseObjects()
 			delete m_ExplosionShader[i];
 		}
 	}
+	for (int i = 0; i < MAX_USER; ++i) {
+		if (m_StunShader[i]) {
+			m_StunShader[i]->ReleaseShaderVariables();
+			m_StunShader[i]->ReleaseObjects();
+			delete m_StunShader[i];
+		}
+	}
 	if (m_TeamShader) {
 		m_TeamShader->ReleaseShaderVariables();
 		m_TeamShader->ReleaseObjects();
@@ -822,7 +834,7 @@ void CScene::initObject()
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 			m_WeaponShader[i]->getObject(j)->init();
-			m_WeaponShader[i]->getObject(j)->visible = false;
+			m_WeaponShader[i]->getObject(j)->visible = true;
 
 			if (SERVER_ON) {
 				m_WeaponShader[i]->getObject(j)->visible = false;
@@ -1021,6 +1033,12 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				m_ExplosionShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				//if (m_ExplosionShader[i]->m_bBlowingUp == false) m_ExplosionShader[i]->m_bBlowingUp = true;
+
+				if (m_pPlayer[i]->getAnimIndex() == Anim_Stun) {	//Anim_Jump
+					m_StunShader[i]->visible = true;
+					m_StunShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition()); //Anim_Stun
+				}
+				else m_StunShader[i]->visible = false;
 
 				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1) {
 					m_SkillEffectShader[i]->getObject(0)->visible = true;
@@ -1272,7 +1290,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
-	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected() && m_pPlayerShader[i]->render) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < MAX_USER; i++) if (m_pPlayer[i]->GetConnected()) if (m_StunShader[i])if(m_StunShader[i]->visible) m_StunShader[i]->Render(pd3dCommandList, pCamera);
 
 	if (Selected_Map == M_Map_1) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
@@ -1310,8 +1328,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		for (int i = 0; i < 2; ++i) if (m_StairShader[i]) m_StairShader[i]->Render(pd3dCommandList, pCamera);
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
-
-
+	
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
 	if (Selected_Map == M_Map_1) {
@@ -1353,6 +1370,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//	}
 	//}
 
+	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected() && m_pPlayerShader[i]->render) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
+	
 	for (int i = 0; i < MAX_USER; i++)if (m_ExplosionShader[i])if (m_ExplosionShader[i]->m_bBlowingUp)m_ExplosionShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);

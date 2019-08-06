@@ -35,6 +35,7 @@ public:
 	void SetCharacter(Model_Animation *model_anim) { character_anim = model_anim; }
 	void SetMap(LoadModel **mapmodel) { Map_Model = mapmodel; }
 	void SetWeapon(LoadModel **weaponmodel) { weapon_Model = weaponmodel; }
+	void SetEffect(LoadModel **effectmodel) { effect_Model = effectmodel; }
 	void initUI(wchar_t *character_id[]);
 	void initObject();
 	void SetTeamUI();
@@ -86,6 +87,9 @@ public:
 
 	ShadowREverseShader			*m_ShadowReverseShader[8] = { NULL, };
 	ShadowReverseModelShader	*m_ShadowReverseModelShader[3] = { NULL, };
+
+	StunShader					*m_StunShader[MAX_USER] = { NULL, };
+	LoadModel					**effect_Model;
 
 	ExplosionShader				*m_ExplosionShader[MAX_USER] = { NULL, };
 	TeamShader					*m_TeamShader = NULL;

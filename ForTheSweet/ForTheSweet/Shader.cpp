@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Shader.h"
-
+#include <math.h>
 
 CompiledShaders::CompiledShaders()
 {
@@ -3469,4 +3469,61 @@ void TeamShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * p
 
 void TeamShader::Animate(float fTimeElapsed)
 {
+}
+
+/////////////////////////////////
+
+void StunShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = 1;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\star.dds", 0);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
+		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_bbObjects[i] = map;
+		m_bbObjects[i]->SetPosition(0, -100, 0);
+	}
+	delete pTexture;
+}
+
+void StunShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
+{
+	if (IsZero(fTimeElapsed)) return;
+
+	for (int i = 0; i < m_nObjects; ++i) {
+		if (m_bbObjects[i]) {
+			m_bbObjects[i]->Animate(fTimeElapsed);
+
+			if (rotate_time >= 360) rotate_time = 0.f;
+			else rotate_time += 2.f;
+
+			//if (rotate_time_2 >= 360) rotate_time_2 = -360.f;
+			//else rotate_time_2 += 0.1f;
+			
+			float x = cos(rotate_time / 360 * 3.14 * 2) * 10.f + pos.x;
+			float z = sin(rotate_time / 360 * 3.14 * 2) * 10.f + pos.z;
+
+			m_bbObjects[i]->SetPosition(x, pos.y + 38, z);
+			m_bbObjects[i]->Rotate(&rotate_y_check, 3.f);
+		}
+	}
 }

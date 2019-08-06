@@ -171,6 +171,12 @@ void CGameFramework::OnDestroy()
 			weapon[i] = NULL;
 		}
 	}
+	for (int i = 0; i < 2; i++) {
+		if (effect[i]) {
+			delete effect[i];
+			effect[i] = NULL;
+		}
+	}
 	if (Character_Model) {
 		delete Character_Model;
 		Character_Model = NULL;
@@ -731,6 +737,10 @@ void CGameFramework::LoadModels()
 	character_animation.emplace_back(make_pair("./resource/character/chocolate_skill.FBX", 0));		// Anim_chocolate_Skill
 	   
 	character_animation.emplace_back(make_pair("./resource/character/hit_fall_down.FBX", 0));		// Anim_Hard_React
+	character_animation.emplace_back(make_pair("./resource/character/victory.FBX", 0));				// Anim_Victorty
+	character_animation.emplace_back(make_pair("./resource/character/victory_2.FBX", 0));			// Anim_Victorty_2
+	character_animation.emplace_back(make_pair("./resource/character/death_1.FBX", 0));				// Anim_Death	- death_2
+	character_animation.emplace_back(make_pair("./resource/character/stun.FBX", 0));				// Anim_Stun
 
 	Character_Model = new Model_Animation("./resource/character/main_character.FBX", &character_animation);
 	
@@ -764,6 +774,9 @@ void CGameFramework::LoadModels()
 	weapon[2] = new LoadModel("./resource/weapon/pepero.FBX", true);			// M_Weapon_pepero
 	weapon[3] = new LoadModel("./resource/weapon/chocolate.FBX", true);			// M_Weapon_chocolate
 	weapon[4] = new LoadModel("./resource/weapon/cupcake.FBX", true);			// M_Weapon_cupcake
+
+	effect[0] = new LoadModel("./resource/effect/on_head_star.FBX", true);		// M_Effect_Head_Star
+	effect[1] = new LoadModel("./resource/effect/explosion_star.FBX", true);	// M_Effect_Explosion_Star
 }
 
 void CGameFramework::BuildObjects()
@@ -781,6 +794,7 @@ void CGameFramework::BuildObjects()
 		m_pScene->SetCharacter(Character_Model);
 		m_pScene->SetMap(Map_Model);
 		m_pScene->SetWeapon(weapon);
+		m_pScene->SetEffect(effect);
 
 		if (selected_map == 1)
 			selected_map = M_Map_2;

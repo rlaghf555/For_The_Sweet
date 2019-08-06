@@ -40,6 +40,7 @@ public:
 	virtual XMFLOAT4X4* GetBoneData() { return nullptr; }
 	virtual int GetBoneNum() const { return 0; }
 	virtual void init();
+	virtual void init(XMFLOAT3 pos);
 public:
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
 public:
