@@ -155,7 +155,7 @@ c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(1214): warning 
 c:\users\hol\desktop\졸작\forthesweet\forthesweet\uishader.cpp(1224): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
   UIobject.cpp
   코드를 생성하고 있습니다.
-  117 of 4038 functions ( 2.9%) were compiled, the rest were copied from previous compilation.
+  120 of 4038 functions ( 3.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     16 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
