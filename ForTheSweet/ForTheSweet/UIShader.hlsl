@@ -73,7 +73,19 @@ float4 PSDefaultUI(VS_TEXTURED_OUTPUT input) : SV_Target
 
     return finalColor;
 }
+float4 PSDark(VS_TEXTURED_OUTPUT input) : SV_Target
+{
+    float4 finalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    float2 uv = input.uv;
+ 
+    uv = float2(
+    input.uv.x / gnNumSprite.x + float(gnNowSprite.x) / float(gnNumSprite.x),
+    input.uv.y / gnNumSprite.y + float(gnNowSprite.y) / float(gnNumSprite.y)
+    );
+    finalColor.a *= gfAlpha;
 
+    return finalColor;
+}
 float4 PSUIHPBar(VS_TEXTURED_OUTPUT input) : SV_Target
 {
 

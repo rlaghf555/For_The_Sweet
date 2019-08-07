@@ -578,7 +578,7 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_MP());	//mp
-
+		SoundManager::GetInstance()->PlaySounds(HIT);
 		break;
 	}
 	case SC_PUT_WEAPON:
@@ -1967,8 +1967,6 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->ChangeAnimation(Anim_Jump);
 				m_pPlayer->DisableLoop();
 				m_pPlayer->jumpstart();
-				SoundManager::GetInstance()->PlaySounds(SOUND_2);	//soundeffect 테스트
-				SoundManager::GetInstance()->FadeOutBackGroundSounds();	//soundeffect 테스트
 
 				m_pPlayer->SetWeapon(false, -1, -1);
 			}

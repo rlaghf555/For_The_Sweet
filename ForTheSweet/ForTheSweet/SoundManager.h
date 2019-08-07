@@ -9,7 +9,11 @@ enum SOUNDKIND {
 	BACKGROUND,
 	FEVERTIME,
 	HIT,
-	LIGHTING,
+	LIGHTNING,
+	JUMPSOUND,
+	FOG,
+	WIN,
+	LOSE,
 	SOUND_END
 };
 class SoundManager
@@ -33,7 +37,7 @@ public:
 	}
 	void PlaySounds(SOUNDKIND eSound);
 	void PlayBackGroundSounds(SOUNDKIND eSound);
-	void StopBackGroundSounds(SOUNDKIND eSound);
+	void StopBackGroundSounds();
 	void FadeOutBackGroundSounds();
 	void FadeINBackGroundSounds();
 

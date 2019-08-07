@@ -11,10 +11,16 @@ void SoundManager::Setup()
 	g_pSystem->init(10, FMOD_INIT_NORMAL, nullptr);
 	g_pSystem->createSound("resource\\sound\\Soundtest.mp3", FMOD_LOOP_NORMAL, 0, &g_pSound[SOUND_1]);
 	g_pSystem->createSound("resource\\sound\\effectsoundtest.mp3", FMOD_DEFAULT, 0, &g_pSound[SOUND_2]);
-	g_pSystem->createSound("resource\\sound\\bgm.mp3", FMOD_DEFAULT, 0, &g_pSound[BACKGROUND]);
-	g_pSystem->createSound("resource\\sound\\fevertime.mp3", FMOD_DEFAULT, 0, &g_pSound[FEVERTIME]);
-	g_pSystem->createSound("resource\\sound\\hit.mp3", FMOD_DEFAULT, 0, &g_pSound[HIT]);
-	g_pSystem->createSound("resource\\sound\\lightning.mp3", FMOD_DEFAULT, 0, &g_pSound[LIGHTING]);	
+	g_pSystem->createSound("resource\\sound\\bgm.mp3", FMOD_LOOP_NORMAL, 0, &g_pSound[BACKGROUND]);
+	g_pSystem->createSound("resource\\sound\\fevertime.mp3", FMOD_LOOP_NORMAL, 0, &g_pSound[FEVERTIME]);
+	//g_pSystem->createSound("resource\\sound\\hit.mp3", FMOD_DEFAULT, 0, &g_pSound[HIT]);
+	g_pSystem->createSound("resource\\sound\\hit2.mp3", FMOD_DEFAULT, 0, &g_pSound[HIT]);
+	//g_pSystem->createSound("resource\\sound\\hit3.mp3", FMOD_DEFAULT, 0, &g_pSound[HIT]);
+	g_pSystem->createSound("resource\\sound\\lightning.mp3", FMOD_DEFAULT, 0, &g_pSound[LIGHTNING]);	
+	g_pSystem->createSound("resource\\sound\\jump.mp3", FMOD_DEFAULT, 0, &g_pSound[JUMPSOUND]);	
+	g_pSystem->createSound("resource\\sound\\fog.mp3", FMOD_LOOP_NORMAL, 0, &g_pSound[FOG]);
+	g_pSystem->createSound("resource\\sound\\win.mp3", FMOD_DEFAULT, 0, &g_pSound[WIN]);	
+	g_pSystem->createSound("resource\\sound\\lose.mp3", FMOD_DEFAULT, 0, &g_pSound[LOSE]);	
 }
 void SoundManager::Release()
 {
@@ -40,7 +46,7 @@ void SoundManager::PlayBackGroundSounds(SOUNDKIND eSound)
 	g_pSystem->playSound(g_pSound[eSound], NULL, false, &background);
 }
 
-void SoundManager::StopBackGroundSounds(SOUNDKIND eSound)
+void SoundManager::StopBackGroundSounds()
 {
 	background->stop();
 }

@@ -275,7 +275,13 @@ public:
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
 	virtual void Animate(float fTimeElapsed);
+	virtual void ShowEffect(int index) {
+	m_ppObjects[index]->visible = true;
+	SoundManager::GetInstance()->PlaySounds(LIGHTNING);
+	}
 	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+
 
 	int spritenum;
 };

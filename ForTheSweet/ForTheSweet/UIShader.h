@@ -217,3 +217,11 @@ public:
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 	virtual void ShowMessage(bool win);//win = true, lose = false
 };
+class DarkShader : public UIShader
+{
+public:
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
+	bool is_dark = false;
+	float ftime = 0;
+	virtual void Animate(float fTimeElapsed);
+};

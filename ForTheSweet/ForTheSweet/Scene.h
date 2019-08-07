@@ -73,7 +73,7 @@ public:
 	MeshShader					*m_BackGroundShader[2] = { NULL, };
 	EffectShader				*m_EffectShader = NULL;
 	SkillEffectShader			*m_SkillEffectShader[MAX_USER] = { NULL, };
-	SkillParticleShader			*m_SkillParticleShader[3] = { NULL, };
+	SkillParticleShader			*m_SkillParticleShader[MAX_USER][3] = { NULL, };
 	WaveShader					*m_WavesShader = NULL;
 
 	unique_ptr<CCamera>			m_Camera = nullptr;
@@ -96,6 +96,7 @@ public:
 	ExplosionShader				*m_ExplosionShader[MAX_USER] = { NULL, };
 	TeamShader					*m_TeamShader = NULL;
 	TeamShader					*m_EnemyShader = NULL;
+	DarkShader					*m_DarkShader = NULL;
 	int Selected_Map = 0;
 	int mode = MODE_TEAM;
 	int myid;

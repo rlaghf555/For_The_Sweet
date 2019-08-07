@@ -141,6 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(SolutionDir)Release\PhysXPvdSDK_static_32.lib;$(SolutionDir)Release\PhysXVehicle_static_32.lib;$(SolutionDir)Release\PhysXCharacterKinematic_static_32.lib;$(SolutionDir)Release\PhysXExtensions_static_32.lib;$(SolutionDir)Release\PhysXCooking_32.lib;$(SolutionDir)Release\PhysXCommon_32.lib;$(SolutionDir)Release\PhysX_32.lib;$(SolutionDir)Release\PhysXFoundation_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

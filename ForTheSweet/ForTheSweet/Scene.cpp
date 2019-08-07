@@ -238,16 +238,16 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	}
 	m_EffectShader = new EffectShader();
 	m_EffectShader->BuildObjects(pd3dDevice, pd3dCommandList, Selected_Map);
-	for (int i = 0; i < 10; i++)m_EffectShader->getObject(i)->visible = true;
+	//for (int i = 0; i < 10; i++)m_EffectShader->getObject(i)->visible = true;
 
 	for (int i = 0; i < MAX_USER; i++) {
 		m_SkillEffectShader[i] = new SkillEffectShader();
 		m_SkillEffectShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
 	}
-	
+	for(int j=0;j<MAX_USER;j++)
 	for (int i = 0; i < 3; i++) {
-		m_SkillParticleShader[i] = new SkillParticleShader();
-		m_SkillParticleShader[i]->BuildObjects(pd3dDevice, pd3dCommandList,i);
+		m_SkillParticleShader[j][i] = new SkillParticleShader();
+		m_SkillParticleShader[j][i]->BuildObjects(pd3dDevice, pd3dCommandList,i);
 	}
 	m_pPlayer[0]->selected_skill = SKILL_ATTACK;		//각 플레이어 별로 방에서 고른 스킬이 뭔지 넣어주면 스킬키 눌럿을때 해당 파티클 출력 default SKILL_ATTACK
 
@@ -324,10 +324,10 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		m_MapShader[7] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
 		m_MapShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar_2);
 
-		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
-		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
-		//}
+		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
+		}
 
 		m_ShadowReverseModelShader[0] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test]);
 		m_ShadowReverseModelShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
@@ -507,6 +507,9 @@ void CScene::BuildUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComman
 
 	m_MessageShader = new MessageShader();
 	m_MessageShader->BuildObjects(pDevice, pCommandList);
+	
+	m_DarkShader = new DarkShader();
+	m_DarkShader->BuildObjects(pDevice, pCommandList);
 	//m_MessageShader->ShowMessage(MESSAGE_LIGHTING);
 
 }
@@ -719,11 +722,12 @@ void CScene::ReleaseObjects()
 			delete m_SkillEffectShader[i];
 		}
 	}
+	for(int j=0;j<MAX_USER;++j)
 	for (int i = 0; i < 3; ++i) {
-		if (m_SkillParticleShader[i]) {
-			m_SkillParticleShader[i]->ReleaseShaderVariables();
-			m_SkillParticleShader[i]->ReleaseObjects();
-			delete m_SkillParticleShader[i];
+		if (m_SkillParticleShader[j][i]) {
+			m_SkillParticleShader[j][i]->ReleaseShaderVariables();
+			m_SkillParticleShader[j][i]->ReleaseObjects();
+			delete m_SkillParticleShader[j][i];
 		}
 	}
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -749,6 +753,11 @@ void CScene::ReleaseObjects()
 		m_EnemyShader->ReleaseShaderVariables();
 		m_EnemyShader->ReleaseObjects();
 		delete m_EnemyShader;
+	}
+	if (m_DarkShader) {
+		m_DarkShader->ReleaseShaderVariables();
+		m_DarkShader->ReleaseObjects();
+		delete m_DarkShader;
 	}
 }
 
@@ -824,7 +833,9 @@ void CScene::initUI(wchar_t *character_id[])
 			m_ppUIShaders[12 + i + 4]->SetPos(&pos, j);
 		}
 	}
-
+	m_DarkShader->getObejct(0)->SetAlpha(0.f);
+	m_DarkShader->ftime = 0.f;
+	m_DarkShader->is_dark = false;
 //	m_ppUIShaders[20]->ShowMessage(false);   //true면 win false면 lose
 
 	//-------------------------------안개생성하기
@@ -872,7 +883,7 @@ void CScene::initObject()
 		}
 		//번개 위치
 		for (int i = 0; i < 10; i++) {
-			m_EffectShader->getObject(i)->visible = true;
+			m_EffectShader->getObject(i)->visible = false;
 			//m_EffectShader->setPosition();
 		}
 		m_EffectShader->getObject(0)->SetPosition(-240.f, 100.f, 110.f);
@@ -906,7 +917,7 @@ void CScene::initObject()
 		}
 		//번개 위치
 		for (int i = 0; i < 10; i++) {
-			m_EffectShader->getObject(i)->visible = true;
+			m_EffectShader->getObject(i)->visible = false;
 			//m_EffectShader->setPosition();
 		}
 		m_EffectShader->getObject(0)->SetPosition(-240.f, 100.f, 110.f);
@@ -941,7 +952,7 @@ void CScene::initObject()
 
 		//번개 위치
 		for (int i = 0; i < 10; i++) {
-			m_EffectShader->getObject(i)->visible = true;
+			m_EffectShader->getObject(i)->visible = false;
 			//m_EffectShader->setPosition();
 		}
 		m_EffectShader->getObject(0)->SetPosition(-240.f, 100.f, 110.f);
@@ -965,6 +976,13 @@ void CScene::initObject()
 			}
 		}
 	}
+	//번개 테스트 -----------------------------------------------------------
+	//m_EffectShader->ShowEffect(1);
+	//m_EffectShader->ShowEffect(3);
+	//m_EffectShader->ShowEffect(5);
+	//m_EffectShader->ShowEffect(7);
+	//m_DarkShader->is_dark = true;
+	//번개------------------------------------------------------------------
 	//m_pPlayer[0]->SetWeapon(true, M_Weapon_Lollipop, 0);	// test
 }
 
@@ -1060,7 +1078,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_SkillEffectShader[i]->getObject(0)->visible = true;
 					m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 
-					m_SkillParticleShader[m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
+					m_SkillParticleShader[i][m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
+				}
+				if (m_pPlayer[i]->getAnimIndex() == Anim_Jump&&m_pPlayer[i]->getAnimtime() <= 1) {	//Anim_Jump
+					SoundManager::GetInstance()->PlaySounds(JUMPSOUND);
 				}
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
@@ -1079,8 +1100,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			}
 		}
 	}
-	for (int i = 0; i < 3; i++) {
-		m_SkillParticleShader[i]->Animate(fTimeElapsed);
+	for (int i = 0; i < MAX_USER; i++) {
+		for(int j=0;j<3;j++)
+		m_SkillParticleShader[i][j]->Animate(fTimeElapsed);
 	}
 
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
@@ -1102,7 +1124,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 
 	m_WavesShader->Animate(fTimeElapsed, Selected_Map);
-
+	if (m_DarkShader) m_DarkShader->Animate(fTimeElapsed);
 	for (UINT i = 0; i < m_nUIShaders; i++) {
 		if (m_ppUIShaders[i]) {
 			m_ppUIShaders[i]->UpdateState(ready_state);
@@ -1330,7 +1352,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[7]) m_MapShader[7]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_3) {
-		for (int i = 0; i < 8; ++i)if (door[i]) door[i]->Render(pd3dCommandList, pCamera);
+	//	for (int i = 0; i < 8; ++i)if (door[i]) door[i]->Render(pd3dCommandList, pCamera);
 		
 		if (m_MapShader[8]) m_MapShader[8]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[9]) m_MapShader[9]->Render(pd3dCommandList, pCamera);
@@ -1402,11 +1424,13 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < 10; i++) if (m_EffectShader)if (m_EffectShader->getObject(i)->visible == true)m_EffectShader->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < 10; i++) if (m_EffectShader) m_EffectShader->Render(pd3dCommandList, pCamera);
 
 	//for (int i = 0; i < MAX_USER;i++)if (bounding_box_test[i]) bounding_box_test[i]->Render(pd3dCommandList, pCamera);
 	
-	for (int i = 0; i < 3; i++)if (m_SkillParticleShader[i])m_SkillParticleShader[i]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < MAX_USER; i++)
+		for(int j=0;j<3;j++)
+		if (m_SkillParticleShader[i][j])m_SkillParticleShader[i][j]->Render(pd3dCommandList, pCamera);
 
 }
 
@@ -1414,6 +1438,7 @@ void CScene::RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pComma
 {
 	//for (UINT i = 0; i < m_nUIShaders - 2; ++i)
 	//	m_ppUIShaders[i]->Render(pCommandList);
+	if (m_DarkShader)m_DarkShader->Render(pCommandList);
 	for (int i = m_nUIShaders-2; i >= 0; i--) {	//22번 제외
 		m_ppUIShaders[i]->Render(pCommandList);
 	}
