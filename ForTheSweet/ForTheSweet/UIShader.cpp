@@ -1053,12 +1053,11 @@ void MessageShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComman
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 
-	XMFLOAT2 pos = XMFLOAT2(-100, 0);	//570,680;
-	XMFLOAT2 scale = XMFLOAT2(0.8f, 0.8f);
+	XMFLOAT2 pos = XMFLOAT2(640, 590);	//570,680;
+	XMFLOAT2 scale = XMFLOAT2(0.6f, 0.6f);
 
 	UIObject* weapon;
 	weapon = new UIObject();
-	pos = XMFLOAT2(650, 600);
 	weapon->SetPosition(pos);
 	weapon->SetScale(scale);
 	weapon->m_bEnabled = false;

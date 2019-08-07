@@ -1338,7 +1338,7 @@ void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		m_ppObjects[i] = Map_Object;
 
 		CMesh *pCubeMesh = NULL;
-		if (type == 0) pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -1400, 1000, 2800, 1500, 1000);	// pos(x, y), Width(w, h), depth
+		if (type == 0) pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -1400, 1000, 2800, 1500, 600);	// pos(x, y), Width(w, h), depth
 		if (type == 1) pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000, 500, 500);				
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
@@ -2356,7 +2356,7 @@ D3D12_DEPTH_STENCIL_DESC ShadowDebugShader::CreateDepthStencilState(int index)
 	d3dDepthStencilDesc.StencilWriteMask = 0xff;
 	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
 	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_INVERT;		// D3D12_STENCIL_OP_KEEP	//D3D12_STENCIL_OP_INVERT	//D3D12_STENCIL_OP_INCR
+	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_INCR;		// D3D12_STENCIL_OP_KEEP	//D3D12_STENCIL_OP_INVERT	//D3D12_STENCIL_OP_INCR
 	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL;	// D3D12_COMPARISON_FUNC_NEVER
 	// 후면 다각형 렌더링
 	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;

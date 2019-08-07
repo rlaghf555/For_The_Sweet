@@ -983,7 +983,7 @@ void CScene::initObject()
 	//m_EffectShader->ShowEffect(7);
 	//m_DarkShader->is_dark = true;
 	//번개------------------------------------------------------------------
-	//m_pPlayer[0]->SetWeapon(true, M_Weapon_Lollipop, 0);	// test
+	m_pPlayer[0]->SetWeapon(true, M_Weapon_Lollipop, 0);	// test
 }
 
 void CScene::SetTeamUI()
@@ -1214,6 +1214,7 @@ void CScene::AnimateWeapon(int i)
 	if (animindex == Anim_Lollipop_Skill && m_pPlayer[i]->getAnimtime() >= 23) {
 		m_MagicShader[i]->visible = true;//마법진
 		XMFLOAT3 aa = m_WeaponShader[weapon_type]->getObject(weapon_index)->GetPosition();
+		aa.y -= 3.f;
 		m_WeaponShader[weapon_type]->getObject(weapon_index)->init(aa);
 		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 90.f, 0);
 		//m_WeaponShader[weapon_type]->getObject(weapon_index)->SetScale(1.5f);
@@ -1342,7 +1343,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[2]) m_MapShader[2]->Render(pd3dCommandList, pCamera);
-		if (m_ShadowShader[0]) m_ShadowShader[0]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_2) {
 		if (m_MapShader[3]) m_MapShader[3]->Render(pd3dCommandList, pCamera);
@@ -1374,9 +1374,10 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		for (int i = 0; i < 2; ++i) if (m_StairShader[i]) m_StairShader[i]->Render(pd3dCommandList, pCamera);
 	}
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
-	
+
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
+	
 	if (Selected_Map == M_Map_1) {
 		if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
@@ -1415,11 +1416,13 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//			weapon_box[i][j]->Render(pd3dCommandList, pCamera);
 	//	}
 	//}
-
+	
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected() && m_pPlayerShader[i]->render) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER; i++) if (m_pPlayer[i]->GetConnected()) if (m_MagicShader[i])if (m_MagicShader[i]->visible) m_MagicShader[i]->Render(pd3dCommandList, pCamera);
-	
+
+	if (Selected_Map == M_Map_1) if (m_ShadowShader[0]) m_ShadowShader[0]->Render(pd3dCommandList, pCamera);
+
 	for (int i = 0; i < MAX_USER; i++)if (m_ExplosionShader[i])if (m_ExplosionShader[i]->m_bBlowingUp)m_ExplosionShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);
