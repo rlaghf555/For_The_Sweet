@@ -40,6 +40,9 @@ constexpr int SC_PICK_WEAPON = 6;
 constexpr int SC_HIT = 7;
 constexpr int SC_PUT_WEAPON = 8;
 constexpr int SC_TIMER = 9;
+constexpr int SC_UNPICK_WEAPON = 10;
+constexpr int SC_POS_WEAPON = 11;
+constexpr int SC_REMOVE_WEAPON = 12;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
@@ -205,10 +208,33 @@ struct sc_packet_put_weapon {
 	float x, y, z;
 };
 
+struct sc_packet_pos_weapon {
+	char size;
+	char type;
+	char weapon_type;
+	char weapon_index;
+	float x, y, z;
+};
+
 struct sc_packet_pick_weapon {
 	char size;
 	char type;
 	char id;
+	char weapon_type;
+	char weapon_index;
+};
+
+struct sc_packet_unpick_weapon {
+	char size;
+	char type;
+	char id;
+	char weapon_type;
+	char weapon_index;
+};
+
+struct sc_packet_remove_weapon {
+	char size;
+	char type;
 	char weapon_type;
 	char weapon_index;
 };

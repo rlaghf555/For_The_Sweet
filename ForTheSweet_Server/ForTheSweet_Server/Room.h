@@ -6,7 +6,8 @@
 #include "Timer.h"
 
 enum EVENT_TYPE {
-	EV_FREE, EV_HIT, EV_PICK,											// 플레이어에 해당
+	EV_FREE, EV_HIT, EV_PICK, EV_WEAPON_SKILL, EV_WEAPON_REMOVE,		// 플레이어에 해당
+	EV_PEPERO_MOVE,
 	EV_WEAPON, EV_FOG, EV_FEVER, EV_LIGHTNING, EV_SLIME,				// 심판에 해당
 	EV_TIME
 };
@@ -21,6 +22,26 @@ struct EVENT_ST {
 	{
 		return (start_time > left.start_time);
 	}
+};
+
+struct Skill_Trigger {
+	char order;
+	char type;
+	char index;
+	char owner;
+	PxRigidActor* skillTrigger;
+	PxVec3 vel;
+	PxVec3 look;
+
+public:
+	Skill_Trigger(char tp, char in, char ow, char ord) {
+		type = tp;
+		owner = ow;
+		index = in;
+		order = ord;
+	}
+
+	bool operator==(const char ord) { return (order == ord); }
 };
 
 class CRoom
@@ -51,6 +72,11 @@ public:
 	CWeapon_Respawn weapon_respawn[RESPAWN_WEAPON_NUM];
 
 	int timer;
+
+	PxBoxController *test;
+
+	vector<Skill_Trigger> m_skillTrigger;
+	char trigger_order;
 
 public:
 	CRoom();

@@ -60,6 +60,15 @@ void CGameObject::SetEffectLook(XMFLOAT3& xmf3Look)
 	SetWorld(m_xmf3Look, m_xmf3Up, m_xmf3Right);
 
 }
+void CGameObject::SetLook(XMFLOAT3 & xmf3Look)
+{
+	if (xmf3Look.x == 0 && xmf3Look.y == 0 && xmf3Look.z == 0)
+		return;
+	XMFLOAT3 m_xmf3Up = xmf3Look;
+	XMFLOAT3 m_xmf3Look(0, -1, 0);
+	XMFLOAT3 m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
+	SetWorld(m_xmf3Look, m_xmf3Up, m_xmf3Right);
+}
 void CGameObject::SetScale(float value)
 {
 	m_xmf4x4World._11 *= value;

@@ -74,6 +74,7 @@ public:
 	virtual void SetMesh(CMesh *pMesh);
 	virtual void SetMesh(int nIndex, shared_ptr<MMesh> pMesh);
 	virtual void SetShader(CShader *pShader);
+	virtual void SetLook(XMFLOAT3 & xmf3Look);
 	virtual void Animate(float fTimeElapsed);
 	virtual void OnPrepareRender();
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);

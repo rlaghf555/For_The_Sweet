@@ -29,3 +29,14 @@ constexpr int Weapon_chupachupse = 1;
 constexpr int Weapon_pepero = 2;
 constexpr int Weapon_chocolate = 3;
 constexpr int Weapon_cupcake = 4;
+
+// Pepero
+constexpr float Pepero_Vel = 100.f;
+constexpr float Pepero_Trigger_Len = 27.f;
+constexpr float Pepero_Pos_Gap = 23.f;
+
+// Trigger_Type
+constexpr int Player_Trigger = 0;
+constexpr int Lollipop_Tritter = 1;
+constexpr int Candy_Trigger = 2;
+constexpr int Pepero_Trigger = 3;

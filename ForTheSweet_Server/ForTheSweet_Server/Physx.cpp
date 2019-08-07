@@ -1,12 +1,36 @@
 #include <vector>
 #include "Physx.h"
 #include "Player.h"
+#include "Room.h"
+
+void add_timer(CRoom *room, char order, high_resolution_clock::time_point start_time)
+{
+	int room_num = room->room_num + ROOM_TIMER_START;
+
+	room->m_timer_l.lock();
+	room->m_timer_queue.push(EVENT_ST{ room_num, EV_WEAPON_REMOVE, start_time, order });
+	room->m_timer_l.unlock();
+}
 
 void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
 	for (PxU32 i = 0; i < count; ++i) {
+		if (pairs[i].status)
+		{
+			cout << "~~\n";
+			if (Pepero_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
+			{
+				cout << "3\n";
+			}
+		}
 		if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 		{
+			cout << "1\n";
+			if (Pepero_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
+			{
+				cout << "2\n";
+			}
+
 			//PxTransform tmp = pairs[i].triggerActor->getGlobalPose();
 			//cout << "Trigger Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
 			//
@@ -29,42 +53,74 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 				}
 			}
 
+			bool pepero_status = false;
+			char order = 0;
+
 			for (int j = 0; j < 8; ++j)
 			{
-				//cout << j << endl;
-				if (player[j])
+				if (Player_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
 				{
-					if (pairs[i].triggerActor != player[j]->m_AttackTrigger)
+					if (player[j])
 					{
-						if (player[j]->m_PlayerController != nullptr)
+						if (pairs[i].triggerActor != player[j]->m_AttackTrigger)
 						{
-							if (pairs[i].otherActor == player[j]->getControllerActor()) {
-								cout << j << " Player Hitted\n";
-								otherlook = player[j]->m_Look;
-								dot = mylook.dot(otherlook);
+							if (player[j]->m_PlayerController != nullptr)
+							{
+								if (pairs[i].otherActor == player[j]->getControllerActor()) {
+									cout << j << " Player Hitted\n";
+									//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
+									//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
+									//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
+									otherlook = player[j]->m_Look;
+									dot = mylook.dot(otherlook);
 
-								// -0.707... ~ -1.0 : 아머 가능
-								if (player[j]->m_status == STATUS::DEFENSE) {
-									if (dot <= -0.7f && dot >= -1.0f) {
-										continue;
+									// -0.707... ~ -1.0 : 아머 가능
+									if (player[j]->m_status == STATUS::DEFENSE) {
+										if (dot <= -0.7f && dot >= -1.0f) {
+											continue;
+										}
+										else {
+											player[j]->setAniIndex(Anim::Small_React);
+											player[j]->hitted = true;
+										}
 									}
 									else {
 										player[j]->setAniIndex(Anim::Small_React);
 										player[j]->hitted = true;
 									}
 								}
-								else {
-									player[j]->setAniIndex(Anim::Small_React);
-									player[j]->hitted = true;
-								}
+							}
+						}
+					}
+				}
+				else if (Pepero_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
+				{
+					pepero_status = true;
+					order = reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->order;
+
+					if (player[j])
+					{
+						if (player[j]->m_PlayerController != nullptr)
+						{
+							if (pairs[i].otherActor == player[j]->getControllerActor()) {
+								cout << j << " Pepero Skill Player Hitted\n";
+								//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
+
+								player[j]->setAniIndex(Anim::Small_React);
+								player[j]->hitted = true;
 							}
 						}
 					}
 				}
 			}
+			if (pepero_status == true) {
+				add_timer(room, order, high_resolution_clock::now());
+			}
 		}
 	}
-} //트리거박스 충돌 체크
+}//트리거박스 충돌 체크
 
 CPhysx::CPhysx()
 {
@@ -125,6 +181,7 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(vector<PxVec3> ver, vector<int> index) {
 	meshDesc.triangles.data = index.data();
 
 	meshDesc.flags = PxMeshFlags(0);
+
 	PxCookingParams params = m_Cooking->getParams();
 	params.midphaseDesc = PxMeshMidPhase::eBVH33;
 	params.suppressTriangleMeshRemapTable = true;
@@ -168,9 +225,118 @@ PxCapsuleController* CPhysx::getCapsuleController(PxVec3 pos, float height, floa
 	return controller;
 }
 
-PxRigidStatic* CPhysx::getTrigger(PxVec3& t, PxVec3 size)
+void CPhysx::getBoxController(PxVec3 pos, PxVec3 size)
+{
+	PxBoxControllerDesc boxDesc;
+	boxDesc.halfForwardExtent = size.z;
+	boxDesc.halfHeight = size.y;
+	boxDesc.halfSideExtent = size.x;
+
+	boxDesc.position = PXtoPXEx(pos);
+
+	//boxDesc.density = 1.0f;
+	boxDesc.material = m_Physics->createMaterial(1.0f, 1.0f, 1.0f);
+	//boxDesc.contactOffset = 5.0f;
+	//boxDesc.slopeLimit = slopeDegree;
+	//boxDesc.stepOffset = step;
+
+	//boxDesc.reportCallback = collisionCallback;
+
+	PxBoxController* controller = static_cast<PxBoxController*>(m_PlayerManager->createController(boxDesc));
+
+	//return controller;
+}
+
+PxRigidStatic* CPhysx::getBox(PxVec3& t, PxVec3 size)
 {
 	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);	//시물레이션 off
+	//shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
+
+	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t));
+
+	//staticActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+
+	//UserData* udata = new UserData;
+	//udata->type = Player_Trigger;
+	//
+	staticActor->attachShape(*shape);
+	//staticActor->userData = udata;
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
+
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
+}
+
+PxRigidStatic* CPhysx::getBoxTrigger(PxVec3& t, PxVec3 size)
+{
+	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);	//시물레이션 off
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
+
+	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t));
+
+	UserData* udata = new UserData;
+	udata->type = Player_Trigger;
+
+	staticActor->attachShape(*shape);
+	staticActor->userData = udata;
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
+
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
+}
+
+PxRigidStatic* CPhysx::getRotateBoxTrigger(PxVec3& t, PxVec3& ro, PxVec3 size, int trigger_type, int order)
+{
+	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);	//시물레이션 off
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
+
+	PxVec3 init(1, 0, 0);
+
+	//cout << "weapon look : " << ro.x << "," << ro.y << "," << ro.z << endl;
+
+	PxVec3 a = init.cross(ro);
+
+	PxQuat q;
+	q.x = a.x;
+	q.y = a.y;
+	q.z = a.z;
+	q.w = sqrt((init.magnitude() * init.magnitude()) * (ro.magnitude()*ro.magnitude())) + init.dot(ro);
+
+	q = q.getNormalized();
+
+	PxTransform temp(t, q);
+
+	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t, q));
+
+	UserData* udata = new UserData;
+	udata->order = order;
+	udata->type = trigger_type;
+
+	staticActor->attachShape(*shape);
+	staticActor->userData = (void *)udata;
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
+}
+
+PxRigidStatic* CPhysx::getSphereTrigger(PxVec3& t, PxReal rad)
+{
+	PxShape* shape = m_Physics->createShape(PxSphereGeometry(rad), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
 	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);	//시물레이션 off
 	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
 

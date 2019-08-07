@@ -103,5 +103,5 @@ void CPlayer::setPlayerController(CPhysx *physx)
 void CPlayer::setTrigger(CPhysx *physx)
 {
 	PxVec3 pos(100, 100, 100);
-	m_AttackTrigger = physx->getTrigger(pos, PxVec3(5, 5, 5));
+	m_AttackTrigger = physx->getBoxTrigger(pos, PxVec3(5, 5, 5));
 }

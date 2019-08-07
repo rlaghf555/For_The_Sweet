@@ -14,7 +14,11 @@ enum STATUS {
 	HARD_ATTACK,
 	DEFENSE,
 	JUMP,
-	HITTED
+	HITTED,
+	SKILL_Lolli,
+	SKILL_Candy,
+	SKILL_Pepero,
+	SKILL_Choco
 };
 
 enum Anim {

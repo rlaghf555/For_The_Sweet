@@ -294,6 +294,33 @@ void send_put_weapon_packet(char client, char wp_type, char wp_index, float x, f
 	sendPacket(client, &p_put_weapon);
 }
 
+void send_pos_weapon_packet(char client, char wp_type, char wp_index, float x, float y, float z) {
+	sc_packet_pos_weapon p_pos_weapon;
+
+	p_pos_weapon.type = SC_POS_WEAPON;
+	p_pos_weapon.size = sizeof(sc_packet_put_weapon);
+	p_pos_weapon.weapon_type = wp_type;
+	p_pos_weapon.weapon_index = wp_index;
+	p_pos_weapon.x = x;
+	p_pos_weapon.y = y;
+	p_pos_weapon.z = z;
+
+	//cout << "Weapon Pos : " << x << "," << y << "," << z << endl;
+
+	sendPacket(client, &p_pos_weapon);
+}
+
+void send_remove_weapon_packet(char client, char wp_type, char wp_index) {
+	sc_packet_remove_weapon p_remove_weapon;
+
+	p_remove_weapon.type = SC_REMOVE_WEAPON;
+	p_remove_weapon.size = sizeof(sc_packet_remove_weapon);
+	p_remove_weapon.weapon_type = wp_type;
+	p_remove_weapon.weapon_index = wp_index;
+
+	sendPacket(client, &p_remove_weapon);
+}
+
 void send_pick_weapon_packet(char client, char id, char wp_type, char wp_index) {
 	sc_packet_pick_weapon p_pick_weapon;
 	p_pick_weapon.type = SC_PICK_WEAPON;
@@ -303,6 +330,17 @@ void send_pick_weapon_packet(char client, char id, char wp_type, char wp_index) 
 	p_pick_weapon.weapon_index = wp_index;
 
 	sendPacket(client, &p_pick_weapon);
+}
+
+void send_unpick_weapon_packet(char client, char id, char wp_type, char wp_index) {
+	sc_packet_unpick_weapon p_unpick_weapon;
+	p_unpick_weapon.type = SC_UNPICK_WEAPON;
+	p_unpick_weapon.size = sizeof(sc_packet_unpick_weapon);
+	p_unpick_weapon.id = id;
+	p_unpick_weapon.weapon_type = wp_type;
+	p_unpick_weapon.weapon_index = wp_index;
+
+	sendPacket(client, &p_unpick_weapon);
 }
 
 void send_time_packet(char client, int timer)
@@ -565,6 +603,8 @@ void process_packet(char key, char *buffer)
 		// Physx¿¡ ¸Ê ÃÊ±âÈ­
 		it->start(gMapVertex, gMapIndex);
 
+		it->m_pPhysx->registerRoom(&(*it));
+
 		// ¹«±â ÃÊ±âÈ­
 		for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i) {
 			if (it->weapon_respawn[i].respawn_able == true) {
@@ -582,6 +622,7 @@ void process_packet(char key, char *buffer)
 						it->weapon_list[type][j].empty = false;
 						it->weapon_list[type][j].owner = -1;
 						it->weapon_list[type][j].pos = WeaponInitPosition[i];
+						it->weapon_list[type][j].respawn_index = i;
 
 						break;
 					}
@@ -947,9 +988,13 @@ void process_packet(char key, char *buffer)
 		cs_packet_weapon *p_weapon;
 		p_weapon = reinterpret_cast<cs_packet_weapon*>(buffer);
 
-		clients[key].playerinfo->weapon_type = p_weapon->weapon_type;
-		clients[key].playerinfo->weapon_index = p_weapon->weapon_index;
+		char type = p_weapon->weapon_type;
+		char index = p_weapon->weapon_index;
+
+		clients[key].playerinfo->weapon_type = type;
+		clients[key].playerinfo->weapon_index = index;
 		clients[key].playerinfo->setAniIndex(Anim::Pick_Up);
+
 		int room_num = clients[key].room_num;
 
 		//cout << int(key) << " Player Weapon Success : " << int(p_weapon->weapon_type) << ", " << int(p_weapon->weapon_index) << endl;;
@@ -959,6 +1004,7 @@ void process_packet(char key, char *buffer)
 		room_l.lock();
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
+
 
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
@@ -979,21 +1025,38 @@ void process_packet(char key, char *buffer)
 		cs_packet_weapon_skill *p_weapon_skill;
 		p_weapon_skill = reinterpret_cast<cs_packet_weapon_skill*>(buffer);
 
+		int room_num = clients[key].room_num;
+
 		int weapon_type = clients[key].playerinfo->weapon_type;
+
+		// ·Ñ¸®ÆË
 		if (weapon_type == Weapon_Lollipop) {
 			clients[key].playerinfo->setAniIndex(Anim::Lollipop_Skill);
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 1000ms, 0);
+			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 760ms, Weapon_Lollipop);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_Lolli);
 		}
+		// ÃòÆÄÃä½º
 		else if (weapon_type == Weapon_chupachupse) {
 			clients[key].playerinfo->setAniIndex(Anim::Candy_Skill);
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 3000ms, 0);
+			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 600ms, Weapon_chupachupse);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_Candy);
 		}
+		// »©»©·Î
 		else if (weapon_type == Weapon_pepero) {
 			clients[key].playerinfo->setAniIndex(Anim::Pepero_Skill);
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 1000ms, 0);
+			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 630ms, Weapon_pepero);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_Pepero);
 		}
+		// ÃÊÄÝ¸´
 		else if (weapon_type == Weapon_chocolate) {
 			clients[key].playerinfo->setAniIndex(Anim::Chocolate_Skill);
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 660ms, 0);
+			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 360ms, Weapon_chocolate);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_Choco);
 		}
-
-		int room_num = clients[key].room_num;
 
 		room_l.lock();
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
@@ -1273,6 +1336,8 @@ void process_event(EVENT_ST &ev)
 		if (it->weapon_list[wp_type][wp_index].owner == -1)
 		{
 			it->weapon_list[wp_type][wp_index].SetOwner(my_slot);
+			char index = it->weapon_list[wp_type][wp_index].respawn_index;
+			it->weapon_respawn[index].respawn_able = true;
 
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
@@ -1293,6 +1358,168 @@ void process_event(EVENT_ST &ev)
 				clients[ev.id].playerinfo->weapon_index = -1;
 				clients[ev.id].playerinfo->weapon_type = -1;
 			}
+		}
+		break;
+	}
+	case EV_WEAPON_SKILL:
+	{
+		int room_num = clients[ev.id].room_num;
+		char weapon_type = ev.attack_count;
+		char weapon_index = clients[ev.id].playerinfo->weapon_index;
+		char owner = clients[ev.id].slot;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		if (weapon_type == Weapon_Lollipop) {
+
+		}
+		else if (weapon_type == Weapon_chupachupse) {
+
+		}
+		else if (weapon_type == Weapon_pepero) {
+
+			// »©»©·Î ÅõÃ¢ ½ºÅ³
+
+			PxVec3 look = clients[ev.id].playerinfo->m_Look;
+			cout << "player look : " << look.x << ", " << look.y << ", " << look.z << endl;
+			look = look.getNormalized();
+
+			char order = it->trigger_order;
+
+			Skill_Trigger *s_trigger = new Skill_Trigger(weapon_type, weapon_index, owner, order);
+
+			it->trigger_order += 1;
+
+			PxVec3 pos = clients[ev.id].playerinfo->m_Pos;
+			pos += look * Pepero_Trigger_Len;
+			pos.y += CH_HALF_HEIGHT;
+
+			PxVec3 weapon_look = look;
+			//weapon_look.z *= -1.f;
+			if (weapon_look == PxVec3(-1, 0, 0)) {
+				weapon_look.x *= -1.f;
+			}
+			//weapon_look.z = weapon_look.z * -1.f;
+
+			//it->m_pPhysx->m_Scene->lockWrite();
+
+			//cout << "weapon pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
+
+			s_trigger->skillTrigger = it->m_pPhysx->getRotateBoxTrigger(pos, weapon_look, PxVec3(18, 1, 1), Pepero_Trigger, order);
+
+			//s_trigger->skillTrigger = it->m_pPhysx->getBoxTrigger(pos, PxVec3(45, 5, 5));
+
+			//s_trigger->skillTrigger->setGlobalPose();
+
+			//it->m_pPhysx->m_Scene->unlockWrite();
+
+			s_trigger->vel = look * Pepero_Vel;
+			s_trigger->look = look;
+
+			it->m_skillTrigger.push_back(*s_trigger);
+
+			pos -= look * Pepero_Pos_Gap;
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index);
+						send_pos_weapon_packet(client_id, weapon_type, weapon_index, pos.x, pos.y, pos.z);
+					}
+				}
+			}
+
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_PEPERO_MOVE, high_resolution_clock::now() + 16ms, order);
+		}
+		else if (weapon_type == Weapon_chocolate) {
+
+		}
+		break;
+	}
+	case EV_PEPERO_MOVE:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+		char order = ev.attack_count;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		auto it2 = find(it->m_skillTrigger.begin(), it->m_skillTrigger.end(), order);			//order
+
+		if (it2 != it->m_skillTrigger.end())
+		{
+			char type = it2->type;
+			char index = it2->index;
+			PxVec3 vel = it2->vel;
+			PxVec3 look = it2->look;
+
+			//cout << "vel : " << vel.x << "," << vel.y << "," << vel.z << endl;
+
+			PxTransform trans = it2->skillTrigger->getGlobalPose();
+
+			trans.p += vel * gGameTimer.GetTimeElapsed();
+
+			it2->skillTrigger->setGlobalPose(trans);
+
+			trans.p -= look * Pepero_Pos_Gap;
+
+			//cout << "send weapon pos\n";
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_pos_weapon_packet(client_id, type, index, trans.p.x, trans.p.y, trans.p.z);
+					}
+				}
+			}
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_PEPERO_MOVE, high_resolution_clock::now() + 16ms, order);
+		}
+		break;
+	}
+	case EV_WEAPON_REMOVE:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		cout << int(ev.attack_count) << "¹ø »©»©·Î ¹«±â¸¦ ¾ø¾Ö¶ó!!\n";
+
+		auto it2 = find(it->m_skillTrigger.begin(), it->m_skillTrigger.end(), ev.attack_count);			//order
+
+		if (it2 != it->m_skillTrigger.end())
+		{
+			char type = it2->type;
+			char index = it2->index;
+			it->weapon_list[type][index].init();
+			it2->skillTrigger->release();
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_remove_weapon_packet(client_id, type, index);
+					}
+				}
+			}
+			it->m_skillTrigger.erase(it2);
 		}
 		break;
 	}
@@ -1405,6 +1632,10 @@ void clientInputProcess(int room_num)
 					if (clients[client_id].playerinfo->m_PlayerController) {
 						const PxU32 flags = clients[client_id].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
 
+						PxExtendedVec3 pos = clients[client_id].playerinfo->m_PlayerController->getPosition();
+
+						cout << pos.x << "," << pos.y << "," << pos.z << endl;
+
 						if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 						{
 							//cout << "Ãæµ¹\n";
@@ -1457,6 +1688,9 @@ void clientUpdateProcess(int room_num)
 	room_l.lock();
 	auto it = find(gRoom.begin(), gRoom.end(), room_num);
 	room_l.unlock();
+
+	//PxTransform t = it->test->getGlobalPose();
+	//cout << t.p.x << "," << t.p.y << "," << t.p.z << endl;
 
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{

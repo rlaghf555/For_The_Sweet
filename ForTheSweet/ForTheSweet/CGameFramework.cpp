@@ -615,6 +615,40 @@ void CGameFramework::processPacket(char *ptr)
 
 		break;
 	}
+	case SC_POS_WEAPON:
+	{
+		sc_packet_pos_weapon p_pos_weapon;
+
+		memcpy(&p_pos_weapon, ptr, sizeof(p_pos_weapon));
+
+		int type = p_pos_weapon.weapon_type;
+		int index = p_pos_weapon.weapon_index;
+		float x = p_pos_weapon.x;
+		float y = p_pos_weapon.y;
+		float z = p_pos_weapon.z;
+
+		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
+
+		//XMFLOAT3 pos = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition();
+		//cout << "pos1 : " << pos.x << "," << pos.y << "," << pos.z << endl;
+
+		break;
+	}
+	case SC_REMOVE_WEAPON:
+	{
+		sc_packet_remove_weapon p_remove_weapon;
+
+		memcpy(&p_remove_weapon, ptr, sizeof(p_remove_weapon));
+
+		int type = p_remove_weapon.weapon_type;
+		int index = p_remove_weapon.weapon_index;
+
+		m_pScene->m_WeaponShader[type]->getObject(index)->visible = false;
+		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(1000.f, 1000.f, 1000.f);
+		m_pScene->weapon_box[type][index]->pick = false;
+
+		break;
+	}
 	case SC_PICK_WEAPON:
 	{
 		sc_packet_pick_weapon p_pick_weapon;
@@ -2193,7 +2227,9 @@ void CGameFramework::FrameAdvance()
 	
 	if (SERVER_ON) {
 		m_pPhysx->m_Scene->simulate(1.f / 60.f);
+		m_pPhysx->m_Scene->lockWrite();
 		m_pPhysx->m_Scene->fetchResults(true);
+		m_pPhysx->m_Scene->unlockWrite();
 
 		//physx::PxExtendedVec3 playerPosition;
 		//playerPosition = m_pPhysx->m_PlayerController->getPosition();

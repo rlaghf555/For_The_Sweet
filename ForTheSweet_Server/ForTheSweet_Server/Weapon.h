@@ -11,6 +11,7 @@ class CWeapon
 {
 public:
 	char owner;
+	char respawn_index;
 	bool empty;
 	PxVec3 pos;
 
@@ -18,7 +19,9 @@ public:
 	CWeapon();
 	~CWeapon();
 
+	void init();
 	void SetOwner(char own) { owner = own; }
 	void SetEmpty(bool emp) { empty = emp; }
+	void SetRespawnIndex(char index) { respawn_index = index; }
 };
 

@@ -5,8 +5,14 @@
 #include "Protocol.h"
 
 class CPlayer;
+class CRoom;
 
 using namespace physx;
+
+struct UserData {
+	char order = 0;
+	char type = 0;
+};
 
 class PhysSimulation : public PxSimulationEventCallback
 {
@@ -16,6 +22,7 @@ private:
 	//
 	//GameObject* player = nullptr;
 	CPlayer* player[8];
+	CRoom* room;
 
 public:
 	void onTrigger(PxTriggerPair* pairs, PxU32 count);
@@ -26,6 +33,7 @@ public:
 	void onContact(const PxContactPairHeader&, const PxContactPair*, PxU32) { }
 
 	void setPlayer(CPlayer* pl, int index) { player[index] = pl; }
+	void setRoom(CRoom* ro) { room = ro; }
 	//void removePlayer(int index) { delete player[index]; player[index] = nullptr; }
 	//void setPlayer(GameObject* object) { player = object; }
 };
@@ -70,13 +78,18 @@ public:
 	~CPhysx() = default;
 
 	void initPhysics();
-	void move(int direction, float distance);
 
 	PxTriangleMesh*	GetTriangleMesh(vector<PxVec3> ver, vector<int> index);
+	void getBoxController(PxVec3 pos, PxVec3 size);
 	PxCapsuleController* getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback);
-	PxRigidStatic* getTrigger(PxVec3& t, PxVec3 size);
+	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size);
+	PxRigidStatic* getRotateBoxTrigger(PxVec3& t, PxVec3& ro, PxVec3 size, int trigger_type, int order);
+	PxRigidStatic* getSphereTrigger(PxVec3& t, PxReal rad);
+
+	PxRigidStatic* getBox(PxVec3& t, PxVec3 size);
 
 	void registerPlayer(CPlayer* player, int index) { m_Simulator.setPlayer(player, index); }
+	void registerRoom(CRoom* room) { m_Simulator.setRoom(room); }
 	//void removePlayer(int index) { m_Simulator.removePlayer(index); }
 };
 
