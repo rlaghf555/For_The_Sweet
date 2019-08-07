@@ -1632,9 +1632,9 @@ void clientInputProcess(int room_num)
 					if (clients[client_id].playerinfo->m_PlayerController) {
 						const PxU32 flags = clients[client_id].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
 
-						PxExtendedVec3 pos = clients[client_id].playerinfo->m_PlayerController->getPosition();
-
-						cout << pos.x << "," << pos.y << "," << pos.z << endl;
+						//PxExtendedVec3 pos = clients[client_id].playerinfo->m_PlayerController->getPosition();
+						//
+						//cout << pos.x << "," << pos.y << "," << pos.z << endl;
 
 						if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 						{

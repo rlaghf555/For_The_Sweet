@@ -664,6 +664,29 @@ void CGameFramework::processPacket(char *ptr)
 
 		break;
 	}
+	case SC_UNPICK_WEAPON:
+	{
+		sc_packet_unpick_weapon p_unpick_weapon;
+
+		memcpy(&p_unpick_weapon, ptr, sizeof(p_unpick_weapon));
+
+		int type = p_unpick_weapon.weapon_type;
+		int index = p_unpick_weapon.weapon_index;
+		XMFLOAT3 look = m_pScene->m_pPlayer[p_unpick_weapon.id]->GetLook();
+		XMFLOAT3 pos = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition();
+
+		cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
+		cout << "pos1 : " << pos.x << "," << pos.y << "," << pos.z << endl;
+
+		m_pScene->m_pPlayer[p_unpick_weapon.id]->SetWeapon(false, -1, -1);
+
+		m_pScene->m_WeaponShader[type]->getObject(index)->SetLook(look);
+		//m_pScene->m_WeaponShader[type]->getObject(index)->init();
+		//m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, 90);
+		//m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(-90, 0, 0);
+
+		break;
+	}
 	case SC_TIMER:
 	{
 		sc_packet_timer p_timer;
