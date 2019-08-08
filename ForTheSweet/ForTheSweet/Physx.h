@@ -84,8 +84,9 @@ public:
 	void move(DWORD direction, float distance);
 
 	PxTriangleMesh*	GetTriangleMesh(mesh* meshes, UINT count);
-	PxCapsuleController*	getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback);
-	PxRigidStatic*				getTrigger(PxVec3& t, XMFLOAT3 size);
+	PxCapsuleController* getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback);
+	PxRigidStatic*	getTrigger(PxVec3& t, XMFLOAT3 size);
+	PxRigidDynamic* getRotateBox(PxVec3& t, PxVec3& ro, PxVec3 size);	// 초콜릿 방패세팅
 
 	void registerPlayer(CPlayer* player, int index) { m_Simulator.setPlayer(player, index); }
 };

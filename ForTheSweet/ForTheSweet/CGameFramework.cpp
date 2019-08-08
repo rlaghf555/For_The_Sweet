@@ -459,12 +459,14 @@ void CGameFramework::processPacket(char *ptr)
 
 		XMFLOAT3 pos(p_pos.x, p_pos.y, p_pos.z);
 		XMFLOAT3 vel(p_pos.vx, p_pos.vy, p_pos.vz);
+		int status = m_pScene->getplayer(p_pos.id)->GetStatus();
 
 		if (p_pos.size == sizeof(sc_packet_pos))
 		{
 			m_pScene->getplayer(p_pos.id)->SetPosition(pos);
 			m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
-			m_pScene->getplayer(p_pos.id)->SetLook(vel);
+			if(status != STATUS::CRI_HITTED)
+				m_pScene->getplayer(p_pos.id)->SetLook(vel);
 
 			// cout << int(p_pos.dashed) << endl;
 
@@ -560,6 +562,13 @@ void CGameFramework::processPacket(char *ptr)
 				|| anim_index == Anim_candy_HardAttack || anim_index == Anim_chocolate_HardAttack) {
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HARD_ATTACK);
 			}
+			if (anim_index == Anim_Lollipop_Skill || anim_index == Anim_pepero_Skill
+				|| anim_index == Anim_pepero_Skill ) {
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::SKILL_WEAPON_NO_MOVE);
+			}
+			if (anim_index == Anim_candy_Skill) {
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::SKILL_WEAPON_MOVE);
+			}
 			
 		}
 
@@ -570,7 +579,7 @@ void CGameFramework::processPacket(char *ptr)
 		sc_packet_hit p_hit;
 
 		memcpy(&p_hit, ptr, sizeof(p_hit));
-		m_pScene->getplayer(p_hit.id)->Set_HP(p_hit.hp);
+		m_pScene->getplayer(p_hit.id)->Set_HP(int(p_hit.hp));
 
 		m_pScene->getplayer(p_hit.id)->SetStatus(STATUS::HITTED);
 		m_pScene->getplayer(p_hit.id)->ChangeAnimation(Anim_Small_React);
@@ -579,6 +588,43 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_MP());	//mp
 		SoundManager::GetInstance()->PlaySounds(HIT);
+		break;
+	}
+
+	case SC_CRITICAL_HIT:
+	{
+		sc_packet_critical_hit p_cri_hit;
+
+		memcpy(&p_cri_hit, ptr, sizeof(p_cri_hit));
+
+		float x = p_cri_hit.x;
+		float y = p_cri_hit.y;
+		float z = p_cri_hit.z;
+
+		PxVec3 knockback(x, y, z);
+		XMFLOAT3 look(x, y, z);
+
+		m_pScene->getplayer(p_cri_hit.id)->Set_HP(int(p_cri_hit.hp));
+		m_pScene->getplayer(p_cri_hit.id)->SetLook(look);
+		m_pScene->getplayer(p_cri_hit.id)->m_Knockback = knockback;
+		m_pScene->getplayer(p_cri_hit.id)->SetStatus(STATUS::CRI_HITTED);
+		m_pScene->getplayer(p_cri_hit.id)->ChangeAnimation(Anim_Hard_React);
+		m_pScene->getplayer(p_cri_hit.id)->DisableLoop();
+
+		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_HP());	//hp
+		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_MP());	//mp
+
+		break;
+	}
+	case SC_HEAL:
+	{
+		sc_packet_heal p_heal;
+
+		memcpy(&p_heal, ptr, sizeof(p_heal));
+		m_pScene->getplayer(p_heal.id)->Set_HP(int(p_heal.hp));
+
+		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_heal.id]->Get_HP());	//hp
+		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_heal.id]->Get_MP());	//mp
 		break;
 	}
 	case SC_PUT_WEAPON:
@@ -628,10 +674,6 @@ void CGameFramework::processPacket(char *ptr)
 		float z = p_pos_weapon.z;
 
 		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
-
-		//XMFLOAT3 pos = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition();
-		//cout << "pos1 : " << pos.x << "," << pos.y << "," << pos.z << endl;
-
 		break;
 	}
 	case SC_REMOVE_WEAPON:
@@ -645,6 +687,17 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_WeaponShader[type]->getObject(index)->visible = false;
 		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(1000.f, 1000.f, 1000.f);
+
+		if (type == M_Weapon_Lollipop)
+		{
+			m_pScene->m_MagicShader[index]->visible = false;
+		}
+		if (type == M_Weapon_chocolate)
+		{
+			m_pPhysx->m_Scene->lockWrite();
+			Choco_Actor[index]->release();
+			m_pPhysx->m_Scene->unlockWrite();
+		}
 		m_pScene->weapon_box[type][index]->pick = false;
 
 		break;
@@ -659,7 +712,7 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->weapon_box[p_pick_weapon.weapon_type][p_pick_weapon.weapon_index]->pick = true;
 
-		cout << p_pick_weapon.id << " Player Weapon Success\n";
+		cout << int(p_pick_weapon.id) << " Player Weapon Success\n";
 		// 여러 Client Position 정보가 버퍼에 누적되어있을 수도 있으니 땡겨주자.
 
 		break;
@@ -672,19 +725,61 @@ void CGameFramework::processPacket(char *ptr)
 
 		int type = p_unpick_weapon.weapon_type;
 		int index = p_unpick_weapon.weapon_index;
-		XMFLOAT3 look = m_pScene->m_pPlayer[p_unpick_weapon.id]->GetLook();
-		XMFLOAT3 pos = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition();
-
-		cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
-		cout << "pos1 : " << pos.x << "," << pos.y << "," << pos.z << endl;
+		float x = p_unpick_weapon.x;
+		float y = p_unpick_weapon.y;
+		float z = p_unpick_weapon.z;
 
 		m_pScene->m_pPlayer[p_unpick_weapon.id]->SetWeapon(false, -1, -1);
 
-		m_pScene->m_WeaponShader[type]->getObject(index)->SetLook(look);
-		//m_pScene->m_WeaponShader[type]->getObject(index)->init();
-		//m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, 90);
-		//m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(-90, 0, 0);
+		if (type == M_Weapon_pepero)
+		{
+			XMFLOAT3 look = m_pScene->m_pPlayer[p_unpick_weapon.id]->GetLook();
+			XMFLOAT3 pos = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition();
 
+			cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
+			cout << "pos1 : " << pos.x << "," << pos.y << "," << pos.z << endl;
+
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetUp(look);
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
+		}
+		
+		if (type == M_Weapon_Lollipop)
+		{
+			m_pScene->m_WeaponShader[type]->getObject(index)->init();
+			m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 90.f, 0);
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
+		}
+
+		if (type == M_Weapon_chocolate)
+		{
+			XMFLOAT3 look = m_pScene->m_pPlayer[p_unpick_weapon.id]->GetLook();
+			XMFLOAT3 right = m_pScene->m_pPlayer[p_unpick_weapon.id]->GetRight();
+			XMFLOAT3 pos = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition();
+
+			cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
+			cout << "right : " << right.x << "," << right.y << "," << right.z << endl;
+			cout << "pos : " << x << "," << y << "," << z << endl;
+
+			PxVec3 phyx_pos(x, y, z);
+			PxVec3 phyx_look(look.x, look.y, look.z);
+			phyx_look = phyx_look.getNormalized();
+			PxVec3 phyx_size(Chocolate_Depth, Chocolate_Height, Chocolate_Width);
+
+			if (phyx_look == PxVec3(-1, 0, 0)) {
+				phyx_look.x *= -1.f;
+			}
+			Choco_Actor[index] = m_pPhysx->getRotateBox(phyx_pos, phyx_look, phyx_size);
+
+			m_pScene->m_WeaponShader[type]->getObject(index)->init();
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetLook(look);
+			m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 90.f, 0);
+
+			x += -right.x * Chocolate_Width * 0.7f;
+			y += -right.y * Chocolate_Width * 0.7f;
+			z += -right.z * Chocolate_Width * 0.7f;
+
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
+		}
 		break;
 	}
 	case SC_TIMER:
@@ -1129,7 +1224,7 @@ void CGameFramework::ProcessInput()
 	{
 		if (m_pPlayer)
 		{
-			if (input_able)	// 나중에 input_able로 대체하기!!!!!!!!!!!!!!!!!!!!!
+			if (true)	// 나중에 input_able로 대체하기!!!!!!!!!!!!!!!!!!!!!
 			{
 				if (::GetFocus())
 				{
@@ -2097,9 +2192,30 @@ void CGameFramework::UpdateProcess()
 				if (m_pScene->m_pPlayer[i]->GetConnected())
 				{
 					char status = m_pScene->m_pPlayer[i]->GetStatus();
-					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK || status == STATUS::HITTED)
+					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK 
+						|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE)
 					{
 						continue;
+					}
+					else if (status == STATUS::CRI_HITTED) 
+					{
+						PxVec3 knockback_dir = m_pScene->m_pPlayer[i]->m_Knockback;
+						PxVec3 dist = knockback_dir * m_GameTimer.GetTimeElapsed() * KnockBack_Vel;
+						
+						float jump_height = 0.0f;
+
+						if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
+							m_pScene->m_pPlayer[i]->m_Jump.stopJump();
+						}
+						else {
+							m_pScene->m_pPlayer[i]->m_Fall.startJump(0);
+							jump_height = m_pScene->m_pPlayer[i]->m_Fall.getHeight(m_GameTimer.GetTimeElapsed());
+						}
+
+						dist.y += jump_height;
+
+						PxControllerFilters filters;
+						const PxU32 flags = m_pScene->m_pPlayer[i]->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
 					}
 					else
 					{
@@ -2123,7 +2239,10 @@ void CGameFramework::UpdateProcess()
 
 						if (m_pScene->m_pPlayer[i]->GetDashed())
 						{
-							vel *= 2;
+							if (status != STATUS::SKILL_WEAPON_MOVE)
+							{
+								vel *= 2;
+							}
 						}
 
 						float jump_height;
@@ -2174,7 +2293,6 @@ void CGameFramework::UpdateProcess()
 		}
 	}
 }
-
 
 void CGameFramework::CollisionProcess()
 {
@@ -2308,7 +2426,7 @@ void CGameFramework::FrameAdvance()
 		m_pCamera->SetLookAt(position);
 		m_pPlayer->SetPosition(position);
 
-		//cout << "0 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+		cout << "0 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
 
 		playerPosition = m_pScene->m_pPlayer[1]->m_PlayerController->getPosition();
 		position.x = playerPosition.x;
@@ -2369,6 +2487,23 @@ void CGameFramework::FrameAdvance()
 							hard_attack_count = 0;
 					}
 					else if (status == STATUS::HITTED)
+					{
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+					}
+					else if (status == STATUS::CRI_HITTED)
+					{
+						XMFLOAT3 look = m_pScene->m_pPlayer[i]->GetLook();
+						look.x *= -1.f;
+						look.y *= -1.f;
+						look.z *= -1.f;
+						m_pScene->m_pPlayer[i]->SetLook(look);
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+					}
+					else if (status == STATUS::SKILL_WEAPON_MOVE)
+					{
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+					}
+					else if (status == STATUS::SKILL_WEAPON_NO_MOVE) 
 					{
 						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
 					}

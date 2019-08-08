@@ -95,6 +95,11 @@ void CPlayer::setHP(int hp)
 	m_hp = hp;
 }
 
+void  CPlayer::setLollipopHeal(bool heal)
+{
+	lollipop_heal = true;
+}
+
 void CPlayer::setPlayerController(CPhysx *physx)
 {
 	m_PlayerController = physx->getCapsuleController(m_Pos, CH_CAPSULE_HEIGHT, CH_CAPSULE_RADIUS, m_HitReport);

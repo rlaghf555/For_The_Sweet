@@ -133,13 +133,16 @@ void CRoom::start(const vector<PxVec3>& vectex, const vector<int>& index)
 
 	// room : PhysicSimulation에 등록
 
-	PxVec3 wall_size(3, 30, 65);
+	PxVec3 wall_size(3, 100, 65);
 	PxVec3 wall_pos(167, 40, 0);
 
-
-	m_pPhysx->getBoxController(wall_pos, wall_size);
+	test2 = m_pPhysx->getBox(wall_pos, wall_size);
 	wall_pos.x *= -1.f;
-	m_pPhysx->getBoxController(wall_pos, wall_size);
+	m_pPhysx->getBox(wall_pos, wall_size);
+
+	//m_pPhysx->setBoxController(wall_pos, wall_size);
+	//wall_pos.x *= -1.f;
+	//m_pPhysx->setBoxController(wall_pos, wall_size);
 
 	// 무기 로딩
 

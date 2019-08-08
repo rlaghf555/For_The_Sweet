@@ -280,6 +280,31 @@ void send_hit_packet(char client, char id, int hp)
 	sendPacket(client, &p_hit);
 }
 
+void send_critical_hit_packet(char client, char id, int hp, const PxVec3& dir)
+{
+	sc_packet_critical_hit p_cri_hit;
+	p_cri_hit.type = SC_CRITICAL_HIT;
+	p_cri_hit.size = sizeof(sc_packet_critical_hit);
+	p_cri_hit.id = id;
+	p_cri_hit.hp = hp;
+	p_cri_hit.x = dir.x;
+	p_cri_hit.y = dir.y;
+	p_cri_hit.z = dir.z;
+
+	sendPacket(client, &p_cri_hit);
+}
+
+void send_heal_packet(char client, char id, int hp)
+{
+	sc_packet_heal p_heal;
+	p_heal.type = SC_HEAL;
+	p_heal.size = sizeof(sc_packet_heal);
+	p_heal.id = id;
+	p_heal.hp = hp;
+
+	sendPacket(client, &p_heal);
+}
+
 void send_put_weapon_packet(char client, char wp_type, char wp_index, float x, float y, float z) {
 	sc_packet_put_weapon p_put_weapon;
 
@@ -332,13 +357,17 @@ void send_pick_weapon_packet(char client, char id, char wp_type, char wp_index) 
 	sendPacket(client, &p_pick_weapon);
 }
 
-void send_unpick_weapon_packet(char client, char id, char wp_type, char wp_index) {
+void send_unpick_weapon_packet(char client, char id, char wp_type, char wp_index, const PxVec3& pos) {
 	sc_packet_unpick_weapon p_unpick_weapon;
+
 	p_unpick_weapon.type = SC_UNPICK_WEAPON;
 	p_unpick_weapon.size = sizeof(sc_packet_unpick_weapon);
 	p_unpick_weapon.id = id;
 	p_unpick_weapon.weapon_type = wp_type;
 	p_unpick_weapon.weapon_index = wp_index;
+	p_unpick_weapon.x = pos.x;
+	p_unpick_weapon.y = pos.y;
+	p_unpick_weapon.z = pos.z;
 
 	sendPacket(client, &p_unpick_weapon);
 }
@@ -611,7 +640,8 @@ void process_packet(char key, char *buffer)
 
 				it->weapon_respawn[i].respawn_able = false;
 
-				int type = rand() % (MAX_WEAPON_TYPE - 1);
+				//int type = rand() % (MAX_WEAPON_TYPE - 1);
+				int type = (rand() % 2) + 2;
 
 				it->weapon_respawn[i].type = type;
 
@@ -1034,28 +1064,28 @@ void process_packet(char key, char *buffer)
 			clients[key].playerinfo->setAniIndex(Anim::Lollipop_Skill);
 			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 1000ms, 0);
 			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 760ms, Weapon_Lollipop);
-			clients[key].playerinfo->setStatus(STATUS::SKILL_Lolli);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_WEAPON_NO_MOVE);
 		}
 		// ÃòÆÄÃä½º
 		else if (weapon_type == Weapon_chupachupse) {
 			clients[key].playerinfo->setAniIndex(Anim::Candy_Skill);
 			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 3000ms, 0);
 			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 600ms, Weapon_chupachupse);
-			clients[key].playerinfo->setStatus(STATUS::SKILL_Candy);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_WEAPON_MOVE);
 		}
 		// »©»©·Î
 		else if (weapon_type == Weapon_pepero) {
 			clients[key].playerinfo->setAniIndex(Anim::Pepero_Skill);
 			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 1000ms, 0);
 			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 630ms, Weapon_pepero);
-			clients[key].playerinfo->setStatus(STATUS::SKILL_Pepero);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_WEAPON_NO_MOVE);
 		}
 		// ÃÊÄÝ¸´
 		else if (weapon_type == Weapon_chocolate) {
 			clients[key].playerinfo->setAniIndex(Anim::Chocolate_Skill);
 			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 660ms, 0);
 			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 360ms, Weapon_chocolate);
-			clients[key].playerinfo->setStatus(STATUS::SKILL_Choco);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_WEAPON_NO_MOVE);
 		}
 
 		room_l.lock();
@@ -1281,6 +1311,8 @@ void process_event(EVENT_ST &ev)
 		// ÇÃ·¹ÀÌ¾î
 	case EV_FREE:
 	{
+		cout << "FREE\n";
+
 		if (clients[ev.id].playerinfo->attack_count != ev.attack_count)
 			break;
 
@@ -1374,21 +1406,73 @@ void process_event(EVENT_ST &ev)
 
 		if (weapon_type == Weapon_Lollipop) {
 
+			// ·Ñ¸®ÆË ½ºÅ³
+			char order = it->trigger_order;
+
+			Skill_Actor *s_lollipop = new Skill_Actor(weapon_type, weapon_index, owner, order);
+
+			it->trigger_order += 1;
+
+			PxVec3 look = clients[ev.id].playerinfo->m_Look.getNormalized();
+			PxVec3 pos = clients[ev.id].playerinfo->m_Pos;
+			pos += look * Lollipop_Pos_Gap;
+
+			it->weapon_list[weapon_type][weapon_index].pos = pos;
+
+			//it->m_pPhysx->m_Scene->lockWrite();
+			s_lollipop->skillTrigger = it->m_pPhysx->getSphereTrigger(pos, Lollipop_Radius, Lollipop_Trigger, order);
+			//it->m_pPhysx->m_Scene->unlockWrite();
+
+
+			it->m_skillTrigger.push_back(*s_lollipop);
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index, pos);
+					}
+				}
+			}
+			
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_LOLLIPOP_HEAL, high_resolution_clock::now() + 500ms, order);
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_WEAPON_REMOVE, high_resolution_clock::now() + 5000ms, order);
 		}
 		else if (weapon_type == Weapon_chupachupse) {
 
+			// ÃòÆÄÃä½º ½ºÅ³
+			char order = it->trigger_order;
+
+			Skill_Actor *s_candy = new Skill_Actor(weapon_type, weapon_index, owner, order);
+
+			it->trigger_order += 1;
+
+			PxVec3 pos = clients[ev.id].playerinfo->m_Pos;
+			pos.y += CH_HALF_HEIGHT;
+
+			//it->m_pPhysx->m_Scene->lockWrite();
+			s_candy->skillTrigger = it->m_pPhysx->getSphereTrigger(pos, Candy_Radius, Candy_Trigger, order);
+			//it->m_pPhysx->m_Scene->unlockWrite();
+
+			it->m_skillTrigger.push_back(*s_candy);
+
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_CANDY_MOVE, high_resolution_clock::now() + 16ms, order);
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_WEAPON_REMOVE, high_resolution_clock::now() + 1860ms, order);
 		}
 		else if (weapon_type == Weapon_pepero) {
-
+			
 			// »©»©·Î ÅõÃ¢ ½ºÅ³
-
 			PxVec3 look = clients[ev.id].playerinfo->m_Look;
 			cout << "player look : " << look.x << ", " << look.y << ", " << look.z << endl;
 			look = look.getNormalized();
 
 			char order = it->trigger_order;
 
-			Skill_Trigger *s_trigger = new Skill_Trigger(weapon_type, weapon_index, owner, order);
+			Skill_Actor *s_pepero = new Skill_Actor(weapon_type, weapon_index, owner, order);
 
 			it->trigger_order += 1;
 
@@ -1397,28 +1481,21 @@ void process_event(EVENT_ST &ev)
 			pos.y += CH_HALF_HEIGHT;
 
 			PxVec3 weapon_look = look;
-			//weapon_look.z *= -1.f;
 			if (weapon_look == PxVec3(-1, 0, 0)) {
 				weapon_look.x *= -1.f;
 			}
-			//weapon_look.z = weapon_look.z * -1.f;
-
-			//it->m_pPhysx->m_Scene->lockWrite();
 
 			//cout << "weapon pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
 
-			s_trigger->skillTrigger = it->m_pPhysx->getRotateBoxTrigger(pos, weapon_look, PxVec3(18, 1, 1), Pepero_Trigger, order);
-
-			//s_trigger->skillTrigger = it->m_pPhysx->getBoxTrigger(pos, PxVec3(45, 5, 5));
-
-			//s_trigger->skillTrigger->setGlobalPose();
-
+			//it->m_pPhysx->m_Scene->lockWrite();
+			s_pepero->skillTrigger = it->m_pPhysx->getRotateBoxTrigger(pos, weapon_look, 
+				PxVec3(Pepero_Length, Pepero_Width, Pepero_Width), Pepero_Trigger, order);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
-			s_trigger->vel = look * Pepero_Vel;
-			s_trigger->look = look;
+			s_pepero->vel = look * Pepero_Vel;
+			s_pepero->look = look;
 
-			it->m_skillTrigger.push_back(*s_trigger);
+			it->m_skillTrigger.push_back(*s_pepero);
 
 			pos -= look * Pepero_Pos_Gap;
 
@@ -1430,16 +1507,136 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
-						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index);
-						send_pos_weapon_packet(client_id, weapon_type, weapon_index, pos.x, pos.y, pos.z);
+						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index, pos);
 					}
 				}
 			}
 
 			add_timer(room_num, room_num + ROOM_TIMER_START, EV_PEPERO_MOVE, high_resolution_clock::now() + 16ms, order);
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_WEAPON_REMOVE, high_resolution_clock::now() + 5000ms, order);
 		}
 		else if (weapon_type == Weapon_chocolate) {
 
+			// »©»©·Î ÅõÃ¢ ½ºÅ³
+			PxVec3 look = clients[ev.id].playerinfo->m_Look;
+			//look = PxVec3(1, 0, 0);
+
+			cout << "player look : " << look.x << ", " << look.y << ", " << look.z << endl;
+			look = look.getNormalized();
+
+			char order = it->trigger_order;
+
+			Skill_Actor *s_choco= new Skill_Actor(weapon_type, weapon_index, owner, order);
+
+			it->trigger_order += 1;
+
+			PxVec3 pos = clients[ev.id].playerinfo->m_Pos;
+			pos += look * Chocolate_Len;
+			pos.y += Chocolate_Height;
+
+			PxVec3 weapon_look = look;
+			if (weapon_look == PxVec3(-1, 0, 0)) {
+				weapon_look.x *= -1.f;
+			}
+
+			cout << "weapon pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
+
+			//it->m_pPhysx->m_Scene->lockWrite();
+			s_choco->skillTrigger = it->m_pPhysx->getRotateBox(pos, weapon_look, 
+				PxVec3(Chocolate_Depth, Chocolate_Height, Chocolate_Width));
+			//it->m_pPhysx->m_Scene->unlockWrite();
+
+			it->m_skillTrigger.push_back(*s_choco);
+
+			//pos -= look * Pepero_Pos_Gap;
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index, pos);
+					}
+				}
+			}
+
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_WEAPON_REMOVE, high_resolution_clock::now() + 5000ms, order);
+		}
+		break;
+	}
+	case EV_LOLLIPOP_HEAL:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+		char order = ev.attack_count;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		auto it2 = find(it->m_skillTrigger.begin(), it->m_skillTrigger.end(), order);			//order
+
+		if (it2 != it->m_skillTrigger.end())
+		{
+			char type = it2->type;
+			char index = it2->index;
+			PxVec3 vel = it2->vel;
+			PxVec3 look = it2->look;
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						if (clients[client_id].playerinfo->lollipop_heal = true)
+						{
+							char slot = clients[client_id].slot;
+							int hp = clients[client_id].playerinfo->m_hp + 2;
+							if (hp > MAX_HP) hp = MAX_HP;
+							clients[client_id].playerinfo->setHP(hp);
+
+							for (int j = 0; j < MAX_ROOM_USER; ++j)
+							{
+								int client_id2 = it->clientNum[j];
+
+								if (client_id2 != -1)
+								{
+									if (clients[client_id2].connected == true)
+									{
+										send_heal_packet(client_id, slot, hp);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_LOLLIPOP_HEAL, high_resolution_clock::now() + 500ms, order);
+		}
+		break;
+	}
+	case EV_CANDY_MOVE:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+		char order = ev.attack_count;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		auto it2 = find(it->m_skillTrigger.begin(), it->m_skillTrigger.end(), order);			//order
+
+		if (it2 != it->m_skillTrigger.end())
+		{
+			int owner = it->clientNum[it2->owner];
+			PxVec3 owner_pos = clients[owner].playerinfo->m_Pos;
+			it2->skillTrigger->setGlobalPose(PxTransform(owner_pos));
+
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_CANDY_MOVE, high_resolution_clock::now() + 16ms, order);
 		}
 		break;
 	}
@@ -1496,7 +1693,7 @@ void process_event(EVENT_ST &ev)
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
 
-		cout << int(ev.attack_count) << "¹ø »©»©·Î ¹«±â¸¦ ¾ø¾Ö¶ó!!\n";
+		cout << int(ev.attack_count) << "¹ø ¹«±â¸¦ ¾ø¾Ö¶ó!!\n";
 
 		auto it2 = find(it->m_skillTrigger.begin(), it->m_skillTrigger.end(), ev.attack_count);			//order
 
@@ -1504,6 +1701,8 @@ void process_event(EVENT_ST &ev)
 		{
 			char type = it2->type;
 			char index = it2->index;
+			char slot = it2->owner;
+
 			it->weapon_list[type][index].init();
 			it2->skillTrigger->release();
 
@@ -1515,6 +1714,10 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
+						if (type == Weapon_chupachupse) {
+							PxVec3 pos(0, 0, 0);
+							send_unpick_weapon_packet(client_id, slot, type, index, pos);
+						}
 						send_remove_weapon_packet(client_id, type, index);
 					}
 				}
@@ -1602,12 +1805,42 @@ void clientInputProcess(int room_num)
 				direction = velocity.getNormalized();
 
 				if (clients[client_id].playerinfo->m_dashed) {
-					direction *= 2;
+					if (status != STATUS::SKILL_WEAPON_MOVE) {
+						direction *= 2;
+					}
 				}
 
-				if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK || status == STATUS::HITTED)
+				if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK
+					|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE)
 				{
 					continue;
+				}
+				else if (status == STATUS::CRI_HITTED)
+				{
+					PxVec3 knockback_dir = clients[client_id].playerinfo->m_Knockback;
+					PxVec3 dist = knockback_dir * gGameTimer.GetTimeElapsed() * KnockBack_Vel;
+
+					float jump_height = 0.0f;
+
+					if (clients[client_id].playerinfo->m_Jump.mJump == true) {
+						clients[client_id].playerinfo->m_Jump.stopJump();
+					}
+					else {
+						clients[client_id].playerinfo->m_Fall.startJump(0);
+						jump_height = clients[client_id].playerinfo->m_Fall.getHeight(gGameTimer.GetTimeElapsed());
+					}
+
+					dist.y += jump_height;
+
+					PxControllerFilters filters;
+					const PxU32 flags = clients[client_id].playerinfo->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
+
+					if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+					{
+						if (clients[client_id].playerinfo->m_Fall.mJump) {
+							clients[client_id].playerinfo->m_Fall.stopJump();
+						}
+					}
 				}
 				else
 				{
@@ -1689,33 +1922,63 @@ void clientUpdateProcess(int room_num)
 	auto it = find(gRoom.begin(), gRoom.end(), room_num);
 	room_l.unlock();
 
-	//PxTransform t = it->test->getGlobalPose();
+	//PxTransform t = it->test2->getGlobalPose();
 	//cout << t.p.x << "," << t.p.y << "," << t.p.z << endl;
 
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		int client_id = it->clientNum[i];
+		int client_slot = clients[client_id].slot;
 		if (client_id != -1)
 		{
 			if (clients[client_id].connected == true)
 			{
 				if (clients[client_id].playerinfo->hitted == true)
 				{
-					add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 660ms);
+					char status = clients[client_id].playerinfo->m_status;
 
-					clients[client_id].playerinfo->setStatus(STATUS::HITTED);
-					int hp = clients[client_id].playerinfo->m_hp - 10;
-					clients[client_id].playerinfo->setHP(hp);
+					if (status == STATUS::HITTED) {
 
-					for (int j = 0; j < MAX_ROOM_USER; ++j)
-					{
-						if (clients[it->clientNum[j]].connected == true)
+						add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 660ms);
+
+						clients[client_id].playerinfo->setAniIndex(Anim::Small_React);
+
+						int hp = clients[client_id].playerinfo->m_hp - 10;
+						if (hp < 0) hp = 0;
+						clients[client_id].playerinfo->setHP(hp);
+
+						for (int j = 0; j < MAX_ROOM_USER; ++j)
 						{
-							if (it->clientNum[j] != -1)
+							int client_id2 = it->clientNum[j];
+							if (client_id2 != -1)
 							{
-								if (clients[it->clientNum[j]].connected == true)
+								if (clients[client_id2].connected == true)
 								{
-									send_hit_packet(it->clientNum[j], client_id, hp);
+									send_hit_packet(client_id2, client_slot, hp);
+								}
+							}
+						}
+					}
+					if (status == STATUS::CRI_HITTED) {
+
+						add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 2000ms);
+
+						clients[client_id].playerinfo->setAniIndex(Anim::Hard_React);
+
+						int hp = clients[client_id].playerinfo->m_hp - 20;
+						if (hp < 0) hp = 0;
+						clients[client_id].playerinfo->setHP(hp);
+
+						PxVec3 dir = clients[client_id].playerinfo->m_Knockback;
+
+						for (int j = 0; j < MAX_ROOM_USER; ++j)
+						{
+							int client_id2 = it->clientNum[j];
+							if (client_id2 != -1)
+							{
+								if (clients[client_id2].connected == true)
+								{
+									send_critical_hit_packet(client_id2, client_slot, hp, dir);
 								}
 							}
 						}

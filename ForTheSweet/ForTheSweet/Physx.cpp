@@ -253,3 +253,51 @@ PxRigidStatic * CPhysx::getTrigger(PxVec3 & t, XMFLOAT3 size)
 
 	return staticActor;
 }
+
+PxRigidDynamic* CPhysx::getRotateBox(PxVec3& t, PxVec3& ro, PxVec3 size)
+{
+	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);	//시물레이션 off
+	//shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);			//트리거링 on
+
+	PxVec3 init(1, 0, 0);
+
+	//cout << "weapon look : " << ro.x << "," << ro.y << "," << ro.z << endl;
+
+	PxVec3 a = init.cross(ro);
+
+	PxQuat q;
+	q.x = a.x;
+	q.y = a.y;
+	q.z = a.z;
+	q.w = sqrt((init.magnitude() * init.magnitude()) * (ro.magnitude()*ro.magnitude())) + init.dot(ro);
+
+	q = q.getNormalized();
+
+	PxTransform temp(t, q);
+
+	PxRigidDynamic * staticActor = m_Physics->createRigidDynamic(temp);
+
+	//staticActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	//staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
+	//staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+	//staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_X, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Y, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, true);
+
+
+	//UserData* udata = new UserData;
+	//udata->type = Player_Trigger;
+	//
+	staticActor->attachShape(*shape);
+	//staticActor->userData = udata;
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
+
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
+}

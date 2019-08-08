@@ -17,10 +17,7 @@ struct UserData {
 class PhysSimulation : public PxSimulationEventCallback
 {
 private:
-	//void PlayerToEnemy(PxTriggerPair* trigger);
-	//void EnemyToPlayer(PxTriggerPair* trigger);
-	//
-	//GameObject* player = nullptr;
+	
 	CPlayer* player[8];
 	CRoom* room;
 
@@ -30,8 +27,7 @@ public:
 	void onConstraintBreak(PxConstraintInfo*, PxU32) {}
 	void onWake(PxActor**, PxU32) {}
 	void onSleep(PxActor**, PxU32) {}
-	void onContact(const PxContactPairHeader&, const PxContactPair*, PxU32) { }
-
+	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);
 	void setPlayer(CPlayer* pl, int index) { player[index] = pl; }
 	void setRoom(CRoom* ro) { room = ro; }
 	//void removePlayer(int index) { delete player[index]; player[index] = nullptr; }
@@ -80,13 +76,16 @@ public:
 	void initPhysics();
 
 	PxTriangleMesh*	GetTriangleMesh(vector<PxVec3> ver, vector<int> index);
-	void getBoxController(PxVec3 pos, PxVec3 size);
+	void setBoxController(PxVec3 pos, PxVec3 size);
 	PxCapsuleController* getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback);
-	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size);
-	PxRigidStatic* getRotateBoxTrigger(PxVec3& t, PxVec3& ro, PxVec3 size, int trigger_type, int order);
-	PxRigidStatic* getSphereTrigger(PxVec3& t, PxReal rad);
 
-	PxRigidStatic* getBox(PxVec3& t, PxVec3 size);
+	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size);
+	PxRigidStatic* getRotateBoxTrigger(PxVec3& t, PxVec3& ro, PxVec3 size, int trigger_type, int order);	// ª©ª©∑Œ ºº∆√
+
+	PxRigidStatic* getSphereTrigger(PxVec3& t, PxReal rad, int trigger_type, int order);	// ∑—∏Æ∆À, √Ú∆ƒ√‰Ω∫ ºº∆√
+
+	PxRigidDynamic* getBox(PxVec3& t, PxVec3 size);						// ∏ ºº∆√
+	PxRigidDynamic* getRotateBox(PxVec3& t, PxVec3& ro, PxVec3 size);	// √ ƒ›∏¥ πÊ∆–ºº∆√
 
 	void registerPlayer(CPlayer* player, int index) { m_Simulator.setPlayer(player, index); }
 	void registerRoom(CRoom* room) { m_Simulator.setRoom(room); }

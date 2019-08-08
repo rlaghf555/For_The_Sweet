@@ -43,6 +43,8 @@ constexpr int SC_TIMER = 9;
 constexpr int SC_UNPICK_WEAPON = 10;
 constexpr int SC_POS_WEAPON = 11;
 constexpr int SC_REMOVE_WEAPON = 12;
+constexpr int SC_HEAL = 13;
+constexpr int SC_CRITICAL_HIT = 14;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
@@ -128,8 +130,6 @@ struct cs_packet_weapon_skill {
 	//char weapon_type;
 };
 
-///////////////////////////////////////////////////////////////////
-
 struct sc_packet_login {
 	char size;
 	char type;
@@ -202,6 +202,23 @@ struct sc_packet_hit {
 	char hp;
 };
 
+struct sc_packet_critical_hit {
+	char size;
+	char type;
+	char id;
+	char hp;
+	float x;
+	float y;
+	float z;
+};
+
+struct sc_packet_heal {
+	char size;
+	char type;
+	char id;
+	char hp;
+};
+
 struct sc_packet_put_weapon {
 	char size;
 	char type;
@@ -232,6 +249,9 @@ struct sc_packet_unpick_weapon {
 	char id;
 	char weapon_type;
 	char weapon_index;
+	float x;
+	float y;
+	float z;
 };
 
 struct sc_packet_remove_weapon {

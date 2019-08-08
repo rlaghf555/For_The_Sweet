@@ -6,6 +6,7 @@
 void add_timer(CRoom *room, char order, high_resolution_clock::time_point start_time)
 {
 	int room_num = room->room_num + ROOM_TIMER_START;
+	cout << "Crush\n";
 
 	room->m_timer_l.lock();
 	room->m_timer_queue.push(EVENT_ST{ room_num, EV_WEAPON_REMOVE, start_time, order });
@@ -15,33 +16,42 @@ void add_timer(CRoom *room, char order, high_resolution_clock::time_point start_
 void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
 	for (PxU32 i = 0; i < count; ++i) {
-		if (pairs[i].status)
+		if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_LOST)
 		{
-			cout << "~~\n";
-			if (Pepero_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
-			{
-				cout << "3\n";
+			for (int j = 0; j < MAX_ROOM_USER; ++j) {
+				if (Lollipop_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
+				{
+					if (player[j])
+					{
+						if (player[j]->m_PlayerController != nullptr)
+						{
+							if (pairs[i].otherActor == player[j]->getControllerActor()) {
+								cout << j << " Player : Lollipop Heal Fail\n";
+								//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
+
+								player[j]->setLollipopHeal(false);
+							}
+						}
+					}
+				}
 			}
 		}
+
 		if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 		{
-			cout << "1\n";
-			if (Pepero_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
-			{
-				cout << "2\n";
-			}
-
 			//PxTransform tmp = pairs[i].triggerActor->getGlobalPose();
 			//cout << "Trigger Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
 			//
 			//tmp = pairs[i].otherActor->getGlobalPose();
 			//cout << "Other Actor Pos : " << tmp.p.x << "," << tmp.p.y << "," << tmp.p.z << endl;
 
-			PxVec3 mylook;
-			PxVec3 otherlook;
+			PxVec3 mylook(0, 0, 0);
+			PxVec3 otherlook(0, 0, 0);
 			float dot;
 
-			for (int j = 0; j < 8; ++j)
+			for (int j = 0; j < MAX_ROOM_USER; ++j)
 			{
 				if (player[j])
 				{
@@ -56,7 +66,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 			bool pepero_status = false;
 			char order = 0;
 
-			for (int j = 0; j < 8; ++j)
+			for (int j = 0; j < MAX_ROOM_USER; ++j)
 			{
 				if (Player_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
 				{
@@ -67,7 +77,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 							if (player[j]->m_PlayerController != nullptr)
 							{
 								if (pairs[i].otherActor == player[j]->getControllerActor()) {
-									cout << j << " Player Hitted\n";
+									cout << j << " Player : Hitted\n";
 									//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
 									//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
 									//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
@@ -80,12 +90,12 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 											continue;
 										}
 										else {
-											player[j]->setAniIndex(Anim::Small_React);
+											player[j]->setStatus(STATUS::HITTED);
 											player[j]->hitted = true;
 										}
 									}
 									else {
-										player[j]->setAniIndex(Anim::Small_React);
+										player[j]->setStatus(STATUS::HITTED);
 										player[j]->hitted = true;
 									}
 								}
@@ -95,7 +105,6 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 				}
 				else if (Pepero_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
 				{
-					pepero_status = true;
 					order = reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->order;
 
 					if (player[j])
@@ -103,24 +112,88 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 						if (player[j]->m_PlayerController != nullptr)
 						{
 							if (pairs[i].otherActor == player[j]->getControllerActor()) {
-								cout << j << " Pepero Skill Player Hitted\n";
+								cout << j << " Player : Pepero Skill Hitted\n";
 								//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
 								//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
 								//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
 
-								player[j]->setAniIndex(Anim::Small_React);
+								auto it = find(room->m_skillTrigger.begin(), room->m_skillTrigger.end(), order);
+								
+								player[j]->m_Knockback = it->look;
+								player[j]->setStatus(STATUS::CRI_HITTED);
 								player[j]->hitted = true;
+							}
+						}
+						add_timer(room, order, high_resolution_clock::now());
+					}
+				 }
+				else if (Lollipop_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
+				{
+					if (player[j])
+					{
+						if (player[j]->m_PlayerController != nullptr)
+						{
+							if (pairs[i].otherActor == player[j]->getControllerActor()) {
+								cout << j << " Player : Lollipop Heal Success\n";
+								//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
+
+								player[j]->setLollipopHeal(true);
+							}
+						}
+					}
+				}
+				else if (Candy_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
+				{
+					order = reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->order;
+
+					auto it = find(room->m_skillTrigger.begin(), room->m_skillTrigger.end(), order);
+
+					int slot = it->owner;
+
+					if (player[j])
+					{
+						if (player[j]->m_PlayerController != nullptr)
+						{
+							if (slot != j)
+							{
+								if (pairs[i].otherActor == player[j]->getControllerActor()) {
+									cout << j << " Player : Candy Skill Hit\n";
+									//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
+									//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
+									//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
+									// cout << mylook.x << "," << mylook.y << "," << mylook.z << endl;
+									PxVec3 knockback;
+
+									knockback = player[j]->m_Pos - player[slot]->m_Pos;
+
+									player[j]->m_Knockback = knockback.getNormalized();
+									//player[j]->m_Knockback = PxVec3(1, 0, 0);
+									player[j]->setStatus(STATUS::CRI_HITTED);
+									player[j]->hitted = true;
+								}
 							}
 						}
 					}
 				}
 			}
-			if (pepero_status == true) {
-				add_timer(room, order, high_resolution_clock::now());
-			}
 		}
 	}
 }//트리거박스 충돌 체크
+
+void PhysSimulation::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
+{ 
+	for (PxU32 i = 0; i < nbPairs; i++)
+	{
+		const PxContactPair& cp = pairs[i];
+
+		if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+		{
+			cout << "contack~~\n";
+		}
+	}
+}
 
 CPhysx::CPhysx()
 {
@@ -225,7 +298,7 @@ PxCapsuleController* CPhysx::getCapsuleController(PxVec3 pos, float height, floa
 	return controller;
 }
 
-void CPhysx::getBoxController(PxVec3 pos, PxVec3 size)
+void CPhysx::setBoxController(PxVec3 pos, PxVec3 size)
 {
 	PxBoxControllerDesc boxDesc;
 	boxDesc.halfForwardExtent = size.z;
@@ -247,15 +320,66 @@ void CPhysx::getBoxController(PxVec3 pos, PxVec3 size)
 	//return controller;
 }
 
-PxRigidStatic* CPhysx::getBox(PxVec3& t, PxVec3 size)
+PxRigidDynamic* CPhysx::getBox(PxVec3& t, PxVec3 size)
 {
 	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
 	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);	//시물레이션 off
-	//shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
+	//shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);			//트리거링 on
 
-	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t));
+	PxRigidDynamic * staticActor = m_Physics->createRigidDynamic(PxTransform(t));
+
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_X, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Y, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, true);
+	
+
+	//UserData* udata = new UserData;
+	//udata->type = Player_Trigger;
+	//
+	staticActor->attachShape(*shape);
+	//staticActor->userData = udata;
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
+
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
+}
+
+PxRigidDynamic* CPhysx::getRotateBox(PxVec3& t, PxVec3& ro, PxVec3 size)
+{
+	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);	//시물레이션 off
+	//shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);			//트리거링 on
+
+	PxVec3 init(1, 0, 0);
+
+	//cout << "weapon look : " << ro.x << "," << ro.y << "," << ro.z << endl;
+
+	PxVec3 a = init.cross(ro);
+
+	PxQuat q;
+	q.x = a.x;
+	q.y = a.y;
+	q.z = a.z;
+	q.w = sqrt((init.magnitude() * init.magnitude()) * (ro.magnitude()*ro.magnitude())) + init.dot(ro);
+
+	q = q.getNormalized();
+
+	PxTransform temp(t, q);
+
+	PxRigidDynamic * staticActor = m_Physics->createRigidDynamic(temp);
 
 	//staticActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	//staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
+	//staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+	//staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_X, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Y, true);
+	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, true);
+
 
 	//UserData* udata = new UserData;
 	//udata->type = Player_Trigger;
@@ -334,14 +458,21 @@ PxRigidStatic* CPhysx::getRotateBoxTrigger(PxVec3& t, PxVec3& ro, PxVec3 size, i
 	return staticActor;
 }
 
-PxRigidStatic* CPhysx::getSphereTrigger(PxVec3& t, PxReal rad)
+PxRigidStatic* CPhysx::getSphereTrigger(PxVec3& t, PxReal rad, int trigger_type, int order)
 {
 	PxShape* shape = m_Physics->createShape(PxSphereGeometry(rad), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
 	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);	//시물레이션 off
 	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
 
 	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t));
+
+	UserData* udata = new UserData;
+	udata->order = order;
+	udata->type = trigger_type;
+
 	staticActor->attachShape(*shape);
+	staticActor->userData = (void *)udata;
+
 	//float* num = new float(0.0f);
 	//staticActor->userData = (void*)num;
 	/*int* tmp = (int*)staticActor->userData;

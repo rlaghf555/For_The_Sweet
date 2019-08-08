@@ -44,6 +44,8 @@ public:
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
 	ID3D12RootSignature *GetGraphicsRootSignature();
 
+	PxRigidActor				*test;
+
 	CPlayer						*m_pPlayer[MAX_USER];
 	CPlayer*					getplayer(char id) { return m_pPlayer[id]; }
 	Model_Animation				*character_anim;

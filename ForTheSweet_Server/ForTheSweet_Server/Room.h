@@ -7,7 +7,9 @@
 
 enum EVENT_TYPE {
 	EV_FREE, EV_HIT, EV_PICK, EV_WEAPON_SKILL, EV_WEAPON_REMOVE,		// 플레이어에 해당
+	EV_LOLLIPOP_HEAL,
 	EV_PEPERO_MOVE,
+	EV_CANDY_MOVE,
 	EV_WEAPON, EV_FOG, EV_FEVER, EV_LIGHTNING, EV_SLIME,				// 심판에 해당
 	EV_TIME
 };
@@ -24,7 +26,7 @@ struct EVENT_ST {
 	}
 };
 
-struct Skill_Trigger {
+struct Skill_Actor {
 	char order;
 	char type;
 	char index;
@@ -34,7 +36,7 @@ struct Skill_Trigger {
 	PxVec3 look;
 
 public:
-	Skill_Trigger(char tp, char in, char ow, char ord) {
+	Skill_Actor(char tp, char in, char ow, char ord) {
 		type = tp;
 		owner = ow;
 		index = in;
@@ -74,8 +76,9 @@ public:
 	int timer;
 
 	PxBoxController *test;
+	PxRigidActor *test2;
 
-	vector<Skill_Trigger> m_skillTrigger;
+	vector<Skill_Actor> m_skillTrigger;
 	char trigger_order;
 
 public:

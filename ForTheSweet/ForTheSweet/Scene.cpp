@@ -857,10 +857,11 @@ void CScene::initObject()
 	//무기 매트릭스 초기화
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
-			m_WeaponShader[i]->getObject(j)->init();
+			//m_WeaponShader[i]->getObject(j)->init();
 			m_WeaponShader[i]->getObject(j)->visible = true;
 
 			if (SERVER_ON) {
+				m_WeaponShader[i]->getObject(j)->init();
 				m_WeaponShader[i]->getObject(j)->visible = false;
 				m_WeaponShader[i]->getObject(j)->SetPosition(1000.f, 1000.f, 1000.f);
 				
@@ -983,7 +984,7 @@ void CScene::initObject()
 	//m_EffectShader->ShowEffect(7);
 	//m_DarkShader->is_dark = true;
 	//번개------------------------------------------------------------------
-	m_pPlayer[0]->SetWeapon(true, M_Weapon_Lollipop, 0);	// test
+	//m_pPlayer[0]->SetWeapon(true, M_Weapon_Lollipop, 0);	// test
 }
 
 void CScene::SetTeamUI()
@@ -1211,14 +1212,21 @@ void CScene::AnimateWeapon(int i)
 	else if (weapon_type == M_Weapon_chocolate) m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-100, 10, 0);
 	else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 
-	if (animindex == Anim_Lollipop_Skill && m_pPlayer[i]->getAnimtime() >= 23) {
-		m_MagicShader[i]->visible = true;//마법진
-		XMFLOAT3 aa = m_WeaponShader[weapon_type]->getObject(weapon_index)->GetPosition();
-		aa.y -= 3.f;
-		m_WeaponShader[weapon_type]->getObject(weapon_index)->init(aa);
-		m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 90.f, 0);
-		//m_WeaponShader[weapon_type]->getObject(weapon_index)->SetScale(1.5f);
-		m_MagicShader[i]->getObjects()->SetPosition(aa);
+	if (SERVER_ON == false) {
+
+		if (animindex == Anim_Lollipop_Skill && m_pPlayer[i]->getAnimtime() >= 23) {
+			m_MagicShader[i]->visible = true;//마법진
+
+			XMFLOAT3 pos = m_pPlayer[0]->GetPosition();
+
+			XMFLOAT3 aa = m_WeaponShader[weapon_type]->getObject(weapon_index)->GetPosition();
+			aa.y -= 3.f;
+			m_WeaponShader[weapon_type]->getObject(weapon_index)->init(aa);
+			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 90.f, 0);
+			//m_WeaponShader[weapon_type]->getObject(weapon_index)->SetScale(1.5f);
+
+			m_MagicShader[i]->getObjects()->SetPosition(aa);
+		}
 	}
 }
 

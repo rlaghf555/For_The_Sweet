@@ -56,6 +56,8 @@ public:
 	// 스킬 관련
 	bool skill_state = false;
 
+	PxRigidActor *Choco_Actor[WEAPON_EACH_NUM];
+
 	vector<KEY> key_buffer;
 
 	char *m_pid, *m_pip;	//id, ip

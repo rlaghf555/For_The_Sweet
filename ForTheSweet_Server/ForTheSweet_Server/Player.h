@@ -15,10 +15,9 @@ enum STATUS {
 	DEFENSE,
 	JUMP,
 	HITTED,
-	SKILL_Lolli,
-	SKILL_Candy,
-	SKILL_Pepero,
-	SKILL_Choco
+	CRI_HITTED,
+	SKILL_WEAPON_MOVE,
+	SKILL_WEAPON_NO_MOVE,
 };
 
 enum Anim {
@@ -99,6 +98,9 @@ public:
 	void setHP(int hp);
 	void jumpstart() { m_Jump.startJump(120); }
 
+	// ·Ñ¸®ÆË Heal
+	void setLollipopHeal(bool heal);
+
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
 	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
 
@@ -107,6 +109,8 @@ public:
 	PxVec3 m_Vel;
 	PxVec3 m_JumpVel;
 	PxVec3 m_Look;
+
+	PxVec3 m_Knockback;
 
 	PxCapsuleController* m_PlayerController;
 	PlayerHitReport* m_HitReport;
@@ -127,5 +131,6 @@ public:
 	char attack_count;
 
 	int m_hp;
+	bool lollipop_heal;
 };
 

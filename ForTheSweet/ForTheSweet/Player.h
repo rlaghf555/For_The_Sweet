@@ -21,7 +21,10 @@ enum STATUS {
 	HARD_ATTACK,
 	DEFENSE,
 	JUMP,
-	HITTED
+	HITTED,
+	CRI_HITTED,
+	SKILL_WEAPON_MOVE,
+	SKILL_WEAPON_NO_MOVE,
 };
 
 static PxF32 gJumpGravity = -140.0f;
@@ -100,6 +103,8 @@ public:
 	Jump m_Fall;
 	
 	float Scale_time = 0.3f;
+
+	PxVec3 m_Knockback;
 
 public:
 	CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
