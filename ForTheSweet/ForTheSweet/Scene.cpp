@@ -1059,30 +1059,38 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	{
 		if (m_pPlayer[i]) {
 			if (m_pPlayer[i]->GetConnected()) {
+				int animindex = m_pPlayer[i]->getAnimIndex();
 				m_pPlayerShader[i]->Animate(fTimeElapsed);
-				if (m_pPlayer[i]->getAnimIndex() != m_pPlayerShadowShader[i]->getAnimIndex()) {
-					m_pPlayerShadowShader[i]->ChangeAnimation(m_pPlayer[i]->getAnimIndex());
+				if (animindex != m_pPlayerShadowShader[i]->getAnimIndex()) {
+					m_pPlayerShadowShader[i]->ChangeAnimation(animindex);
 				}
+				XMFLOAT3 Look = m_pPlayer[i]->GetLook();
+				XMFLOAT3 Up = m_pPlayer[i]->GetUp();
+				XMFLOAT3 Right = m_pPlayer[i]->GetRight();
+				m_pPlayerShadowShader[i]->getPlayer()->SetWorld(Look, Up, Right);
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				m_ExplosionShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 				//if (m_ExplosionShader[i]->m_bBlowingUp == false) m_ExplosionShader[i]->m_bBlowingUp = true;
 				
 				if(m_MagicShader[i]->visible)m_MagicShader[i]->Animate(fTimeElapsed);
 
-				if (m_pPlayer[i]->getAnimIndex() == Anim_Stun) {	//Anim_Jump
+				if (animindex == Anim_Stun) {	//Anim_Jump
 					m_StunShader[i]->visible = true;
 					m_StunShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition()); //Anim_Stun
 				}
 				else m_StunShader[i]->visible = false;
 
-				if (m_pPlayer[i]->getAnimIndex() == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1) {
+				if (animindex == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1) {
 					m_SkillEffectShader[i]->getObject(0)->visible = true;
 					m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 
 					m_SkillParticleShader[i][m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
 				}
-				if (m_pPlayer[i]->getAnimIndex() == Anim_Jump&&m_pPlayer[i]->getAnimtime() <= 1) {	//Anim_Jump
+				if (animindex == Anim_Jump&&m_pPlayer[i]->getAnimtime() <= 1) {	//Anim_Jump
 					SoundManager::GetInstance()->PlaySounds(JUMPSOUND);
+				}
+				if ((animindex == Anim_Small_React||animindex == Anim_Hard_React)&& m_pPlayer[i]->getAnimtime() <= 1) {	//Anim_Jump
+					SoundManager::GetInstance()->PlaySounds(HIT);
 				}
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {

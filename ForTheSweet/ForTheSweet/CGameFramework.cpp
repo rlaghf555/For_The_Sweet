@@ -587,7 +587,6 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_MP());	//mp
-		SoundManager::GetInstance()->PlaySounds(HIT);
 		break;
 	}
 
@@ -613,7 +612,6 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_MP());	//mp
-
 		break;
 	}
 	case SC_HEAL:

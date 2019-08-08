@@ -1,26 +1,26 @@
 ﻿  CGameFramework.cpp
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(588): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(589): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(614): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(615): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(626): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(627): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2041): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2042): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2043): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(1694): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2218): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2266): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2389): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2390): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2391): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2417): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2422): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2423): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2424): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2432): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2433): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2434): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(588): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(589): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(613): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(614): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(624): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(625): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2039): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2040): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2041): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(1692): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2216): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2264): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2387): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2388): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2389): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2415): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2420): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2421): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2422): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2430): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2431): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(2432): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(240): warning C4244: '초기화 중': '_Ty'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
@@ -51,14 +51,63 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=std::pair<std::string,float>
           ]
-  c:\users\kyh\desktop\0808\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(853): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
+  c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\cgameframework.cpp(851): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
           with
           [
               _Ty=std::pair<std::string,float>
           ]
+  Scene.cpp
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(63): warning C4316: 'PlayerShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(67): warning C4316: 'PlayerShadowShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(91): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(178): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(180): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(183): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(185): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(299): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(386): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(388): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(391): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(393): warning C4316: 'ShadowDebugShader': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(435): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(437): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(439): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(447): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(449): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(451): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(479): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(488): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(784): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(785): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(788): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(790): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(792): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(796): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(798): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(800): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(826): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\hol\desktop\밀화부리\forthesweet\forthesweet\scene.cpp(832): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   코드를 생성하고 있습니다.
-  2 of 4079 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  5 of 4079 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    5 functions had inline decision re-evaluated but remain unchanged
+    10 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
-  ForTheSweet.vcxproj -> C:\Users\KYH\Desktop\0808\For_The_Sweet\ForTheSweet\Release\ForTheSweet.exe
+PhysXCharacterKinematic_static_32.lib(CctBoxController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctBoxController.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCapsuleController.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterController.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCharacterControllerCallbacks.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterControllerCallbacks.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctCharacterControllerManager.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctCharacterControllerManager.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctController.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctController.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctObstacleContext.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctObstacleContext.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctSweptBox.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctSweptBox.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctSweptCapsule.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctSweptCapsule.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXCharacterKinematic_static_32.lib(CctSweptVolume.obj) : warning LNK4099: 'PhysXCharacterKinematic_static_32.pdb' PDB를 'PhysXCharacterKinematic_static_32.lib(CctSweptVolume.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXCharacterKinematic_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtCpuWorkerThread.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtCpuWorkerThread.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtDefaultCpuDispatcher.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtDefaultCpuDispatcher.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtDefaultErrorCallback.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtDefaultErrorCallback.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtDefaultSimulationFilterShader.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtDefaultSimulationFilterShader.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtDefaultStreams.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtDefaultStreams.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtRigidBodyExt.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtRigidBodyExt.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtSimpleFactory.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtSimpleFactory.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+PhysXExtensions_static_32.lib(ExtTriangleMeshExt.obj) : warning LNK4099: 'PhysXExtensions_static_32.pdb' PDB를 'PhysXExtensions_static_32.lib(ExtTriangleMeshExt.obj)' 또는 'C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\PhysXExtensions_static_32.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+  ForTheSweet.vcxproj -> C:\Users\Hol\Desktop\밀화부리\ForTheSweet\Release\ForTheSweet.exe

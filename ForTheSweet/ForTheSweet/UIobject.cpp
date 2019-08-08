@@ -93,7 +93,7 @@ void UIObject::SetNumSprite(XMUINT2 & numSprite, XMUINT2& nowSprite)
 void HPBarObject::UpdateScale()
 {
 	float tmp = m_nSize.x *m_xmf2Scale.x;
-	m_xmf2Scale.x = m_xmf2Scale.x *Now_Gauge / Max_Gauge;
+	m_xmf2Scale.x = 0.8f *Now_Gauge / Max_Gauge;
 	float tmp2 = m_nSize.x * m_xmf2Scale.x;
 	tmp -= tmp2;
 	m_xmf2ScreenPos.x -= (tmp / 2);
