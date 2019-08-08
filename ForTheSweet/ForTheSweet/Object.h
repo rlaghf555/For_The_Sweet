@@ -25,6 +25,7 @@ public:
 	virtual void SetPosition(XMFLOAT3& xmf3Position);
 	virtual void SetEffectLook(XMFLOAT3&xmf3Look);
 	void SetScale(float value);
+	void SetScale(float value, bool test);
 	//게임 객체를 로컬 x-축, y-축, z-축 방향으로 이동한다.
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);

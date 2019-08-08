@@ -236,6 +236,17 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			}
 		}
 	}
+
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
+			m_ExplosionShader[i][j] = new ExplosionModelShader(effect_Model[M_Effect_Explosion_Star]);
+			m_ExplosionShader[i][j]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+			if (i == 4) {
+				j = WEAPON_EACH_NUM;
+			}
+		}
+	}
+
 	m_EffectShader = new EffectShader();
 	m_EffectShader->BuildObjects(pd3dDevice, pd3dCommandList, Selected_Map);
 	//for (int i = 0; i < 10; i++)m_EffectShader->getObject(i)->visible = true;
@@ -256,17 +267,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_StunShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
 	}
 
-	for (int i = 0; i < MAX_USER; i++) {
-		m_MagicShader[i] = new MagicShader();
-		m_MagicShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
-	}
-
-	for (int i = 0; i < MAX_USER; i++) {
-		m_ExplosionShader[i] = new ExplosionShader();
-		m_ExplosionShader[i]->BuildObjects(pd3dDevice, pd3dCommandList);
-		m_ExplosionShader[i]->m_bBlowingUp = true;
-	}
-		
+	m_MagicShader = new MagicShader();
+	m_MagicShader->BuildObjects(pd3dDevice, pd3dCommandList);
+			
 	m_TeamShader = new TeamShader();
 	m_TeamShader->BuildObjects(pd3dDevice, pd3dCommandList, 0);
 	m_EnemyShader = new TeamShader();
@@ -677,6 +680,15 @@ void CScene::ReleaseObjects()
 			}
 		}
 	}
+	for (int i = 0; i < WEAPON_MAX_NUM; ++i) {
+		for (int j = 0; j < WEAPON_EACH_NUM; ++j) {
+			if (m_ExplosionShader[i][j]) {
+				m_ExplosionShader[i][j]->ReleaseShaderVariables();
+				m_ExplosionShader[i][j]->ReleaseObjects();
+				delete m_ExplosionShader[i][j];
+			}
+		}
+	}
 	for (int i = 0; i < MAX_USER; ++i) {
 		if (bounding_box_test[i]) {
 			bounding_box_test[i]->ReleaseShaderVariables();
@@ -684,12 +696,10 @@ void CScene::ReleaseObjects()
 			delete bounding_box_test[i];
 		}
 	}
-	for (int i = 0; i < MAX_USER; ++i) {
-		if (m_MagicShader[i]) {
-			m_MagicShader[i]->ReleaseShaderVariables();
-			m_MagicShader[i]->ReleaseObjects();
-			delete m_MagicShader[i];
-		}
+	if (m_MagicShader) {
+		m_MagicShader->ReleaseShaderVariables();
+		m_MagicShader->ReleaseObjects();
+		delete m_MagicShader;
 	}
 	for (int i = 0; i < 8; ++i) {
 		if (door[i]) {
@@ -728,13 +738,6 @@ void CScene::ReleaseObjects()
 			m_SkillParticleShader[j][i]->ReleaseShaderVariables();
 			m_SkillParticleShader[j][i]->ReleaseObjects();
 			delete m_SkillParticleShader[j][i];
-		}
-	}
-	for (int i = 0; i < MAX_USER; ++i) {
-		if (m_ExplosionShader[i]) {
-			m_ExplosionShader[i]->ReleaseShaderVariables();
-			m_ExplosionShader[i]->ReleaseObjects();
-			delete m_ExplosionShader[i];
 		}
 	}
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -1069,11 +1072,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				XMFLOAT3 Right = m_pPlayer[i]->GetRight();
 				m_pPlayerShadowShader[i]->getPlayer()->SetWorld(Look, Up, Right);
 				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
-				m_ExplosionShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
-				//if (m_ExplosionShader[i]->m_bBlowingUp == false) m_ExplosionShader[i]->m_bBlowingUp = true;
 				
-				if(m_MagicShader[i]->visible)m_MagicShader[i]->Animate(fTimeElapsed);
-
 				if (animindex == Anim_Stun) {	//Anim_Jump
 					m_StunShader[i]->visible = true;
 					m_StunShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition()); //Anim_Stun
@@ -1122,6 +1121,18 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		}
 	}
 
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
+			if (i == 4 && j == 1)//컵케익 1개
+				break;
+			m_ExplosionShader[i][j]->Animate(fTimeElapsed);
+		}
+	}
+
+	//if (m_ExplosionShader[0][0]->m_bBlowingUp == false) m_ExplosionShader[0][0]->m_bBlowingUp = true;	//test
+	//m_ExplosionShader[0][0]->Setposition(-100, 30, 20);
+	//m_ExplosionShader[0][0]->Animate(fTimeElapsed);
+
 	if (Selected_Map == M_Map_1) {
 		if (m_WeaponShader[M_Weapon_cupcake]->get_cupcake_up_flag() == false)
 			m_WeaponShader[M_Weapon_cupcake]->Animate(fTimeElapsed, animate_flag, M_Weapon_cupcake);
@@ -1150,6 +1161,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 	m_MessageShader->Animate(fTimeElapsed);
 	m_EffectShader->Animate(fTimeElapsed);
+
+	m_MagicShader->Animate(fTimeElapsed);
 }
 
 void CScene::AnimateWeapon(int i)
@@ -1221,9 +1234,8 @@ void CScene::AnimateWeapon(int i)
 	else m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(-70, 0, 0);
 
 	if (SERVER_ON == false) {
-
 		if (animindex == Anim_Lollipop_Skill && m_pPlayer[i]->getAnimtime() >= 23) {
-			m_MagicShader[i]->visible = true;//마법진
+			m_MagicShader->getObjects(weapon_index)->visible = true;//마법진
 
 			XMFLOAT3 pos = m_pPlayer[0]->GetPosition();
 
@@ -1233,7 +1245,7 @@ void CScene::AnimateWeapon(int i)
 			m_WeaponShader[weapon_type]->getObject(weapon_index)->Rotate(0, 90.f, 0);
 			//m_WeaponShader[weapon_type]->getObject(weapon_index)->SetScale(1.5f);
 
-			m_MagicShader[i]->getObjects()->SetPosition(aa);
+			m_MagicShader->getObjects(weapon_index)->SetPosition(aa);
 		}
 	}
 }
@@ -1432,15 +1444,21 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	//			weapon_box[i][j]->Render(pd3dCommandList, pCamera);
 	//	}
 	//}
-	
+
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
+			if (m_ExplosionShader[i][j])
+				if (m_ExplosionShader[i][j]->m_bBlowingUp)
+					m_ExplosionShader[i][j]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected() && m_pPlayerShader[i]->render) m_pPlayerShadowShader[i]->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < MAX_USER; i++) if (m_pPlayer[i]->GetConnected()) if (m_MagicShader[i])if (m_MagicShader[i]->visible) m_MagicShader[i]->Render(pd3dCommandList, pCamera);
+	if (m_MagicShader) m_MagicShader->Render(pd3dCommandList, pCamera);
 
 	if (Selected_Map == M_Map_1) if (m_ShadowShader[0]) m_ShadowShader[0]->Render(pd3dCommandList, pCamera);
-
-	for (int i = 0; i < MAX_USER; i++)if (m_ExplosionShader[i])if (m_ExplosionShader[i]->m_bBlowingUp)m_ExplosionShader[i]->Render(pd3dCommandList, pCamera);
-
+	
 	for (int i = 0; i < MAX_USER; i++)if (m_SkillEffectShader[i]) /*if (m_SkillEffectShader[i]->visible == true)*/ m_SkillEffectShader[i]->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < 10; i++) if (m_EffectShader) m_EffectShader->Render(pd3dCommandList, pCamera);

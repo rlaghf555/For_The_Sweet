@@ -252,7 +252,6 @@ public:
 class MagicShader : public MeshShader
 {
 public:
-	bool visible = false;
 	MagicShader() {};
 	~MagicShader() {};
 
@@ -260,6 +259,7 @@ public:
 	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Animate(float fTimeElapsed);
+	virtual CGameObject* getObjects(int i) { return m_ppObjects[i]; }
 };
 
 class EffectShader : public MeshShader
@@ -517,7 +517,6 @@ public:
 	virtual int getAnimIndex();
 };
 
-
 class ExplosionShader : public MeshShader
 {
 public:
@@ -533,13 +532,9 @@ public:
 public:
 	ExplosionShader() {};
 	~ExplosionShader() {};
-
-	//virtual D3D12_INPUT_LAYOUT_DESC		CreateInputLayout(int index = 0);
-
+	
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
-
-	//virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
 
 	XMVECTOR RandomUnitVectorOnSphere();
 
@@ -548,6 +543,32 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	virtual void Animate(float fTimeElapsed, XMFLOAT3 pos);
 	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
+};
+
+class ExplosionModelShader : public CModelShader
+{
+public:
+	XMFLOAT3					m_pxmf3SphereVectors[EXPLOSION_DEBRISES];
+	XMFLOAT3					xmf3Position = XMFLOAT3(1000, 1000, 1000);
+
+	bool						m_bBlowingUp = false;
+
+	float						m_fElapsedTimes = 0.0f;
+	float						m_fDuration = 3.0f;					// Æø¹ß½Ã°£
+	float						m_fExplosionSpeed = 14.0f;
+	float						m_fExplosionRotation = 720.0f;
+
+public:
+	ExplosionModelShader() {};
+	ExplosionModelShader(LoadModel *ma);
+	~ExplosionModelShader() {};
+
+	XMVECTOR RandomUnitVectorOnSphere();
+
+	virtual void Setposition(float x, float y, float z) { xmf3Position = XMFLOAT3(x, y, z); };
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void Animate(float fTimeElapsed);
+	virtual ModelObject* getObject(UINT index) { return m_bbObjects[index]; }
 };
 
 class StunShader : public CModelShader

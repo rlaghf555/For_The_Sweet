@@ -683,12 +683,20 @@ void CGameFramework::processPacket(char *ptr)
 		int type = p_remove_weapon.weapon_type;
 		int index = p_remove_weapon.weapon_index;
 
+		float x = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition().x;
+		float y = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition().y + 10.f;
+		float z = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition().z;
+
 		m_pScene->m_WeaponShader[type]->getObject(index)->visible = false;
 		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(1000.f, 1000.f, 1000.f);
+		
+		m_pScene->m_ExplosionShader[type][index]->Setposition(x, y, z);
+		m_pScene->m_ExplosionShader[type][index]->m_bBlowingUp = true;
 
 		if (type == M_Weapon_Lollipop)
 		{
-			m_pScene->m_MagicShader[index]->visible = false;
+			m_pScene->m_MagicShader->getObjects(index)->visible = false;
+			m_pScene->m_MagicShader->getObjects(index)->SetPosition(1000.f, 1000.f, 1000.f);
 		}
 		if (type == M_Weapon_chocolate)
 		{
@@ -746,6 +754,9 @@ void CGameFramework::processPacket(char *ptr)
 			m_pScene->m_WeaponShader[type]->getObject(index)->init();
 			m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 90.f, 0);
 			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
+
+			m_pScene->m_MagicShader->getObjects(index)->visible = true;
+			m_pScene->m_MagicShader->getObjects(index)->SetPosition(x, y + 0.3f, z);
 		}
 
 		if (type == M_Weapon_chocolate)
@@ -758,10 +769,12 @@ void CGameFramework::processPacket(char *ptr)
 			cout << "right : " << right.x << "," << right.y << "," << right.z << endl;
 			cout << "pos : " << x << "," << y << "," << z << endl;
 
-			PxVec3 phyx_pos(x, y, z);
+			float scale_ = 1.6f;
+
+			PxVec3 phyx_pos(x, y + (Chocolate_Height * scale_ / 2.f), z);
 			PxVec3 phyx_look(look.x, look.y, look.z);
 			phyx_look = phyx_look.getNormalized();
-			PxVec3 phyx_size(Chocolate_Depth, Chocolate_Height, Chocolate_Width);
+			PxVec3 phyx_size(Chocolate_Depth*scale_, Chocolate_Height*scale_, Chocolate_Width*scale_);
 
 			if (phyx_look == PxVec3(-1, 0, 0)) {
 				phyx_look.x *= -1.f;
@@ -771,12 +784,13 @@ void CGameFramework::processPacket(char *ptr)
 			m_pScene->m_WeaponShader[type]->getObject(index)->init();
 			m_pScene->m_WeaponShader[type]->getObject(index)->SetLook(look);
 			m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 90.f, 0);
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetScale(scale_, true);
 
 			x += -right.x * Chocolate_Width * 0.7f;
 			y += -right.y * Chocolate_Width * 0.7f;
 			z += -right.z * Chocolate_Width * 0.7f;
 
-			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y + (Chocolate_Height * scale_ / 2.f), z);
 		}
 		break;
 	}

@@ -86,6 +86,14 @@ void CGameObject::SetScale(float value)
 	m_xmf4x4World._22 *= value;
 	m_xmf4x4World._33 *= value;
 }
+
+void CGameObject::SetScale(float value, bool test)
+{
+	m_xmf4x4World._11 *= value;	m_xmf4x4World._12 *= value;	m_xmf4x4World._13 *= value;
+	m_xmf4x4World._21 *= value; m_xmf4x4World._22 *= value; m_xmf4x4World._23 *= value;
+	m_xmf4x4World._31 *= value; m_xmf4x4World._32 *= value; m_xmf4x4World._33 *= value;
+}
+
 XMFLOAT3 CGameObject::GetPosition()
 {
 	return(XMFLOAT3(m_xmf4x4World._41, m_xmf4x4World._42, m_xmf4x4World._43));

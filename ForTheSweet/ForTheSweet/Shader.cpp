@@ -3239,25 +3239,6 @@ void SkillParticleShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CC
 }
 
 ////////////////////////
-/*
-D3D12_INPUT_LAYOUT_DESC ExplosionShader::CreateInputLayout(int index)
-{
-	D3D12_INPUT_LAYOUT_DESC inputLayout;
-
-	m_pInputElementDesc =
-	{
-		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TANGENT",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXINDEX",	0, DXGI_FORMAT_R32_UINT,			0,	44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-	};
-
-	inputLayout = { m_pInputElementDesc.data(), (UINT)m_pInputElementDesc.size() };
-
-	return inputLayout;
-}*/
-
 D3D12_SHADER_BYTECODE ExplosionShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
 {
 	wchar_t filename[100] = L"Model.hlsl";
@@ -3279,35 +3260,6 @@ void ExplosionShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dComm
 		m_ObjectCB->CopyData(i, cBuffer);
 	}
 }
-
-/*
-D3D12_RASTERIZER_DESC MeshShader::CreateRasterizerState(int index)
-{
-	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
-	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
-
-	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
-
-	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-
-	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
-
-	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
-	d3dRasterizerDesc.DepthBias = 0;
-	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
-	d3dRasterizerDesc.SlopeScaledDepthBias = 0.0f;
-
-	d3dRasterizerDesc.DepthClipEnable = TRUE;
-	//d3dRasterizerDesc.DepthClipEnable = FALSE;
-
-	d3dRasterizerDesc.MultisampleEnable = FALSE;
-	d3dRasterizerDesc.AntialiasedLineEnable = FALSE;
-	d3dRasterizerDesc.ForcedSampleCount = 0;
-	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
-	return(d3dRasterizerDesc);
-}*/
 
 inline float RandF(float fMin, float fMax)
 {
@@ -3409,6 +3361,92 @@ void ExplosionShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
 		}
 	}
 }
+
+////////////////////////////////////
+
+ExplosionModelShader::ExplosionModelShader(LoadModel *ma) : CModelShader(ma)
+{
+}
+
+XMVECTOR ExplosionModelShader::RandomUnitVectorOnSphere()
+{
+	XMVECTOR xmvOne = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+	XMVECTOR xmvZero = XMVectorZero();
+
+	while (true)
+	{
+		XMVECTOR v = XMVectorSet(RandF(-1.0f, 1.0f), RandF(-1.0f, 1.0f), RandF(-1.0f, 1.0f), 0.0f);
+		if (!XMVector3Greater(XMVector3LengthSq(v), xmvOne)) return(XMVector3Normalize(v));
+	}
+}
+
+void ExplosionModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets, void * pContext)
+{
+	m_nPSO = 1;
+	CreatePipelineParts();
+
+	m_nObjects = EXPLOSION_DEBRISES;
+	m_bbObjects = vector<ModelObject*>(m_nObjects);
+
+	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
+
+	CreateGraphicsRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice, nRenderTargets);
+
+	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if (type == 0)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\star.dds", 0);
+	if (type == 1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\star_1.dds", 0);
+	if (type == 2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\star_2.dds", 0);
+	if (type == 3)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\star_3.dds", 0);
+	if (type == 4)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\star_4.dds", 0);
+	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
+
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+	m_pMaterial->SetReflection(1);
+
+	for (int i = 0; i < m_nObjects; i++) {
+		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
+		XMStoreFloat3(&m_pxmf3SphereVectors[i], RandomUnitVectorOnSphere());
+		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_bbObjects[i] = map;
+	}
+	delete pTexture;
+}
+
+void ExplosionModelShader::Animate(float fTimeElapsed)
+{
+	if (IsZero(fTimeElapsed)) return;
+
+	if (m_bBlowingUp)
+	{
+		for (int i = 0; i < m_nObjects; ++i)
+		{
+			m_fElapsedTimes += fTimeElapsed * 0.05f;
+
+			if (m_fElapsedTimes <= m_fDuration)
+			{
+				m_bbObjects[i]->m_xmf4x4World = Matrix4x4::Identity();
+				m_bbObjects[i]->m_xmf4x4World._41 = xmf3Position.x + m_pxmf3SphereVectors[i].x * m_fExplosionSpeed * m_fElapsedTimes;
+				m_bbObjects[i]->m_xmf4x4World._42 = xmf3Position.y + 10.f + m_pxmf3SphereVectors[i].y * m_fExplosionSpeed * m_fElapsedTimes;
+				m_bbObjects[i]->m_xmf4x4World._43 = xmf3Position.z + m_pxmf3SphereVectors[i].z * m_fExplosionSpeed * m_fElapsedTimes;
+
+				m_bbObjects[i]->m_xmf4x4World = Matrix4x4::Multiply(Matrix4x4::RotationAxis(m_pxmf3SphereVectors[i], m_fExplosionRotation * m_fElapsedTimes), m_bbObjects[i]->m_xmf4x4World);
+			}
+			else
+			{
+				m_bBlowingUp = false;
+				m_fElapsedTimes = 0.0f;
+			}
+
+			if (m_bbObjects[i]) m_bbObjects[i]->Animate(fTimeElapsed);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////
 
 D3D12_SHADER_BYTECODE TeamShader::CreateVertexShader(ID3DBlob ** ppd3dShaderBlob)
 {
@@ -3576,7 +3614,7 @@ void MagicShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 1;
+	m_nObjects = WEAPON_EACH_NUM;
 	m_ppObjects = vector<CGameObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
@@ -3604,20 +3642,24 @@ void MagicShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 
 		CMesh *pCubeMesh = NULL;
 		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -50, 50, 100, 100, 0);	// pos(x, y), Width(w, h), depth
-		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
+		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 		m_ppObjects[i]->Rotate(&aa, 90.f);
+		m_ppObjects[i]->visible = false;
+		m_ppObjects[i]->SetPosition(1000.f, 1000.f, 1000.f);
 	}
 	delete pTexture;
 }
 
 void MagicShader::Animate(float fTimeElapsed)
 {
-	if (IsZero(fTimeElapsed))
-		return;
+	if (IsZero(fTimeElapsed)) return;
+
 	for (UINT i = 0; i < m_nObjects; ++i) {
-		XMFLOAT3 aa = XMFLOAT3(0, 0, 1);
-		m_ppObjects[i]->Rotate(&aa, 3.f);
-		if (m_ppObjects[i]) m_ppObjects[i]->Animate(fTimeElapsed);
+		if (m_ppObjects[i]->visible) {
+			XMFLOAT3 aa = XMFLOAT3(0, 0, 1);
+			m_ppObjects[i]->Rotate(&aa, 2.f);
+			if (m_ppObjects[i]) m_ppObjects[i]->Animate(fTimeElapsed);
+		}
 	}
 }
