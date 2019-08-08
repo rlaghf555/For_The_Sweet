@@ -640,8 +640,8 @@ void process_packet(char key, char *buffer)
 
 				it->weapon_respawn[i].respawn_able = false;
 
-				//int type = rand() % (MAX_WEAPON_TYPE - 1);
-				int type = (rand() % 2) + 2;
+				int type = rand() % (MAX_WEAPON_TYPE - 1);
+				//int type = (rand() % 2) + 2;
 
 				it->weapon_respawn[i].type = type;
 
