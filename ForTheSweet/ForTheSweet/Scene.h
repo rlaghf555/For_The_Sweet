@@ -55,6 +55,8 @@ public:
 	CModelShader				*m_MapShader[22] = { NULL, };
 	LoadModel					**Map_Model;
 
+	RoundBackGroundShader		*m_RoundBackGroundShader[3] = { NULL, };
+
 	int							animate_flag = 0;
 
 	StairShader					*m_StairShader[2];

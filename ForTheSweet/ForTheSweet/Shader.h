@@ -206,6 +206,17 @@ public:
 	void setScale(float scale);
 };
 
+class RoundBackGroundShader : public CModelShader
+{
+public:
+	RoundBackGroundShader() {};
+	RoundBackGroundShader(LoadModel *ma) { static_model = ma; };
+	~RoundBackGroundShader() {};
+
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int texture, bool backgroundflag, int nRenderTargets = 1, void * pContext = NULL);
+};
+
 class StairShader : public CModelShader
 {
 public:

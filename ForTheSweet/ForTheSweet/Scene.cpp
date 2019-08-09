@@ -99,6 +99,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ShadowReverseShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
 		m_ShadowReverseShader[3] = new ShadowREverseShader();
 		m_ShadowReverseShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, 3);
+
+		m_RoundBackGroundShader[0] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
+		m_RoundBackGroundShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0, true);
 		Map_1_Build = true;
 	}
 	//m_mapshader 2까지 map 1
@@ -127,8 +130,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ShadowReverseModelShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
 		m_ShadowReverseModelShader[2] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_2]);
 		m_ShadowReverseModelShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
-		Map_2_Build = true;
 
+		m_RoundBackGroundShader[1] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
+		m_RoundBackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1, true);
+		Map_2_Build = true;
 	}
 	//m_mapshader 3~8까지 map 2
 	if (Selected_Map == M_Map_3) {
@@ -203,6 +208,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
 			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
 		}
+
+		m_RoundBackGroundShader[2] = new RoundBackGroundShader(Map_Model[M_Map_round_background_2]);
+		m_RoundBackGroundShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2, true);
 		Map_3_Build = true;
 	}
 	//m_mapshader 9~22까지 map3
@@ -312,6 +320,9 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		m_ShadowReverseShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
 		m_ShadowReverseShader[3] = new ShadowREverseShader();
 		m_ShadowReverseShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, 3);
+
+		m_RoundBackGroundShader[0] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
+		m_RoundBackGroundShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0, true);
 		Map_1_Build = true;
 	}
 	//m_mapshader 2까지 map 1
@@ -329,10 +340,10 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		m_MapShader[7] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
 		m_MapShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar_2);
 
-		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
-			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
-		}
+		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
+		//}
 
 		m_ShadowReverseModelShader[0] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test]);
 		m_ShadowReverseModelShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
@@ -340,8 +351,10 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		m_ShadowReverseModelShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
 		m_ShadowReverseModelShader[2] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_2]);
 		m_ShadowReverseModelShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
-		Map_2_Build = true;
 
+		m_RoundBackGroundShader[1] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
+		m_RoundBackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1, true);
+		Map_2_Build = true;
 	}
 	//m_mapshader 3~8까지 map 2
 	if (Selected_Map == M_Map_3 && Map_3_Build == false) {
@@ -418,6 +431,9 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		//}
 		m_BackGroundShader[1] = new MeshShader();					// 맵 3 내부 감싸는 검은바탕
 		m_BackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+
+		m_RoundBackGroundShader[2] = new RoundBackGroundShader(Map_Model[M_Map_round_background_2]);
+		m_RoundBackGroundShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2, true);
 		Map_3_Build = true;
 	}
 }
@@ -617,6 +633,13 @@ void CScene::ReleaseObjects()
 			m_MapShader[i]->ReleaseShaderVariables();
 			m_MapShader[i]->ReleaseObjects();
 			delete m_MapShader[i];
+		}
+	}
+	for (int i = 0; i < 3; i++){
+		if (m_RoundBackGroundShader[i]) {
+			m_RoundBackGroundShader[i]->ReleaseShaderVariables();
+			m_RoundBackGroundShader[i]->ReleaseObjects();
+			delete m_RoundBackGroundShader[i];
 		}
 	}
 	for (int i = 0; i < 5; ++i) {
@@ -881,6 +904,14 @@ void CScene::initObject()
 	if (Selected_Map == M_Map_1) {
 		//캐릭터 좌표 및 스킬 초기화
 		for (int i = 0; i < MAX_USER; i++) {
+			if (m_pPlayer[i]->GetConnected()) {
+				m_pPlayerShader[i]->render = true;
+				m_pPlayerShadowShader[i]->render = true;
+			}
+			else {
+				m_pPlayerShader[i]->render = false;
+				m_pPlayerShadowShader[i]->render = false;
+			}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
@@ -914,6 +945,14 @@ void CScene::initObject()
 	else if (Selected_Map == M_Map_2) {
 		//캐릭터 좌표 및 스킬 초기화
 		for (int i = 0; i < MAX_USER; i++) {
+			if (m_pPlayer[i]->GetConnected()) {
+				m_pPlayerShader[i]->render = true;
+				m_pPlayerShadowShader[i]->render = true;
+			}
+			else {
+				m_pPlayerShader[i]->render = false;
+				m_pPlayerShadowShader[i]->render = false;
+			}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
@@ -949,6 +988,14 @@ void CScene::initObject()
 	else if (Selected_Map == M_Map_3) {
 		//캐릭터 좌표 및 스킬 초기화
 		for (int i = 0; i < MAX_USER; i++) {
+			if (m_pPlayer[i]->GetConnected()) {
+				m_pPlayerShader[i]->render = true;
+				m_pPlayerShadowShader[i]->render = true;
+			}
+			else {
+				m_pPlayerShader[i]->render = false;
+				m_pPlayerShadowShader[i]->render = false;
+			}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
@@ -1361,7 +1408,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < MAX_USER; ++i) if (m_pPlayer[i]->GetConnected()) m_pPlayerShader[i]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < MAX_USER; i++) if (m_pPlayer[i]->GetConnected()) if (m_StunShader[i])if(m_StunShader[i]->visible) m_StunShader[i]->Render(pd3dCommandList, pCamera);
-
+	
 	if (Selected_Map == M_Map_1) {
 		if (m_MapShader[0]) m_MapShader[0]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[1]) m_MapShader[1]->Render(pd3dCommandList, pCamera);
@@ -1399,10 +1446,13 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
-	if (m_BackGroundShader[2]) m_BackGroundShader[2]->Render(pd3dCommandList, pCamera);
-	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
+
+	//if (m_BackGroundShader[2]) m_BackGroundShader[2]->Render(pd3dCommandList, pCamera);
+	//if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
 	
 	if (Selected_Map == M_Map_1) {
+		if (m_RoundBackGroundShader[0]) m_RoundBackGroundShader[0]->Render(pd3dCommandList, pCamera);
+
 		if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		for (int i = 0; i < 2; ++i) if (m_CottonShader[i]) m_CottonShader[i]->Render(pd3dCommandList, pCamera);
@@ -1412,6 +1462,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_ShadowReverseShader[3]) m_ShadowReverseShader[3]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_2) {
+		if (m_RoundBackGroundShader[1]) m_RoundBackGroundShader[1]->Render(pd3dCommandList, pCamera);
+
 		if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_ShadowReverseModelShader[0]) m_ShadowReverseModelShader[0]->Render(pd3dCommandList, pCamera);
@@ -1419,6 +1471,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_ShadowReverseModelShader[2]) m_ShadowReverseModelShader[2]->Render(pd3dCommandList, pCamera);
 	}
 	if (Selected_Map == M_Map_3) {
+		if (m_RoundBackGroundShader[2]) m_RoundBackGroundShader[2]->Render(pd3dCommandList, pCamera);
+
 		if (m_TeamShader) m_TeamShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_EnemyShader) m_EnemyShader->Render(pd3dCommandList, pCamera, m_pPlayerShader);
 		if (m_ShadowReverseShader[4]) m_ShadowReverseShader[4]->Render(pd3dCommandList, pCamera);
