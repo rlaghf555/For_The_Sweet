@@ -222,6 +222,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_BackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
 	}
 	//m_pPlayer[0]->SetWeapon(true, 0);
+	m_BackGroundShader[2] = new MeshShader();
+	m_BackGroundShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
 	
 	for (int i = 0; i < MAX_USER; i++) {
 		bounding_box_test[i] = new testBox();
@@ -657,7 +659,7 @@ void CScene::ReleaseObjects()
 			delete m_StairShader[i];
 		}
 	}
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		if (m_BackGroundShader[i]) {
 			m_BackGroundShader[i]->ReleaseShaderVariables();
 			m_BackGroundShader[i]->ReleaseObjects();
@@ -1326,10 +1328,11 @@ void CScene::Collision_Cotton()
 			}
 		}
 
+		if(SERVER_ON == false) if (myid == -1) return;
+
 		if (bounding_box_test[myid]->bounding.Intersects(Cotton_box[0])) {
 			for (int i = 0; i < MAX_USER; ++i) {
-				if (myid == i)
-					continue;
+				if (myid == i) continue;
 				if (bounding_box_test[i]->bounding.Intersects(Cotton_box[0])) {
 					m_pPlayerShader[i]->render = true;
 					if (m_pPlayer[i]->Get_Weapon_grab())
@@ -1339,8 +1342,7 @@ void CScene::Collision_Cotton()
 		}
 		if (bounding_box_test[myid]->bounding.Intersects(Cotton_box[1])) {
 			for (int i = 0; i < MAX_USER; ++i) {
-				if (myid == i)
-					continue;
+				if (myid == i) continue;
 				if (bounding_box_test[i]->bounding.Intersects(Cotton_box[1])) {
 					m_pPlayerShader[i]->render = true;
 					if (m_pPlayer[i]->Get_Weapon_grab())
@@ -1397,6 +1399,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	for (int i = 0; i < WEAPON_MAX_NUM; ++i) if (m_WeaponShader[i]) m_WeaponShader[i]->Render(pd3dCommandList, pCamera);
 
 	if (m_WavesShader) m_WavesShader->Render(pd3dCommandList, pCamera);
+	if (m_BackGroundShader[2]) m_BackGroundShader[2]->Render(pd3dCommandList, pCamera);
 	if (m_BackGroundShader[0]) m_BackGroundShader[0]->Render(pd3dCommandList, pCamera);
 	
 	if (Selected_Map == M_Map_1) {

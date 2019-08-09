@@ -276,8 +276,8 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
 	virtual void Animate(float fTimeElapsed);
 	virtual void ShowEffect(int index) {
-	m_ppObjects[index]->visible = true;
-	SoundManager::GetInstance()->PlaySounds(LIGHTNING);
+		m_ppObjects[index]->visible = true;
+		SoundManager::GetInstance()->PlaySounds(LIGHTNING);
 	}
 	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
@@ -291,7 +291,7 @@ public:
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
 	virtual void Animate(float fTimeElapsed);
-	virtual void ShowParticle(bool show, XMFLOAT3 pos = XMFLOAT3(0,0,0));
+	virtual void ShowParticle(bool show, XMFLOAT3 pos = XMFLOAT3(0, 0, 0));
 	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera);
 
 	float ftime = 0.f;
@@ -302,7 +302,7 @@ class PlayerShader;
 class TeamShader : public EffectShader {
 public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList,int type, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);//, XMFLOAT4X4 *pxmf4x4World);
 	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera, PlayerShader **ps);
 	virtual void Animate(float fTimeElapsed);
@@ -320,12 +320,15 @@ public:
 class WaveShader : public MeshShader
 {
 public:
+	float wave_sin = 0.f;
+
 	WaveShader();
 	~WaveShader();
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
-	
+
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList);
 	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int map_type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Animate(float fTimeElapsed, int map_type);
@@ -341,9 +344,9 @@ public:
 	WeaponShader();
 	WeaponShader(LoadModel *ma);
 	~WeaponShader();
-	
+
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
-//	virtual D3D12_BLEND_DESC CreateBlendState(int index);
+	//	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 
 	virtual void Animate(float fTimeElapsed, int flag_up, int weapon_num);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int weapon_num, int mpa_type, int nRenderTargets = 1, void * pContext = NULL);
@@ -360,7 +363,7 @@ public:
 	CottonCloudShader();
 	CottonCloudShader(LoadModel *ma);
 	~CottonCloudShader();
-	
+
 	virtual D3D12_BLEND_DESC CreateBlendState(int index);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int kind, int nRenderTargets = 1, void * pContext = NULL);
@@ -372,7 +375,7 @@ public:
 	CInstancingShader();
 	virtual ~CInstancingShader();
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob); 
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGraphicsRootSignature);
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
@@ -444,7 +447,7 @@ public:
 
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState(int index);
-	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int type,int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int type, int nRenderTargets = 1, void * pContext = NULL);
 	//virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, ModelObject *mo, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void SetPosition(XMFLOAT3& pos);
 	virtual void Rotate(float x, float y, float z);
@@ -532,7 +535,7 @@ public:
 public:
 	ExplosionShader() {};
 	~ExplosionShader() {};
-	
+
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 

@@ -28,7 +28,7 @@ CShader::~CShader()
 {
 	if (m_ppd3dPipelineStates)
 	{
-		for (int i = 0; i < m_nPipelineStates; i++) 
+		for (int i = 0; i < m_nPipelineStates; i++)
 			if (m_ppd3dPipelineStates[i])
 				m_ppd3dPipelineStates[i]->Release();
 		delete[] m_ppd3dPipelineStates;
@@ -40,10 +40,10 @@ D3D12_RASTERIZER_DESC CShader::CreateRasterizerState()
 {
 	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
 	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
-	
+
 	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
-	
+
 	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
@@ -192,7 +192,7 @@ void CShader::ReleaseShaderVariables()
 
 void CShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	
+
 	//파이프라인에 그래픽스 상태 객체를 설정한다.
 	pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[0]);
 }
@@ -242,8 +242,8 @@ void CObjectsShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature	
 
 void CObjectsShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT3 Position)
 {
-	
-	
+
+
 }
 
 void CObjectsShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, XMFLOAT3 Position, int Object_Kind)
@@ -316,7 +316,7 @@ void CObjectsShader::AnimateObjects(float fTimeElapsed)
 
 void CObjectsShader::ReleaseUploadBuffers()
 {
-	if (m_ppObjects.size()>0)
+	if (m_ppObjects.size() > 0)
 	{
 		for (int j = 0; j < m_nObjects; j++) m_ppObjects[j]->ReleaseUploadBuffers();
 	}
@@ -379,7 +379,7 @@ void CInstancingShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignatu
 void CInstancingShader::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	//인스턴스 정보를 저장할 정점 버퍼를 업로드 힙 유형으로 생성한다.
-	m_pd3dcbGameObjects = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL,	sizeof(VS_VB_INSTANCE) * m_nObjects, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
+	m_pd3dcbGameObjects = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, sizeof(VS_VB_INSTANCE) * m_nObjects, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
 
 	//정점 버퍼(업로드 힙)에 대한 포인터를 저장한다.
 	m_pd3dcbGameObjects->Map(0, NULL, (void **)&m_pcbMappedGameObjects);
@@ -854,11 +854,11 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (map_type == M_Map_1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_2.dds", 0);
 	if (map_type == M_Map_1_macaron_1)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron.dds", 0);
-	
+
 	if (map_type == M_Map_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_oreo.dds", 0);
 	if (map_type == M_Map_1_macaron || map_type == M_Map_1_macaron_2)pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_macaron_2.dds", 0);
 	if (map_type == M_Map_2_chocolate_bar || map_type == M_Map_2_chocolate_bar_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_chocolate_bar.dds", 0);
-	
+
 	if (map_type == M_Map_3 || map_type == M_Map_3_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_1.dds", 0);
 	if (map_type == M_Map_3_cake_2 || map_type == M_Map_3_cake_2_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_2.dds", 0);
 	if (map_type == M_Map_3_cake_3 || map_type == M_Map_3_cake_3_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_3.dds", 0);
@@ -866,7 +866,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	if (map_type == M_Map_3_in || map_type == M_Map_3_in_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_in.dds", 0);
 	if (map_type == M_Map_3_in_stair_1 || map_type == M_Map_3_in_stair_1_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\test_1.dds", 0);
 	if (map_type == M_Map_3_in_stair_2 || map_type == M_Map_3_in_stair_2_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\test_1.dds", 0);
-	
+
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -884,7 +884,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		if (map_type == M_Map_1_macaron_2) map->SetPosition(-185.f, -10.f, 0.f);
 		if (map_type == M_Map_2_chocolate_bar) map->SetPosition(300.f, -20.f, 0.f);
 		if (map_type == M_Map_2_chocolate_bar_2) map->SetPosition(-300.f, -20.f, 0.f);
-		
+
 		if (map_type == M_Map_3) map->SetPosition(map_3_distance, -132.f, 0.f);
 		if (map_type == M_Map_3_2) map->SetPosition(-map_3_distance, -132.f, 0.f);
 		if (map_type == M_Map_3_cake_2) map->SetPosition(map_3_distance, 0.f, 50.f);
@@ -899,7 +899,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		if (map_type == M_Map_3_in_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
 		if (map_type == M_Map_3_in_stair_1_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
 		if (map_type == M_Map_3_in_stair_2_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
-		
+
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
 
@@ -949,7 +949,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
-		if (map_type == M_Map_1) m_bbObjects[i]->SetPosition(0, -20 + -20*i, 0);
+		if (map_type == M_Map_1) m_bbObjects[i]->SetPosition(0, -20 + -20 * i, 0);
 		if (map_type == M_Map_3) {
 			if (i == 0) m_bbObjects[i]->SetPosition(250.f, 0.f, 50.f);
 			if (i == 1) m_bbObjects[i]->SetPosition(-250.f, 0.f, 50.f);
@@ -1056,11 +1056,11 @@ void StairShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		if (type == 0) {
-			if (i == 10) map->SetPosition(128.f + map_3_distance, (i-1) * 8.f, i * 18.f - 50);
+			if (i == 10) map->SetPosition(128.f + map_3_distance, (i - 1) * 8.f, i * 18.f - 50);
 			else map->SetPosition(128.f + map_3_distance, i * 8.f, i * 18.f - 50);
 		}
 		else if (type == 1) {
-			if (i == 10) map->SetPosition(-128.f - map_3_distance, (i-1) * 8.f, i * 18.f - 50);
+			if (i == 10) map->SetPosition(-128.f - map_3_distance, (i - 1) * 8.f, i * 18.f - 50);
 			else map->SetPosition(-128.f - map_3_distance, i * 8.f, i * 18.f - 50);
 		}
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
@@ -1107,7 +1107,7 @@ void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
-	
+
 	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		map->SetPosition(0.f, 0.f, i * 20.f + 30.f);
@@ -1266,7 +1266,7 @@ void MeshShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandLi
 	// XMFLOAT4X4 xmf4x4World;
 	// XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(pxmf4x4World)));
 	// pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
-	
+
 	CB_GAMEOBJECT_INFO cBuffer;
 	for (UINT i = 0; i < m_nObjects; ++i) {
 		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[i]->m_xmf4x4World)));
@@ -1284,7 +1284,7 @@ D3D12_RASTERIZER_DESC MeshShader::CreateRasterizerState(int index)
 	//d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
 	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-	
+
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
 
@@ -1321,12 +1321,13 @@ void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (type == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\candyland.dds", 0);	//1400*788
 	if (type == 1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\black.dds", 0);
+	if (type == 2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\brick.dds", 0);
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
-	
+
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
-	
+
 	XMFLOAT3 aa = XMFLOAT3(1, 0, 0);
 	for (UINT i = 0; i < m_nObjects; i++) {
 
@@ -1335,11 +1336,13 @@ void MeshShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		Map_Object = new CGameObject();
 		if (type == 0)Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 		if (type == 1)Map_Object->SetPosition(0.f, 400.f, 0.f);
+		if (type == 2)Map_Object->SetPosition(0.f, 0.f, 0.f);
 		m_ppObjects[i] = Map_Object;
 
 		CMesh *pCubeMesh = NULL;
 		if (type == 0) pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -1400, 1000, 2800, 1500, 600);	// pos(x, y), Width(w, h), depth
-		if (type == 1) pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000, 500, 500);				
+		if (type == 1) pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000, 500, 500);
+		if (type == 2) pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, -1400, 0, 2800, 200, 599);
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 	}
@@ -1378,9 +1381,9 @@ void MeshShader::setScale(float scale)
 	}
 }
 
-WaveShader::WaveShader(){}
+WaveShader::WaveShader() {}
 
-WaveShader::~WaveShader(){}
+WaveShader::~WaveShader() {}
 
 D3D12_SHADER_BYTECODE WaveShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
 {
@@ -1392,6 +1395,16 @@ D3D12_SHADER_BYTECODE WaveShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
 {
 	wchar_t filename[100] = L"Model.hlsl";
 	return(CShader::CompileShaderFromFile(filename, "PSWaveModel", "ps_5_1", ppd3dShaderBlob));
+}
+
+void WaveShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dCommandList)//, XMFLOAT4X4 *pxmf4x4World)
+{
+	CB_GAMEOBJECT_INFO cBuffer;
+	for (UINT i = 0; i < m_nObjects; ++i) {
+		XMStoreFloat4x4(&cBuffer.m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[i]->m_xmf4x4World)));
+		cBuffer.m_nMaterial = wave_sin;
+		m_ObjectCB->CopyData(i, cBuffer);
+	}
 }
 
 D3D12_BLEND_DESC WaveShader::CreateBlendState(int index)
@@ -1419,7 +1432,7 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	m_nPSO = 1;
 	CreatePipelineParts();
 
-	m_nObjects = 10;
+	m_nObjects = 1;	//10
 	m_ppObjects = vector<CGameObject*>(m_nObjects);
 
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 1);
@@ -1430,7 +1443,7 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	BuildPSO(pd3dDevice, nRenderTargets);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	if (map_type == M_Map_1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water1.dds", 0);	//1400*788
+	if (map_type == M_Map_1) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water3.dds", 0);	//1400*788
 	if (map_type == M_Map_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water1.dds", 0);	//1400*788
 	if (map_type == M_Map_3) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\water1.dds", 0);	//1400*788
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
@@ -1438,7 +1451,7 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
-	
+
 	for (int i = 0; i < m_nObjects; i++) {
 		CGameObject *Map_Object = NULL;
 
@@ -1446,7 +1459,7 @@ void WaveShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 		Map_Object->SetPosition(Pos_act.x, Pos_act.y, Pos_act.z);
 		m_ppObjects[i] = Map_Object;
 
-		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 201, 1000, 30, 30);	// Width(w, h), xycount(m, n)
+		CMesh *pCubeMesh = new CreateGrid(pd3dDevice, pd3dCommandList, 2000, 1000, 200, 200);	// Width(w, h), xycount(m, n)
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 		m_ppObjects[i]->SetPosition(i * 200 - 1000, -10, 0);//20.f * i - 200,0,200
@@ -1462,20 +1475,27 @@ void WaveShader::Animate(float fTimeElapsed, int map_type)
 	for (int i = 0; i < m_nObjects; ++i) {
 		if (m_ppObjects[i]) {
 			m_ppObjects[i]->Animate(fTimeElapsed);
+
+			if (wave_sin >= 10000) wave_sin = 0;
+			wave_sin += 1;
+
 			if (map_type == M_Map_1) {
-				float xx = m_ppObjects[i]->GetPosition().x;
-				if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -10, 0);
-				else m_ppObjects[i]->SetPosition(-1000, -10, 0);
+				//float xx = m_ppObjects[i]->GetPosition().x;
+				//if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -10, 0);
+				//else m_ppObjects[i]->SetPosition(-1000, -10, 0);
+				m_ppObjects[i]->SetPosition(0, -10, 0);
 			}
 			if (map_type == M_Map_2) {
-				float xx = m_ppObjects[i]->GetPosition().x;
-				if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -30, 0);
-				else m_ppObjects[i]->SetPosition(-1000, -30, 0);
+				//float xx = m_ppObjects[i]->GetPosition().x;
+				//if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -30, 0);
+				//else m_ppObjects[i]->SetPosition(-1000, -30, 0);
+				m_ppObjects[i]->SetPosition(-1000, -30, 0);
 			}
 			if (map_type == M_Map_3) {
-				float xx = m_ppObjects[i]->GetPosition().x;
-				if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -50, 0);
-				else m_ppObjects[i]->SetPosition(-1000, -50, 0);
+				//float xx = m_ppObjects[i]->GetPosition().x;
+				//if (m_ppObjects[i]->GetPosition().x < 1000) m_ppObjects[i]->SetPosition(xx += 0.5, -50, 0);
+				//else m_ppObjects[i]->SetPosition(-1000, -50, 0);
+				m_ppObjects[i]->SetPosition(-1000, -50, 0);
 			}
 		}
 	}
@@ -1789,7 +1809,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	//else 
 	if (mpa_type == M_Map_1) m_nObjects = WEAPON_EACH_NUM;
 	else if (mpa_type == M_Map_2) m_nObjects = WEAPON_EACH_NUM;
-	
+
 	if (weapon_num == M_Weapon_cupcake) m_nObjects = 1;
 	m_bbObjects = vector<ModelObject*>(m_nObjects);
 
@@ -1799,7 +1819,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	CreateCbvAndSrvDescriptorHeaps(pd3dDevice, pd3dCommandList, m_nObjects, 2);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	CreateConstantBufferViews(pd3dDevice, pd3dCommandList, m_nObjects, m_ObjectCB->Resource(), D3DUtil::CalcConstantBufferByteSize(sizeof(CB_GAMEOBJECT_INFO)));
-	
+
 	CTexture *pTexture;
 	pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (weapon_num == 0) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\weapon\\lollipop.dds", 0);
@@ -1840,7 +1860,7 @@ void WeaponShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 			}
 
 			//weapon->SetPosition(7.47554874, 8.61560154, -0.784351766);
-			
+
 			if (weapon_num == 3) weapon->Rotate(0, 0, -90);
 			else weapon->Rotate(0, 0, 90);
 			weapon->Rotate(&a, D3DMath::Rand(0, 4) * 90.f);
@@ -1859,7 +1879,7 @@ void WeaponShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera *
 
 	for (UINT j = 0; j < m_nObjects; j++)
 	{
-		if (m_bbObjects[j]&&m_bbObjects[j]->visible)
+		if (m_bbObjects[j] && m_bbObjects[j]->visible)
 		{
 			//m_bbObjects[j]->G
 			m_bbObjects[j]->Render(pd3dCommandList, pCamera);
@@ -2029,7 +2049,7 @@ void DynamicModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsC
 
 	CreateGraphicsRootSignature(pd3dDevice);
 	BuildPSO(pd3dDevice, nRenderTargets);
-	
+
 	CPlayer* player = new CPlayer(model_anim, pd3dDevice, pd3dCommandList);
 	player->SetAnimations(model_anim->getAnimCount(), model_anim->getAnim(Anim_Idle));
 
@@ -2049,7 +2069,7 @@ void DynamicModelShader::Animate(float fTimeElapsed)
 
 PlayerShader::PlayerShader(Model_Animation *ma) : DynamicModelShader(ma)
 {
-	
+
 }
 
 PlayerShader::~PlayerShader()
@@ -2156,7 +2176,7 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 	CreateGraphicsRootSignature(pd3dDevice);
 	BuildPSO(pd3dDevice, nRenderTargets);
-	
+
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\cloth_1.dds", 0);	//cloth_2
 	//pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\character\\body.dds", 0);
@@ -2167,7 +2187,7 @@ void PlayerShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
-	
+
 	CPlayer* player = new CPlayer(model_anim, pd3dDevice, pd3dCommandList);
 	player->SetAnimations(model_anim->getAnimCount(), model_anim->getAnim(0));
 	m_Camera = player->GetCamera();
@@ -2207,7 +2227,7 @@ void PlayerShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera *
 	//pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 
 	if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
-	if(render)
+	if (render)
 		for (UINT j = 0; j < m_nObjects; j++)
 		{
 			if (m_bbObjects[j])
@@ -3004,7 +3024,7 @@ void EffectShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera *
 
 	for (UINT j = 0; j < m_nObjects; j++)
 	{
-		if (m_ppObjects[j]&&m_ppObjects[j]->visible)
+		if (m_ppObjects[j] && m_ppObjects[j]->visible)
 		{
 			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
 		}
@@ -3132,7 +3152,7 @@ void SkillParticleShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphics
 	BuildPSO(pd3dDevice);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	if(type==0)
+	if (type == 0)
 		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\skill_attack.dds", 0);
 	else if (type == 1)
 		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\effect\\skill_speed.dds", 0);
@@ -3153,7 +3173,7 @@ void SkillParticleShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphics
 		CMesh *pCubeMesh = NULL;
 		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 5, 5, 0);	// pos(x, y), Width(w, h), depth
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i]->SetMesh(pCubeMesh);	
+		m_ppObjects[i]->SetMesh(pCubeMesh);
 	}
 	delete pTexture;
 }
@@ -3179,23 +3199,23 @@ void SkillParticleShader::Animate(float fTimeElapsed)
 	if (ftime > 0.05f) {
 		ftime = 0.f;
 		for (int i = 0; i < m_nObjects; ++i) {
-				auto pos = m_ppObjects[i]->GetPosition();
-				pos.x += rand() % 2-1;
-				pos.z += rand() % 2-1;
-				pos.y += 3;
-				m_ppObjects[i]->SetPosition(pos);
-				if (pos.y > startpos.y + 50) {
-					m_ppObjects[i]->visible = false;
-					for (int j = 0; j < m_nObjects; ++j) {
-						if (m_ppObjects[j]->visible == false) {
-							if (j == m_nObjects - 1)
-								visible = false;
-						}
-						else break;
+			auto pos = m_ppObjects[i]->GetPosition();
+			pos.x += rand() % 2 - 1;
+			pos.z += rand() % 2 - 1;
+			pos.y += 3;
+			m_ppObjects[i]->SetPosition(pos);
+			if (pos.y > startpos.y + 50) {
+				m_ppObjects[i]->visible = false;
+				for (int j = 0; j < m_nObjects; ++j) {
+					if (m_ppObjects[j]->visible == false) {
+						if (j == m_nObjects - 1)
+							visible = false;
 					}
+					else break;
 				}
 			}
 		}
+	}
 
 }
 
@@ -3231,7 +3251,7 @@ void SkillParticleShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CC
 
 	for (UINT j = 0; j < m_nObjects; j++)
 	{
-		if (m_ppObjects[j]&& m_ppObjects[j]->visible)
+		if (m_ppObjects[j] && m_ppObjects[j]->visible)
 		{
 			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
 		}
@@ -3454,7 +3474,7 @@ D3D12_SHADER_BYTECODE TeamShader::CreateVertexShader(ID3DBlob ** ppd3dShaderBlob
 	return(CShader::CompileShaderFromFile(filename, "VSDiffused", "vs_5_1", ppd3dShaderBlob));
 }
 
-void TeamShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList,int type, int nRenderTargets, void * pContext)
+void TeamShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int type, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
 	CreatePipelineParts();
@@ -3470,11 +3490,11 @@ void TeamShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandLi
 	BuildPSO(pd3dDevice);
 
 	CTexture *pTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	if(type ==0)
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Team.dds", 0);
-	else if(type==1)
-	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Enemy.dds", 0);
-	
+	if (type == 0)
+		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Team.dds", 0);
+	else if (type == 1)
+		pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\image\\Enemy.dds", 0);
+
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -3571,7 +3591,7 @@ void StunShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
 
 			//if (rotate_time_2 >= 360) rotate_time_2 = -360.f;
 			//else rotate_time_2 += 0.1f;
-			
+
 			float x = cos(rotate_time / 360 * 3.14 * 2) * 10.f + pos.x;
 			float z = sin(rotate_time / 360 * 3.14 * 2) * 10.f + pos.z;
 

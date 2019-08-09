@@ -72,7 +72,7 @@ public:
 	testBox						*weapon_box[WEAPON_MAX_NUM][WEAPON_EACH_NUM] = { NULL, };
 	testBox						*door[8] = { NULL, };
 	BoundingOrientedBox			Cotton_box[2];
-	MeshShader					*m_BackGroundShader[2] = { NULL, };
+	MeshShader					*m_BackGroundShader[3] = { NULL, };
 	EffectShader				*m_EffectShader = NULL;
 	SkillEffectShader			*m_SkillEffectShader[MAX_USER] = { NULL, };
 	SkillParticleShader			*m_SkillParticleShader[MAX_USER][3] = { NULL, };

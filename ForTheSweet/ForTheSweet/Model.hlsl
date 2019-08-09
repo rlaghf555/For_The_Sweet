@@ -208,8 +208,32 @@ VS_MODEL_TEXTURED_OUTPUT VSWave(VS_INPUT input)
     output.normalW = mul(input.normal, (float3x3) gmtxGameObject);
     output.positionW = (float3) mul(float4(input.position, 1.0f), gmtxGameObject);
     float4 position_ = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+    
+    float3 mewpos = output.positionW;
 
-    position_.y += sin(3.141592 * 2.f);
+    float sin_test = gnMaterial / 50.f;
+
+    float additionalValueX = mewpos.x;
+    float additionalValueY = mewpos.y;
+    float additionalValueZ = mewpos.z;
+	
+    float periodX = 1.0 + (1.0 - additionalValueY) * 0.5;
+    float periodY = 1.0 + additionalValueX * 0.1;
+    float periodZ = 1.0 + additionalValueZ; // * 0.5;
+	
+    float valueX = (additionalValueY * 2 * 3.141592) - sin_test;
+    float valueY = (additionalValueX * 2 * 3.141592) - sin_test;
+    float valueZ = (additionalValueZ * 2 * 3.141592) - sin_test;
+
+    float sinValueX = sin(valueX) * 0.08;
+    float sinValueY = sin(valueY) * 0.05;
+    float sinValueZ = sin(valueZ) * 0.05;
+
+    //position_.y = position_.y * ((1.0 - additionalValueX) * 0.5 + 0.5);
+    
+    //position_.x = position_.x - sinValueX * additionalValueX;
+    position_.y = position_.y + sinValueY * additionalValueX;
+    //position_.z = position_.z + sinValueX * additionalValueZ;
 
     output.position = position_;
     output.uv = input.uv;
@@ -227,9 +251,38 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PSWaveModel(VS_MODEL_TEXTURED_OUTPUT input, ui
 	
     input.normalW = normalize(input.normalW);
 	
-    output.color = cColor;
-    output.color.w = 0.7f;
-	//output.color = float4(1, 1, 1, 1);
+    float3 Light_Position = float3(0.f, 1.f, 0.f);
+    float3 c_Light1 = float3(0.5f, -1.0f, 0.4f);
+
+    float3 ambient = float3(0.7f, 0.7f, 0.7f);
+    float3 diffuse = float3(0.5f, 0.5f, 0.5f);
+    float3 specular = float3(1.0f, 1.0f, 1.0f);
+
+    float constant = 1.0f;
+    float linear_ = 0.09f;
+    float quadratic = 0.0032f;
+       
+    float3 ambient_ = ambient * cColor.rgb;
+    
+    input.normalW = normalize(input.normalW);
+    float3 lightDir = normalize(-c_Light1); // -c_Light1
+    float diff = clamp(dot(input.normalW, lightDir), 0.0, 1.0);
+    float3 diffuse_ = diffuse * diff * cColor.rgb;
+    
+    float3 CameraDir_test = float3(0.0f, -1.0f, 0.2f); // gvCameraPosition
+    float3 viewDir = normalize(gvCameraPosition - input.position.xyz); //positionW
+    float3 reflectDir = reflect(-lightDir, input.normalW);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32); // 32 : shiness
+    float3 specular_test = float3(1.0, 1.0, 1.0);
+    float3 specular_ = specular * spec * specular_test; //cColor.rgb;
+    
+    float distance = length(Light_Position - input.position.xyz);
+    float attenuation = 1.0 / (constant + linear_ * distance + quadratic * (distance * distance));
+
+    float3 result = ambient_ + diffuse_ + specular_;
+
+    output.color = float4(result, 0.7f);
+    
     output.nrmoutline = float4(input.normalW, 1.0f);
     output.nrm = output.nrmoutline;
     output.pos = float4(input.positionW, 1.0f);
