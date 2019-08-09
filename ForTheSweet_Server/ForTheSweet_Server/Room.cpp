@@ -133,7 +133,7 @@ void CRoom::start(const vector<PxVec3>& vectex, const vector<int>& index)
 
 	// room : PhysicSimulation¿¡ µî·Ï
 
-	PxVec3 wall_size(3, 100, 65);
+	PxVec3 wall_size(3, 100, 60);
 	PxVec3 wall_pos(167, 40, 0);
 
 	test2 = m_pPhysx->getBox(wall_pos, wall_size);

@@ -771,7 +771,7 @@ void CGameFramework::processPacket(char *ptr)
 
 			float scale_ = 1.6f;
 
-			PxVec3 phyx_pos(x, y + (Chocolate_Height * scale_ / 2.f), z);
+			PxVec3 phyx_pos(x, y, z);
 			PxVec3 phyx_look(look.x, look.y, look.z);
 			phyx_look = phyx_look.getNormalized();
 			PxVec3 phyx_size(Chocolate_Depth*scale_, Chocolate_Height*scale_, Chocolate_Width*scale_);
@@ -786,11 +786,11 @@ void CGameFramework::processPacket(char *ptr)
 			m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 90.f, 0);
 			m_pScene->m_WeaponShader[type]->getObject(index)->SetScale(scale_, true);
 
-			x += -right.x * Chocolate_Width * 0.7f;
-			y += -right.y * Chocolate_Width * 0.7f;
-			z += -right.z * Chocolate_Width * 0.7f;
+			x += -right.x * Chocolate_Width * 0.7f * scale_;
+			y += -right.y * Chocolate_Width * 0.7f * scale_;
+			z += -right.z * Chocolate_Width * 0.7f * scale_;
 
-			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y + (Chocolate_Height * scale_ / 2.f), z);
+			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
 		}
 		break;
 	}
@@ -2315,7 +2315,7 @@ void CGameFramework::UpdateProcess()
 
 						//cout << " Vel : " << vel.x << ", " << vel.y << ", " << vel.z << endl;
 
-						PxVec3 dist = vel * m_GameTimer.GetTimeElapsed() * 20.f;
+						PxVec3 dist = vel * m_GameTimer.GetTimeElapsed() * NORMAL_SPEED;
 						dist.y += jump_height;
 
 						PxControllerFilters filters;

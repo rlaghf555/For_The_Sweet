@@ -1,4 +1,8 @@
 #pragma once
+
+// ¼Óµµ
+constexpr float NORMAL_SPEED = 20.f;
+
 constexpr float GRAVITY = 9.81f;
 constexpr float MAP_BOTTOM_HEIGHT = 10.1f;
 
@@ -49,6 +53,7 @@ constexpr float Chocolate_Width = 10.f;
 constexpr float Chocolate_Height = 16.f;
 constexpr float Chocolate_Depth = 2.f;
 constexpr float Chocolate_Len = 15.f;
+constexpr float Chocolate_Scale = 1.6f;
 
 
 // Trigger_Type

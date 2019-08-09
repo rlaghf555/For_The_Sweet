@@ -418,6 +418,7 @@ void send_room_setting_player(int room_num)
 
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
+		// i : 현재 플레이어
 		int client_id = it->clientNum[i];
 
 		if (client_id != -1)
@@ -426,13 +427,14 @@ void send_room_setting_player(int room_num)
 			{
 				for (int j = 0; j < MAX_ROOM_USER; ++j)
 				{
+					// j : 받을 플레이어
 					int client_id2 = it->clientNum[j];
 					if (client_id2 != -1)
 					{
 						if (clients[client_id2].connected == true)
 						{
 							cout << client_id << ", " << j << endl;
-							send_put_player_packet(client_id, j);
+							send_put_player_packet(client_id2, i);
 						}
 					}
 				}
@@ -1112,6 +1114,8 @@ void process_packet(char key, char *buffer)
 
 void worker_thread()
 {
+	srand((unsigned int)time(NULL));
+
 	while (true)
 	{
 		ULONG io_byte;
@@ -1423,8 +1427,9 @@ void process_event(EVENT_ST &ev)
 			s_lollipop->skillTrigger = it->m_pPhysx->getSphereTrigger(pos, Lollipop_Radius, Lollipop_Trigger, order);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
-
 			it->m_skillTrigger.push_back(*s_lollipop);
+
+			clients[ev.id].playerinfo->weapon_type = -1;
 
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
@@ -1438,7 +1443,7 @@ void process_event(EVENT_ST &ev)
 					}
 				}
 			}
-			
+
 			add_timer(room_num, room_num + ROOM_TIMER_START, EV_LOLLIPOP_HEAL, high_resolution_clock::now() + 500ms, order);
 			add_timer(room_num, room_num + ROOM_TIMER_START, EV_WEAPON_REMOVE, high_resolution_clock::now() + 5000ms, order);
 		}
@@ -1464,7 +1469,7 @@ void process_event(EVENT_ST &ev)
 			add_timer(room_num, room_num + ROOM_TIMER_START, EV_WEAPON_REMOVE, high_resolution_clock::now() + 1860ms, order);
 		}
 		else if (weapon_type == Weapon_pepero) {
-			
+
 			// 빼빼로 투창 스킬
 			PxVec3 look = clients[ev.id].playerinfo->m_Look;
 			cout << "player look : " << look.x << ", " << look.y << ", " << look.z << endl;
@@ -1488,7 +1493,7 @@ void process_event(EVENT_ST &ev)
 			//cout << "weapon pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
 
 			//it->m_pPhysx->m_Scene->lockWrite();
-			s_pepero->skillTrigger = it->m_pPhysx->getRotateBoxTrigger(pos, weapon_look, 
+			s_pepero->skillTrigger = it->m_pPhysx->getRotateBoxTrigger(pos, weapon_look,
 				PxVec3(Pepero_Length, Pepero_Width, Pepero_Width), Pepero_Trigger, order);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
@@ -1496,6 +1501,8 @@ void process_event(EVENT_ST &ev)
 			s_pepero->look = look;
 
 			it->m_skillTrigger.push_back(*s_pepero);
+
+			clients[ev.id].playerinfo->weapon_type = -1;
 
 			pos -= look * Pepero_Pos_Gap;
 
@@ -1526,13 +1533,16 @@ void process_event(EVENT_ST &ev)
 
 			char order = it->trigger_order;
 
-			Skill_Actor *s_choco= new Skill_Actor(weapon_type, weapon_index, owner, order);
+			Skill_Actor *s_choco = new Skill_Actor(weapon_type, weapon_index, owner, order);
 
 			it->trigger_order += 1;
 
 			PxVec3 pos = clients[ev.id].playerinfo->m_Pos;
+			PxVec3 size(Chocolate_Depth, Chocolate_Height, Chocolate_Width);
+			size *= Chocolate_Scale;
+
 			pos += look * Chocolate_Len;
-			pos.y += Chocolate_Height;
+			pos.y += size.y;
 
 			PxVec3 weapon_look = look;
 			if (weapon_look == PxVec3(-1, 0, 0)) {
@@ -1542,13 +1552,14 @@ void process_event(EVENT_ST &ev)
 			cout << "weapon pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
 
 			//it->m_pPhysx->m_Scene->lockWrite();
-			s_choco->skillTrigger = it->m_pPhysx->getRotateBox(pos, weapon_look, 
-				PxVec3(Chocolate_Depth, Chocolate_Height, Chocolate_Width));
+			s_choco->skillTrigger = it->m_pPhysx->getRotateBox(pos, weapon_look, size);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
 			it->m_skillTrigger.push_back(*s_choco);
 
 			//pos -= look * Pepero_Pos_Gap;
+
+			clients[ev.id].playerinfo->weapon_type = -1;
 
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
@@ -1580,11 +1591,6 @@ void process_event(EVENT_ST &ev)
 
 		if (it2 != it->m_skillTrigger.end())
 		{
-			char type = it2->type;
-			char index = it2->index;
-			PxVec3 vel = it2->vel;
-			PxVec3 look = it2->look;
-
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int client_id = it->clientNum[i];
@@ -1607,7 +1613,7 @@ void process_event(EVENT_ST &ev)
 								{
 									if (clients[client_id2].connected == true)
 									{
-										send_heal_packet(client_id, slot, hp);
+										send_heal_packet(client_id2, slot, hp);
 									}
 								}
 							}
@@ -1705,6 +1711,11 @@ void process_event(EVENT_ST &ev)
 
 			it->weapon_list[type][index].init();
 			it2->skillTrigger->release();
+
+			if (type == Weapon_chupachupse) {
+				int id = it->clientNum[slot];
+				clients[id].playerinfo->weapon_type = -1;
+			}
 
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
@@ -1858,7 +1869,7 @@ void clientInputProcess(int room_num)
 					//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
 					float elapsedTime = gGameTimer.GetTimeElapsed();
 
-					PxVec3 distance = direction * elapsedTime * 20.f;
+					PxVec3 distance = direction * elapsedTime * NORMAL_SPEED;
 					distance.y += jump_height;
 
 					PxControllerFilters filters;
