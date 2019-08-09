@@ -34,7 +34,7 @@ LoadAnimation::LoadAnimation(string filename, float trigger, float skip) :
 
 		m_animSpeed = (end_time - start_time) / m_pAnim->mChannels[0]->mNumPositionKeys;
 		m_animSpeed = m_pAnim->mTicksPerSecond;
-		//cout << m_animSpeed << endl;
+		m_initSpeed = m_animSpeed;
 	}
 }
 
@@ -49,6 +49,8 @@ LoadAnimation::LoadAnimation(const LoadAnimation & T)
 	trigger_time = T.trigger_time;
 	posible_skip = T.posible_skip;
 	m_animSpeed = T.m_animSpeed;
+	m_prevSpeed = T.m_prevSpeed;
+	m_initSpeed = T.m_initSpeed;
 }
 LoadAnimation::~LoadAnimation()
 {

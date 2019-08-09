@@ -121,6 +121,9 @@ void CPlayer::init()
 	Scale_flag = false;
 	m_status = STATUS::FREE;
 	Scale_time = 0.3f;
+	for (int i = 0; i < m_NumofAnim; i++)
+		m_ani[i]->initspeed();
+	
 }
 
 /*플레이어의 위치를 변경하는 함수이다. 플레이어의 위치는 기본적으로 사용자가 플레이어를 이동하기 위한 키보드를

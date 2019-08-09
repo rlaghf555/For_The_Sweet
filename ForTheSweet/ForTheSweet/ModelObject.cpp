@@ -141,6 +141,19 @@ void ModelObject::ChangeAnimation(UINT nextIndex)
 	}
 	//m_loopCheck = 0;
 	m_AnimIndex = nextIndex;
+	if(m_AnimIndex == Anim_Jump) SoundManager::GetInstance()->PlaySounds(JUMPSOUND);
+	if(m_AnimIndex == Anim_Small_React||m_AnimIndex == Anim_Hard_React)SoundManager::GetInstance()->PlaySounds(HIT);
+}
+
+void ModelObject::ChangeAnimationSpeed(UINT AnimIndex, float speed)
+{
+	m_ani[AnimIndex]->saveAnimSpeed();
+	m_ani[AnimIndex]->SetAnimSpeed(speed);
+}
+
+void ModelObject::ResetAnimationSpeed(UINT AnimIndex)
+{
+	m_ani[AnimIndex]->loadAnimSpeed();
 }
 
 void ModelObject::stopAnim(bool stop)

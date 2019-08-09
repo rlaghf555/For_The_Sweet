@@ -851,7 +851,7 @@ void CScene::initUI(wchar_t *character_id[])
 	//}
 	//--------------------------------여기까지
 
-	m_MessageShader->ShowMessage(MESSAGE_LIGHTING);
+	//m_MessageShader->ShowMessage(MESSAGE_LIGHTING);
 
 }
 
@@ -882,7 +882,6 @@ void CScene::initObject()
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
-
 			//m_pPlayer[i]->selected_skill = ;
 		}
 		//번개 위치
@@ -1084,13 +1083,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 
 					m_SkillParticleShader[i][m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
-				}
-				if (animindex == Anim_Jump&&m_pPlayer[i]->getAnimtime() <= 1) {	//Anim_Jump
-					SoundManager::GetInstance()->PlaySounds(JUMPSOUND);
-				}
-				if ((animindex == Anim_Small_React||animindex == Anim_Hard_React)&& m_pPlayer[i]->getAnimtime() <= 1) {	//Anim_Jump
-					SoundManager::GetInstance()->PlaySounds(HIT);
-				}
+				}			
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
 					AnimateWeapon(i);

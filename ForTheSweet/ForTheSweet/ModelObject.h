@@ -46,7 +46,8 @@ public:
 	}
 
 	void ChangeAnimation(UINT nextIndex);
-
+	void ChangeAnimationSpeed(UINT AnimIndex, float speed = 2.0f);
+	void ResetAnimationSpeed(UINT AnimIndex);
 	void stopAnim(bool stop);
 
 	virtual int getAnimIndex() { return m_AnimIndex; }

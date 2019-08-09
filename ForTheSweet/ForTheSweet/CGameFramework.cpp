@@ -465,7 +465,7 @@ void CGameFramework::processPacket(char *ptr)
 		{
 			m_pScene->getplayer(p_pos.id)->SetPosition(pos);
 			m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
-			if(status != STATUS::CRI_HITTED)
+			if (status != STATUS::CRI_HITTED)
 				m_pScene->getplayer(p_pos.id)->SetLook(vel);
 
 			// cout << int(p_pos.dashed) << endl;
@@ -563,13 +563,13 @@ void CGameFramework::processPacket(char *ptr)
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::HARD_ATTACK);
 			}
 			if (anim_index == Anim_Lollipop_Skill || anim_index == Anim_pepero_Skill
-				|| anim_index == Anim_pepero_Skill ) {
+				|| anim_index == Anim_pepero_Skill) {
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::SKILL_WEAPON_NO_MOVE);
 			}
 			if (anim_index == Anim_candy_Skill) {
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::SKILL_WEAPON_MOVE);
 			}
-			
+
 		}
 
 		break;
@@ -689,7 +689,7 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_WeaponShader[type]->getObject(index)->visible = false;
 		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(1000.f, 1000.f, 1000.f);
-		
+
 		m_pScene->m_ExplosionShader[type][index]->Setposition(x, y, z);
 		m_pScene->m_ExplosionShader[type][index]->m_bBlowingUp = true;
 
@@ -748,7 +748,7 @@ void CGameFramework::processPacket(char *ptr)
 			m_pScene->m_WeaponShader[type]->getObject(index)->SetUp(look);
 			m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
 		}
-		
+
 		if (type == M_Weapon_Lollipop)
 		{
 			m_pScene->m_WeaponShader[type]->getObject(index)->init();
@@ -804,6 +804,50 @@ void CGameFramework::processPacket(char *ptr)
 
 		break;
 	}
+//	case SC_FEVER:
+//		//피버타임 시작할때
+//	{	
+//		m_pScene->m_MessageShader->ShowMessage(MESSAGE_FEVER);	//메세지는 3초전..?
+//		for (int i = 0; i < MAX_USER; i++) {
+//			m_pScene->m_pPlayer[i]->ChangeAnimationSpeed(Anim_Walk, 2.0f);
+//			m_pScene->m_pPlayer[i]->ChangeAnimationSpeed(Anim_Run, 2.0f);
+//		}
+//		//피버타임 끝날때
+//		for (int i = 0; i < MAX_USER; i++) {
+//			m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Walk);
+//			m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Run);
+//		}
+//		break;
+//	}
+//	case SC_LIGHTNING:
+//	{	//번개 시작
+//		m_pScene->m_MessageShader->ShowMessage(MESSAGE_LIGHTING);	//메세지는 3초전..?
+//		m_pScene->m_DarkShader->is_dark = true;	//어두워짐
+//		//번개인덱스 2개 
+//		m_pScene->m_EffectShader->ShowEffect(0);
+//		m_pScene->m_EffectShader->ShowEffect(0);
+//		//번개 종료
+//		m_pScene->m_DarkShader->is_dark = false;	//어두워짐
+//		break;
+//	}
+//
+//	case SC_FOG:
+//	{
+//		//안개 시작
+//		m_pScene->m_MessageShader->ShowMessage(MESSAGE_FOG);	//메세지는 3초전..?
+//		m_pScene->m_ppUIShaders[21]->SetFog();
+//		for (int i = 0; i < 8; i++) {
+//			m_pScene->m_ppUIShaders[i]->FogOn(true);
+//		}
+//		for (int i = 12; i < 20; i++) {
+//			m_pScene->m_ppUIShaders[i]->FogOn(true);
+//		}
+//
+//		//안개 종료
+//		m_pScene->m_ppUIShaders[21]->FogOff();
+//
+//		break;
+//	}
 	default:
 	{
 		cout << "알수 없는 패킷 type : " << int(ptr[1]) << endl;

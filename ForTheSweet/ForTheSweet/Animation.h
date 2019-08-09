@@ -29,6 +29,7 @@ private:
 
 	float										m_animSpeed;
 	float										m_prevSpeed;
+	float										m_initSpeed;
 public:
 	LoadAnimation(string filename, float trigger, float skip);
 	LoadAnimation(const LoadAnimation& T);
@@ -50,7 +51,7 @@ public:
 	void SetAnimSpeed(float speed) { m_animSpeed *= speed; }
 	void loadAnimSpeed() { m_animSpeed = m_prevSpeed; }
 	void saveAnimSpeed() { m_prevSpeed = m_animSpeed; }
-
+	void initspeed() { m_animSpeed = m_initSpeed;}
 	UINT BoneTransform(UINT& index, float fTime, vector<XMFLOAT4X4>& transforms);
 	void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const XMMATRIX& ParentTransform);
 	const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
