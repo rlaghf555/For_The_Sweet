@@ -468,11 +468,6 @@ void CGameFramework::processPacket(char *ptr)
 
 		if (p_pos.size == sizeof(sc_packet_pos))
 		{
-			//if (m_pScene->getplayer(p_pos.id)->king == true) {
-			//	p_pos.y -= 17.5f;
-			//}
-			//cout << "pos : " << pos.x << "," << pos.y << "," << pos.z << endl;
-
 			m_pScene->getplayer(p_pos.id)->SetPosition(pos);
 			m_pScene->getplayer(p_pos.id)->SetVelocity(vel);
 			if (status != STATUS::CRI_HITTED)
@@ -680,7 +675,9 @@ void CGameFramework::processPacket(char *ptr)
 		XMFLOAT3 a = XMFLOAT3(1, 0, 0);
 
 		//m_pScene->m_WeaponShader[type]->getObject(index)->Rotate();
+
 		if (type == 3) m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, -90);
+		else if(type == 4) m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, 0);
 		else m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, 90);
 		m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(&a, D3DMath::Rand(0, 4) * 90.f);
 
@@ -966,6 +963,8 @@ void CGameFramework::processPacket(char *ptr)
 		}
 		m_pScene->m_pPlayer[p_king.king]->king = true;
 
+		m_pScene->m_pPlayer[p_king.king]->SetScaleflag(true);
+
 		m_pPhysx->m_Scene->lockWrite();
 		m_pScene->m_pPlayer[p_king.king]->m_PlayerController->setRadius(10.f * 2.f);
 		m_pScene->m_pPlayer[p_king.king]->m_PlayerController->setHeight(15.f * 2.f);
@@ -984,6 +983,8 @@ void CGameFramework::processPacket(char *ptr)
 			isKing = false;
 		}
 		m_pScene->m_pPlayer[p_king_off.king]->king = false;
+
+		m_pScene->m_pPlayer[p_king_off.king]->SetScaleflag(false);
 
 		m_pPhysx->m_Scene->lockWrite();
 		m_pScene->m_pPlayer[p_king_off.king]->m_PlayerController->setRadius(10.f);
@@ -2588,13 +2589,13 @@ void CGameFramework::UpdateProcess()
 
 						XMFLOAT3 pos = m_pScene->m_pPlayer[i]->GetPosition();
 						position.x = pos.x;
-						position.y = pos.y + 17.5;
-						//if (m_pScene->m_pPlayer[i]->king == true) {
-						//	position.y = pos.y + 35.f;
-						//}
-						//else {
-						//	position.y = pos.y + 17.5f;
-						//}
+						//position.y = pos.y + 17.5;
+						if (m_pScene->m_pPlayer[i]->king == true) {
+							position.y = pos.y + 35.f;
+						}
+						else {
+							position.y = pos.y + 17.5f;
+						}
 						position.z = pos.z;
 						m_pScene->m_pPlayer[i]->m_PlayerController->setPosition(position);
 
@@ -2768,13 +2769,13 @@ void CGameFramework::FrameAdvance()
 					PxExtendedVec3 playerPosition = m_pScene->m_pPlayer[i]->m_PlayerController->getPosition();
 					XMFLOAT3 position;
 					position.x = playerPosition.x;
-					position.y = playerPosition.y - 17.5f;
-					//if (m_pScene->m_pPlayer[i]->king == true) {
-					//	position.y = playerPosition.y - 35.0f;
-					//}
-					//else {
-					//	position.y = playerPosition.y - 17.5f;
-					//}	
+					//position.y = playerPosition.y - 17.5f;
+					if (m_pScene->m_pPlayer[i]->king == true) {
+						position.y = playerPosition.y - 35.0f;
+					}
+					else {
+						position.y = playerPosition.y - 17.5f;
+					}	
 					position.z = playerPosition.z;
 					//m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 					//m_pCamera->SetLookAt(position);

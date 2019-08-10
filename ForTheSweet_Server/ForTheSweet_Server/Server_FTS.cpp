@@ -2165,7 +2165,7 @@ void process_event(EVENT_ST &ev)
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
 
-		PxVec3 pos(0, 10.1f, 0);
+		PxVec3 pos(0, 15.1f, 0);
 
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
@@ -2526,7 +2526,13 @@ void clientUpdateProcess(int room_num)
 					//cout << int(i) << " Client Pos : " << position.x << "," << position.y - 17.5 << "," << position.z << endl;
 
 					clients[client_id].playerinfo->m_Pos.x = position.x;
-					clients[client_id].playerinfo->m_Pos.y = position.y - 17.5;
+					if (clients[client_id].playerinfo->weapon_type == Weapon_King)
+					{
+						clients[client_id].playerinfo->m_Pos.y = position.y - 35.f;
+					}
+					else {
+						clients[client_id].playerinfo->m_Pos.y = position.y - 17.5f;
+					}
 					clients[client_id].playerinfo->m_Pos.z = position.z;
 				}
 			}
