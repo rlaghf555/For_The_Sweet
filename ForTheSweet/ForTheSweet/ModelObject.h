@@ -25,6 +25,8 @@ protected:
 	CMaterial*						m_pMaterial = NULL;
 
 	XMFLOAT4						m_handpos;
+
+	float							jump_pos_y = 0.f;
 public:
 	ModelObject(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	ModelObject(LoadModel* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
@@ -65,4 +67,7 @@ public:
 
 	void SetHandPos(XMFLOAT4 pos) { m_handpos = pos; }
 	XMFLOAT4 GetHandPos() { return m_handpos; }
+
+	virtual float GetJumpPos() { return jump_pos_y; };
+	virtual void SetJumpPos(float posy) { jump_pos_y = posy; };
 };

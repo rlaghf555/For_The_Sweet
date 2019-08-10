@@ -2377,9 +2377,9 @@ void CGameFramework::AnimateObjects()
 	if (m_pScene) {
 		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
 
-		PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
-		pos.p.y += 0.1f;
-		m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
+		//PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
+		//pos.p.y += 0.1f;
+		//m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
 
 		//cout << pos.p.x << "," << pos.p.y << "," << pos.p.z << endl;
 	}

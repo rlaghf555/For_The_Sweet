@@ -1114,7 +1114,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				XMFLOAT3 Up = m_pPlayer[i]->GetUp();
 				XMFLOAT3 Right = m_pPlayer[i]->GetRight();
 				m_pPlayerShadowShader[i]->getPlayer()->SetWorld(Look, Up, Right);
-				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->m_Fall.getHeight(fTimeElapsed));
+
+				if (animindex == Anim_Jump) m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->GetJumpPos());
+				else m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->GetPosition().y);
 				
 				if (animindex == Anim_Stun) {	//Anim_Jump
 					m_StunShader[i]->visible = true;

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ModelObject.h"
+#include "Shader.h"
 
 ModelObject::ModelObject(Model_Animation * ma, ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList)
 {
@@ -141,7 +142,10 @@ void ModelObject::ChangeAnimation(UINT nextIndex)
 	}
 	//m_loopCheck = 0;
 	m_AnimIndex = nextIndex;
-	if(m_AnimIndex == Anim_Jump) SoundManager::GetInstance()->PlaySounds(JUMPSOUND);
+	if (m_AnimIndex == Anim_Jump) {
+		SoundManager::GetInstance()->PlaySounds(JUMPSOUND);
+		jump_pos_y = GetPosition().y;
+	}
 	if(m_AnimIndex == Anim_Small_React||m_AnimIndex == Anim_Hard_React)SoundManager::GetInstance()->PlaySounds(HIT);
 }
 

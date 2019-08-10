@@ -50,10 +50,11 @@ public:
 
 	PxF32		mV0;
 	PxF32		mJumpTime;
-	bool			mJump;
+	bool		mJump;
+	float		jump_height = 0.f;
 
-	void			startJump(PxF32 v0);
-	void			stopJump();
+	void		startJump(PxF32 v0);
+	void		stopJump();
 	PxF32		getHeight(PxF32 elapsedTime);
 };
 

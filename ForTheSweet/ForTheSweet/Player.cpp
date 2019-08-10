@@ -29,8 +29,9 @@ PxF32 Jump::getHeight(PxF32 elapsedTime)
 
 	mJumpTime += elapsedTime;
 	const PxF32 h = gJumpGravity * mJumpTime*mJumpTime + mV0 * mJumpTime;
+	jump_height = h * elapsedTime;
+
 	return h * elapsedTime;
-	//return -1.0f;
 }
 
 PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxShape& shape, const PxActor& actor)

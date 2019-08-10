@@ -201,6 +201,7 @@ public:
 	virtual void setPosition(XMFLOAT3* pos, UINT num) {}
 	virtual UINT getRemainObjects() { return 0; }
 	virtual CGameObject** getObjects(UINT& num) { return nullptr; }
+	virtual CGameObject* getObjects() { return m_bbObjects[0]; }
 	//virtual CGameObject** getObjects() { return m_bbObjects.data(); }
 
 	void setScale(float scale);

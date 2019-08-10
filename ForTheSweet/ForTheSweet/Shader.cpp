@@ -2648,10 +2648,10 @@ void PlayerShadowShader::Animate(float fTimeElapsed, XMFLOAT3 pos, float jump)
 		return;
 	for (UINT i = 0; i < m_nObjects; ++i) {
 		if (m_bbObjects[i]) m_bbObjects[i]->Animate(fTimeElapsed);
-		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f - jump, 0.0f, 0.0f);
+		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
 		XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
-		XMMATRIX shadowoffset = XMMatrixTranslation(pos.x, pos.y, pos.z);
+		XMMATRIX shadowoffset = XMMatrixTranslation(pos.x, pos.y - (pos.y - jump), pos.z);
 
 		shadow_mat = S * shadowoffset;//XMMatrixShadow(XMVectorSet(+0.0f, -1.0f, +0.0f, 0.0f), XMVector3Normalize(XMVectorSet(0.f, -1.0f, 0.36f, 0.0f))) * XMMatrixTranslation(+0.0f, +11.0f, 0.f);
 	}
@@ -2841,7 +2841,7 @@ void ShadowREverseShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12Graphics
 
 		if (type == 0)pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000.f, 100.f, 20.f);
 		if (type == 1)pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 20.f, 100.f, 1000.f);
-		if (type == 2)pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 115.f, 115.f, 115.f);
+		if (type == 2)pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 115.f, 30.f, 115.f);
 		if (type == 3)pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 20.f, 100.f, 1000.f);
 		if (type == 4)pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1000.f, 100.f, 20.f);
 		if (type == 5)pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 185.f, 50.f, 100.f);
