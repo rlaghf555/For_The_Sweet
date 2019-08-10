@@ -971,6 +971,7 @@ void CGameFramework::processPacket(char *ptr)
 		PxExtendedVec3 pos = m_pScene->m_pPlayer[p_king.king]->m_PlayerController->getPosition();
 		pos.y += 17.5f;
 		m_pScene->m_pPlayer[p_king.king]->m_PlayerController->setPosition(pos);
+		//m_pScene->m_pPlayer[p_king.king]->SetScale(2.0f, true);
 		m_pPhysx->m_Scene->unlockWrite();
 		break;
 	}
@@ -992,6 +993,7 @@ void CGameFramework::processPacket(char *ptr)
 		PxExtendedVec3 pos = m_pScene->m_pPlayer[p_king_off.king]->m_PlayerController->getPosition();
 		pos.y -= 17.5f;
 		m_pScene->m_pPlayer[p_king_off.king]->m_PlayerController->setPosition(pos);
+		m_pScene->m_pPlayer[p_king_off.king]->SetScale(1.0f, true);
 		m_pPhysx->m_Scene->unlockWrite();
 		break;
 	}
