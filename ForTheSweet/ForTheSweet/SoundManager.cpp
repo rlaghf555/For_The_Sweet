@@ -21,6 +21,8 @@ void SoundManager::Setup()
 	g_pSystem->createSound("resource\\sound\\fog.mp3", FMOD_LOOP_NORMAL, 0, &g_pSound[FOG]);
 	g_pSystem->createSound("resource\\sound\\win.mp3", FMOD_DEFAULT, 0, &g_pSound[WIN]);	
 	g_pSystem->createSound("resource\\sound\\lose.mp3", FMOD_DEFAULT, 0, &g_pSound[LOSE]);	
+	g_pSystem->createSound("resource\\sound\\spinning.mp3", FMOD_DEFAULT, 0, &g_pSound[SPINNING]);	
+	g_pSystem->createSound("resource\\sound\\throw.mp3", FMOD_DEFAULT, 0, &g_pSound[THROW]);	
 }
 void SoundManager::Release()
 {

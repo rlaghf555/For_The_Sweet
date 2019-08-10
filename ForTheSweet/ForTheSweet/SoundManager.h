@@ -14,6 +14,8 @@ enum SOUNDKIND {
 	FOG,
 	WIN,
 	LOSE,
+	SPINNING,
+	THROW,
 	SOUND_END
 };
 class SoundManager
