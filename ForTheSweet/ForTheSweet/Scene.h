@@ -52,7 +52,7 @@ public:
 	PlayerShader				*m_pPlayerShader[MAX_USER];
 	PlayerShadowShader			*m_pPlayerShadowShader[MAX_USER];
 
-	CModelShader				*m_MapShader[22] = { NULL, };
+	CModelShader				*m_MapShader[24] = { NULL, };
 	LoadModel					**Map_Model;
 
 	RoundBackGroundShader		*m_RoundBackGroundShader[3] = { NULL, };

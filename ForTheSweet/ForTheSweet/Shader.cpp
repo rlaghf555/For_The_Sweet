@@ -866,7 +866,8 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	if (map_type == M_Map_3_in || map_type == M_Map_3_in_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\map_3_cake_in.dds", 0);
 	if (map_type == M_Map_3_in_stair_1 || map_type == M_Map_3_in_stair_1_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\test_1.dds", 0);
 	if (map_type == M_Map_3_in_stair_2 || map_type == M_Map_3_in_stair_2_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\test_1.dds", 0);
-
+	if (map_type == M_Map_3_in_wall_collision || map_type == M_Map_3_in_wall_collision_2) pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"resource\\map\\test_1.dds", 0);
+	
 	CreateShaderResourceViews(pd3dDevice, pd3dCommandList, pTexture, 2, true);
 
 	m_pMaterial = new CMaterial();
@@ -896,9 +897,11 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		if (map_type == M_Map_3_in) map->SetPosition(map_3_distance, 500.f, 40.f);
 		if (map_type == M_Map_3_in_stair_1) map->SetPosition(map_3_distance, 500.f, 40.f);
 		if (map_type == M_Map_3_in_stair_2) map->SetPosition(map_3_distance, 500.f, 40.f);
+		if (map_type == M_Map_3_in_wall_collision) map->SetPosition(map_3_distance, 500.f, 40.f);
 		if (map_type == M_Map_3_in_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
 		if (map_type == M_Map_3_in_stair_1_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
 		if (map_type == M_Map_3_in_stair_2_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
+		if (map_type == M_Map_3_in_wall_collision_2) map->SetPosition(-map_3_distance, 500.f, 40.f);
 
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;

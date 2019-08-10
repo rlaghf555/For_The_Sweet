@@ -176,6 +176,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_MapShader[20]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1_2);
 		m_MapShader[21] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
 		m_MapShader[21]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2_2);
+		m_MapShader[22] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
+		m_MapShader[22]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision);
+		m_MapShader[23] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
+		m_MapShader[23]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision_2);
 
 		m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
 		m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
@@ -397,6 +401,10 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 		m_MapShader[20]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1_2);
 		m_MapShader[21] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
 		m_MapShader[21]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2_2);
+		m_MapShader[22] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
+		m_MapShader[22]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision);
+		m_MapShader[23] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
+		m_MapShader[23]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision_2);
 
 		m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
 		m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
@@ -628,7 +636,7 @@ void CScene::ReleaseObjects()
 			delete m_pPlayerShader[i];
 		}
 	}
-	for (int i = 0; i < 22; i++) {
+	for (int i = 0; i < 24; i++) {
 		if (m_MapShader[i]) {
 			m_MapShader[i]->ReleaseShaderVariables();
 			m_MapShader[i]->ReleaseObjects();
@@ -1503,6 +1511,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_MapShader[19]) m_MapShader[19]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[20]) m_MapShader[20]->Render(pd3dCommandList, pCamera);
 		if (m_MapShader[21]) m_MapShader[21]->Render(pd3dCommandList, pCamera);
+		//if (m_MapShader[22]) m_MapShader[22]->Render(pd3dCommandList, pCamera);
+		//if (m_MapShader[23]) m_MapShader[23]->Render(pd3dCommandList, pCamera);
 
 		m_BridgeShader->Render(pd3dCommandList, pCamera);
 		for (int i = 0; i < 2; ++i) if (m_StairShader[i]) m_StairShader[i]->Render(pd3dCommandList, pCamera);

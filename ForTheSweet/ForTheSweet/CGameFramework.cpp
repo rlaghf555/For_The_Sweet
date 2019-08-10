@@ -164,7 +164,7 @@ void CGameFramework::OnDestroy()
 
 	if (m_pPhysx) delete m_pPhysx;
 
-	for (int i = 0; i < 21; i++) {
+	for (int i = 0; i < 22; i++) {
 		if (Map_Model[i]) {
 			delete Map_Model[i];
 			Map_Model[i] = NULL;
@@ -1119,6 +1119,8 @@ void CGameFramework::LoadModels()
 
 	Map_Model[19] = new LoadModel("./resource/map/round_background_1.FBX", true);	// M_Map_round_background_1
 	Map_Model[20] = new LoadModel("./resource/map/round_background_2.FBX", true);	// M_Map_round_background_2
+
+	Map_Model[21] = new LoadModel("./resource/map/map_3_in_wall_collision.FBX", true);	// M_Map_3_in_wall_collision
 
 	weapon[0] = new LoadModel("./resource/weapon/lollipop.FBX", true);			// M_Weapon_Lollipop
 	weapon[1] = new LoadModel("./resource/weapon/candy.FBX", true);				// M_Weapon_chupachupse
@@ -2534,7 +2536,7 @@ void CGameFramework::CollisionProcess()
 
 void CGameFramework::Map2Camera()
 {
-	XMFLOAT3 position(0, 0, 0);
+	XMFLOAT3 position(0, 0, -80);
 	m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 	m_pCamera->SetLookAt(position);
 }

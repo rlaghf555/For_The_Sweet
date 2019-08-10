@@ -116,7 +116,7 @@ private:
 	//펜스 인터페이스 포인터, 펜스의 값, 이벤트 핸들이다.
 
 	Model_Animation *Character_Model;
-	LoadModel		*Map_Model[21];
+	LoadModel		*Map_Model[22];
 	LoadModel		*weapon[7];
 	LoadModel		*effect[2];
 #if defined(_DEBUG)
