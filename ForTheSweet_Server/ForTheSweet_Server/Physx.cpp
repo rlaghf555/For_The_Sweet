@@ -50,6 +50,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 			PxVec3 mylook(0, 0, 0);
 			PxVec3 otherlook(0, 0, 0);
 			float dot;
+			int my;
 
 			for (int j = 0; j < MAX_ROOM_USER; ++j)
 			{
@@ -58,6 +59,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 					if (pairs[i].triggerActor == player[j]->m_AttackTrigger)
 					{
 						mylook = player[j]->m_Look;
+						my = j;
 						break;
 					}
 				}
@@ -84,19 +86,31 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 									otherlook = player[j]->m_Look;
 									dot = mylook.dot(otherlook);
 
-									// -0.707... ~ -1.0 : 아머 가능
-									if (player[j]->m_status == STATUS::DEFENSE) {
-										if (dot <= -0.7f && dot >= -1.0f) {
-											continue;
+									if (player[my]->weapon_type == Weapon_King)
+									{
+										PxVec3 knockback;
+										knockback = player[j]->m_Pos - player[my]->m_Pos;
+
+										player[j]->m_Knockback = knockback.getNormalized();
+										player[j]->setStatus(STATUS::CRI_HITTED);
+										player[j]->hitted = true;
+									}
+									else
+									{
+										// -0.707... ~ -1.0 : 아머 가능
+										if (player[j]->m_status == STATUS::DEFENSE) {
+											if (dot <= -0.7f && dot >= -1.0f) {
+												continue;
+											}
+											else {
+												player[j]->setStatus(STATUS::HITTED);
+												player[j]->hitted = true;
+											}
 										}
 										else {
 											player[j]->setStatus(STATUS::HITTED);
 											player[j]->hitted = true;
 										}
-									}
-									else {
-										player[j]->setStatus(STATUS::HITTED);
-										player[j]->hitted = true;
 									}
 								}
 							}
@@ -118,7 +132,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 								//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
 
 								auto it = find(room->m_skillTrigger.begin(), room->m_skillTrigger.end(), order);
-								
+
 								player[j]->m_Knockback = it->look;
 								player[j]->setStatus(STATUS::CRI_HITTED);
 								player[j]->hitted = true;
@@ -126,7 +140,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 						}
 						add_timer(room, order, high_resolution_clock::now());
 					}
-				 }
+				}
 				else if (Lollipop_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
 				{
 					if (player[j])
@@ -179,22 +193,22 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 				}
 				else if (Light_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
 				{
-				if (player[j])
-				{
-					if (player[j]->m_PlayerController != nullptr)
+					if (player[j])
 					{
-						if (pairs[i].otherActor == player[j]->getControllerActor()) {
-							cout << j << " Player : Lightning Stun\n";
-							//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
-							//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
-							//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
-							// cout << mylook.x << "," << mylook.y << "," << mylook.z << endl;
+						if (player[j]->m_PlayerController != nullptr)
+						{
+							if (pairs[i].otherActor == player[j]->getControllerActor()) {
+								cout << j << " Player : Lightning Stun\n";
+								//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
+								//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
+								// cout << mylook.x << "," << mylook.y << "," << mylook.z << endl;
 
-							player[j]->setStatus(STATUS::STUN);
-							player[j]->hitted = true;
+								player[j]->setStatus(STATUS::STUN);
+								player[j]->hitted = true;
+							}
 						}
 					}
-				}
 				}
 			}
 		}
@@ -202,7 +216,7 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 }//트리거박스 충돌 체크
 
 void PhysSimulation::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
-{ 
+{
 	for (PxU32 i = 0; i < nbPairs; i++)
 	{
 		const PxContactPair& cp = pairs[i];
@@ -293,7 +307,7 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(vector<PxVec3> ver, vector<int> index) {
 	return triMesh;
 }
 
-PxCapsuleController* CPhysx::getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback)
+PxCapsuleController* CPhysx::getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback, CPlayer *player)
 {
 	PxCapsuleControllerDesc capsuleDesc;
 	capsuleDesc.height = height; //Height of capsule
@@ -311,6 +325,7 @@ PxCapsuleController* CPhysx::getCapsuleController(PxVec3 pos, float height, floa
 
 	//충돌 콜백 함수
 	capsuleDesc.reportCallback = collisionCallback;
+	capsuleDesc.behaviorCallback = player;
 
 	PxCapsuleController* controller = static_cast<PxCapsuleController*>(m_PlayerManager->createController(capsuleDesc));
 
@@ -350,7 +365,7 @@ PxRigidDynamic* CPhysx::getBox(PxVec3& t, PxVec3 size)
 	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_X, true);
 	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Y, true);
 	staticActor->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, true);
-	
+
 
 	//UserData* udata = new UserData;
 	//udata->type = Player_Trigger;

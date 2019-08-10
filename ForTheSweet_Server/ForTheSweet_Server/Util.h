@@ -43,12 +43,32 @@ constexpr int ROOM_MOVE_KING = 2;
 
 constexpr int ROOM_TIMER_START = 1000;
 
+// MAP
+constexpr int MAP_Wehas = 0;
+constexpr int MAP_Oreo = 1;
+constexpr int MAP_Cake = 2;
+
+// MAP OBJECT
+constexpr int MAP_1_BASE = 0;
+constexpr int MAP_2_BASE = 1;
+constexpr int MAP_2_CHOCOHAR = 2;
+constexpr int MAP_3_BRIDGE = 3;
+constexpr int MAP_3_FLOOR_1 = 4;
+constexpr int MAP_3_FLOOR_2 = 5;
+constexpr int MAP_3_FLOOR_3 = 6;
+constexpr int MAP_3_IN = 7;
+constexpr int MAP_3_IN_STAIR_1 = 8;
+constexpr int MAP_3_IN_STAIR_2 = 9;
+constexpr int MAP_3_STAIR = 10;
+constexpr int MAP_MACARON = 11;
+
 // Weapon
 constexpr int Weapon_Lollipop = 0;
 constexpr int Weapon_chupachupse = 1;
 constexpr int Weapon_pepero = 2;
 constexpr int Weapon_chocolate = 3;
 constexpr int Weapon_cupcake = 4;
+constexpr int Weapon_King = 5;
 
 // Pepero
 constexpr float Pepero_Width = 1.f;

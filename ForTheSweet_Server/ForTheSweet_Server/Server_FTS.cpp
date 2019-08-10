@@ -16,8 +16,8 @@
 
 HANDLE g_iocp;
 
-vector<PxVec3> gMapVertex;
-vector<int> gMapIndex;
+vector<vector<PxVec3>> gMapVertexs;
+vector<vector<int>> gMapIndexs;
 
 vector<CRoom> gRoom;
 mutex room_l;
@@ -428,6 +428,24 @@ void send_light_index_packet(char client_id, char index1, char index2) {
 	sendPacket(client_id, &p_light_index);
 }
 
+void send_king_packet(char client_id, char king) {
+	sc_packet_king p_king;
+	p_king.type = SC_KING;
+	p_king.size = sizeof(sc_packet_king);
+	p_king.king = king;
+
+	sendPacket(client_id, &p_king);
+}
+
+void send_king_off_packet(char client_id, char king) {
+	sc_packet_king_off p_king_off;
+	p_king_off.type = SC_KING_OFF;
+	p_king_off.size = sizeof(sc_packet_king_off);
+	p_king_off.king = king;
+
+	sendPacket(client_id, &p_king_off);
+}
+
 void send_room_setting_weapon(int room_num)
 {
 	room_l.lock();
@@ -678,7 +696,7 @@ void process_packet(char key, char *buffer)
 		room_l.unlock();
 
 		// Physx에 맵 초기화
-		it->start(gMapVertex, gMapIndex);
+		it->start(MAP_Wehas, gMapVertexs, gMapIndexs);
 
 		it->m_pPhysx->registerRoom(&(*it));
 
@@ -899,7 +917,8 @@ void process_packet(char key, char *buffer)
 		if (p_anim->key == CS_GUARD) {
 			cout << "guard" << endl;
 
-			if (clients[key].playerinfo->weapon_type == -1) {
+			if (clients[key].playerinfo->weapon_type == -1 || clients[key].playerinfo->weapon_type == Weapon_cupcake
+				|| clients[key].playerinfo->weapon_type == Weapon_King) {
 				clients[key].playerinfo->setAniIndex(Anim::Guard);
 			}
 			else if (clients[key].playerinfo->weapon_type >= Weapon_Lollipop && clients[key].playerinfo->weapon_type <= Weapon_pepero) {
@@ -909,8 +928,6 @@ void process_packet(char key, char *buffer)
 				clients[key].playerinfo->setAniIndex(Anim::Chocolate_Guard);
 			}
 			clients[key].playerinfo->setStatus(STATUS::DEFENSE);
-
-
 		}
 
 		if (p_anim->key == CS_GUARD_OFF) {
@@ -920,7 +937,8 @@ void process_packet(char key, char *buffer)
 		}
 
 		if (p_anim->key == CS_WEAK) {
-			if (clients[key].playerinfo->weapon_type == -1)
+			if (clients[key].playerinfo->weapon_type == -1 || clients[key].playerinfo->weapon_type == Weapon_cupcake
+				|| clients[key].playerinfo->weapon_type == Weapon_King)
 			{
 				cout << "Idle weak attack ";
 				if (p_anim->count == 0) {
@@ -980,7 +998,8 @@ void process_packet(char key, char *buffer)
 		}
 
 		if (p_anim->key == CS_HARD) {
-			if (clients[key].playerinfo->weapon_type == -1)
+			if (clients[key].playerinfo->weapon_type == -1 || clients[key].playerinfo->weapon_type == Weapon_cupcake
+				|| clients[key].playerinfo->weapon_type == Weapon_King)
 			{
 				cout << "Idle hard attack ";
 				if (p_anim->count == 0) {
@@ -1032,10 +1051,6 @@ void process_packet(char key, char *buffer)
 				clients[key].playerinfo->attack_count = 1;
 				add_timer(room_num, key, EV_FREE, clients[key].playerinfo->attack_time + 660ms, 1);
 				add_timer(room_num, key, EV_HIT, clients[key].playerinfo->attack_time + 500ms, 0);
-			}
-			else if (clients[key].playerinfo->weapon_type == Weapon_cupcake)
-			{
-
 			}
 
 			clients[key].playerinfo->setStatus(STATUS::HARD_ATTACK);
@@ -1133,6 +1148,13 @@ void process_packet(char key, char *buffer)
 			clients[key].playerinfo->setAniIndex(Anim::Chocolate_Skill);
 			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 660ms, 0);
 			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 360ms, Weapon_chocolate);
+			clients[key].playerinfo->setStatus(STATUS::SKILL_WEAPON_NO_MOVE);
+		}
+		else if (weapon_type == Weapon_cupcake) {
+			clients[key].playerinfo->setAniIndex(Anim::CupCake_Eat);
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 1330ms, 0);
+			add_timer(room_num, key, EV_WEAPON_SKILL, high_resolution_clock::now() + 1260ms, Weapon_cupcake);
+			add_timer(room_num, key, EV_CUPCAKE_REMOVE, high_resolution_clock::now() + 660ms);
 			clients[key].playerinfo->setStatus(STATUS::SKILL_WEAPON_NO_MOVE);
 		}
 
@@ -1376,17 +1398,14 @@ void process_event(EVENT_ST &ev)
 		{
 			clients[ev.id].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
 
-			float hit_dist = 10.f;
+			float hit_dist = 10.f;		// 기본, 컵케이크, 방패
 
 			int type = clients[ev.id].playerinfo->weapon_type;
-			if (type == Weapon_Lollipop || type == Weapon_chupachupse) {
+			if (type == Weapon_Lollipop || type == Weapon_chupachupse || type == Weapon_King) {
 				hit_dist = 20.f;
 			}
 			else if (type == Weapon_pepero) {
 				hit_dist = 30.f;
-			}
-			else if (type == Weapon_chocolate) {
-				hit_dist = 10.f;
 			}
 
 			PxTransform triggerpos(PxVec3(0, 0, 0));
@@ -1418,8 +1437,11 @@ void process_event(EVENT_ST &ev)
 		if (it->weapon_list[wp_type][wp_index].owner == -1)
 		{
 			it->weapon_list[wp_type][wp_index].SetOwner(my_slot);
-			char index = it->weapon_list[wp_type][wp_index].respawn_index;
-			it->weapon_respawn[index].respawn_able = true;
+			if (wp_type != Weapon_cupcake)
+			{
+				char index = it->weapon_list[wp_type][wp_index].respawn_index;
+				it->weapon_respawn[index].respawn_able = true;
+			}
 
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
@@ -1622,6 +1644,64 @@ void process_event(EVENT_ST &ev)
 
 			add_timer(room_num, room_num + ROOM_TIMER_START, EV_WEAPON_REMOVE, high_resolution_clock::now() + 5000ms, order);
 		}
+		else if (weapon_type == Weapon_cupcake)
+		{
+			// 컵케이크 스킬 : 커진다.
+
+			clients[ev.id].playerinfo->m_PlayerController->setRadius(CH_CAPSULE_RADIUS * 2.f);
+			clients[ev.id].playerinfo->m_PlayerController->setHeight(CH_CAPSULE_HEIGHT * 2.f);
+			PxExtendedVec3 pos = clients[ev.id].playerinfo->m_PlayerController->getPosition();
+			pos.y += 17.5f;
+			clients[ev.id].playerinfo->m_PlayerController->setPosition(pos);
+
+			clients[ev.id].playerinfo->weapon_type = Weapon_King;
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_king_packet(client_id, owner);
+					}
+				}
+			}
+
+			add_timer(room_num, ev.id, EV_KING_OFF, high_resolution_clock::now() + 10000ms);
+		}
+		break;
+	}
+	case EV_KING_OFF:
+	{
+		int room_num = clients[ev.id].room_num;
+		char slot = clients[ev.id].slot;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		clients[ev.id].playerinfo->m_PlayerController->setRadius(CH_CAPSULE_RADIUS);
+		clients[ev.id].playerinfo->m_PlayerController->setHeight(CH_CAPSULE_HEIGHT);
+		PxExtendedVec3 pos = clients[ev.id].playerinfo->m_PlayerController->getPosition();
+		pos.y -= 17.5f;
+		clients[ev.id].playerinfo->m_PlayerController->setPosition(pos);
+
+		clients[ev.id].playerinfo->weapon_type = -1;
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_king_off_packet(client_id, slot);
+				}
+			}
+		}
 		break;
 	}
 	case EV_LOLLIPOP_HEAL:
@@ -1762,6 +1842,10 @@ void process_event(EVENT_ST &ev)
 				int id = it->clientNum[slot];
 				clients[id].playerinfo->weapon_type = -1;
 			}
+			if (type == Weapon_cupcake) {
+				int id = it->clientNum[slot];
+				clients[id].playerinfo->weapon_type = -1;
+			}
 
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
@@ -1780,6 +1864,29 @@ void process_event(EVENT_ST &ev)
 				}
 			}
 			it->m_skillTrigger.erase(it2);
+		}
+		break;
+	}
+	case EV_CUPCAKE_REMOVE:
+	{
+		int room_num = clients[ev.id].room_num;
+		char slot = clients[ev.id].slot;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_unpick_weapon_packet(client_id, slot, Weapon_cupcake, 0, PxVec3(1000, 1000, 1000));
+				}
+			}
 		}
 		break;
 	}
@@ -2052,6 +2159,26 @@ void process_event(EVENT_ST &ev)
 	}
 	case EV_RFR_SLIME:
 	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		PxVec3 pos(0, 10.1f, 0);
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_put_weapon_packet(client_id, Weapon_cupcake, 0, pos);
+				}
+			}
+		}
 		break;
 	}
 	case EV_TIME:
@@ -2087,7 +2214,7 @@ void process_event(EVENT_ST &ev)
 			char patern;
 			count += 1;
 
-			if (count == 3) {	// 컵케이크
+			if (count == 1) {	// 컵케이크
 				patern = EV_RFR_SLIME;	// 12. 컵케이크
 			}
 			else {				// 나머지
@@ -2097,7 +2224,7 @@ void process_event(EVENT_ST &ev)
 
 			it->referee.patern_count = count;
 			it->referee.patern_type = patern;
-			
+
 			for (int i = 0; i < MAX_ROOM_USER; ++i) {
 				int client_id = it->clientNum[i];
 
@@ -2111,6 +2238,9 @@ void process_event(EVENT_ST &ev)
 			}
 
 			add_timer(room_num, room_num + ROOM_TIMER_START, EVENT_TYPE(patern), high_resolution_clock::now() + 3s, 0);
+			if (patern == EV_RFR_SLIME) {
+				it->move_actor_flag = true;
+			}
 			if (patern == EV_RFR_LIGHTNING) {
 				it->lighting = true;
 				it->light_count = 0;
@@ -2147,6 +2277,18 @@ void clientInputProcess(int room_num)
 	room_l.lock();
 	auto it = find(gRoom.begin(), gRoom.end(), room_num);
 	room_l.unlock();
+
+	if (it->move_actor_flag == true)
+	{
+		PxTransform pos = it->move_actor->getGlobalPose();
+		pos.p.y += 25.f * gGameTimer.GetTimeElapsed();
+		if (pos.p.y > 0.0f) {
+			pos.p.y = 0.0f;
+			it->move_actor_flag = false;
+		}
+
+		it->move_actor->setGlobalPose(PxTransform(pos));
+	}
 
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
@@ -2482,34 +2624,62 @@ void logic()
 
 void mapLoad()
 {
-	ifstream in("map.txt");
-	int i;
-	float f;
-	PxVec3 vertex;
+	char title[12][40];
+	char txt[8];
 
-	while (true) {
-		in >> i;
-		int ver_size = i;
-		for (int j = 0; j < ver_size; ++j) {
-			in >> f;
-			vertex.x = f;
-			in >> f;
-			vertex.y = f;
-			in >> f;
-			vertex.z = f;
+	sprintf_s(txt, sizeof(txt), ".txt");
+	sprintf_s(title[0], sizeof(title[0]), "map_1_base");
+	sprintf_s(title[1], sizeof(title[1]), "map_2_base");
+	sprintf_s(title[2], sizeof(title[2]), "map_2_chocobar");
+	sprintf_s(title[3], sizeof(title[3]), "map_3_bridge");
+	sprintf_s(title[4], sizeof(title[4]), "map_3_floor1");
+	sprintf_s(title[5], sizeof(title[5]), "map_3_floor2");
+	sprintf_s(title[6], sizeof(title[6]), "map_3_floor3");
+	sprintf_s(title[7], sizeof(title[7]), "map_3_in");
+	sprintf_s(title[8], sizeof(title[8]), "map_3_in_stair1");
+	sprintf_s(title[9], sizeof(title[9]), "map_3_in_stair2");
+	sprintf_s(title[10], sizeof(title[10]), "map_3_stair");
+	sprintf_s(title[11], sizeof(title[11]), "map_macaron");
 
-			gMapVertex.push_back(vertex);
+	for (int i = 0; i < 12; ++i)
+	{
+		strcat_s(title[i], sizeof(title[i]), txt);
+
+		ifstream in(title[i]);
+		int size;
+		float pos;
+		PxVec3 vertex;
+
+		vector<PxVec3> mapVertex;
+		vector<int> mapIndex;
+
+		while (true) {
+			in >> size;
+			int ver_size = size;
+			for (int j = 0; j < ver_size; ++j) {
+				in >> pos;
+				vertex.x = pos;
+				in >> pos;
+				vertex.y = pos;
+				in >> pos;
+				vertex.z = pos;
+
+				mapVertex.push_back(vertex);
+			}
+
+			in >> size;
+			int index_size = size;
+			for (int j = 0; j < index_size; ++j) {
+				in >> size;
+				mapIndex.push_back(size);
+			}
+			break;
 		}
+		in.close();
 
-		in >> i;
-		int index_size = i;
-		for (int j = 0; j < index_size; ++j) {
-			in >> i;
-			gMapIndex.push_back(i);
-		}
-		break;
+		gMapVertexs.push_back(mapVertex);
+		gMapIndexs.push_back(mapIndex);
 	}
-	in.close();
 }
 
 int main()

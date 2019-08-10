@@ -17,7 +17,7 @@ struct UserData {
 class PhysSimulation : public PxSimulationEventCallback
 {
 private:
-	
+
 	CPlayer* player[8];
 	CRoom* room;
 
@@ -77,7 +77,7 @@ public:
 
 	PxTriangleMesh*	GetTriangleMesh(vector<PxVec3> ver, vector<int> index);
 	void setBoxController(PxVec3 pos, PxVec3 size);
-	PxCapsuleController* getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback);
+	PxCapsuleController* getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback, CPlayer *player);
 
 	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size);
 	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size, int trigger_type);

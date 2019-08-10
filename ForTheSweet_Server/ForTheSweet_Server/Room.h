@@ -10,6 +10,8 @@ enum EVENT_TYPE {
 	EV_LOLLIPOP_HEAL,
 	EV_PEPERO_MOVE,
 	EV_CANDY_MOVE,
+	EV_CUPCAKE_REMOVE,
+	EV_KING_OFF,
 	EV_RFR_WEAPON, EV_RFR_FOG, EV_RFR_FEVER, EV_RFR_LIGHTNING, EV_RFR_SLIME,				// 심판에 해당
 	EV_RFR_FOG_END, EV_RFR_FEVER_END, EV_RFR_LIGHTNING_END,
 	EV_RFR_LIGHTNING_INDEX, EV_RFR_LIGHTNING_DELETE,
@@ -65,6 +67,7 @@ public:
 	char max_num;					// 최대 인원
 	char host_num;					// host의 slot
 	char room_mode;					// 0 : 팀전, 1 : 개인전, 2 : 대장전
+	char room_map;
 
 	char room_status;				// 방 상태 (대기 = 0, 게임 로딩 = 1, 게임 중 = 2)
 
@@ -83,8 +86,8 @@ public:
 
 	int timer;
 
-	PxBoxController *test;
-	PxRigidActor *test2;
+	PxRigidActor *move_actor;
+	bool move_actor_flag = false;
 
 	vector<Skill_Actor> m_skillTrigger;
 	char trigger_order;
@@ -102,7 +105,7 @@ public:
 	CRoom(const CRoom &);
 	void init(char *nm, int hostId, int roomNum);
 	bool attend(int Num);
-	void start(const vector<PxVec3>& vectex, const vector<int>& index);
+	void start(int map_type, const vector<vector<PxVec3>>& vectex, const vector<vector<int>>& index);
 	bool operator==(const int num) { return (num == room_num); }
 	bool all_load_complete();
 	bool all_setting_complete();

@@ -172,13 +172,21 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count) {
 	meshDesc.points.data = fromVertex(meshes->m_vertices.data(), meshes->m_vertices.size());
 
 	//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-
-	//ofstream out("map.txt");
+	//
+	//char title[20];
+	//char test[8];
+	//
+	//sprintf_s(title, sizeof(title), "%d", type);
+	//sprintf_s(test, sizeof(test), ".txt");
+	//
+	//strcat_s(title, sizeof(title), test);
+	//
+	//ofstream out(title);
 	//out << meshes->m_vertices.size() << endl;
 
 	//for (auto d : meshes->m_vertices)
 	//{
-	//	cout << d.m_pos.x << "," << d.m_pos.y << "," << d.m_pos.z << endl;
+	//	//cout << d.m_pos.x << "," << d.m_pos.y << "," << d.m_pos.z << endl;
 	//	out << d.m_pos.x << endl << d.m_pos.y << endl << d.m_pos.z << endl;
 	//}
 	//cout << "size : " << meshes->m_vertices.size() << endl;
@@ -192,13 +200,15 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count) {
 	//out << meshes->m_indices.size() << endl;
 	//for (auto d : meshes->m_indices)
 	//{
-	//	cout << d << endl;
+	//	//cout << d << endl;
 	//	out << d << endl;;
 	//}
-	//cout << "size : " << meshes->m_indices.size() << endl;
-	//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-
+	////cout << "size : " << meshes->m_indices.size() << endl;
+	////cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+	//
 	//out.close();
+	//cout << type << endl;
+	//type += 1;
 
 	meshDesc.flags = PxMeshFlags(0);
 	PxCookingParams params = m_Cooking->getParams();

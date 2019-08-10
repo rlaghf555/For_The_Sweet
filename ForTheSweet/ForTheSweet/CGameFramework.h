@@ -30,6 +30,8 @@ public:
 
 	bool input_able = false;
 	bool fever = false;
+	bool move_actor_flag = false;
+	bool isKing = false;
 
 	wchar_t *Characters_ID[MAX_USER];
 	// 이동관련 

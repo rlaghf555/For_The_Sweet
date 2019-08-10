@@ -107,6 +107,7 @@ public:
 	float Scale_time = 0.3f;
 
 	PxVec3 m_Knockback;
+	bool king = false;
 
 public:
 	CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);

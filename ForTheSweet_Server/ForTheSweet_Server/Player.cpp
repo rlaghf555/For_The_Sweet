@@ -33,15 +33,15 @@ PxF32 CJump::getHeight(PxF32 elapsedTime)
 
 PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxShape& shape, const PxActor& actor)
 {
-	//PxExtendedVec3 dist(0, 0.1, 0);
-	//
-	//PxControllerFilters filters;
-	//
-	//PxExtendedVec3 pos = m_PlayerController->getPosition();
-	//pos += dist;
-	//m_PlayerController->setPosition(pos);
+	if (actor.userData == (void *)(int)1)
+	{
+		//cout << "~~\n";
+		//PxExtendedVec3 pos = m_PlayerController->getPosition();
+		//pos.y += 0.5f;
+		//m_PlayerController->setPosition(pos);
 
-	//return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+	}
 	return PxControllerBehaviorFlags(0);
 }
 
@@ -125,11 +125,11 @@ void  CPlayer::setLollipopHeal(bool heal)
 
 void CPlayer::setPlayerController(CPhysx *physx)
 {
-	m_PlayerController = physx->getCapsuleController(m_Pos, CH_CAPSULE_HEIGHT, CH_CAPSULE_RADIUS, m_HitReport);
+	m_PlayerController = physx->getCapsuleController(m_Pos, CH_CAPSULE_HEIGHT, CH_CAPSULE_RADIUS, m_HitReport, this);
 }
 
 void CPlayer::setTrigger(CPhysx *physx)
 {
 	PxVec3 pos(100, 100, 100);
-	m_AttackTrigger = physx->getBoxTrigger(pos, PxVec3(5, 5, 5));
+	m_AttackTrigger = physx->getBoxTrigger(pos, PxVec3(10, 20, 10));
 }

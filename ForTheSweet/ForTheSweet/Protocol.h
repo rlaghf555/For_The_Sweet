@@ -56,6 +56,8 @@ constexpr int SC_FOG_END = 25;
 constexpr int SC_FEVER_END = 26;
 constexpr int SC_LIGHTNING_END = 27;
 constexpr int SC_LIGHT_INDEX = 28;
+constexpr int SC_KING = 29;
+constexpr int SC_KING_OFF = 30;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
@@ -307,6 +309,18 @@ struct sc_packet_light_index {
 	char type;
 	char index1;
 	char index2;
+};
+
+struct sc_packet_king {
+	char size;
+	char type;
+	char king;
+};
+
+struct sc_packet_king_off {
+	char size;
+	char type;
+	char king;
 };
 
 

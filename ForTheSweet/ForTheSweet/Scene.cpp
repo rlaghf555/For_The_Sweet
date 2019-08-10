@@ -1206,7 +1206,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		if (m_WeaponShader[M_Weapon_cupcake]->get_cupcake_up_flag() == false)
 			m_WeaponShader[M_Weapon_cupcake]->Animate(fTimeElapsed, animate_flag, M_Weapon_cupcake);
 
-		m_MapShader[2]->Animate(fTimeElapsed, animate_flag);
+		//m_MapShader[2]->Animate(fTimeElapsed, animate_flag);
 	}
 	if (Selected_Map == M_Map_3) {
 		m_MapShader[15]->Animate(fTimeElapsed, animate_flag);
