@@ -929,6 +929,29 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	delete pTexture;
 }
 
+void CModelShader::BuildPhysx(CPhysx * physx)
+{
+	PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices());
+	PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+
+	PxMeshScale PxScale;
+	PxScale.scale = scaleTmp;
+
+	PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+	XMFLOAT3 pos = m_bbObjects[0]->GetPosition();
+	PxTransform location(pos.x, pos.y, pos.z);
+
+	PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+
+	PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+	physx->m_Scene->addActor(*m_Actor);
+
+	if (maptype == M_Map_1_macaron_1) {
+		physx->move_actor = m_Actor;
+		physx->move_actor->userData = (void *)(int)100;
+	}
+}
+
 void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int map_type, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;

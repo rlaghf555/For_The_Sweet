@@ -191,6 +191,8 @@ void CGameFramework::OnDestroy()
 
 bool CGameFramework::Restart()
 {
+	m_pPhysx = new CPhysx();
+	m_pPhysx->initPhysics();
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	if (m_pScene) {
 		if (selected_map == 1)
@@ -207,6 +209,7 @@ bool CGameFramework::Restart()
 		
 	}	
 	playing = true;
+
 
 	if (SERVER_ON) {
 		if (UI_ON) {
@@ -235,6 +238,66 @@ bool CGameFramework::Restart()
 		}
 	}
 
+	if (!SERVER_ON) {
+		playing = true;
+		My_ID = 0;
+		Camera_ID = 0;
+		m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
+		cout << "ID : " << My_ID << endl;
+		m_pCamera = m_pPlayer->GetCamera();
+		XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
+		m_pPlayer->SetPosition(pos);
+		PxVec3 triggerPos = PxVec3(100, 100, 100);
+		m_pPlayer->m_AttackTrigger = m_pPhysx->getTrigger(triggerPos, XMFLOAT3(5, 5, 5));
+		m_pPhysx->registerPlayer(m_pPlayer, 0);
+		m_pPlayer->SetConnected(true);
+
+		pos = XMFLOAT3(100, 10, 0);
+		m_pScene->getplayer(1)->SetPosition(pos);
+		m_pPhysx->registerPlayer(m_pScene->getplayer(1), 1);
+		m_pScene->getplayer(1)->SetConnected(true);
+
+		if (m_pPhysx)
+		{
+			//PxRigidStatic* groundPlane = PxCreatePlane(*m_pPhysx->m_Physics, PxPlane(0, 1, 0, 0), *m_pPhysx->m_Material);
+			//m_pPhysx->m_Scene->addActor(*groundPlane);
+
+			//PxBoxControllerDesc bdesc;
+			//bdesc.position = PxExtendedVec3(0, 0, 0);
+			//bdesc.material = m_pPhysx->m_Material;
+			//bdesc.halfHeight = 10.f;
+			//bdesc.halfSideExtent = 10.f;
+			//bdesc.halfForwardExtent = 10.f;
+
+			//PxCapsuleControllerDesc desc;
+			//desc.height = 15.f;
+			//desc.radius = 10.f;
+			//desc.position = PxExtendedVec3(0, 17.5, 0);
+			//desc.material = m_pPhysx->m_Material;
+			PxExtendedVec3 position = PxExtendedVec3(0, 17.5, 0);
+
+			m_pPlayer->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pPlayer->getCollisionCallback(), m_pPlayer);
+
+			position = PxExtendedVec3(100, 27.5, 0);
+
+			m_pScene->m_pPlayer[1]->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pScene->m_pPlayer[1]->getCollisionCallback(), m_pScene->m_pPlayer[1]);
+
+			//m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
+
+			//PxShape* boxshape = m_pPhysx->m_Physics->createShape(PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material));
+			//boxshape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			//boxshape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+			//
+			//PxRigidStatic* box = m_pPhysx->m_Physics->createRigidStatic(PxTransform(PxVec3(50, 17.5, 0)));
+			//box->attachShape(*boxshape);
+			//m_pPhysx->m_Scene->addActor(*box);
+
+			//PxRigidStatic* box = PxCreateRigidStatic(*(m_pPhysx->m_Physics), PxTransform(PxVec3(50, 17.5, 0)), PxBoxGeometry(17.5, 17.5, 17.5), *(m_pPhysx->m_Material), 1.0f);
+			//dynamic->setAngularDamping(0.5f);
+			//dynamic->setLinearVelocity(PxVec3(0, 0, 0));
+
+		}
+	}
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
@@ -2703,7 +2766,23 @@ void CGameFramework::Map2Camera()
 	m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
 	m_pCamera->SetLookAt(position);
 }
-
+void CGameFramework::CameraShake()
+{
+	if (camerashake) {
+		CameraShake_Time += m_GameTimer.GetTimeElapsed();
+		if (CameraShake_Time < 0.5) {
+			if (CameraShakeX == -3)
+				CameraShakeX = 3;
+			else
+				CameraShakeX = -3;
+		}
+		else {
+			camerashake = false;
+			CameraShake_Time = 0;
+			CameraShakeX = 0;
+		}
+	}
+}
 void CGameFramework::WaitForGpuComplete()
 {
 	UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
@@ -2812,8 +2891,10 @@ void CGameFramework::FrameAdvance()
 		position.x = playerPosition.x;
 		position.y = playerPosition.y - 17.5f;
 		position.z = playerPosition.z;
-		m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
-		m_pCamera->SetLookAt(position);
+		XMFLOAT3 Camerapos = position;
+		Camerapos.x += CameraShakeX;
+		m_pCamera->SetPosition(Vector3::Add(Camerapos, m_pCamera->GetOffset()));
+		m_pCamera->SetLookAt(Camerapos);
 		m_pPlayer->SetPosition(position);
 
 		//cout << "0 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
@@ -2829,7 +2910,7 @@ void CGameFramework::FrameAdvance()
 	
 	
 	CollisionProcess();
-
+	CameraShake();
 	AnimateObjects();
 	
 	if (SERVER_ON)
@@ -2987,7 +3068,11 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
-
+void CGameFramework::GameOver()
+{
+	state = STATE_GAMEEND;
+	if (m_pPhysx) delete m_pPhysx;
+}
 void CGameFramework::OnResizeBackBuffers()
 {
 	WaitForGpuComplete();

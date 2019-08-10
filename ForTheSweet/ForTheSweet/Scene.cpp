@@ -71,9 +71,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	if (Selected_Map == M_Map_1) {
 		m_MapShader[0] = new CModelShader(Map_Model[M_Map_1]);
 		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1);
-
+		m_MapShader[0]->BuildPhysx(physx);
 		m_MapShader[1] = new CModelShader(Map_Model[M_Map_1_wall]);
 		m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
+		m_MapShader[1]->BuildPhysx(physx);
 
 		for (int i = 0; i < 2; i++) {
 			m_CottonShader[i] = new CottonCloudShader(Map_Model[M_Map_1_cotton]);
@@ -82,7 +83,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		m_MapShader[2] = new CModelShader(Map_Model[M_Map_1_macaron]);
 		m_MapShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_1);
-		
+		m_MapShader[2]->BuildPhysx(physx);
+
 		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
 			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_1);
@@ -108,17 +110,22 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	if (Selected_Map == M_Map_2) {
 		m_MapShader[3] = new CModelShader(Map_Model[M_Map_2]);
 		m_MapShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2);
+		m_MapShader[3]->BuildPhysx(physx);
 
 		m_MapShader[4] = new CModelShader(Map_Model[M_Map_1_macaron]);
 		m_MapShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron);
+		m_MapShader[4]->BuildPhysx(physx);
 		m_MapShader[5] = new CModelShader(Map_Model[M_Map_1_macaron]);
 		m_MapShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_2);
-		
+		m_MapShader[5]->BuildPhysx(physx);
+
 		m_MapShader[6] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
 		m_MapShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar);
+		m_MapShader[6]->BuildPhysx(physx);
 		m_MapShader[7] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
 		m_MapShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar_2);
-		
+		m_MapShader[7]->BuildPhysx(physx);
+
 		for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 			m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
 			m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
@@ -144,42 +151,58 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		m_MapShader[8] = new CModelShader(Map_Model[M_Map_3]);
 		m_MapShader[8]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3);
+		m_MapShader[8]->BuildPhysx(physx);
 		m_MapShader[9] = new CModelShader(Map_Model[M_Map_3]);
 		m_MapShader[9]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_2);
+		m_MapShader[9]->BuildPhysx(physx);
 
 		m_MapShader[10] = new CModelShader(Map_Model[M_Map_3_cake_2]);
 		m_MapShader[10]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2);
+		m_MapShader[10]->BuildPhysx(physx);
 		m_MapShader[11] = new CModelShader(Map_Model[M_Map_3_cake_2]);
 		m_MapShader[11]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2_2);
+		m_MapShader[11]->BuildPhysx(physx);
 
 		m_MapShader[12] = new CModelShader(Map_Model[M_Map_3_cake_3]);
 		m_MapShader[12]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3);
+		m_MapShader[12]->BuildPhysx(physx);
 		m_MapShader[13] = new CModelShader(Map_Model[M_Map_3_cake_3]);
 		m_MapShader[13]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3_2);
+		m_MapShader[13]->BuildPhysx(physx);
 
 		m_MapShader[14] = new CModelShader(Map_Model[M_Map_3_in_black]);
 		m_MapShader[14]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3);
+		m_MapShader[14]->BuildPhysx(physx);
 
 		m_MapShader[15] = new CModelShader(Map_Model[M_Map_1_macaron]);
 		m_MapShader[15]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_3);
+		m_MapShader[15]->BuildPhysx(physx);
 
 		m_MapShader[16] = new CModelShader(Map_Model[M_Map_3_in]);
 		m_MapShader[16]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in);
+		m_MapShader[16]->BuildPhysx(physx);
 		m_MapShader[17] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
 		m_MapShader[17]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1);
+		m_MapShader[17]->BuildPhysx(physx);
 		m_MapShader[18] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
 		m_MapShader[18]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2);
+		m_MapShader[18]->BuildPhysx(physx);
 
 		m_MapShader[19] = new CModelShader(Map_Model[M_Map_3_in]);
 		m_MapShader[19]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_2);
+		m_MapShader[19]->BuildPhysx(physx);
 		m_MapShader[20] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
 		m_MapShader[20]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1_2);
+		m_MapShader[20]->BuildPhysx(physx);
 		m_MapShader[21] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
 		m_MapShader[21]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2_2);
+		m_MapShader[21]->BuildPhysx(physx);
 		m_MapShader[22] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
 		m_MapShader[22]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision);
+		m_MapShader[22]->BuildPhysx(physx);
 		m_MapShader[23] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
 		m_MapShader[23]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision_2);
+		m_MapShader[23]->BuildPhysx(physx);
 
 		m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
 		m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
@@ -293,156 +316,217 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx * physx)
 {
 	animate_flag = Selected_Map;
-	if (Selected_Map == M_Map_1 && Map_1_Build == false) {
-		m_MapShader[0] = new CModelShader(Map_Model[M_Map_1]);
-		m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1);
+	if (Selected_Map == M_Map_1) {
+		if (Map_1_Build == false) {
+			m_MapShader[0] = new CModelShader(Map_Model[M_Map_1]);
+			m_MapShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1);
+			m_MapShader[0]->BuildPhysx(physx);
 
-		m_MapShader[1] = new CModelShader(Map_Model[M_Map_1_wall]);
-		m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
+			m_MapShader[1] = new CModelShader(Map_Model[M_Map_1_wall]);
+			m_MapShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
+			m_MapShader[1]->BuildPhysx(physx);
 
-		for (int i = 0; i < 2; i++) {
-			m_CottonShader[i] = new CottonCloudShader(Map_Model[M_Map_1_cotton]);
-			m_CottonShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+			for (int i = 0; i < 2; i++) {
+				m_CottonShader[i] = new CottonCloudShader(Map_Model[M_Map_1_cotton]);
+				m_CottonShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i);
+			}
+
+			m_MapShader[2] = new CModelShader(Map_Model[M_Map_1_macaron]);
+			m_MapShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_1);
+			m_MapShader[2]->BuildPhysx(physx);
+
+			//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+			//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_1);
+			//}
+
+			m_ShadowShader[0] = new ShadowDebugShader(Map_Model[M_Map_1_Shadow_test]);
+			m_ShadowShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
+
+			m_ShadowReverseShader[0] = new ShadowREverseShader();
+			m_ShadowReverseShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+			m_ShadowReverseShader[1] = new ShadowREverseShader();
+			m_ShadowReverseShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+			m_ShadowReverseShader[2] = new ShadowREverseShader();
+			m_ShadowReverseShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
+			m_ShadowReverseShader[3] = new ShadowREverseShader();
+			m_ShadowReverseShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, 3);
+
+			m_RoundBackGroundShader[0] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
+			m_RoundBackGroundShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0, true);
+			Map_1_Build = true;
 		}
+		else if (Map_1_Build == true) {
+			m_MapShader[0]->BuildPhysx(physx);
+			m_MapShader[1]->BuildPhysx(physx);
+			m_MapShader[2]->BuildPhysx(physx);
 
-		m_MapShader[2] = new CModelShader(Map_Model[M_Map_1_macaron]);
-		m_MapShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_1);
-
-		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
-		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_1);
-		//}
-
-		m_ShadowShader[0] = new ShadowDebugShader(Map_Model[M_Map_1_Shadow_test]);
-		m_ShadowShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_1);
-
-		m_ShadowReverseShader[0] = new ShadowREverseShader();
-		m_ShadowReverseShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
-		m_ShadowReverseShader[1] = new ShadowREverseShader();
-		m_ShadowReverseShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
-		m_ShadowReverseShader[2] = new ShadowREverseShader();
-		m_ShadowReverseShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
-		m_ShadowReverseShader[3] = new ShadowREverseShader();
-		m_ShadowReverseShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, 3);
-
-		m_RoundBackGroundShader[0] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
-		m_RoundBackGroundShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0, true);
-		Map_1_Build = true;
+		}
 	}
 	//m_mapshader 2±îÁö map 1
-	if (Selected_Map == M_Map_2 && Map_2_Build == false) {
-		m_MapShader[3] = new CModelShader(Map_Model[M_Map_2]);
-		m_MapShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2);
+	if (Selected_Map == M_Map_2) {
+		if (Map_2_Build == false) {
+			m_MapShader[3] = new CModelShader(Map_Model[M_Map_2]);
+			m_MapShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2);
+			m_MapShader[3]->BuildPhysx(physx);
 
-		m_MapShader[4] = new CModelShader(Map_Model[M_Map_1_macaron]);
-		m_MapShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron);
-		m_MapShader[5] = new CModelShader(Map_Model[M_Map_1_macaron]);
-		m_MapShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_2);
+			m_MapShader[4] = new CModelShader(Map_Model[M_Map_1_macaron]);
+			m_MapShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron);
+			m_MapShader[4]->BuildPhysx(physx);
+			m_MapShader[5] = new CModelShader(Map_Model[M_Map_1_macaron]);
+			m_MapShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_2);
+			m_MapShader[5]->BuildPhysx(physx);
 
-		m_MapShader[6] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
-		m_MapShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar);
-		m_MapShader[7] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
-		m_MapShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar_2);
+			m_MapShader[6] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
+			m_MapShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar);
+			m_MapShader[6]->BuildPhysx(physx);
+			m_MapShader[7] = new CModelShader(Map_Model[M_Map_2_chocolate_bar]);
+			m_MapShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_2_chocolate_bar_2);
+			m_MapShader[7]->BuildPhysx(physx);
 
-		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
-		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
-		//}
+			//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+			//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
+			//}
 
-		m_ShadowReverseModelShader[0] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test]);
-		m_ShadowReverseModelShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
-		m_ShadowReverseModelShader[1] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_1]);
-		m_ShadowReverseModelShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
-		m_ShadowReverseModelShader[2] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_2]);
-		m_ShadowReverseModelShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
+			m_ShadowReverseModelShader[0] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test]);
+			m_ShadowReverseModelShader[0]->BuildObjects(pd3dDevice, pd3dCommandList, 0);
+			m_ShadowReverseModelShader[1] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_1]);
+			m_ShadowReverseModelShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+			m_ShadowReverseModelShader[2] = new ShadowReverseModelShader(Map_Model[M_Map_2_shadow_reverse_test_2]);
+			m_ShadowReverseModelShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2);
 
-		m_RoundBackGroundShader[1] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
-		m_RoundBackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1, true);
-		Map_2_Build = true;
+			m_RoundBackGroundShader[1] = new RoundBackGroundShader(Map_Model[M_Map_round_background_1]);
+			m_RoundBackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1, true);
+			Map_2_Build = true;
+		}
+		else if (Map_2_Build == true) {
+			m_MapShader[3]->BuildPhysx(physx);
+			m_MapShader[4]->BuildPhysx(physx);
+			m_MapShader[5]->BuildPhysx(physx);
+			m_MapShader[6]->BuildPhysx(physx);
+			m_MapShader[7]->BuildPhysx(physx);
+		}
 	}
 	//m_mapshader 3~8±îÁö map 2
-	if (Selected_Map == M_Map_3 && Map_3_Build == false) {
-		for (int i = 0; i < 8; i++) {
-			door[i] = new testBox();
-			door[i]->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[i], 11 + i);
+	if (Selected_Map == M_Map_3) {
+		if (Map_3_Build == false) {
+			for (int i = 0; i < 8; i++) {
+				door[i] = new testBox();
+				door[i]->BuildObjects(pd3dDevice, pd3dCommandList, m_pPlayer[i], 11 + i);
+			}
+
+			m_MapShader[8] = new CModelShader(Map_Model[M_Map_3]);
+			m_MapShader[8]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3);
+			m_MapShader[8]->BuildPhysx(physx);
+			m_MapShader[9] = new CModelShader(Map_Model[M_Map_3]);
+			m_MapShader[9]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_2);
+			m_MapShader[9]->BuildPhysx(physx);
+
+			m_MapShader[10] = new CModelShader(Map_Model[M_Map_3_cake_2]);
+			m_MapShader[10]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2);
+			m_MapShader[10]->BuildPhysx(physx);
+			m_MapShader[11] = new CModelShader(Map_Model[M_Map_3_cake_2]);
+			m_MapShader[11]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2_2);
+			m_MapShader[11]->BuildPhysx(physx);
+
+			m_MapShader[12] = new CModelShader(Map_Model[M_Map_3_cake_3]);
+			m_MapShader[12]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3);
+			m_MapShader[12]->BuildPhysx(physx);
+			m_MapShader[13] = new CModelShader(Map_Model[M_Map_3_cake_3]);
+			m_MapShader[13]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3_2);
+			m_MapShader[13]->BuildPhysx(physx);
+
+			m_MapShader[14] = new CModelShader(Map_Model[M_Map_3_in_black]);
+			m_MapShader[14]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3);
+			m_MapShader[14]->BuildPhysx(physx);
+
+			m_MapShader[15] = new CModelShader(Map_Model[M_Map_1_macaron]);
+			m_MapShader[15]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_3);
+			m_MapShader[15]->BuildPhysx(physx);
+
+			m_MapShader[16] = new CModelShader(Map_Model[M_Map_3_in]);
+			m_MapShader[16]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in);
+			m_MapShader[16]->BuildPhysx(physx);
+			m_MapShader[17] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
+			m_MapShader[17]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1);
+			m_MapShader[17]->BuildPhysx(physx);
+			m_MapShader[18] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
+			m_MapShader[18]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2);
+			m_MapShader[18]->BuildPhysx(physx);
+
+			m_MapShader[19] = new CModelShader(Map_Model[M_Map_3_in]);
+			m_MapShader[19]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_2);
+			m_MapShader[19]->BuildPhysx(physx);
+			m_MapShader[20] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
+			m_MapShader[20]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1_2);
+			m_MapShader[20]->BuildPhysx(physx);
+			m_MapShader[21] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
+			m_MapShader[21]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2_2);
+			m_MapShader[21]->BuildPhysx(physx);
+			m_MapShader[22] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
+			m_MapShader[22]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision);
+			m_MapShader[22]->BuildPhysx(physx);
+			m_MapShader[23] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
+			m_MapShader[23]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision_2);
+			m_MapShader[23]->BuildPhysx(physx);
+
+			m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
+			m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
+
+			m_ShadowShader[1] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
+			m_ShadowShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2);
+			m_ShadowShader[2] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
+			m_ShadowShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2_2);
+
+			m_ShadowShader[3] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
+			m_ShadowShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3);
+			m_ShadowShader[4] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
+			m_ShadowShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3_2);
+
+			m_ShadowReverseShader[4] = new ShadowREverseShader();
+			m_ShadowReverseShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, 4);
+			m_ShadowReverseShader[5] = new ShadowREverseShader();
+			m_ShadowReverseShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, 5);
+			m_ShadowReverseShader[6] = new ShadowREverseShader();
+			m_ShadowReverseShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, 6);
+			m_ShadowReverseShader[7] = new ShadowREverseShader();
+			m_ShadowReverseShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, 7);
+
+			for (int i = 0; i < 2; i++) {
+				m_StairShader[i] = new StairShader(Map_Model[M_Map_3_stair]);
+				m_StairShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, physx, i);
+			}
+
+			//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
+			//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
+			//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
+			//}
+			m_BackGroundShader[1] = new MeshShader();					// ¸Ê 3 ³»ºÎ °¨½Î´Â °ËÀº¹ÙÅÁ
+			m_BackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
+
+			m_RoundBackGroundShader[2] = new RoundBackGroundShader(Map_Model[M_Map_round_background_2]);
+			m_RoundBackGroundShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2, true);
+			Map_3_Build = true;
 		}
-
-		m_MapShader[8] = new CModelShader(Map_Model[M_Map_3]);
-		m_MapShader[8]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3);
-		m_MapShader[9] = new CModelShader(Map_Model[M_Map_3]);
-		m_MapShader[9]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_2);
-
-		m_MapShader[10] = new CModelShader(Map_Model[M_Map_3_cake_2]);
-		m_MapShader[10]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2);
-		m_MapShader[11] = new CModelShader(Map_Model[M_Map_3_cake_2]);
-		m_MapShader[11]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_2_2);
-
-		m_MapShader[12] = new CModelShader(Map_Model[M_Map_3_cake_3]);
-		m_MapShader[12]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3);
-		m_MapShader[13] = new CModelShader(Map_Model[M_Map_3_cake_3]);
-		m_MapShader[13]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_cake_3_2);
-
-		m_MapShader[14] = new CModelShader(Map_Model[M_Map_3_in_black]);
-		m_MapShader[14]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3);
-
-		m_MapShader[15] = new CModelShader(Map_Model[M_Map_1_macaron]);
-		m_MapShader[15]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_3);
-
-		m_MapShader[16] = new CModelShader(Map_Model[M_Map_3_in]);
-		m_MapShader[16]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in);
-		m_MapShader[17] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
-		m_MapShader[17]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1);
-		m_MapShader[18] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
-		m_MapShader[18]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2);
-
-		m_MapShader[19] = new CModelShader(Map_Model[M_Map_3_in]);
-		m_MapShader[19]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_2);
-		m_MapShader[20] = new CModelShader(Map_Model[M_Map_3_in_stair_1]);
-		m_MapShader[20]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_1_2);
-		m_MapShader[21] = new CModelShader(Map_Model[M_Map_3_in_stair_2]);
-		m_MapShader[21]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_stair_2_2);
-		m_MapShader[22] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
-		m_MapShader[22]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision);
-		m_MapShader[23] = new CModelShader(Map_Model[M_Map_3_in_wall_collision]);
-		m_MapShader[23]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_3_in_wall_collision_2);
-
-		m_BridgeShader = new BridgeShader(Map_Model[M_Map_3_bridge]);
-		m_BridgeShader->BuildObjects(pd3dDevice, pd3dCommandList, physx);
-
-		m_ShadowShader[1] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
-		m_ShadowShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2);
-		m_ShadowShader[2] = new ShadowDebugShader(Map_Model[M_Map_3_cake_2]);
-		m_ShadowShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_2_2);
-
-		m_ShadowShader[3] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
-		m_ShadowShader[3]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3);
-		m_ShadowShader[4] = new ShadowDebugShader(Map_Model[M_Map_3_cake_3]);
-		m_ShadowShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, M_Map_3_cake_3_2);
-
-		m_ShadowReverseShader[4] = new ShadowREverseShader();
-		m_ShadowReverseShader[4]->BuildObjects(pd3dDevice, pd3dCommandList, 4);
-		m_ShadowReverseShader[5] = new ShadowREverseShader();
-		m_ShadowReverseShader[5]->BuildObjects(pd3dDevice, pd3dCommandList, 5);
-		m_ShadowReverseShader[6] = new ShadowREverseShader();
-		m_ShadowReverseShader[6]->BuildObjects(pd3dDevice, pd3dCommandList, 6);
-		m_ShadowReverseShader[7] = new ShadowREverseShader();
-		m_ShadowReverseShader[7]->BuildObjects(pd3dDevice, pd3dCommandList, 7);
-
-		for (int i = 0; i < 2; i++) {
-			m_StairShader[i] = new StairShader(Map_Model[M_Map_3_stair]);
-			m_StairShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, physx, i);
+		else if (Map_3_Build == true) {
+			m_MapShader[8]->BuildPhysx(physx);
+			m_MapShader[9]->BuildPhysx(physx);
+			m_MapShader[10]->BuildPhysx(physx);
+			m_MapShader[11]->BuildPhysx(physx);
+			m_MapShader[12]->BuildPhysx(physx);
+			m_MapShader[13]->BuildPhysx(physx);
+			m_MapShader[14]->BuildPhysx(physx);
+			m_MapShader[15]->BuildPhysx(physx);
+			m_MapShader[16]->BuildPhysx(physx);
+			m_MapShader[17]->BuildPhysx(physx);
+			m_MapShader[18]->BuildPhysx(physx);
+			m_MapShader[19]->BuildPhysx(physx);
+			m_MapShader[20]->BuildPhysx(physx);
+			m_MapShader[21]->BuildPhysx(physx);
+			m_MapShader[22]->BuildPhysx(physx);
+			m_MapShader[23]->BuildPhysx(physx);
 		}
-
-		//for (int i = 0; i < WEAPON_MAX_NUM; i++) {
-		//	m_WeaponShader[i] = new WeaponShader(weapon_Model[i]);
-		//	m_WeaponShader[i]->BuildObjects(pd3dDevice, pd3dCommandList, i, M_Map_2);
-		//}
-		m_BackGroundShader[1] = new MeshShader();					// ¸Ê 3 ³»ºÎ °¨½Î´Â °ËÀº¹ÙÅÁ
-		m_BackGroundShader[1]->BuildObjects(pd3dDevice, pd3dCommandList, 1);
-
-		m_RoundBackGroundShader[2] = new RoundBackGroundShader(Map_Model[M_Map_round_background_2]);
-		m_RoundBackGroundShader[2]->BuildObjects(pd3dDevice, pd3dCommandList, 2, true);
-		Map_3_Build = true;
 	}
 }
 
@@ -907,7 +991,8 @@ void CScene::initObject()
 			}
 		}
 	}
-
+	for (int i = 0; i < MAX_USER; i++)
+		m_pPlayer[i]->king = false;
 	if (Selected_Map == M_Map_1) {
 		//Ä³¸¯ÅÍ ÁÂÇ¥ ¹× ½ºÅ³ ÃÊ±âÈ­
 		for (int i = 0; i < MAX_USER; i++) {
@@ -1144,11 +1229,14 @@ void CScene::AnimateObjects(float fTimeElapsed)
 								
 				if (animindex == Anim_Cupckae_Eat) {
 					//if (m_pPlayer[i]->getAnimtime() >= 0 && m_pPlayer[i]->getAnimtime() < 20) m_pPlayer[i]->SetScale(1.0f);
-					if (m_pPlayer[i]->getAnimtime() >= 20 && m_pPlayer[i]->getAnimtime() < 30) m_pPlayer[i]->SetScale(1.3f, true);
-					else if (m_pPlayer[i]->getAnimtime() >= 30 && m_pPlayer[i]->getAnimtime() < 38) m_pPlayer[i]->SetScale(1.7f, true);
-					else if (m_pPlayer[i]->getAnimtime() >= 38 && m_pPlayer[i]->getAnimtime() < 40) m_pPlayer[i]->SetScale(2.0f, true);
+					if (m_pPlayer[i]->getAnimtime() >= 20 && m_pPlayer[i]->getAnimtime() < 30) { m_pPlayer[i]->SetScale(1.3f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(1.3f, true); }
+					else if (m_pPlayer[i]->getAnimtime() >= 30 && m_pPlayer[i]->getAnimtime() < 38) { m_pPlayer[i]->SetScale(1.7f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(1.7f, true);}
+					else if (m_pPlayer[i]->getAnimtime() >= 38 && m_pPlayer[i]->getAnimtime() < 40) { m_pPlayer[i]->SetScale(2.0f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(2.0f, true);}
 				}
-				else if (m_pPlayer[i]->king) m_pPlayer[i]->SetScale(2.f, true);
+				else if (m_pPlayer[i]->king) {
+					m_pPlayer[i]->SetScale(2.f, true);
+					m_pPlayerShadowShader[i]->getPlayer()->SetScale(2.0f, true);
+				}
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
 					AnimateWeapon(i);
@@ -1458,6 +1546,10 @@ void CScene::Collision_Cotton()
 				}
 			}
 		}
+		for(int i=0;i<MAX_USER;++i)
+			if (m_pPlayer[i]->king) {
+				m_pPlayerShader[i]->render = true;
+			}
 	}
 }
 

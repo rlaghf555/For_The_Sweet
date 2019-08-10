@@ -168,7 +168,7 @@ public:
 	~CModelShader();
 
 	bool map_3_macaron_flag = false;
-
+	int maptype;
 	virtual D3D12_INPUT_LAYOUT_DESC		CreateInputLayout(int index = 0);
 
 	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature	*pd3dGraphicsRootSignature);
@@ -191,6 +191,7 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void CreatePipelineParts();
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int map_type, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildPhysx(CPhysx* physx);
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, int map_type, int nRenderTargets = 1, void * pContext = NULL);
 	virtual void Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera);
 	//virtual void RenderToDepthBuffer(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera, XMFLOAT3& cameraPos, float offset);
