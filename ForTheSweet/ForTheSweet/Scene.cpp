@@ -881,7 +881,7 @@ void CScene::initUI(wchar_t *character_id[])
 }
 
 void CScene::initObject()
-{	
+{
 	//무기 매트릭스 초기화
 	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
@@ -892,15 +892,14 @@ void CScene::initObject()
 				m_WeaponShader[i]->getObject(j)->init();
 				m_WeaponShader[i]->getObject(j)->visible = false;
 				m_WeaponShader[i]->getObject(j)->SetPosition(1000.f, 1000.f, 1000.f);
-				
+
 			}
 			if (i == 4) {
 				j = WEAPON_EACH_NUM;
 			}
 		}
 	}
-	SetTeamUI();
-	
+
 	if (Selected_Map == M_Map_1) {
 		//캐릭터 좌표 및 스킬 초기화
 		for (int i = 0; i < MAX_USER; i++) {
@@ -908,10 +907,10 @@ void CScene::initObject()
 				m_pPlayerShader[i]->render = true;
 				m_pPlayerShadowShader[i]->render = true;
 			}
-			else {
-				m_pPlayerShader[i]->render = false;
-				m_pPlayerShadowShader[i]->render = false;
-			}
+			//else {
+			//	m_pPlayerShader[i]->render = false;
+			//	m_pPlayerShadowShader[i]->render = false;
+			//}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
@@ -949,10 +948,10 @@ void CScene::initObject()
 				m_pPlayerShader[i]->render = true;
 				m_pPlayerShadowShader[i]->render = true;
 			}
-			else {
-				m_pPlayerShader[i]->render = false;
-				m_pPlayerShadowShader[i]->render = false;
-			}
+			//else {
+			//	m_pPlayerShader[i]->render = false;
+			//	m_pPlayerShadowShader[i]->render = false;
+			//}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
@@ -992,10 +991,10 @@ void CScene::initObject()
 				m_pPlayerShader[i]->render = true;
 				m_pPlayerShadowShader[i]->render = true;
 			}
-			else {
-				m_pPlayerShader[i]->render = false;
-				m_pPlayerShadowShader[i]->render = false;
-			}
+			//else {
+			//	m_pPlayerShader[i]->render = false;
+			//	m_pPlayerShadowShader[i]->render = false;
+			//}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
@@ -1028,14 +1027,7 @@ void CScene::initObject()
 			}
 		}
 	}
-	//번개 테스트 -----------------------------------------------------------
-	//m_EffectShader->ShowEffect(1);
-	//m_EffectShader->ShowEffect(3);
-	//m_EffectShader->ShowEffect(5);
-	//m_EffectShader->ShowEffect(7);
-	//m_DarkShader->is_dark = true;
-	//번개------------------------------------------------------------------
-	//m_pPlayer[0]->SetWeapon(true, M_Weapon_Lollipop, 0);	// test
+	SetTeamUI();
 }
 
 void CScene::SetTeamUI()
@@ -1043,6 +1035,8 @@ void CScene::SetTeamUI()
 	for (int i = 0; i < MAX_USER; i++) {
 		m_TeamShader->getObject(i)->visible = false;
 		m_EnemyShader->getObject(i)->visible = false;
+		m_TeamShader->getObject(i)->SetPosition(0, -5000, 0);
+		m_EnemyShader->getObject(i)->SetPosition(0, -5000, 0);
 	}
 	if (mode == MODE_TEAM || mode == MODE_KING) {
 		if (myid < 4) {
@@ -1060,6 +1054,7 @@ void CScene::SetTeamUI()
 			else m_TeamShader->getObject(i)->visible = true;
 		}
 	}
+
 }
 
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice)

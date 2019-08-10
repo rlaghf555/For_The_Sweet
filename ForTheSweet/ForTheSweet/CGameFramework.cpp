@@ -864,7 +864,9 @@ void CGameFramework::processPacket(char *ptr)
 				m_pScene->m_pPlayer[i]->ChangeAnimationSpeed(Anim_Run, 2.0f);
 			}
 		}
-
+		SoundManager::GetInstance()->StopBackGroundSounds();
+		SoundManager::GetInstance()->PlayBackGroundSounds(FEVERTIME);
+	
 		break;
 	}
 	case SC_FEVER_END:
@@ -878,12 +880,14 @@ void CGameFramework::processPacket(char *ptr)
 				m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Run);
 			}
 		}
+		SoundManager::GetInstance()->StopBackGroundSounds();
+		SoundManager::GetInstance()->PlayBackGroundSounds(BACKGROUND);
 		break;
 	}
 	case SC_LIGHTNING:
 	{
 		//번개 시작
-		//m_pScene->m_DarkShader->is_dark = true;	//어두워짐
+		m_pScene->m_DarkShader->is_dark = true;	//어두워짐
 
 		//m_pScene->m_EffectShader->ShowEffect(0);
 
@@ -900,6 +904,8 @@ void CGameFramework::processPacket(char *ptr)
 		XMFLOAT3 pos2 = LightningInitPos[p_light_index.index2];
 		m_pScene->m_EffectShader->ShowEffects(0, pos1);
 		m_pScene->m_EffectShader->ShowEffects(1, pos2);
+		SoundManager::GetInstance()->PlaySounds(LIGHTNING);
+
 		break;
 	}
 	case SC_LIGHTNING_END:
@@ -918,7 +924,8 @@ void CGameFramework::processPacket(char *ptr)
 		for (int i = 12; i < 20; i++) {
 			m_pScene->m_ppUIShaders[i]->FogOn(true);
 		}
-
+		SoundManager::GetInstance()->StopBackGroundSounds();
+		SoundManager::GetInstance()->PlayBackGroundSounds(FOG);
 		break;
 	}
 	case SC_FOG_END:
@@ -931,6 +938,8 @@ void CGameFramework::processPacket(char *ptr)
 		for (int i = 12; i < 20; i++) {
 			m_pScene->m_ppUIShaders[i]->FogOn(false);
 		}
+		SoundManager::GetInstance()->StopBackGroundSounds();
+		SoundManager::GetInstance()->PlayBackGroundSounds(BACKGROUND);
 		break;
 	}
 //	case SC_FEVER:
