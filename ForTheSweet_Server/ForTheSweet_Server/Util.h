@@ -22,7 +22,7 @@ constexpr int MAX_TIMER = 150;			// 원래 300
 constexpr int MINUTE = 30;				// 원래 60
 
 // Referee
-constexpr int Rfr_Start_Num = 9;
+constexpr int Rfr_Start_Num = 11;
 constexpr int Rfr_Init = 23;
 constexpr int Rfr_Start = 20;
 constexpr int Rfr_End = 10;

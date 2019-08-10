@@ -2771,14 +2771,14 @@ void CGameFramework::Map2Camera()
 	m_pCamera->SetLookAt(position);
 }
 void CGameFramework::CameraShake()
-{
+{	
 	if (camerashake) {
 		CameraShake_Time += m_GameTimer.GetTimeElapsed();
-		if (CameraShake_Time < 1) {
-			if (CameraShakeX == -5)
-				CameraShakeX = 5;
+		if (CameraShake_Time < 0.7) {
+			if (CameraShakeX == -2)
+				CameraShakeX = 2;
 			else
-				CameraShakeX = -5;
+				CameraShakeX = -2;
 		}
 		else {
 			camerashake = false;
@@ -2878,8 +2878,11 @@ void CGameFramework::FrameAdvance()
 				if(m_pScene->getplayer(Camera_ID)->GetConnected())
 				position = m_pScene->getplayer(Camera_ID)->GetPosition();
 				if (position.y < 0) position.y = 0;
-				m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
-				m_pCamera->SetLookAt(position);
+				XMFLOAT3 Camerapos = position;
+				Camerapos.x += CameraShakeX;
+				Camerapos.y -= CameraShakeX;
+				m_pCamera->SetPosition(Vector3::Add(Camerapos, m_pCamera->GetOffset()));
+				m_pCamera->SetLookAt(Camerapos);
 			}
 		}
 		//cout << "캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
