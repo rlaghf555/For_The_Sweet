@@ -2637,6 +2637,24 @@ void PlayerShadowShader::ChangeAnimation(int m_animindex)
 	if (m_bbObjects[0]) m_bbObjects[0]->ChangeAnimation(m_animindex);
 }
 
+void PlayerShadowShader::ChangeAnimationSpeed(UINT AnimIndex, float speed)
+{
+	if (m_bbObjects[0]) m_bbObjects[0]->ChangeAnimationSpeed(AnimIndex, speed);
+}
+
+void PlayerShadowShader::ResetAnimationSpeed(UINT AnimIndex)
+{
+	if (m_bbObjects[0]) m_bbObjects[0]->ResetAnimationSpeed(AnimIndex);
+}
+
+void PlayerShadowShader::init()
+{
+	for (int i = 0; i < m_bbObjects[0]->GetNumofAnim(); i++) {
+		m_bbObjects[0]->m_ani[i]->initspeed();
+	}
+	m_bbObjects[0]->m_ani[Anim_Walk]->SetAnimSpeed(1.3);
+}
+
 int PlayerShadowShader::getAnimIndex()
 {
 	return m_bbObjects[0]->getAnimIndex();

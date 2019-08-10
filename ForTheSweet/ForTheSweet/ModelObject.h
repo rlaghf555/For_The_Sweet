@@ -14,7 +14,6 @@ class ModelObject : public CGameObject
 {
 protected:
 	LoadModel *			m_model;			//모델 정보 (vertex, UV and ....)
-	LoadAnimation**		m_ani;				//애니메이션 정보 (multi animation)
 
 	vector<XMFLOAT4X4>				m_Bones;			//뼈 정보 (최종 변환 정보)
 	float							m_Animtime;		//애니메이션 상대 시간
@@ -28,6 +27,7 @@ protected:
 
 	float							jump_pos_y = 0.f;
 public:
+	LoadAnimation**		m_ani;				//애니메이션 정보 (multi animation)
 	ModelObject(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	ModelObject(LoadModel* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual ~ModelObject();

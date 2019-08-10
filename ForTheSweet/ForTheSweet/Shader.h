@@ -553,6 +553,9 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int nRenderTargets = 1, void *pContext = NULL);
 	virtual void ChangeAnimation(int m_animindex);
+	void ChangeAnimationSpeed(UINT AnimIndex, float speed = 2.0f);
+	void ResetAnimationSpeed(UINT AnimIndex);
+	void init();
 	virtual int getAnimIndex();
 };
 

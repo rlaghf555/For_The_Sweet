@@ -862,6 +862,8 @@ void CGameFramework::processPacket(char *ptr)
 				fever = true;
 				m_pScene->m_pPlayer[i]->ChangeAnimationSpeed(Anim_Walk, 2.0f);
 				m_pScene->m_pPlayer[i]->ChangeAnimationSpeed(Anim_Run, 2.0f);
+				m_pScene->m_pPlayerShadowShader[i]->ChangeAnimationSpeed(Anim_Walk, 2.0f);
+				m_pScene->m_pPlayerShadowShader[i]->ChangeAnimationSpeed(Anim_Run, 2.0f);
 			}
 		}
 		SoundManager::GetInstance()->StopBackGroundSounds();
@@ -2528,6 +2530,13 @@ void CGameFramework::CollisionProcess()
 		}
 		m_pScene->Collision_Cotton();
 	}
+}
+
+void CGameFramework::Map2Camera()
+{
+	XMFLOAT3 position(0, 0, 0);
+	m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+	m_pCamera->SetLookAt(position);
 }
 
 void CGameFramework::WaitForGpuComplete()

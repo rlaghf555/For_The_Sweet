@@ -1,7 +1,7 @@
 #pragma once
 
 // ¼Óµµ
-constexpr float NORMAL_SPEED = 20.f;
+constexpr float NORMAL_SPEED = 30.f;
 
 constexpr float GRAVITY = 9.81f;
 constexpr float MAP_BOTTOM_HEIGHT = 10.1f;

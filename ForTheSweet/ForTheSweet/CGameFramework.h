@@ -156,6 +156,7 @@ public:
 	void AnimateObjects();
 	void UpdateProcess();
 	void CollisionProcess();
+	void Map2Camera();
 	void FrameAdvance();
 
 	void WaitForGpuComplete();

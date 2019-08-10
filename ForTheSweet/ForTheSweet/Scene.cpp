@@ -215,9 +215,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	}
 	//m_mapshader 9~22±îÁö map3
 	Cotton_box[0].Center = XMFLOAT3(0, 10, -120);
-	Cotton_box[0].Extents = XMFLOAT3(58, 30, 58);
+	Cotton_box[0].Extents = XMFLOAT3(45, 30, 45);
 	Cotton_box[1].Center = XMFLOAT3(0, 10, 120);
-	Cotton_box[1].Extents = XMFLOAT3(58, 30, 58);
+	Cotton_box[1].Extents = XMFLOAT3(45, 30, 45);
 
 	m_WavesShader = new WaveShader();
 	m_WavesShader->BuildObjects(pd3dDevice, pd3dCommandList, Map_SELECT);
@@ -913,6 +913,7 @@ void CScene::initObject()
 			//}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
+			m_pPlayerShadowShader[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
 			//m_pPlayer[i]->selected_skill = ;
 		}
@@ -954,6 +955,7 @@ void CScene::initObject()
 			//}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
+			m_pPlayerShadowShader[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
 
 			//m_pPlayer[i]->selected_skill = ;
@@ -997,6 +999,7 @@ void CScene::initObject()
 			//}
 			XMFLOAT3 pos(0, 0, 0);
 			m_pPlayer[i]->init();
+			m_pPlayerShadowShader[i]->init();
 			m_pPlayer[i]->SetPosition(pos);
 			//m_pPlayer[i]->selected_skill = ;
 		}
@@ -1336,24 +1339,25 @@ void CScene::CollisionProcess(int index)
 
 void CScene::Collision_telleport(int index)
 {
-	bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
 	
 	for (int i = 0; i < 8; i++) {
 		door[i]->bounding.Center = door[i]->getObjects()->GetPosition();
 		bool result = door[i]->bounding.Intersects(bounding_box_test[index]->bounding);
 		if (result) {
 			//XMFLOAT3 telpos;
-			if (i == 0) { XMFLOAT3 telpos = door[1]->getObjects()->GetPosition(); telpos.z += 15.f;      m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_OUT	
-			else if (i == 1) { XMFLOAT3 telpos = door[0]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_IN	
-			else if (i == 2) { XMFLOAT3 telpos = door[3]->getObjects()->GetPosition(); telpos.z += 15.f; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_OUT		
-			else if (i == 3) { XMFLOAT3 telpos = door[2]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_IN		
+			float tmp = 30.f;
+			if (i == 0) { XMFLOAT3 telpos = door[1]->getObjects()->GetPosition(); telpos.z += tmp;      m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_OUT	
+			else if (i == 1) { XMFLOAT3 telpos = door[0]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_IN	
+			else if (i == 2) { XMFLOAT3 telpos = door[3]->getObjects()->GetPosition(); telpos.z += tmp; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_OUT		
+			else if (i == 3) { XMFLOAT3 telpos = door[2]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_IN		
 																						  		
-			else if (i == 4) { XMFLOAT3 telpos = door[5]->getObjects()->GetPosition(); telpos.z += 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_OUT	
-			else if (i == 5) { XMFLOAT3 telpos = door[4]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_IN	
-			else if (i == 6) { XMFLOAT3 telpos = door[7]->getObjects()->GetPosition(); telpos.z += 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_OUT	
-			else if (i == 7) { XMFLOAT3 telpos = door[6]->getObjects()->GetPosition(); telpos.z -= 15.f; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_IN		
+			else if (i == 4) { XMFLOAT3 telpos = door[5]->getObjects()->GetPosition(); telpos.z += tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_OUT	
+			else if (i == 5) { XMFLOAT3 telpos = door[4]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_IN	
+			else if (i == 6) { XMFLOAT3 telpos = door[7]->getObjects()->GetPosition(); telpos.z += tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_OUT	
+			else if (i == 7) { XMFLOAT3 telpos = door[6]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_IN		
 			//m_pPlayer[index]->SetPosition(telpos);
 			//return;
+			bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
 		}
 	}
 }
