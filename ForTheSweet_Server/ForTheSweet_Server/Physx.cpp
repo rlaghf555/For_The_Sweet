@@ -177,6 +177,25 @@ void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 						}
 					}
 				}
+				else if (Light_Trigger == reinterpret_cast<UserData *>(pairs[i].triggerActor->userData)->type)
+				{
+				if (player[j])
+				{
+					if (player[j]->m_PlayerController != nullptr)
+					{
+						if (pairs[i].otherActor == player[j]->getControllerActor()) {
+							cout << j << " Player : Lightning Stun\n";
+							//cout << player[j]->getControllerActor()->getGlobalPose().p.x << "," 
+							//	<< player[j]->getControllerActor()->getGlobalPose().p.y << "," 
+							//	<< player[j]->getControllerActor()->getGlobalPose().p.z << endl;
+							// cout << mylook.x << "," << mylook.y << "," << mylook.z << endl;
+
+							player[j]->setStatus(STATUS::STUN);
+							player[j]->hitted = true;
+						}
+					}
+				}
+				}
 			}
 		}
 	}
@@ -414,6 +433,29 @@ PxRigidStatic* CPhysx::getBoxTrigger(PxVec3& t, PxVec3 size)
 	/*int* tmp = (int*)staticActor->userData;
 	*tmp = 1;*/
 
+	m_Scene->addActor(*staticActor);
+
+	return staticActor;
+}
+
+PxRigidStatic* CPhysx::getBoxTrigger(PxVec3& t, PxVec3 size, int trigger_type)
+{
+	PxShape* shape = m_Physics->createShape(PxBoxGeometry(size.x, size.y, size.z), *m_Physics->createMaterial(0.2f, 0.2f, 0.2f));
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);	//시물레이션 off
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);			//트리거링 on
+
+	PxRigidStatic * staticActor = m_Physics->createRigidStatic(PxTransform(t));
+
+	UserData* udata = new UserData;
+	udata->order = 0;
+	udata->type = trigger_type;
+
+	staticActor->attachShape(*shape);
+	staticActor->userData = (void *)udata;
+	//float* num = new float(0.0f);
+	//staticActor->userData = (void*)num;
+	/*int* tmp = (int*)staticActor->userData;
+	*tmp = 1;*/
 	m_Scene->addActor(*staticActor);
 
 	return staticActor;

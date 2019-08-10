@@ -31,6 +31,29 @@ PxF32 CJump::getHeight(PxF32 elapsedTime)
 	//return -1.0f;
 }
 
+PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxShape& shape, const PxActor& actor)
+{
+	//PxExtendedVec3 dist(0, 0.1, 0);
+	//
+	//PxControllerFilters filters;
+	//
+	//PxExtendedVec3 pos = m_PlayerController->getPosition();
+	//pos += dist;
+	//m_PlayerController->setPosition(pos);
+
+	//return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+	return PxControllerBehaviorFlags(0);
+}
+
+PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxController& controller)
+{
+	return PxControllerBehaviorFlags(0);
+}
+
+PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxObstacle& obstacle) {
+	return PxControllerBehaviorFlags(0);
+}
+
 CPlayer::CPlayer()
 {
 	m_Pos = PxVec3(0, 0, 0);

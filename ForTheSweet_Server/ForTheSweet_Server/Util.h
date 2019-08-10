@@ -14,8 +14,24 @@ constexpr int MAX_WEAPON_TYPE = 5;
 constexpr int MAX_WEAPON_NUM = 30;
 constexpr int RESPAWN_WEAPON_NUM = 10;
 
-constexpr int MAX_ANIM = 29;
+constexpr int MAX_ANIM = 33;
 constexpr int MAX_HP = 100;
+
+// Timer
+constexpr int MAX_TIMER = 150;			// 원래 300
+constexpr int MINUTE = 30;				// 원래 60
+
+// Referee
+constexpr int Rfr_Start_Num = 9;
+constexpr int Rfr_Init = 23;
+constexpr int Rfr_Start = 20;
+constexpr int Rfr_End = 10;
+constexpr int Rfr_Weapon = 0;
+
+// Lightning
+constexpr int Lightning_Type = 100;
+constexpr float Lightning_Width = 20.f;
+constexpr float Lightning_Height = 60.f;
 
 // ROOM
 constexpr int MAX_ROOM_NAME_LEN = 10;
@@ -61,6 +77,7 @@ constexpr int Player_Trigger = 0;
 constexpr int Lollipop_Trigger = 1;
 constexpr int Candy_Trigger = 2;
 constexpr int Pepero_Trigger = 3;
+constexpr int Light_Trigger = 4;
 
 // KnockBack Vel
 constexpr float KnockBack_Vel = 40.f;

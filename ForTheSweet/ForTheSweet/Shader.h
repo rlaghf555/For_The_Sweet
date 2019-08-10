@@ -290,6 +290,30 @@ public:
 		m_ppObjects[index]->visible = true;
 		SoundManager::GetInstance()->PlaySounds(LIGHTNING);
 	}
+	virtual void ShowEffects(int index, XMFLOAT3& pos) {
+		for (int i = 0; i < 5; ++i) {
+			int effect_index = i + (index * 5);
+			XMFLOAT3 effect_pos = pos;
+			float size = 30.f;
+			float size_z = 20.f;
+			effect_pos.x -= size;
+			if (i == 1) {
+				effect_pos.z -= size_z;
+			}
+			else if (i == 2) {
+				effect_pos.z += size_z;
+			}
+			else if (i == 3) {
+				effect_pos.z -= size_z / 2.f;
+			}
+			else if (i == 4) {
+				effect_pos.z += size_z / 2.f;
+			}
+			m_ppObjects[effect_index]->visible = true;
+			m_ppObjects[effect_index]->SetPosition(effect_pos);
+		}
+		SoundManager::GetInstance()->PlaySounds(LIGHTNING);
+	}
 	virtual CGameObject* getObject(UINT index) { return m_ppObjects[index]; }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 

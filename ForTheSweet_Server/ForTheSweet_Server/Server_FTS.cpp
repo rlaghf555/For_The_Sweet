@@ -27,14 +27,21 @@ mutex lobby_l;
 
 CGameTimer gGameTimer;
 
-PxVec3 PlayerInitPosition[8] = {
+PxVec3 PlayerInitPos[8] = {
    PxVec3(0, 10.1, 100), PxVec3(50, 10.1, 100), PxVec3(-50, 10.1, 100), PxVec3(100, 10.1, 100), PxVec3(-100, 10.1, 100),
    PxVec3(150, 10.1, 100), PxVec3(-150, 10.1, 100), PxVec3(200, 10.1, 100)
 };
 
-PxVec3 WeaponInitPosition[10] = {
+PxVec3 WeaponInitPos[10] = {
    PxVec3(-200, 10, -100), PxVec3(-200, 10, 0), PxVec3(-200, 10, 100), PxVec3(-100, 10, -50), PxVec3(-100, 10, 50),
    PxVec3(100, 10, -50), PxVec3(100, 10, 50), PxVec3(200, 10, -100), PxVec3(200, 10, 0), PxVec3(200, 10, 100)
+};
+
+//PxVec3(-240.f, 100.f, 110.f)
+
+PxVec3 LightningInitPos[10] = {
+   PxVec3(-100.f, 100.f, 100.f), PxVec3(-120.f, 100.f, 110.f), PxVec3(60.f, 100.f, 110.f), PxVec3(180.f, 100.f, 110.f), PxVec3(-150.f, 100.f, 0.f),
+   PxVec3(90.f, 100.f, 0.f), PxVec3(-240.f, 100.f, -110.f), PxVec3(-120.f, 100.f, -110.f), PxVec3(60.f, 100.f, -110.f), PxVec3(180.f, 100.f, -110.f)
 };
 
 enum SITUATION
@@ -163,9 +170,9 @@ void sendPacket(char key, void *ptr)
 void send_login_packet(char client) {
 	sc_packet_login p_login;
 	p_login.id = client;
-	p_login.x = PlayerInitPosition[client].x;
-	p_login.y = PlayerInitPosition[client].y;
-	p_login.z = PlayerInitPosition[client].z;
+	p_login.x = PlayerInitPos[client].x;
+	p_login.y = PlayerInitPos[client].y;
+	p_login.z = PlayerInitPos[client].z;
 	p_login.vx = 0.f;
 	p_login.vy = 0.f;
 	p_login.vz = 0.f;
@@ -294,6 +301,17 @@ void send_critical_hit_packet(char client, char id, int hp, const PxVec3& dir)
 	sendPacket(client, &p_cri_hit);
 }
 
+void send_stun_packet(char client, char id, int hp)
+{
+	sc_packet_stun p_stun;
+	p_stun.type = SC_STUN;
+	p_stun.size = sizeof(sc_packet_stun);
+	p_stun.id = id;
+	p_stun.hp = hp;
+
+	sendPacket(client, &p_stun);
+}
+
 void send_heal_packet(char client, char id, int hp)
 {
 	sc_packet_heal p_heal;
@@ -305,16 +323,16 @@ void send_heal_packet(char client, char id, int hp)
 	sendPacket(client, &p_heal);
 }
 
-void send_put_weapon_packet(char client, char wp_type, char wp_index, float x, float y, float z) {
+void send_put_weapon_packet(char client, char wp_type, char wp_index, const PxVec3& pos) {
 	sc_packet_put_weapon p_put_weapon;
 
 	p_put_weapon.type = SC_PUT_WEAPON;
 	p_put_weapon.size = sizeof(sc_packet_put_weapon);
 	p_put_weapon.weapon_type = wp_type;
 	p_put_weapon.weapon_index = wp_index;
-	p_put_weapon.x = x;
-	p_put_weapon.y = y;
-	p_put_weapon.z = z;
+	p_put_weapon.x = pos.x;
+	p_put_weapon.y = pos.y;
+	p_put_weapon.z = pos.z;
 
 	sendPacket(client, &p_put_weapon);
 }
@@ -382,6 +400,34 @@ void send_time_packet(char client, int timer)
 	sendPacket(client, &p_time);
 }
 
+void send_patern_message_packet(char client_id, char patern)
+{
+	sc_packet_patern_message p_patern_mss;
+	p_patern_mss.type = SC_PATERN_MESSAGE;
+	p_patern_mss.size = sizeof(sc_packet_patern_message);
+	p_patern_mss.patern = patern;
+
+	sendPacket(client_id, &p_patern_mss);
+}
+
+void send_patern_packet(char client_id, char type) {
+	sc_packet_patern p_patern;
+	p_patern.type = type;
+	p_patern.size = sizeof(sc_packet_patern);
+
+	sendPacket(client_id, &p_patern);
+}
+
+void send_light_index_packet(char client_id, char index1, char index2) {
+	sc_packet_light_index p_light_index;
+	p_light_index.type = SC_LIGHT_INDEX;
+	p_light_index.size = sizeof(sc_packet_light_index);
+	p_light_index.index1 = index1;
+	p_light_index.index2 = index2;
+
+	sendPacket(client_id, &p_light_index);
+}
+
 void send_room_setting_weapon(int room_num)
 {
 	room_l.lock();
@@ -402,7 +448,7 @@ void send_room_setting_weapon(int room_num)
 					char index = it->weapon_respawn[j].index;
 					const PxVec3 pos = it->weapon_list[type][index].pos;
 
-					send_put_weapon_packet(client_id, type, index, pos.x, pos.y, pos.z);
+					send_put_weapon_packet(client_id, type, index, pos);
 				}
 			}
 		}
@@ -653,7 +699,7 @@ void process_packet(char key, char *buffer)
 
 						it->weapon_list[type][j].empty = false;
 						it->weapon_list[type][j].owner = -1;
-						it->weapon_list[type][j].pos = WeaponInitPosition[i];
+						it->weapon_list[type][j].pos = WeaponInitPos[i];
 						it->weapon_list[type][j].respawn_index = i;
 
 						break;
@@ -675,7 +721,7 @@ void process_packet(char key, char *buffer)
 
 					clients[client_id].playerinfo = new CPlayer();
 
-					clients[client_id].playerinfo->setPosition(PlayerInitPosition[client_id]);
+					clients[client_id].playerinfo->setPosition(PlayerInitPos[client_id]);
 					clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 					clients[client_id].playerinfo->setLook(PxVec3(0, 0, 1));
 					clients[client_id].playerinfo->setDashed(false);
@@ -1738,23 +1784,273 @@ void process_event(EVENT_ST &ev)
 		break;
 	}
 	// 심판
-	case EV_WEAPON:
+	case EV_RFR_WEAPON:
 	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i) {
+			int client_id = it->clientNum[i];
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_patern_message_packet(client_id, EV_RFR_WEAPON);
+				}
+			}
+		}
+
+		for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i) {
+			if (it->weapon_respawn[i].respawn_able == true) {
+
+				it->weapon_respawn[i].respawn_able = false;
+
+				int type = rand() % (MAX_WEAPON_TYPE - 1);
+				//int type = (rand() % 2) + 2;
+
+				it->weapon_respawn[i].type = type;
+
+				for (int j = 0; j < MAX_WEAPON_NUM; ++j) {
+					if (it->weapon_list[type][j].empty == true) {
+						char index = j;
+						PxVec3 pos = WeaponInitPos[i];
+
+						it->weapon_respawn[i].index = index;
+						it->weapon_list[type][j].empty = false;
+						it->weapon_list[type][j].owner = -1;
+						it->weapon_list[type][j].pos = WeaponInitPos[i];
+						it->weapon_list[type][j].respawn_index = i;
+
+
+						for (int k = 0; k < MAX_ROOM_USER; ++k) {
+							int client_id = it->clientNum[k];
+							if (client_id != -1)
+							{
+								if (clients[client_id].connected == true)
+								{
+									send_put_weapon_packet(client_id, type, j, pos);
+								}
+							}
+						}
+
+						break;
+					}
+				}
+			}
+		}
 		break;
 	}
-	case EV_FOG:
+	case EV_RFR_FOG:
 	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_patern_packet(client_id, SC_FOG);
+				}
+			}
+		}
+
+		add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_FOG_END, high_resolution_clock::now() + 10s, 0);
 		break;
 	}
-	case EV_FEVER:
+	case EV_RFR_FOG_END:
 	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_patern_packet(client_id, SC_FOG_END);
+				}
+			}
+		}
 		break;
 	}
-	case EV_LIGHTNING:
+	case EV_RFR_FEVER:
 	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		it->fever = true;
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_patern_packet(client_id, SC_FEVER);
+				}
+			}
+		}
+
+		add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_FEVER_END, high_resolution_clock::now() + 10s, 0);
 		break;
 	}
-	case EV_SLIME:
+	case EV_RFR_FEVER_END:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		it->fever = false;
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_patern_packet(client_id, SC_FEVER_END);
+				}
+			}
+		}
+		break;
+	}
+	case EV_RFR_LIGHTNING:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_LIGHTNING_END, high_resolution_clock::now() + 10s, 0);
+		break;
+	}
+	case EV_RFR_LIGHTNING_END:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		it->lighting = false;
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_patern_packet(client_id, SC_LIGHTNING_END);
+				}
+			}
+		}
+		break;
+	}
+	case EV_RFR_LIGHTNING_INDEX:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		if (it->lighting == true)
+		{
+			if (it->light_count < 5)
+			{
+				//int index1 = rand() % 5;
+				//int index2 = (rand() % 5) + 5;
+				int index1 = 0;
+				int index2 = 5;
+
+				PxVec3 pos1 = LightningInitPos[index1];
+				PxVec3 pos2 = LightningInitPos[index2];
+
+				Skill_Actor *s_light1 = new Skill_Actor(0, 0, 0, Lightning_Type);
+				Skill_Actor *s_light2 = new Skill_Actor(0, 0, 0, Lightning_Type);
+
+				PxVec3 size(Lightning_Width, Lightning_Height, Lightning_Width);
+
+				//it->m_pPhysx->m_Scene->lockWrite();
+				s_light1->skillTrigger = it->m_pPhysx->getBoxTrigger(pos1, size, Light_Trigger);
+				s_light2->skillTrigger = it->m_pPhysx->getBoxTrigger(pos2, size, Light_Trigger);
+				//it->m_pPhysx->m_Scene->unlockWrite();
+
+				it->m_skillTrigger.push_back(*s_light1);
+				it->m_skillTrigger.push_back(*s_light2);
+
+				for (int i = 0; i < MAX_ROOM_USER; ++i)
+				{
+					int client_id = it->clientNum[i];
+
+					if (client_id != -1)
+					{
+						if (clients[client_id].connected == true)
+						{
+							send_light_index_packet(client_id, index1, index2);
+						}
+					}
+				}
+				it->light_count += 1;
+				//cout << "count : " << int(it->light_count) << endl;
+
+				add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_LIGHTNING_INDEX, high_resolution_clock::now() + 2s, 0);
+				add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_LIGHTNING_DELETE, high_resolution_clock::now() + 1s, 0);
+			}
+		}
+
+		break;
+	}
+	case EV_RFR_LIGHTNING_DELETE:
+	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		auto it2 = find(it->m_skillTrigger.begin(), it->m_skillTrigger.end(), Lightning_Type);			//order
+
+		if (it2 != it->m_skillTrigger.end())
+		{
+			it2->skillTrigger->release();
+			it->m_skillTrigger.erase(it2);
+		}
+
+		auto it3 = find(it->m_skillTrigger.begin(), it->m_skillTrigger.end(), Lightning_Type);			//order
+
+		if (it3 != it->m_skillTrigger.end())
+		{
+			it3->skillTrigger->release();
+			it->m_skillTrigger.erase(it3);
+		}
+		break;
+	}
+	case EV_RFR_SLIME:
 	{
 		break;
 	}
@@ -1766,7 +2062,9 @@ void process_event(EVENT_ST &ev)
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
 
-		it->timer -= 1;
+		int timer = it->timer;
+		timer -= 1;
+		it->timer = timer;
 
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
@@ -1776,13 +2074,66 @@ void process_event(EVENT_ST &ev)
 			{
 				if (clients[client_id].connected == true)
 				{
-					send_time_packet(client_id, it->timer);
+					send_time_packet(client_id, timer);
 				}
 			}
 		}
 
-		add_timer(room_num, room_num + ROOM_TIMER_START, EV_TIME, high_resolution_clock::now() + 1s, 0);
+		int timer_event = timer % MINUTE;
 
+		if (timer_event == Rfr_Init) {
+			// 심판 패턴 정하기
+			char count = it->referee.patern_count;
+			char patern;
+			count += 1;
+
+			if (count == 3) {	// 컵케이크
+				patern = EV_RFR_SLIME;	// 12. 컵케이크
+			}
+			else {				// 나머지
+				//patern = (rand() % 3) + Rfr_Start_Num;	// 9. 안개, 10. 피버, 11.번개
+				patern = EV_RFR_FEVER;
+			}
+
+			it->referee.patern_count = count;
+			it->referee.patern_type = patern;
+			
+			for (int i = 0; i < MAX_ROOM_USER; ++i) {
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_patern_message_packet(client_id, patern);
+					}
+				}
+			}
+
+			add_timer(room_num, room_num + ROOM_TIMER_START, EVENT_TYPE(patern), high_resolution_clock::now() + 3s, 0);
+			if (patern == EV_RFR_LIGHTNING) {
+				it->lighting = true;
+				it->light_count = 0;
+				add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_LIGHTNING_INDEX, high_resolution_clock::now() + 3s, 0);
+			}
+		}
+		else if (timer_event == Rfr_Weapon) {
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_WEAPON, high_resolution_clock::now(), 0);
+		}
+
+		if (timer > 0) {
+			// 시간 종료
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_TIME, high_resolution_clock::now() + 1s, 0);
+		}
+		else {
+			add_timer(room_num, room_num + ROOM_TIMER_START, EV_END, high_resolution_clock::now(), 0);
+		}
+
+		break;
+	}
+	case EV_END:
+	{
+		cout << "게임 종료\n";
 		break;
 	}
 	default:
@@ -1817,12 +2168,17 @@ void clientInputProcess(int room_num)
 
 				if (clients[client_id].playerinfo->m_dashed) {
 					if (status != STATUS::SKILL_WEAPON_MOVE) {
-						direction *= 2;
+						direction *= 2.f;
 					}
 				}
 
+				if (it->fever == true)
+				{
+					direction *= 2.f;
+				}
+
 				if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK
-					|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE)
+					|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
 				{
 					continue;
 				}
@@ -1995,6 +2351,29 @@ void clientUpdateProcess(int room_num)
 						}
 					}
 
+					if (status == STATUS::STUN) {
+
+						add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 1330ms);
+
+						clients[client_id].playerinfo->setAniIndex(Anim::Stun);
+
+						int hp = clients[client_id].playerinfo->m_hp - 2;
+						if (hp < 0) hp = 0;
+						clients[client_id].playerinfo->setHP(hp);
+
+						for (int j = 0; j < MAX_ROOM_USER; ++j)
+						{
+							int client_id2 = it->clientNum[j];
+							if (client_id2 != -1)
+							{
+								if (clients[client_id2].connected == true)
+								{
+									send_stun_packet(client_id2, client_slot, hp);
+								}
+							}
+						}
+					}
+
 					clients[client_id].playerinfo->hitted = false;
 				}
 
@@ -2044,6 +2423,7 @@ void broadcastPosPacket(int room_num)
 
 void logic()
 {
+	srand((unsigned int)time(NULL));
 	gGameTimer.Reset();
 	while (true)
 	{

@@ -2,6 +2,18 @@
 #include "Physx.h"
 #include "Player.h"
 
+PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor)
+{
+	cout << "1\n";
+}
+PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller)
+{
+	cout << "2\n";
+}
+PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) 
+{
+	cout << "3\n";
+}
 void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
 	//cout << "Trigger Count : " << count << endl;
@@ -213,7 +225,7 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count) {
 	return triMesh;
 }
 
-PxCapsuleController* CPhysx::getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback)
+PxCapsuleController* CPhysx::getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback, CPlayer *player)
 {
 	PxCapsuleControllerDesc capsuleDesc;
 	capsuleDesc.height = 15; //Height of capsule
@@ -231,6 +243,7 @@ PxCapsuleController* CPhysx::getCapsuleController(PxExtendedVec3 pos, PxUserCont
 
 	//충돌 콜백 함수
 	capsuleDesc.reportCallback = collisionCallback;
+	capsuleDesc.behaviorCallback = player;
 
 	PxCapsuleController* controller = static_cast<PxCapsuleController*>(m_PlayerManager->createController(capsuleDesc));
 

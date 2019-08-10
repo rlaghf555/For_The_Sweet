@@ -16,6 +16,7 @@ enum STATUS {
 	JUMP,
 	HITTED,
 	CRI_HITTED,
+	STUN,
 	SKILL_WEAPON_MOVE,
 	SKILL_WEAPON_NO_MOVE,
 };
@@ -49,7 +50,11 @@ enum Anim {
 	Chocolate_Hard_Attack,
 	Chocolate_Guard,
 	Chocolate_Skill,
-	Hard_React
+	Hard_React,
+	Victory,
+	Victory_2,
+	Death,
+	Stun
 };
 
 class PlayerHitReport : public PxUserControllerHitReport {
@@ -80,7 +85,7 @@ public:
 	PxF32		getHeight(PxF32 elapsedTime);
 };
 
-class CPlayer
+class CPlayer : public PxControllerBehaviorCallback
 {
 public:
 	CPlayer();
@@ -103,6 +108,10 @@ public:
 
 	PxRigidActor* getTrigger() { return m_AttackTrigger; }
 	PxRigidDynamic* getControllerActor() { return m_PlayerController->getActor(); }
+
+	virtual PxControllerBehaviorFlags		getBehaviorFlags(const PxShape& shape, const PxActor& actor);
+	virtual PxControllerBehaviorFlags		getBehaviorFlags(const PxController& controller);
+	virtual PxControllerBehaviorFlags		getBehaviorFlags(const PxObstacle& obstacle);
 
 public:
 	PxVec3 m_Pos;

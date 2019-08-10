@@ -45,6 +45,17 @@ constexpr int SC_POS_WEAPON = 11;
 constexpr int SC_REMOVE_WEAPON = 12;
 constexpr int SC_HEAL = 13;
 constexpr int SC_CRITICAL_HIT = 14;
+constexpr int SC_STUN = 15;
+
+constexpr int SC_PATERN_MESSAGE = 20;
+constexpr int SC_FOG = 21;
+constexpr int SC_FEVER = 22;
+constexpr int SC_LIGHTNING = 23;
+constexpr int SC_CUPCAKE = 24;
+constexpr int SC_FOG_END = 25;
+constexpr int SC_FEVER_END = 26;
+constexpr int SC_LIGHTNING_END = 27;
+constexpr int SC_LIGHT_INDEX = 28;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
@@ -212,6 +223,13 @@ struct sc_packet_critical_hit {
 	float z;
 };
 
+struct sc_packet_stun {
+	char size;
+	char type;
+	char id;
+	char hp;
+};
+
 struct sc_packet_heal {
 	char size;
 	char type;
@@ -273,7 +291,23 @@ struct sc_packet_timer {
 	int timer;
 };
 
+struct sc_packet_patern_message {
+	char size;
+	char type;
+	char patern;
+};
 
+struct sc_packet_patern {
+	char size;
+	char type;
+};
+
+struct sc_packet_light_index {
+	char size;
+	char type;
+	char index1;
+	char index2;
+};
 
 
 #pragma pack (pop)

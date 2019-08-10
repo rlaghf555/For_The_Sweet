@@ -22,6 +22,7 @@ enum STATUS {
 	DEFENSE,
 	JUMP,
 	HITTED,
+	STUN,
 	CRI_HITTED,
 	SKILL_WEAPON_MOVE,
 	SKILL_WEAPON_NO_MOVE,
@@ -56,7 +57,7 @@ public:
 	PxF32		getHeight(PxF32 elapsedTime);
 };
 
-class CPlayer : public ModelObject
+class CPlayer : public ModelObject, public PxControllerBehaviorCallback
 {
 protected:
 	//플레이어의 위치 벡터, x-축(Right), y-축(Up), z-축(Look) 벡터이다.
@@ -194,6 +195,10 @@ public:
 	
 	//플레이어의 카메라가 3인칭 카메라일 때 플레이어(메쉬)를 렌더링한다.
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
+
+	virtual PxControllerBehaviorFlags		getBehaviorFlags(const PxShape& shape, const PxActor& actor);
+	virtual PxControllerBehaviorFlags		getBehaviorFlags(const PxController& controller);
+	virtual PxControllerBehaviorFlags		getBehaviorFlags(const PxObstacle& obstacle);
 };
 
 /* 

@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "CGameFramework.h"
 
+XMFLOAT3 LightningInitPos[10] = {
+   XMFLOAT3(-100.f, 100.f, 100.f), XMFLOAT3(-120.f, 100.f, 110.f), XMFLOAT3(60.f, 100.f, 110.f), XMFLOAT3(180.f, 100.f, 110.f), XMFLOAT3(-150.f, 100.f, 0.f),
+   XMFLOAT3(90.f, 100.f, 0.f), XMFLOAT3(-240.f, 100.f, -110.f), XMFLOAT3(-120.f, 100.f, -110.f), XMFLOAT3(60.f, 100.f, -110.f), XMFLOAT3(180.f, 100.f, -110.f)
+};
+
 char * ConvertWCtoC(wchar_t* str)
 {
 	//반환할 char* 변수 선언
@@ -614,6 +619,22 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_MP());	//mp
 		break;
 	}
+	case SC_STUN:
+	{
+		sc_packet_stun p_stun;
+
+		memcpy(&p_stun, ptr, sizeof(p_stun));
+
+		m_pScene->getplayer(p_stun.id)->Set_HP(int(p_stun.hp));
+
+		m_pScene->getplayer(p_stun.id)->SetStatus(STATUS::STUN);
+		m_pScene->getplayer(p_stun.id)->ChangeAnimation(Anim_Stun);
+		m_pScene->getplayer(p_stun.id)->DisableLoop();
+
+		m_pScene->m_ppUIShaders[p_stun.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_stun.id]->Get_HP());	//hp
+		m_pScene->m_ppUIShaders[p_stun.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_stun.id]->Get_MP());	//mp
+		break;
+	}
 	case SC_HEAL:
 	{
 		sc_packet_heal p_heal;
@@ -648,6 +669,7 @@ void CGameFramework::processPacket(char *ptr)
 		cout << "Put Weapon (" << type << "," << index << ") : " << x << "," << y << "," << z << endl;
 
 		m_pScene->m_WeaponShader[type]->getObject(index)->visible = true;
+		m_pScene->m_WeaponShader[type]->getObject(index)->init();
 		m_pScene->m_WeaponShader[type]->getObject(index)->SetPosition(x, y, z);
 
 		XMFLOAT3 a = XMFLOAT3(1, 0, 0);
@@ -779,7 +801,9 @@ void CGameFramework::processPacket(char *ptr)
 			if (phyx_look == PxVec3(-1, 0, 0)) {
 				phyx_look.x *= -1.f;
 			}
+			m_pPhysx->m_Scene->lockWrite();
 			Choco_Actor[index] = m_pPhysx->getRotateBox(phyx_pos, phyx_look, phyx_size);
+			m_pPhysx->m_Scene->unlockWrite();
 
 			m_pScene->m_WeaponShader[type]->getObject(index)->init();
 			m_pScene->m_WeaponShader[type]->getObject(index)->SetLook(look);
@@ -802,6 +826,111 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_ppUIShaders[8]->SetTime(p_timer.timer);
 
+		break;
+	}
+	case SC_PATERN_MESSAGE:
+	{
+		sc_packet_patern_message p_patern;
+
+		memcpy(&p_patern, ptr, sizeof(p_patern));
+
+		char patern = p_patern.patern;
+
+		// 8부터 시작 : EV_RFR_FOG, EV_RFR_FEVER, EV_RFR_LIGHTNING, EV_RFR_SLIME
+		if (patern == 8)
+			m_pScene->m_MessageShader->ShowMessage(MESSAGE_WEAPON);
+		if (patern == 9)
+			m_pScene->m_MessageShader->ShowMessage(MESSAGE_FOG);
+		if (patern == 10)
+			m_pScene->m_MessageShader->ShowMessage(MESSAGE_FEVER);
+		if (patern == 11)
+		{
+			m_pScene->m_MessageShader->ShowMessage(MESSAGE_LIGHTING);
+			m_pScene->m_DarkShader->is_dark = true;	//어두워짐
+		}
+		if (patern == 12)
+			m_pScene->m_MessageShader->ShowMessage(MESSAGE_CUPCAKE);
+
+		break;
+	}
+	case SC_FEVER:
+	{
+		//피버타임 시작할때
+		for (int i = 0; i < MAX_USER; i++) {
+			if (m_pScene->m_pPlayer[i]->GetConnected() == true)
+			{
+				fever = true;
+				m_pScene->m_pPlayer[i]->ChangeAnimationSpeed(Anim_Walk, 2.0f);
+				m_pScene->m_pPlayer[i]->ChangeAnimationSpeed(Anim_Run, 2.0f);
+			}
+		}
+
+		break;
+	}
+	case SC_FEVER_END:
+	{
+		//피버타임 끝날때
+		for (int i = 0; i < MAX_USER; i++) {
+			if (m_pScene->m_pPlayer[i]->GetConnected() == true)
+			{
+				fever = false;
+				m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Walk);
+				m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Run);
+			}
+		}
+		break;
+	}
+	case SC_LIGHTNING:
+	{
+		//번개 시작
+		//m_pScene->m_DarkShader->is_dark = true;	//어두워짐
+
+		//m_pScene->m_EffectShader->ShowEffect(0);
+
+		break;
+	}
+	case SC_LIGHT_INDEX:
+	{
+		sc_packet_light_index p_light_index;
+
+		memcpy(&p_light_index, ptr, sizeof(p_light_index));
+
+		//번개인덱스 2개 
+		XMFLOAT3 pos1 = LightningInitPos[p_light_index.index1];
+		XMFLOAT3 pos2 = LightningInitPos[p_light_index.index2];
+		m_pScene->m_EffectShader->ShowEffects(0, pos1);
+		m_pScene->m_EffectShader->ShowEffects(1, pos2);
+		break;
+	}
+	case SC_LIGHTNING_END:
+	{
+		//번개 종료
+		m_pScene->m_DarkShader->is_dark = false;	//어두워짐
+		break;
+	}
+	case SC_FOG:
+	{
+		//안개 시작
+		m_pScene->m_ppUIShaders[21]->SetFog();
+		for (int i = 0; i < 8; i++) {
+			m_pScene->m_ppUIShaders[i]->FogOn(true);
+		}
+		for (int i = 12; i < 20; i++) {
+			m_pScene->m_ppUIShaders[i]->FogOn(true);
+		}
+
+		break;
+	}
+	case SC_FOG_END:
+	{
+		//안개 종료
+		m_pScene->m_ppUIShaders[21]->FogOff();
+		for (int i = 0; i < 8; i++) {
+			m_pScene->m_ppUIShaders[i]->FogOn(false);
+		}
+		for (int i = 12; i < 20; i++) {
+			m_pScene->m_ppUIShaders[i]->FogOn(false);
+		}
 		break;
 	}
 //	case SC_FEVER:
@@ -1066,11 +1195,11 @@ void CGameFramework::BuildObjects()
 			//desc.material = m_pPhysx->m_Material;
 			PxExtendedVec3 position = PxExtendedVec3(0, 17.5, 0);
 
-			m_pPlayer->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pPlayer->getCollisionCallback());
+			m_pPlayer->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pPlayer->getCollisionCallback(), m_pPlayer);
 
 			position = PxExtendedVec3(100, 27.5, 0);
 
-			m_pScene->m_pPlayer[1]->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pScene->m_pPlayer[1]->getCollisionCallback());
+			m_pScene->m_pPlayer[1]->m_PlayerController = m_pPhysx->getCapsuleController(position, m_pScene->m_pPlayer[1]->getCollisionCallback(), m_pScene->m_pPlayer[1]);
 
 			//m_pPhysx->m_PlayerController = m_pPhysx->m_PlayerManager->createController(desc);
 
@@ -2236,7 +2365,15 @@ void CGameFramework::ProcessInput()
 
 void CGameFramework::AnimateObjects()
 {
-	if (m_pScene) m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
+	if (m_pScene) {
+		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
+
+		PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
+		pos.p.y += 0.1f;
+		m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
+
+		//cout << pos.p.x << "," << pos.p.y << "," << pos.p.z << endl;
+	}
 }
 
 void CGameFramework::UpdateProcess()
@@ -2252,7 +2389,7 @@ void CGameFramework::UpdateProcess()
 				{
 					char status = m_pScene->m_pPlayer[i]->GetStatus();
 					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK 
-						|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE)
+						|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
 					{
 						continue;
 					}
@@ -2300,8 +2437,13 @@ void CGameFramework::UpdateProcess()
 						{
 							if (status != STATUS::SKILL_WEAPON_MOVE)
 							{
-								vel *= 2;
+								vel *= 2.f;
 							}
+						}
+
+						if (fever == true)
+						{
+							vel *= 2.f;
 						}
 
 						float jump_height;
@@ -2424,6 +2566,7 @@ void CGameFramework::FrameAdvance()
 	UpdateProcess();
 	
 	if (SERVER_ON) {
+
 		m_pPhysx->m_Scene->simulate(1.f / 60.f);
 		m_pPhysx->m_Scene->lockWrite();
 		m_pPhysx->m_Scene->fetchResults(true);
@@ -2485,7 +2628,7 @@ void CGameFramework::FrameAdvance()
 		m_pCamera->SetLookAt(position);
 		m_pPlayer->SetPosition(position);
 
-		cout << "0 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
+		//cout << "0 캐릭터 위치 : " << position.x << ", " << position.y << ", " << position.z << endl;
 
 		playerPosition = m_pScene->m_pPlayer[1]->m_PlayerController->getPosition();
 		position.x = playerPosition.x;
@@ -2563,6 +2706,10 @@ void CGameFramework::FrameAdvance()
 						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
 					}
 					else if (status == STATUS::SKILL_WEAPON_NO_MOVE) 
+					{
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+					}
+					else if (status == STATUS::STUN)
 					{
 						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
 					}

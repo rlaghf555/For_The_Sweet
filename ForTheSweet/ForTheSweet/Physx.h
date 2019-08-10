@@ -42,6 +42,15 @@ public:
 	void setPlayer(CPlayer* pl, int index) { player[index] = pl; }
 };
 
+//class PhysBehavior : public PxControllerBehaviorCallback
+//{
+//public:
+//	PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) = 0;
+//	PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) = 0;
+//	PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) = 0;
+//};
+
+
 class CPhysx {
 public:
 	// PxFoundation이 관리하는 Allocator, ErrorCallback
@@ -76,6 +85,8 @@ public:
 	//physx::PxCapsuleControllerDesc m_CapsuleDesc;
 	//physx::PxBoxControllerDesc m_BoxDesc;
 
+	PxRigidActor *move_actor;
+
 public:
 	CPhysx();
 	~CPhysx();
@@ -84,9 +95,10 @@ public:
 	void move(DWORD direction, float distance);
 
 	PxTriangleMesh*	GetTriangleMesh(mesh* meshes, UINT count);
-	PxCapsuleController* getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback);
+	PxCapsuleController* getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback, CPlayer *player);
 	PxRigidStatic*	getTrigger(PxVec3& t, XMFLOAT3 size);
 	PxRigidDynamic* getRotateBox(PxVec3& t, PxVec3& ro, PxVec3 size);	// 초콜릿 방패세팅
 
 	void registerPlayer(CPlayer* player, int index) { m_Simulator.setPlayer(player, index); }
+
 };

@@ -917,6 +917,11 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
 		physx->m_Scene->addActor(*m_Actor);
+
+		if (map_type == M_Map_1_macaron_1) {
+			physx->move_actor = m_Actor;
+			physx->move_actor->userData = (void *)(int)100;
+		}
 	}
 	delete pTexture;
 }

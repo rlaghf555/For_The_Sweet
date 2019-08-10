@@ -29,6 +29,7 @@ public:
 	bool setting_send;
 
 	bool input_able = false;
+	bool fever = false;
 
 	wchar_t *Characters_ID[MAX_USER];
 	// 이동관련 

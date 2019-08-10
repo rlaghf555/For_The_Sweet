@@ -830,7 +830,7 @@ void CScene::initUI(wchar_t *character_id[])
 	}
 
 	//time
-	m_ppUIShaders[8]->SetTime(300);
+	m_ppUIShaders[8]->SetTime(150);
 	//m_ppUIShaders[9]   --- :
 	//Ready
 	XMFLOAT2 pos = XMFLOAT2(1300, 400);

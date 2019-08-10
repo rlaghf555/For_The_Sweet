@@ -80,6 +80,7 @@ public:
 	PxCapsuleController* getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback);
 
 	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size);
+	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size, int trigger_type);
 	PxRigidStatic* getRotateBoxTrigger(PxVec3& t, PxVec3& ro, PxVec3 size, int trigger_type, int order);	// ª©ª©∑Œ ºº∆√
 
 	PxRigidStatic* getSphereTrigger(PxVec3& t, PxReal rad, int trigger_type, int order);	// ∑—∏Æ∆À, √Ú∆ƒ√‰Ω∫ ºº∆√

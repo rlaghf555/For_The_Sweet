@@ -33,6 +33,29 @@ PxF32 Jump::getHeight(PxF32 elapsedTime)
 	//return -1.0f;
 }
 
+PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxShape& shape, const PxActor& actor)
+{
+	PxExtendedVec3 dist(0, 0.1, 0);
+
+	PxControllerFilters filters;
+
+	PxExtendedVec3 pos = m_PlayerController->getPosition();
+	pos += dist;
+	m_PlayerController->setPosition(pos);
+
+	return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+}
+
+PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxController& controller)
+{
+	return PxControllerBehaviorFlags(0);
+}
+
+PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxObstacle& obstacle) 
+{
+	return PxControllerBehaviorFlags(0);
+}
+
 CPlayer::CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) : ModelObject(ma, pd3dDevice, pd3dCommandList)
 {
 	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -92,7 +115,7 @@ void CPlayer::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 
 void CPlayer::SetPhysController(CPhysx* physx, PxUserControllerHitReport* callback, PxExtendedVec3* pos)
 {
-	m_PlayerController = physx->getCapsuleController(*pos, callback);
+	m_PlayerController = physx->getCapsuleController(*pos, callback, this);
 }
 
 void CPlayer::move()

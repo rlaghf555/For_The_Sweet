@@ -206,7 +206,7 @@ void CRoom::start(const vector<PxVec3>& vectex, const vector<int>& index)
 	// ¼¼ÆÃ
 	room_mode = 0;
 	room_status = 1;
-	timer = 300;
+	timer = MAX_TIMER;
 }
 
 bool CRoom::all_load_complete()

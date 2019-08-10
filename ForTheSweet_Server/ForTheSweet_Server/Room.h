@@ -10,8 +10,11 @@ enum EVENT_TYPE {
 	EV_LOLLIPOP_HEAL,
 	EV_PEPERO_MOVE,
 	EV_CANDY_MOVE,
-	EV_WEAPON, EV_FOG, EV_FEVER, EV_LIGHTNING, EV_SLIME,				// 심판에 해당
-	EV_TIME
+	EV_RFR_WEAPON, EV_RFR_FOG, EV_RFR_FEVER, EV_RFR_LIGHTNING, EV_RFR_SLIME,				// 심판에 해당
+	EV_RFR_FOG_END, EV_RFR_FEVER_END, EV_RFR_LIGHTNING_END,
+	EV_RFR_LIGHTNING_INDEX, EV_RFR_LIGHTNING_DELETE,
+	EV_TIME,
+	EV_END
 };
 
 struct EVENT_ST {
@@ -44,6 +47,11 @@ public:
 	}
 
 	bool operator==(const char ord) { return (order == ord); }
+};
+
+struct Referee {
+	char patern_type = 0;
+	char patern_count = 0;
 };
 
 class CRoom
@@ -80,6 +88,14 @@ public:
 
 	vector<Skill_Actor> m_skillTrigger;
 	char trigger_order;
+
+	// 심판
+	Referee referee;
+	bool fever = false;
+	bool lighting = false;
+	char light_count = 0;
+	char light_index1 = 0;
+	char light_index2 = 0;
 
 public:
 	CRoom();
