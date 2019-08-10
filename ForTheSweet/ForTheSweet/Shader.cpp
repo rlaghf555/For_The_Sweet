@@ -2642,13 +2642,13 @@ int PlayerShadowShader::getAnimIndex()
 	return m_bbObjects[0]->getAnimIndex();
 }
 
-void PlayerShadowShader::Animate(float fTimeElapsed, XMFLOAT3 pos)
+void PlayerShadowShader::Animate(float fTimeElapsed, XMFLOAT3 pos, float jump)
 {
 	if (IsZero(fTimeElapsed))
 		return;
 	for (UINT i = 0; i < m_nObjects; ++i) {
 		if (m_bbObjects[i]) m_bbObjects[i]->Animate(fTimeElapsed);
-		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		XMVECTOR shadowPlane = XMVectorSet(0.0f, 1.0f - jump, 0.0f, 0.0f);
 		XMVECTOR toMainLight = -XMVectorSet(0.5f, -1.0f, 0.4f, 0.0f);
 		XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
 		XMMATRIX shadowoffset = XMMatrixTranslation(pos.x, pos.y, pos.z);
@@ -3007,6 +3007,7 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		CGameObject *effect_object = NULL;
 		effect_object = new CGameObject();
 		m_ppObjects[i] = effect_object;
+		m_ppObjects[i]->nowsprite = i;
 
 		CMesh *pCubeMesh = NULL;
 		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 60, 120, 0);	// pos(x, y), Width(w, h), depth

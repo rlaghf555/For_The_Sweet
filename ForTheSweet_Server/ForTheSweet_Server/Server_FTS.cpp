@@ -2091,8 +2091,8 @@ void process_event(EVENT_ST &ev)
 				patern = EV_RFR_SLIME;	// 12. 컵케이크
 			}
 			else {				// 나머지
-				//patern = (rand() % 3) + Rfr_Start_Num;	// 9. 안개, 10. 피버, 11.번개
-				patern = EV_RFR_FEVER;
+				patern = (rand() % 3) + Rfr_Start_Num;	// 9. 안개, 10. 피버, 11.번개
+				//patern = EV_RFR_FEVER;
 			}
 
 			it->referee.patern_count = count;

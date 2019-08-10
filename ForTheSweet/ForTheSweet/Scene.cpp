@@ -1114,7 +1114,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				XMFLOAT3 Up = m_pPlayer[i]->GetUp();
 				XMFLOAT3 Right = m_pPlayer[i]->GetRight();
 				m_pPlayerShadowShader[i]->getPlayer()->SetWorld(Look, Up, Right);
-				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+				m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->m_Fall.getHeight(fTimeElapsed));
 				
 				if (animindex == Anim_Stun) {	//Anim_Jump
 					m_StunShader[i]->visible = true;
@@ -1127,7 +1127,26 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 
 					m_SkillParticleShader[i][m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
-				}			
+				}
+
+				if (m_pPlayer[i]->GetScaleflag()) {	// 서버에서 받아오는 컵케이크 플래크
+					if (animindex == Anim_Cupckae_Eat) {
+						if (m_pPlayer[i]->getAnimtime() >= 0 && m_pPlayer[i]->getAnimtime() < 20) m_pPlayer[i]->SetScale(1.0f, true);
+						if (m_pPlayer[i]->getAnimtime() >= 20 && m_pPlayer[i]->getAnimtime() < 30) m_pPlayer[i]->SetScale(1.3f, true);
+						if (m_pPlayer[i]->getAnimtime() >= 30 && m_pPlayer[i]->getAnimtime() < 38) m_pPlayer[i]->SetScale(1.7f, true);
+						if (m_pPlayer[i]->getAnimtime() >= 38 && m_pPlayer[i]->getAnimtime() < 40) m_pPlayer[i]->SetScale(2.0f, true);
+					}
+					else {
+						m_pPlayer[i]->SetScale(2.0f, true);
+
+						if (m_pPlayer[i]->Scale_time < 10) m_pPlayer[i]->Scale_time += fTimeElapsed;
+						else {
+							m_pPlayer[i]->SetScaleflag(false);
+							m_pPlayer[i]->Scale_time = 0.f;
+						}
+					}
+				}
+				else m_pPlayer[i]->SetScale(1.f, true);
 
 				if (m_pPlayer[i]->Get_Weapon_grab()) {
 					AnimateWeapon(i);
