@@ -1694,15 +1694,15 @@ void testBox::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList 
 		XMFLOAT3 pos;
 		if (type <= 10)pos = mo->GetPosition();
 		else {
-			if (type == LEFT_DOWN_OUT) pos = XMFLOAT3(-250.f, 10.f, -50.f);
-			if (type == LEFT_DOWN_IN) pos = XMFLOAT3(-250.f, 30.f + 500.f, -70.f);
-			if (type == LEFT_UP_OUT) pos = XMFLOAT3(-250.f, 85.f, 30.f);
-			if (type == LEFT_UP_IN) pos = XMFLOAT3(-250.f, 85.f + 500.f, 20.f);
+			if (type == LEFT_DOWN_OUT) pos = XMFLOAT3(-250.f, 10.f, -40.f);
+			if (type == LEFT_DOWN_IN) pos = XMFLOAT3(-250.f, 30.f + 500.f, -80.f);
+			if (type == LEFT_UP_OUT) pos = XMFLOAT3(-250.f, 85.f, 40.f);
+			if (type == LEFT_UP_IN) pos = XMFLOAT3(-250.f, 85.f + 500.f, 10.f);
 
-			if (type == RIGHT_DOWN_OUT) pos = XMFLOAT3(250.f, 10.f, -50.f);
-			if (type == RIGHT_DOWN_IN) pos = XMFLOAT3(250.f, 30.f + 500.f, -70.f);
-			if (type == RIGHT_UP_OUT) pos = XMFLOAT3(250.f, 85.f, 30.f);
-			if (type == RIGHT_UP_IN) pos = XMFLOAT3(250.f, 85.f + 500.f, 20.f);
+			if (type == RIGHT_DOWN_OUT) pos = XMFLOAT3(250.f, 10.f, -40.f);
+			if (type == RIGHT_DOWN_IN) pos = XMFLOAT3(250.f, 30.f + 500.f, -80.f);
+			if (type == RIGHT_UP_OUT) pos = XMFLOAT3(250.f, 85.f, 40.f);
+			if (type == RIGHT_UP_IN) pos = XMFLOAT3(250.f, 85.f + 500.f, 10.f);
 		}
 		test_Object->SetPosition(pos);
 		m_ppObjects[i] = test_Object;

@@ -1339,25 +1339,69 @@ void CScene::CollisionProcess(int index)
 
 void CScene::Collision_telleport(int index)
 {
-	
+	bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
 	for (int i = 0; i < 8; i++) {
 		door[i]->bounding.Center = door[i]->getObjects()->GetPosition();
+		//bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
+
 		bool result = door[i]->bounding.Intersects(bounding_box_test[index]->bounding);
 		if (result) {
 			//XMFLOAT3 telpos;
 			float tmp = 30.f;
-			if (i == 0) { XMFLOAT3 telpos = door[1]->getObjects()->GetPosition(); telpos.z += tmp;      m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_OUT	
-			else if (i == 1) { XMFLOAT3 telpos = door[0]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_DOWN_IN	
-			else if (i == 2) { XMFLOAT3 telpos = door[3]->getObjects()->GetPosition(); telpos.z += tmp; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_OUT		
-			else if (i == 3) { XMFLOAT3 telpos = door[2]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// LEFT_UP_IN		
+			if (i == 0) {
+				XMFLOAT3 telpos = door[1]->getObjects()->GetPosition(); telpos.z += tmp;
+				physx::PxExtendedVec3 tmp;
+				tmp.x=telpos.x;	tmp.y = telpos.y;tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// LEFT_DOWN_OUT	
+			else if (i == 1) {
+				XMFLOAT3 telpos = door[0]->getObjects()->GetPosition(); telpos.z -= tmp;
+				physx::PxExtendedVec3 tmp;
+				tmp.x = telpos.x;	tmp.y = telpos.y; tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// LEFT_DOWN_IN	
+			else if (i == 2) {
+				XMFLOAT3 telpos = door[3]->getObjects()->GetPosition(); telpos.z += tmp; 
+				physx::PxExtendedVec3 tmp;
+				tmp.x = telpos.x;	tmp.y = telpos.y; tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// LEFT_UP_OUT		
+			else if (i == 3) { 
+				XMFLOAT3 telpos = door[2]->getObjects()->GetPosition(); telpos.z -= tmp;
+				physx::PxExtendedVec3 tmp;
+				tmp.x = telpos.x;	tmp.y = telpos.y; tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// LEFT_UP_IN		
 																						  		
-			else if (i == 4) { XMFLOAT3 telpos = door[5]->getObjects()->GetPosition(); telpos.z += tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_OUT	
-			else if (i == 5) { XMFLOAT3 telpos = door[4]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_DOWN_IN	
-			else if (i == 6) { XMFLOAT3 telpos = door[7]->getObjects()->GetPosition(); telpos.z += tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_OUT	
-			else if (i == 7) { XMFLOAT3 telpos = door[6]->getObjects()->GetPosition(); telpos.z -= tmp; m_pPlayer[index]->SetPosition(telpos);}		// RIGHT_UP_IN		
+			else if (i == 4) {
+				XMFLOAT3 telpos = door[5]->getObjects()->GetPosition(); telpos.z += tmp;
+				physx::PxExtendedVec3 tmp;
+				tmp.x=telpos.x;	tmp.y = telpos.y;tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// RIGHT_DOWN_OUT	
+			else if (i == 5) {
+				XMFLOAT3 telpos = door[4]->getObjects()->GetPosition(); telpos.z -= tmp;
+				physx::PxExtendedVec3 tmp;
+				tmp.x=telpos.x;	tmp.y = telpos.y;tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// RIGHT_DOWN_IN	
+			else if (i == 6) {
+				XMFLOAT3 telpos = door[7]->getObjects()->GetPosition(); telpos.z += tmp;
+				physx::PxExtendedVec3 tmp;
+				tmp.x=telpos.x;	tmp.y = telpos.y;tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// RIGHT_UP_OUT	
+			else if (i == 7) { 
+				XMFLOAT3 telpos = door[6]->getObjects()->GetPosition(); telpos.z -= tmp; physx::PxExtendedVec3 tmp;
+				tmp.x=telpos.x;	tmp.y = telpos.y;tmp.z = telpos.z;
+				m_pPlayer[index]->m_PlayerController->setPosition(tmp);
+			}		// RIGHT_UP_IN		
 			//m_pPlayer[index]->SetPosition(telpos);
 			//return;
-			bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
+			//bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
+			//cout << "door"<<i<<" x:" << door[i]->getObjects()->GetPosition().x << " y:" << door[i]->getObjects()->GetPosition().y << " z:" << door[i]->getObjects()->GetPosition().z << endl;
+			//cout << "player x:" << m_pPlayer[index]->GetPosition().x << " y:" << m_pPlayer[index]->GetPosition().y << " z:" << m_pPlayer[index]->GetPosition().z << endl;
+			break;
 		}
 	}
 }
