@@ -680,6 +680,10 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_MP());	//mp
+		if (My_ID == p_cri_hit.id) {
+			camerashake = true;
+			cout << "카메라 흔들림" << endl;
+		}
 		break;
 	}
 	case SC_STUN:
@@ -2770,11 +2774,11 @@ void CGameFramework::CameraShake()
 {
 	if (camerashake) {
 		CameraShake_Time += m_GameTimer.GetTimeElapsed();
-		if (CameraShake_Time < 0.5) {
-			if (CameraShakeX == -3)
-				CameraShakeX = 3;
+		if (CameraShake_Time < 1) {
+			if (CameraShakeX == -5)
+				CameraShakeX = 5;
 			else
-				CameraShakeX = -3;
+				CameraShakeX = -5;
 		}
 		else {
 			camerashake = false;

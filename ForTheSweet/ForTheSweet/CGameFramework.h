@@ -77,7 +77,7 @@ public:
 	int mode;
 	int CameraShakeX = 0;
 	float CameraShake_Time = 0.f;
-	bool camerashake = true;
+	bool camerashake = false;
 	//마지막으로 마우스 버튼을 클릭할 때의 마우스 커서의 위치이다.
 	POINT m_ptOldCursorPos;
 
