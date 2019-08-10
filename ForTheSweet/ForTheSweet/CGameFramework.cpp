@@ -141,7 +141,6 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 void CGameFramework::OnDestroy()
 {
-	WaitForGpuComplete();
 	if (m_pSocket) m_pSocket->Release();
 	ReleaseObjects();
 	::CloseHandle(m_hFenceEvent);
@@ -3080,8 +3079,7 @@ void CGameFramework::FrameAdvance()
 }
 void CGameFramework::GameOver()
 {
-	state = STATE_GAMEEND;
-	if (m_pPhysx) delete m_pPhysx;
+	*state = STATE_GAMEEND;
 }
 void CGameFramework::OnResizeBackBuffers()
 {

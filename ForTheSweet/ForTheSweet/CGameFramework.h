@@ -33,6 +33,7 @@ public:
 	bool move_actor_flag = false;
 	bool isKing = false;
 
+	int *state;
 	wchar_t *Characters_ID[MAX_USER];
 	// 이동관련 
 	bool move_state[5] = { false, false, false, false, false }; // 상, 하, 좌, 우, shift
