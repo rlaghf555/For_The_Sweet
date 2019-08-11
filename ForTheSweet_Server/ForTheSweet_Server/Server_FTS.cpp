@@ -664,6 +664,7 @@ void process_packet(char key, char *buffer)
 	case CS_UPDATE_ROOM:
 	{
 		cout << "Update Room\n";
+		cout << gRoom.size() << endl;
 		int count = 0;
 
 		room_l.lock();
@@ -818,9 +819,10 @@ void process_packet(char key, char *buffer)
 
 		cout << "Old Slot : " << int(oldslot) << endl;
 
-		for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
+		int start = 0;
+		if (oldslot < 4 && oldslot >= 0) start += 4;
+		for (int i = start; i < start + (MAX_ROOM_USER / 2); ++i)
 		{
-			if (oldslot < 4 && oldslot >= 0) i += 4;
 			if (it->clientNum[i] == -1) {
 				newslot = i;
 				break;
@@ -834,6 +836,10 @@ void process_packet(char key, char *buffer)
 		if (newslot != -1)
 		{
 			clients[key].slot = newslot;
+			if (it->host_num == oldslot) {
+				it->host_num = newslot;
+				host = 1;
+			}
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int client_id = it->clientNum[i];
@@ -842,7 +848,6 @@ void process_packet(char key, char *buffer)
 					if (clients[client_id].connected == true)
 					{
 						send_room_detail_delete_packet(client_id, oldslot);
-						if (i == it->host_num) host = 1;
 						send_room_datail_info_packet(client_id, key, newslot, room_num, room_mode, host);
 					}
 				}
@@ -872,6 +877,7 @@ void process_packet(char key, char *buffer)
 		{
 			if (it->current_num == 1)
 			{
+				cout << "방 지워썽요\n";
 				room_l.lock();
 				gRoom.erase(it);
 				room_l.unlock();
@@ -929,6 +935,24 @@ void process_packet(char key, char *buffer)
 			}
 			it->current_num -= 1;
 		}
+
+		// EXIT 후 로비에서 받을 방들의 정보 Send
+		int count = 0;
+
+		room_l.lock();
+		cout << gRoom.size() << endl;
+		for (auto it = gRoom.begin(); it != gRoom.end(); ++it)
+		{
+			if (count < 6)
+			{
+				send_room_info_packet(key, *it, count);
+				count++;
+			}
+			else {
+				break;
+			}
+		}
+		room_l.unlock();
 
 		//for (int i = 0; i < MAX_ROOM_USER; ++i)
 		//{
