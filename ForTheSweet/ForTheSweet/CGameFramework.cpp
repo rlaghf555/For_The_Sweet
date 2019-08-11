@@ -1672,6 +1672,38 @@ void CGameFramework::ProcessInput()
 				m_pPhysx->m_Scene->unlockWrite();
 			}
 		}
+		if (selected_map == M_Map_3)
+		{
+			if (playing)
+			{
+				if (move_actor_flag == true) {
+					m_pPhysx->m_Scene->lockWrite();
+					PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
+					pos.p.x += 0.5f;
+					if (pos.p.x > 120.f) {
+						move_actor_flag = false;
+					}
+					m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
+
+					XMFLOAT3 pos1(pos.p.x, pos.p.y, pos.p.z);
+					m_pScene->m_MapShader[15]->getObjects()->SetPosition(pos1);
+					m_pPhysx->m_Scene->unlockWrite();
+				}
+				else {
+					m_pPhysx->m_Scene->lockWrite();
+					PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
+					pos.p.x -= 0.5f;
+					if (pos.p.x < -120.f) {
+						move_actor_flag = true;
+					}
+					m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
+
+					XMFLOAT3 pos1(pos.p.x, pos.p.y, pos.p.z);
+					m_pScene->m_MapShader[15]->getObjects()->SetPosition(pos1);
+					m_pPhysx->m_Scene->unlockWrite();
+				}
+			}
+		}
 		else if (selected_map == M_Map_3)
 		{
 			//if (move_actor_flag == true)

@@ -2717,16 +2717,38 @@ void clientInputProcess(int room_num)
 	auto it = find(gRoom.begin(), gRoom.end(), room_num);
 	room_l.unlock();
 
-	if (it->move_actor_flag == true)
+	if (it->room_map == MAP_Wehas)
 	{
-		PxTransform pos = it->move_actor->getGlobalPose();
-		pos.p.y += 25.f * gGameTimer.GetTimeElapsed();
-		if (pos.p.y > 0.0f) {
-			pos.p.y = 0.0f;
-			it->move_actor_flag = false;
-		}
+		if (it->move_actor_flag == true)
+		{
+			PxTransform pos = it->move_actor->getGlobalPose();
+			pos.p.y += 25.f * gGameTimer.GetTimeElapsed();
+			if (pos.p.y > 0.0f) {
+				pos.p.y = 0.0f;
+				it->move_actor_flag = false;
+			}
 
-		it->move_actor->setGlobalPose(PxTransform(pos));
+			it->move_actor->setGlobalPose(PxTransform(pos));
+		}
+	}
+	else if (it->room_map == MAP_Cake)
+	{
+		if (it->move_actor_flag == true) {
+			PxTransform pos = it->move_actor->getGlobalPose();
+			pos.p.x += 0.5f;
+			if (pos.p.x > 120.0f) {
+				it->move_actor_flag = false;
+			}
+			it->move_actor->setGlobalPose(PxTransform(pos));
+		}
+		else {
+			PxTransform pos = it->move_actor->getGlobalPose();
+			pos.p.x -= 0.5f;
+			if (pos.p.x < -120.0f) {
+				it->move_actor_flag = true;
+			}
+			it->move_actor->setGlobalPose(PxTransform(pos));
+		}
 	}
 
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
@@ -3147,6 +3169,9 @@ void logic()
 				add_timer(it->room_num, it->room_num + ROOM_TIMER_START, EV_TIME, high_resolution_clock::now() + 5s, 0);
 
 				cout << it->room_num << " Room Start Game\n";
+
+				if (it->room_mode == MAP_Cake)
+					it->move_actor_flag = true;
 				it->room_status = 3;
 			}
 			else if (it->room_status == ROOM_ST_PLAYING)

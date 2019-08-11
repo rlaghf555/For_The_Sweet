@@ -35,11 +35,6 @@ PxControllerBehaviorFlags CPlayer::getBehaviorFlags(const PxShape& shape, const 
 {
 	if (actor.userData == (void *)(int)1)
 	{
-		//cout << "~~\n";
-		//PxExtendedVec3 pos = m_PlayerController->getPosition();
-		//pos.y += 0.5f;
-		//m_PlayerController->setPosition(pos);
-
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 	return PxControllerBehaviorFlags(0);

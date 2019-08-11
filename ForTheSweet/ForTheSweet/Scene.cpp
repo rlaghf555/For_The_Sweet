@@ -1304,9 +1304,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 		//m_MapShader[2]->Animate(fTimeElapsed, animate_flag);
 	}
-	if (Selected_Map == M_Map_3) {
-		m_MapShader[15]->Animate(fTimeElapsed, animate_flag);
-	}
+	//if (Selected_Map == M_Map_3) {
+	//	m_MapShader[15]->Animate(fTimeElapsed, animate_flag);
+	//}
 
 	m_WavesShader->Animate(fTimeElapsed, Selected_Map);
 	if (m_DarkShader) m_DarkShader->Animate(fTimeElapsed);

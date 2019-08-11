@@ -928,8 +928,11 @@ void CModelShader::BuildPhysx(CPhysx * physx)
 
 	if (maptype == M_Map_1_macaron_1) {
 		physx->move_actor = m_Actor;
-		physx->move_actor->userData = (void *)(int)100;
-		cout << "asdfasdfasdf" << endl;
+		physx->move_actor->userData = (void *)(int)1;
+	}
+	if (maptype == M_Map_1_macaron_3) {
+		physx->move_actor = m_Actor;
+		physx->move_actor->userData = (void *)(int)1;
 	}
 }
 
