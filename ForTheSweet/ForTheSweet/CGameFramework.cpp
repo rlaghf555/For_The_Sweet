@@ -2,8 +2,12 @@
 #include "CGameFramework.h"
 
 XMFLOAT3 LightningInitPos[10] = {
-   XMFLOAT3(-100.f, 100.f, 100.f), XMFLOAT3(-120.f, 100.f, 110.f), XMFLOAT3(60.f, 100.f, 110.f), XMFLOAT3(180.f, 100.f, 110.f), XMFLOAT3(-150.f, 100.f, 0.f),
-   XMFLOAT3(90.f, 100.f, 0.f), XMFLOAT3(-240.f, 100.f, -110.f), XMFLOAT3(-120.f, 100.f, -110.f), XMFLOAT3(60.f, 100.f, -110.f), XMFLOAT3(180.f, 100.f, -110.f)
+   XMFLOAT3(-100.f, 200.f, 100.f), XMFLOAT3(-120.f, 200.f, 110.f), XMFLOAT3(60.f, 200.f, 110.f), XMFLOAT3(180.f, 200.f, 110.f), XMFLOAT3(-150.f, 200.f, 0.f),
+   XMFLOAT3(90.f, 200.f, 0.f), XMFLOAT3(-240.f, 200.f, -110.f), XMFLOAT3(-120.f, 200.f, -110.f), XMFLOAT3(60.f, 200.f, -110.f), XMFLOAT3(180.f, 200.f, -110.f)
+};
+XMFLOAT3 LightningInitPos_Map3[8] = {
+	XMFLOAT3(-120, 201.31468, 53),XMFLOAT3(120, 201.31468, 53),XMFLOAT3(-134, 201.31468, -122),XMFLOAT3(134 , 201.31468, -122),
+	XMFLOAT3(-368, 201.31468, -132),XMFLOAT3(368, 201.31468,-132),XMFLOAT3(-248, 276.6323,-32),XMFLOAT3(248, 276.6323,-32)
 };
 
 char * ConvertWCtoC(wchar_t* str)
@@ -2935,7 +2939,7 @@ void CGameFramework::CollisionProcess()
 
 					if (selected_map == M_Map_3) {
 						if (SERVER_ON) {
-							if (teletimecheck < 0.5f) {
+							if (teletimecheck < 0.2f) {
 								teletimecheck += m_GameTimer.GetTimeElapsed();
 							}
 							else {
@@ -2952,7 +2956,7 @@ void CGameFramework::CollisionProcess()
 									//cout << "tele index : " << result;
 
 									send(m_pSocket->clientSocket, (char *)&p_tele, sizeof(cs_packet_teleport), 0);
-									teletimecheck = -1.f;
+									teletimecheck = -0.3f;
 
 								}
 							}

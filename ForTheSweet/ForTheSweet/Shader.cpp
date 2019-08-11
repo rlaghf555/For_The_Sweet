@@ -3048,7 +3048,7 @@ void EffectShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		m_ppObjects[i]->nowsprite = i;
 
 		CMesh *pCubeMesh = NULL;
-		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 60, 120, 0);	// pos(x, y), Width(w, h), depth
+		pCubeMesh = new CreateQuad(pd3dDevice, pd3dCommandList, 0, 0, 60, 240, 0);	// pos(x, y), Width(w, h), depth
 		m_ppObjects[i]->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 
