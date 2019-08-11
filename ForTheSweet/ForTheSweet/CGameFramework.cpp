@@ -1102,16 +1102,67 @@ void CGameFramework::processPacket(char *ptr)
 	}
 	case SC_WIN:
 	{
-		m_pScene->m_MessageShader->ShowMessage(MESSAGE_CUPCAKE);
+		m_pScene->m_ppUIShaders[20]->ShowMessage(true);
+		if (mode == MODE_INDIVIDUAL) {			
+				m_pScene->m_pPlayer[My_ID]->ChangeAnimation(Anim_Victory);
+				m_pScene->m_pPlayer[My_ID]->EnableLoop();			
+		}
+		else if (mode == MODE_TEAM || mode == MODE_KING) {			
+				if (My_ID < 4) {
+					for (int i = 0; i < 4; i++)
+						if (m_pScene->m_pPlayer[i]->GetConnected())
+							if (m_pScene->m_pPlayer[i]->Get_HP() > 0) {
+								m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Victory);
+								m_pScene->m_pPlayer[i]->EnableLoop();
+							}
+				}
+				else {
+					for (int i = 4; i < MAX_USER; i++)
+						if (m_pScene->m_pPlayer[i]->GetConnected())
+							if (m_pScene->m_pPlayer[i]->Get_HP() > 0) {
+								m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Victory);
+								m_pScene->m_pPlayer[i]->EnableLoop();
+							}
+				}			
+		}
 		break;
 	}
 	case SC_LOSE:
 	{
-		m_pScene->m_MessageShader->ShowMessage(MESSAGE_CUPCAKE);
+		m_pScene->m_ppUIShaders[20]->ShowMessage(false);
+		if (mode == MODE_INDIVIDUAL) {
+			for (int i = 0; i < MAX_USER; i++) {
+				if (m_pScene->m_pPlayer[i]->GetConnected())
+					if (m_pScene->m_pPlayer[i]->Get_HP() > 0) {
+						m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Victory);
+						m_pScene->m_pPlayer[i]->EnableLoop();
+						break;
+					}
+			}
+		}
+		else if (mode == MODE_TEAM || mode == MODE_KING) {
+			if (My_ID < 4) {
+				for (int i = 4; i < MAX_USER; i++)
+					if (m_pScene->m_pPlayer[i]->GetConnected())
+						if (m_pScene->m_pPlayer[i]->Get_HP() > 0) {
+							m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Victory);
+							m_pScene->m_pPlayer[i]->EnableLoop();
+						}
+			}
+			else {
+				for (int i = 0; i < 4; i++)
+					if (m_pScene->m_pPlayer[i]->GetConnected())
+						if (m_pScene->m_pPlayer[i]->Get_HP() > 0) {
+							m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Victory);
+							m_pScene->m_pPlayer[i]->EnableLoop();
+						}
+			}
+		}
 		break;
 	}
 	case SC_END:
 	{
+		GameOver();
 		break;
 	}
 	default:
