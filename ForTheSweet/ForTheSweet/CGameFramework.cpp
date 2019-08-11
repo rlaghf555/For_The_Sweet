@@ -2789,14 +2789,13 @@ void CGameFramework::CollisionProcess()
 						m_pScene->CollisionProcess(My_ID);
 
 					if (selected_map == M_Map_3) {
-						m_pScene->Collision_telleport(My_ID);	// ¿”Ω√
-						XMFLOAT3 position;
-						position.x = m_pPlayer->GetPosition().x;
-						position.y = m_pPlayer->GetPosition().y;
-						position.z = m_pPlayer->GetPosition().z;
-
-						m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
-						m_pCamera->SetLookAt(position);
+						if (SERVER_ON) {
+							int result = m_pScene->Collision_telleport_Server(My_ID);
+							//-1 æ»∫ŒµÛ»˚
+						}
+						else 
+							m_pScene->Collision_telleport(My_ID);	// ¿”Ω√
+						
 					}
 				}
 			}

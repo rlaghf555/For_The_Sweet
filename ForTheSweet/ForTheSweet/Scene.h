@@ -27,6 +27,7 @@ public:
 	void AnimateWeapon(int i);
 	void CollisionProcess(int index);
 	void Collision_telleport(int index);
+	int Collision_telleport_Server(int index);
 	void Collision_Cotton();
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	void RenderUI(ID3D12Device * pDevice, ID3D12GraphicsCommandList * pCommandList);

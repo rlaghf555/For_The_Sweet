@@ -1200,9 +1200,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (m_pPlayer[i]) {
-			if (m_pPlayer[i]->GetConnected()) {
-				if (m_pPlayer[i]->Get_HP() > 0)
-				{
+			if (m_pPlayer[i]->GetConnected()) {			
 					int animindex = m_pPlayer[i]->getAnimIndex();
 					m_pPlayerShader[i]->Animate(fTimeElapsed);
 					if (animindex != m_pPlayerShadowShader[i]->getAnimIndex()) {
@@ -1240,11 +1238,12 @@ void CScene::AnimateObjects(float fTimeElapsed)
 						m_pPlayerShadowShader[i]->getPlayer()->SetScale(2.0f, true);
 					}
 
-					//f (m_pPlayer[i]->Get_HP() <= 0 && animindex == Anim_Death && m_pPlayer[i]->getAnimtime() >= 39) {
-					//	m_pPlayer[i]->ChangeAnimation(Anim_Death);
-					//	m_pPlayer[i]->SetAnimFrame(39);
-					//	m_pPlayer[i]->DisableLoop();
-					//
+
+					if (m_pPlayer[i]->Get_HP() <= 0 && animindex == Anim_Death && m_pPlayer[i]->getAnimtime() >= 37) {
+						m_pPlayer[i]->ChangeAnimation(Anim_Death);
+						m_pPlayer[i]->SetAnimFrame(37);
+						m_pPlayer[i]->DisableLoop();
+					}					
 
 					if (m_pPlayer[i]->Get_Weapon_grab()) {
 						AnimateWeapon(i);
@@ -1260,7 +1259,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_TeamShader->getObject(i)->SetPosition(tmp);
 					m_EnemyShader->getObject(i)->SetPosition(tmp);
 				}
-			}
+		
 		}
 	}
 	for (int i = 0; i < MAX_USER; i++) {
@@ -1497,6 +1496,21 @@ void CScene::Collision_telleport(int index)
 			//cout << "player x:" << m_pPlayer[index]->GetPosition().x << " y:" << m_pPlayer[index]->GetPosition().y << " z:" << m_pPlayer[index]->GetPosition().z << endl;
 			break;
 		}
+	}
+}
+
+int CScene::Collision_telleport_Server(int index)
+{
+	bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
+	for (int i = 0; i < 8; i++) {
+		door[i]->bounding.Center = door[i]->getObjects()->GetPosition();
+		bounding_box_test[index]->bounding.Center = m_pPlayer[index]->GetPosition();
+		bool result = door[i]->bounding.Intersects(bounding_box_test[index]->bounding);
+		if (result) {
+			return i;
+		}
+		else
+			return -1;
 	}
 }
 
