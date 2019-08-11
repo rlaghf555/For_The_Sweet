@@ -485,6 +485,30 @@ void send_king_off_packet(char client_id, char king) {
 	sendPacket(client_id, &p_king_off);
 }
 
+void send_win_packet(char client_id) {
+	sc_packet_win_lose_end p_win;
+	p_win.type = SC_WIN;
+	p_win.size = sizeof(sc_packet_win_lose_end);
+
+	sendPacket(client_id, &p_win);
+}
+
+void send_lose_packet(char client_id) {
+	sc_packet_win_lose_end p_lose;
+	p_lose.type = SC_LOSE;
+	p_lose.size = sizeof(sc_packet_win_lose_end);
+
+	sendPacket(client_id, &p_lose);
+}
+
+void send_end_packet(char client_id) {
+	sc_packet_win_lose_end p_end;
+	p_end.type = SC_END;
+	p_end.size = sizeof(sc_packet_win_lose_end);
+
+	sendPacket(client_id, &p_end);
+}
+
 void send_room_setting_weapon(int room_num)
 {
 	room_l.lock();
@@ -786,7 +810,7 @@ void process_packet(char key, char *buffer)
 
 						it->weapon_list[type][j].empty = false;
 						it->weapon_list[type][j].owner = -1;
-						if(it->room_map == MAP_Wehas)
+						if (it->room_map == MAP_Wehas)
 							it->weapon_list[type][j].pos = WeaponInitPos_1[i];
 						//if (it->room_map == MAP_Oreo)
 						//	it->weapon_list[type][j].pos = WeaponInitPos_2[i];
@@ -812,14 +836,15 @@ void process_packet(char key, char *buffer)
 					// 자신을 제외한 다른 클라도 게임 업로드 시작하도록 packet send
 					send_start_load_room_packet(client_id);
 
+					// Player Basic Setting
 					clients[client_id].playerinfo = new CPlayer();
 
 					if (it->room_map == MAP_Wehas)
 						clients[client_id].playerinfo->setPosition(PlayerInitPos_1[slot]);
 					if (it->room_map == MAP_Oreo)
 						clients[client_id].playerinfo->setPosition(PlayerInitPos_2[slot]);
-					//if (it->room_map == MAP_Cake)
-					//	clients[client_id].playerinfo->setPosition(PlayerInitPos_3[slot]);
+					if (it->room_map == MAP_Cake)
+						clients[client_id].playerinfo->setPosition(PlayerInitPos_3[slot]);
 					clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 					clients[client_id].playerinfo->setLook(PxVec3(0, 0, 1));
 					clients[client_id].playerinfo->setDashed(false);
@@ -829,6 +854,12 @@ void process_packet(char key, char *buffer)
 					clients[client_id].playerinfo->setTrigger(it->m_pPhysx);
 					it->m_pPhysx->m_Scene->unlockWrite();
 					it->m_pPhysx->registerPlayer(clients[client_id].playerinfo, slot);
+
+					// Player Team/King Setting
+					if (it->room_mode == ROOM_MODE_KING || it->room_mode == ROOM_MODE_TEAM)
+					{
+						it->team_dead[slot] = true;
+					}
 				}
 			}
 		}
@@ -2012,7 +2043,7 @@ void process_event(EVENT_ST &ev)
 						//	pos = WeaponInitPos_2[i];
 						if (it->room_map == MAP_Cake)
 							pos = WeaponInitPos_3[i];
-						
+
 
 						it->weapon_respawn[i].index = index;
 						it->weapon_list[type][j].empty = false;
@@ -2184,7 +2215,7 @@ void process_event(EVENT_ST &ev)
 				int index2 = 5;
 				PxVec3 pos1;
 				PxVec3 pos2;
-				
+
 				if (it->room_map == MAP_Wehas || it->room_map == MAP_Oreo)
 				{
 					pos1 = LightningInitPos_12[index1];
@@ -2553,27 +2584,40 @@ void clientUpdateProcess(int room_num)
 
 							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 660ms);
 
-							int hp = clients[client_id].playerinfo->m_hp - 10;
-							if (hp <= 0) {
-								hp = 0;
-								clients[client_id].playerinfo->setAniIndex(Anim::Death);
-								clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
-								clients[client_id].playerinfo->m_PlayerController->release();
-								clients[client_id].playerinfo->m_PlayerController = nullptr;
-							}
-							else {
-								clients[client_id].playerinfo->setAniIndex(Anim::Small_React);
-							}
-							clients[client_id].playerinfo->setHP(hp);
+							int hp = clients[client_id].playerinfo->m_hp;
+							if (hp > 0) {
+								hp -= 10;
+								if (hp <= 0) {
+									hp = 0;
+									clients[client_id].playerinfo->setAniIndex(Anim::Death);
+									clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
+									clients[client_id].playerinfo->m_PlayerController->release();
+									clients[client_id].playerinfo->m_PlayerController = nullptr;
 
-							for (int j = 0; j < MAX_ROOM_USER; ++j)
-							{
-								int client_id2 = it->clientNum[j];
-								if (client_id2 != -1)
-								{
-									if (clients[client_id2].connected == true)
+									if (it->room_mode == ROOM_MODE_SOLO)
 									{
-										send_hit_packet(client_id2, client_id, hp);
+										it->solo_dead_count += 1;
+									}
+									else if (it->room_mode == ROOM_MODE_TEAM || it->room_mode == ROOM_MODE_KING)
+									{
+										char slot = clients[client_id].slot;
+										it->team_dead[slot] = false;
+									}
+								}
+								else {
+									clients[client_id].playerinfo->setAniIndex(Anim::Small_React);
+								}
+								clients[client_id].playerinfo->setHP(hp);
+
+								for (int j = 0; j < MAX_ROOM_USER; ++j)
+								{
+									int client_id2 = it->clientNum[j];
+									if (client_id2 != -1)
+									{
+										if (clients[client_id2].connected == true)
+										{
+											send_hit_packet(client_id2, client_id, hp);
+										}
 									}
 								}
 							}
@@ -2582,29 +2626,42 @@ void clientUpdateProcess(int room_num)
 
 							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 2000ms);
 
-							int hp = clients[client_id].playerinfo->m_hp - 20;
-							if (hp <= 0) {
-								hp = 0;
-								clients[client_id].playerinfo->setAniIndex(Anim::Death);
-								clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
-								clients[client_id].playerinfo->m_PlayerController->release();
-								clients[client_id].playerinfo->m_PlayerController = nullptr;
-							}
-							else {
-								clients[client_id].playerinfo->setAniIndex(Anim::Hard_React);
-							}
-							clients[client_id].playerinfo->setHP(hp);
+							int hp = clients[client_id].playerinfo->m_hp;
+							if (hp > 0) {
+								hp -= 20;
+								if (hp <= 0) {
+									hp = 0;
+									clients[client_id].playerinfo->setAniIndex(Anim::Death);
+									clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
+									clients[client_id].playerinfo->m_PlayerController->release();
+									clients[client_id].playerinfo->m_PlayerController = nullptr;
 
-							PxVec3 dir = clients[client_id].playerinfo->m_Knockback;
-
-							for (int j = 0; j < MAX_ROOM_USER; ++j)
-							{
-								int client_id2 = it->clientNum[j];
-								if (client_id2 != -1)
-								{
-									if (clients[client_id2].connected == true)
+									if (it->room_mode == ROOM_MODE_SOLO)
 									{
-										send_critical_hit_packet(client_id2, client_id, hp, dir);
+										it->solo_dead_count += 1;
+									}
+									else if (it->room_mode == ROOM_MODE_TEAM || it->room_mode == ROOM_MODE_KING)
+									{
+										char slot = clients[client_id].slot;
+										it->team_dead[slot] = false;
+									}
+								}
+								else {
+									clients[client_id].playerinfo->setAniIndex(Anim::Hard_React);
+								}
+								clients[client_id].playerinfo->setHP(hp);
+
+								PxVec3 dir = clients[client_id].playerinfo->m_Knockback;
+
+								for (int j = 0; j < MAX_ROOM_USER; ++j)
+								{
+									int client_id2 = it->clientNum[j];
+									if (client_id2 != -1)
+									{
+										if (clients[client_id2].connected == true)
+										{
+											send_critical_hit_packet(client_id2, client_id, hp, dir);
+										}
 									}
 								}
 							}
@@ -2614,27 +2671,40 @@ void clientUpdateProcess(int room_num)
 
 							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 1330ms);
 
-							int hp = clients[client_id].playerinfo->m_hp - 2;
-							if (hp <= 0) {
-								hp = 0;
-								clients[client_id].playerinfo->setAniIndex(Anim::Death);
-								clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
-								clients[client_id].playerinfo->m_PlayerController->release();
-								clients[client_id].playerinfo->m_PlayerController = nullptr;
-							}
-							else {
-								clients[client_id].playerinfo->setAniIndex(Anim::Stun);
-							}
-							clients[client_id].playerinfo->setHP(hp);
+							int hp = clients[client_id].playerinfo->m_hp;
+							if (hp > 0) {
+								hp -= 10;
+								if (hp <= 0) {
+									hp = 0;
+									clients[client_id].playerinfo->setAniIndex(Anim::Death);
+									clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
+									clients[client_id].playerinfo->m_PlayerController->release();
+									clients[client_id].playerinfo->m_PlayerController = nullptr;
 
-							for (int j = 0; j < MAX_ROOM_USER; ++j)
-							{
-								int client_id2 = it->clientNum[j];
-								if (client_id2 != -1)
-								{
-									if (clients[client_id2].connected == true)
+									if (it->room_mode == ROOM_MODE_SOLO)
 									{
-										send_stun_packet(client_id2, client_id, hp);
+										it->solo_dead_count += 1;
+									}
+									else if (it->room_mode == ROOM_MODE_TEAM || it->room_mode == ROOM_MODE_KING)
+									{
+										char slot = clients[client_id].slot;
+										it->team_dead[slot] = false;
+									}
+								}
+								else {
+									clients[client_id].playerinfo->setAniIndex(Anim::Stun);
+								}
+								clients[client_id].playerinfo->setHP(hp);
+
+								for (int j = 0; j < MAX_ROOM_USER; ++j)
+								{
+									int client_id2 = it->clientNum[j];
+									if (client_id2 != -1)
+									{
+										if (clients[client_id2].connected == true)
+										{
+											send_stun_packet(client_id2, client_id, hp);
+										}
 									}
 								}
 							}
@@ -2707,11 +2777,11 @@ void logic()
 		gGameTimer.Tick(60.0f);
 		for (auto it = gRoom.begin(); it != gRoom.end(); ++it)
 		{
-			if (it->room_status == 0)
+			if (it->room_status == ROOM_ST_WAITING)
 			{
 				continue;
 			}
-			else if (it->room_status == 1)
+			else if (it->room_status == ROOM_ST_LOADING)
 			{
 				bool result = it->all_load_complete();
 
@@ -2726,7 +2796,7 @@ void logic()
 					continue;
 				}
 			}
-			else if (it->room_status == 2)
+			else if (it->room_status == ROOM_ST_LOADING_COMPLETE)
 			{
 				bool result = it->all_setting_complete();
 
@@ -2736,22 +2806,84 @@ void logic()
 
 				it->room_status = 3;
 			}
-			else if (it->room_status == 3)
+			else if (it->room_status == ROOM_ST_PLAYING)
 			{
-				clientInputProcess(it->room_num);
-
-				it->m_pPhysx->m_Scene->simulate(1.f / 60.f);
-				it->m_pPhysx->m_Scene->fetchResults(true);
-
-				clientUpdateProcess(it->room_num);
-
-				it->PosBroadCastTime += 1.f / 60.f;
-				if (it->PosBroadCastTime > 0.05f)
-				{
-					int room_num = it->room_num;
-					broadcastPosPacket(room_num);
-					it->PosBroadCastTime = 0.0f;
+				bool is_end = it->is_game_end();
+				if (is_end) {
+					if (it->room_mode == ROOM_MODE_SOLO)
+					{
+						for (int i = 0; i < MAX_ROOM_USER; ++i)
+						{
+							int client_id = it->clientNum[i];
+							if (client_id != -1)
+							{
+								if (clients[client_id].connected == true)
+								{
+									if (clients[client_id].playerinfo->m_hp > 0)
+									{
+										send_win_packet(client_id);
+									}
+									else
+									{
+										send_lose_packet(client_id);
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						bool win_team = it->team_victory;			// true : 1팀 우승, false : 2팀 우승
+						for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
+						{
+							int winner, loser;
+							if (win_team == true) {
+								winner = it->clientNum[i];
+								loser = it->clientNum[i + 4];
+							}
+							else {
+								winner = it->clientNum[i + 4];
+								loser = it->clientNum[i];
+							}
+							if (winner != -1)
+							{
+								if (clients[winner].connected == true)
+								{
+									send_win_packet(winner);
+								}
+							}
+							if (loser != -1)
+							{
+								if (clients[loser].connected == true)
+								{
+									send_lose_packet(loser);
+								}
+							}
+						}
+					}
+					cout << "END~~~~~~~~~~~~~~~~~~~~~~~~\n";
+					it->room_status = ROOM_ST_END;
 				}
+				else {
+					clientInputProcess(it->room_num);
+
+					it->m_pPhysx->m_Scene->simulate(1.f / 60.f);
+					it->m_pPhysx->m_Scene->fetchResults(true);
+
+					clientUpdateProcess(it->room_num);
+
+					it->PosBroadCastTime += 1.f / 60.f;
+					if (it->PosBroadCastTime > 0.05f)
+					{
+						int room_num = it->room_num;
+						broadcastPosPacket(room_num);
+						it->PosBroadCastTime = 0.0f;
+					}
+				}
+			}
+			else if (it->room_status == ROOM_ST_END)
+			{
+				continue;
 			}
 		}
 	}

@@ -38,10 +38,16 @@ constexpr int MAX_ROOM_NAME_LEN = 10;
 constexpr int MAX_ROOM_USER = 8;
 
 constexpr int ROOM_MODE_TEAM = 0;
-constexpr int ROOM_MODE_INDIVIDUAL = 1;
-constexpr int ROOM_MOVE_KING = 2;
+constexpr int ROOM_MODE_SOLO = 1;
+constexpr int ROOM_MODE_KING = 2;
 
 constexpr int ROOM_TIMER_START = 1000;
+
+constexpr int ROOM_ST_WAITING = 0;
+constexpr int ROOM_ST_LOADING = 1;
+constexpr int ROOM_ST_LOADING_COMPLETE = 2;
+constexpr int ROOM_ST_PLAYING = 3;
+constexpr int ROOM_ST_END = 4;
 
 // MAP
 constexpr int MAP_Wehas = 0;

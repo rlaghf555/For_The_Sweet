@@ -1100,6 +1100,20 @@ void CGameFramework::processPacket(char *ptr)
 		m_pPhysx->m_Scene->unlockWrite();
 		break;
 	}
+	case SC_WIN:
+	{
+		m_pScene->m_MessageShader->ShowMessage(MESSAGE_CUPCAKE);
+		break;
+	}
+	case SC_LOSE:
+	{
+		m_pScene->m_MessageShader->ShowMessage(MESSAGE_CUPCAKE);
+		break;
+	}
+	case SC_END:
+	{
+		break;
+	}
 	default:
 	{
 		cout << "알수 없는 패킷 type : " << int(ptr[1]) << endl;

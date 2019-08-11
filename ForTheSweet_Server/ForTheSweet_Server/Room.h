@@ -69,7 +69,7 @@ public:
 	char room_mode;					// 0 : 팀전, 1 : 개인전, 2 : 대장전
 	char room_map;
 
-	char room_status;				// 방 상태 (대기 = 0, 게임 로딩 = 1, 게임 중 = 2)
+	char room_status;				// 방 상태 (대기 = 0, 게임 로딩 = 1, 게임 로딩완료 = 2, 게임 중 = 3, 게임 끝 = 4)
 
 	CPhysx *m_pPhysx;
 
@@ -100,6 +100,10 @@ public:
 	char light_index1 = 0;
 	char light_index2 = 0;
 
+	char solo_dead_count = 0;												// 개인전에 사용
+	bool team_dead[8] = { false, false, false, false, false, false, false };	// 팀전에 사용(false : 없는 플레이어, true : 있는 플레이어)
+	bool team_victory = false;												// true: 1팀 우승, false : 2팀 우승
+
 public:
 	CRoom();
 	CRoom(const CRoom &);
@@ -109,6 +113,7 @@ public:
 	bool operator==(const int num) { return (num == room_num); }
 	bool all_load_complete();
 	bool all_setting_complete();
+	bool is_game_end();
 	~CRoom();
 };
 
