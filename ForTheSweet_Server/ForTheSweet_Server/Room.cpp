@@ -78,6 +78,47 @@ CRoom::CRoom(const CRoom& other) {
 	}
 }
 
+CRoom& CRoom::operator=(const CRoom& other)
+{
+	room_num = other.room_num;
+	strcpy_s(name, _countof(name), other.name);
+
+	current_num = other.current_num;
+	max_num = other.max_num;
+	host_num = other.host_num;
+	room_mode = other.room_mode;
+	room_status = other.room_status;
+	room_map = other.room_map;
+
+	PosBroadCastTime = other.PosBroadCastTime;
+
+	trigger_order = other.trigger_order;
+
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		clientNum[i] = other.clientNum[i];
+		load_complete[i] = other.load_complete[i];
+		setting_complete[i] = other.setting_complete[i];
+	}
+
+	for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i)
+	{
+		weapon_respawn[i].respawn_able = other.weapon_respawn[i].respawn_able;
+		weapon_respawn[i].type = other.weapon_respawn[i].type;
+		weapon_respawn[i].index = other.weapon_respawn[i].index;
+	}
+
+	for (int i = 0; i < MAX_WEAPON_TYPE; ++i)
+	{
+		for (int j = 0; j < MAX_WEAPON_NUM; ++j)
+		{
+			weapon_list[i][j] = other.weapon_list[i][j];
+		}
+	}
+
+	return *this;
+}
+
 void CRoom::init(char *nm, int hostId, int roomNum)
 {
 	strcpy_s(name, _countof(name), nm);

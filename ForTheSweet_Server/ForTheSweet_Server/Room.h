@@ -107,6 +107,7 @@ public:
 public:
 	CRoom();
 	CRoom(const CRoom &);
+	CRoom& operator=(const CRoom& other);
 	void init(char *nm, int hostId, int roomNum);
 	bool attend(int Num);
 	void start(int map_type, const vector<vector<PxVec3>>& vectex, const vector<vector<int>>& index);

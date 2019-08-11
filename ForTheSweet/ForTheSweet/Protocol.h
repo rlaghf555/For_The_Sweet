@@ -31,6 +31,8 @@ constexpr int CS_LOAD_COMPLETE = 104;
 constexpr int CS_UPDATE_ROOM = 105;
 constexpr int CS_SETTING_COMPLETE = 106;
 constexpr int CS_OPTION_ROOM = 107;
+constexpr int CS_TEAM_CHANGE_ROOM = 108;
+constexpr int CS_ROOM_EXIT = 109;
 
 constexpr int SC_LOGIN = 1;
 constexpr int SC_POS = 2;
@@ -69,6 +71,7 @@ constexpr int SC_ROOM_DETAIL_INFO = 101;
 constexpr int SC_ROOM_LOAD = 102;
 constexpr int SC_ROOM_START = 103;
 constexpr int SC_ROOM_OPTION = 104;
+constexpr int SC_ROOM_DETAIL_DELETE = 105;
 
 #pragma pack(push, 1)
 
@@ -106,6 +109,18 @@ struct cs_packet_room_option {
 	char room_mode;
 	char room_map;
 	char room_member;
+	int room_num;
+};
+
+struct cs_packet_room_team_change {
+	char size;
+	char type;
+	int room_num;
+};
+
+struct cs_packet_room_exit {
+	char size;
+	char type;
 	int room_num;
 };
 
@@ -184,6 +199,12 @@ struct sc_packet_room_detail_info {
 	char room_mode;
 	char player_name[15];
 	char host;
+};
+
+struct sc_packet_room_detail_delete {
+	char size;
+	char type;
+	char room_index;
 };
 
 struct sc_packet_room_option {

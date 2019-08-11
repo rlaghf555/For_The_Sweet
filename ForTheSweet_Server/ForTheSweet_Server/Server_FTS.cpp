@@ -237,6 +237,16 @@ void send_room_datail_info_packet(int client, int player, char slot, int room_nu
 	sendPacket(client, &p_room_detail_info);
 }
 
+void send_room_detail_delete_packet(int client, char slot)
+{
+	sc_packet_room_detail_delete p_room_detail_delete;
+	p_room_detail_delete.size = sizeof(sc_packet_room_detail_delete);
+	p_room_detail_delete.type = SC_ROOM_DETAIL_DELETE;
+	p_room_detail_delete.room_index = slot;
+
+	sendPacket(client, &p_room_detail_delete);
+}
+
 void send_room_option_packet(int client, char room_mode, char room_map, char room_member)
 {
 	sc_packet_room_option p_room_option;
@@ -753,8 +763,6 @@ void process_packet(char key, char *buffer)
 		}
 
 		clients[key].slot = my_slot;
-
-		cout << "ATTEND ROOM : " << int(it->current_num) << endl;
 		break;
 	}
 
@@ -764,12 +772,17 @@ void process_packet(char key, char *buffer)
 		p_room_option = reinterpret_cast<cs_packet_room_option*>(buffer);
 
 		int room_num = p_room_option->room_num;
-
-		cout << "room Num : " << int(room_num) << endl;
+		char room_map = p_room_option->room_map;
+		char room_mode = p_room_option->room_mode;
+		char room_member = p_room_option->room_member;
 
 		room_l.lock();
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
+
+		it->room_map = room_map;
+		it->room_mode = room_mode;
+		it->max_num = room_member;
 
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
@@ -787,7 +800,149 @@ void process_packet(char key, char *buffer)
 		}
 		break;
 	}
+	case CS_TEAM_CHANGE_ROOM:
+	{
+		cs_packet_room_team_change *p_team_change;
+		p_team_change = reinterpret_cast<cs_packet_room_team_change*>(buffer);
 
+		int room_num = p_team_change->room_num;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		int room_mode = it->room_mode;
+
+		char oldslot = clients[key].slot;
+		char newslot = -1;
+
+		cout << "Old Slot : " << int(oldslot) << endl;
+
+		for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
+		{
+			if (oldslot < 4 && oldslot >= 0) i += 4;
+			if (it->clientNum[i] == -1) {
+				newslot = i;
+				break;
+			}
+		}
+
+		cout << "New Slot : " << int(newslot) << endl;
+
+		char host = 0;
+
+		if (newslot != -1)
+		{
+			clients[key].slot = newslot;
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_room_detail_delete_packet(client_id, oldslot);
+						if (i == it->host_num) host = 1;
+						send_room_datail_info_packet(client_id, key, newslot, room_num, room_mode, host);
+					}
+				}
+			}
+			it->clientNum[oldslot] = -1;
+			it->clientNum[newslot] = key;
+		}
+		break;
+	}
+	case CS_ROOM_EXIT:
+	{
+		cs_packet_room_exit *p_room_exit;
+		p_room_exit = reinterpret_cast<cs_packet_room_exit*>(buffer);
+
+		int room_num = p_room_exit->room_num;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		char myslot = clients[key].slot;
+		int room_mode = it->room_mode;
+
+		cout << "OLD HOST : " << int(it->host_num) << endl;
+
+		if (it->host_num == myslot) 
+		{
+			if (it->current_num == 1)
+			{
+				room_l.lock();
+				gRoom.erase(it);
+				room_l.unlock();
+				break;
+			}
+			else
+			{
+				// 방장 재적용
+				it->clientNum[myslot] = -1;
+				for (int i = 0; i < MAX_ROOM_USER; ++i)
+				{
+					int client_id = it->clientNum[i];
+					if (client_id != -1)
+					{
+						if (clients[client_id].connected == true)
+						{
+							if (i != myslot) 
+							{
+								it->host_num = i;
+								cout << "NEW HOST : " << int(it->host_num) << endl;
+
+								int host_id = it->clientNum[i];
+								for (int j = 0; j < MAX_ROOM_USER; ++j)
+								{
+									int client_id = it->clientNum[j];
+									if (client_id != -1)
+									{
+										if (clients[client_id].connected == true)
+										{
+											send_room_datail_info_packet(client_id, host_id, i, room_num, room_mode, 1);
+											send_room_detail_delete_packet(client_id, myslot);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				it->current_num -= 1;
+			}
+		}
+		else
+		{
+			it->clientNum[myslot] = -1;
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_room_detail_delete_packet(client_id, myslot);
+					}
+				}
+			}
+			it->current_num -= 1;
+		}
+
+		//for (int i = 0; i < MAX_ROOM_USER; ++i)
+		//{
+		//	int client_id = it->clientNum[i];
+		//	if (client_id != -1)
+		//	{
+		//		if (clients[client_id].connected == true)
+		//		{
+		//			send_room_detail_delete_packet(client_id, myslot);
+		//		}
+		//	}
+		//}
+		break;
+	}
 	case CS_START_ROOM:
 	{
 		cs_packet_start_room *p_start_room;
