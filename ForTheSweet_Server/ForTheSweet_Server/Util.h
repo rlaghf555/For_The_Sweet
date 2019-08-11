@@ -18,6 +18,7 @@ constexpr int MAX_ANIM = 33;
 constexpr int MAX_HP = 100;
 
 constexpr float FALL_HEIGHT = -100.f;
+constexpr float END_TIMER = 2.0f;
 
 // Timer
 constexpr int MAX_TIMER = 150;			// ¿ø·¡ 300
@@ -50,6 +51,7 @@ constexpr int ROOM_ST_LOADING = 1;
 constexpr int ROOM_ST_LOADING_COMPLETE = 2;
 constexpr int ROOM_ST_PLAYING = 3;
 constexpr int ROOM_ST_END = 4;
+constexpr int ROOM_ST_EXIT = 5;
 
 // MAP
 constexpr int MAP_Wehas = 0;

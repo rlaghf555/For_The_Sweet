@@ -64,14 +64,14 @@ CPhysx::CPhysx()
 
 CPhysx::~CPhysx()
 {
-	if (m_PlayerController)
-		m_PlayerController->release();
-
-	if (m_PlayerManager)
-		m_PlayerManager->release();
-
-	if (m_Dispatcher)
-		m_Dispatcher->release();
+	//if (m_PlayerController)
+	//	m_PlayerController->release();
+	//
+	//if (m_PlayerManager)
+	//	m_PlayerManager->release();
+	//
+	//if (m_Dispatcher)
+	//	m_Dispatcher->release();
 
 	if (m_Material)
 		m_Material->release();

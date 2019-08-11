@@ -125,13 +125,24 @@ void  CPlayer::setLollipopHeal(bool heal)
 	lollipop_heal = heal;
 }
 
-void CPlayer::setPlayerController(CPhysx *physx)
+void CPlayer::setPlayerController(CRoom *room, CPhysx *physx)
 {
-	m_PlayerController = physx->getCapsuleController(m_Pos, CH_CAPSULE_HEIGHT, CH_CAPSULE_RADIUS, m_HitReport, this);
+	m_PlayerController = room->getCapsuleController(m_Pos, CH_CAPSULE_HEIGHT, CH_CAPSULE_RADIUS, m_HitReport, this, physx);
 }
 
-void CPlayer::setTrigger(CPhysx *physx)
+void CPlayer::setTrigger(CRoom *room, CPhysx *physx)
 {
 	PxVec3 pos(100, 100, 100);
-	m_AttackTrigger = physx->getBoxTrigger(pos, PxVec3(10, 20, 10));
+	m_AttackTrigger = room->getBoxTrigger(pos, PxVec3(10, 20, 10), physx);
 }
+
+//void CPlayer::setPlayerController(CPhysx *physx)
+//{
+//	m_PlayerController = physx->getCapsuleController(m_Pos, CH_CAPSULE_HEIGHT, CH_CAPSULE_RADIUS, m_HitReport, this);
+//}
+//
+//void CPlayer::setTrigger(CPhysx *physx)
+//{
+//	PxVec3 pos(100, 100, 100);
+//	m_AttackTrigger = physx->getBoxTrigger(pos, PxVec3(10, 20, 10));
+//}

@@ -26,6 +26,7 @@ unordered_set<int> gLobby;
 mutex lobby_l;
 
 CGameTimer gGameTimer;
+CPhysx *gPhysx;
 
 PxVec3 PlayerInitPos_1[8] = {
    PxVec3(0, 10.1, 100), PxVec3(50, 10.1, 100), PxVec3(-50, 10.1, 100), PxVec3(100, 10.1, 100), PxVec3(-100, 10.1, 100),
@@ -871,13 +872,12 @@ void process_packet(char key, char *buffer)
 		char myslot = clients[key].slot;
 		int room_mode = it->room_mode;
 
-		cout << "OLD HOST : " << int(it->host_num) << endl;
+		//cout << "OLD HOST : " << int(it->host_num) << endl;
 
 		if (it->host_num == myslot) 
 		{
 			if (it->current_num == 1)
 			{
-				cout << "¹æ Áö¿ö½é¿ä\n";
 				room_l.lock();
 				gRoom.erase(it);
 				room_l.unlock();
@@ -897,7 +897,7 @@ void process_packet(char key, char *buffer)
 							if (i != myslot) 
 							{
 								it->host_num = i;
-								cout << "NEW HOST : " << int(it->host_num) << endl;
+								//cout << "NEW HOST : " << int(it->host_num) << endl;
 
 								int host_id = it->clientNum[i];
 								for (int j = 0; j < MAX_ROOM_USER; ++j)
@@ -954,17 +954,6 @@ void process_packet(char key, char *buffer)
 		}
 		room_l.unlock();
 
-		//for (int i = 0; i < MAX_ROOM_USER; ++i)
-		//{
-		//	int client_id = it->clientNum[i];
-		//	if (client_id != -1)
-		//	{
-		//		if (clients[client_id].connected == true)
-		//		{
-		//			send_room_detail_delete_packet(client_id, myslot);
-		//		}
-		//	}
-		//}
 		break;
 	}
 	case CS_START_ROOM:
@@ -979,9 +968,9 @@ void process_packet(char key, char *buffer)
 		room_l.unlock();
 
 		// Physx¿¡ ¸Ê ÃÊ±âÈ­
-		it->start(MAP_Wehas, gMapVertexs, gMapIndexs);
+		it->start(MAP_Wehas, gMapVertexs, gMapIndexs, gPhysx);
 
-		it->m_pPhysx->registerRoom(&(*it));
+		it->registerRoom(&(*it));
 
 		// ¹«±â ÃÊ±âÈ­
 		for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i) {
@@ -1039,11 +1028,11 @@ void process_packet(char key, char *buffer)
 					clients[client_id].playerinfo->setLook(PxVec3(0, 0, 1));
 					clients[client_id].playerinfo->setDashed(false);
 					clients[client_id].playerinfo->setAniIndex(Anim::Idle);
-					it->m_pPhysx->m_Scene->lockWrite();
-					clients[client_id].playerinfo->setPlayerController(it->m_pPhysx);
-					clients[client_id].playerinfo->setTrigger(it->m_pPhysx);
-					it->m_pPhysx->m_Scene->unlockWrite();
-					it->m_pPhysx->registerPlayer(clients[client_id].playerinfo, slot);
+					it->m_Scene->lockWrite();
+					clients[client_id].playerinfo->setPlayerController(&(*it), gPhysx);
+					clients[client_id].playerinfo->setTrigger(&(*it), gPhysx);
+					it->m_Scene->unlockWrite();
+					it->registerPlayer(clients[client_id].playerinfo, slot);
 
 					// Player Team/King Setting
 					if (it->room_mode == ROOM_MODE_KING || it->room_mode == ROOM_MODE_TEAM)
@@ -1054,7 +1043,7 @@ void process_packet(char key, char *buffer)
 			}
 		}
 
-		cout << "Map, Weapon, Player Init complete\n";
+		cout << it->room_num << "Room : Map, Weapon, Player Init complete\n";
 
 		break;
 	}
@@ -1161,7 +1150,7 @@ void process_packet(char key, char *buffer)
 			else {
 				clients[key].playerinfo->setAniIndex(Anim::Walk);
 			}
-			clients[key].playerinfo->setLook(Normalize(clients[key].playerinfo->m_Vel));
+			clients[key].playerinfo->setLook(clients[key].playerinfo->m_Vel.getNormalized());
 		}
 
 		//cout << "[" << int(key) << "] Clients Move => " << clients[key].playerinfo->m_Vel.x << ","
@@ -1793,7 +1782,7 @@ void process_event(EVENT_ST &ev)
 			it->weapon_list[weapon_type][weapon_index].pos = pos;
 
 			//it->m_pPhysx->m_Scene->lockWrite();
-			s_lollipop->skillTrigger = it->m_pPhysx->getSphereTrigger(pos, Lollipop_Radius, Lollipop_Trigger, order);
+			s_lollipop->skillTrigger = it->getSphereTrigger(pos, Lollipop_Radius, Lollipop_Trigger, order, gPhysx);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
 			it->m_skillTrigger.push_back(*s_lollipop);
@@ -1829,7 +1818,7 @@ void process_event(EVENT_ST &ev)
 			pos.y += CH_HALF_HEIGHT;
 
 			//it->m_pPhysx->m_Scene->lockWrite();
-			s_candy->skillTrigger = it->m_pPhysx->getSphereTrigger(pos, Candy_Radius, Candy_Trigger, order);
+			s_candy->skillTrigger = it->getSphereTrigger(pos, Candy_Radius, Candy_Trigger, order, gPhysx);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
 			it->m_skillTrigger.push_back(*s_candy);
@@ -1862,8 +1851,8 @@ void process_event(EVENT_ST &ev)
 			//cout << "weapon pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
 
 			//it->m_pPhysx->m_Scene->lockWrite();
-			s_pepero->skillTrigger = it->m_pPhysx->getRotateBoxTrigger(pos, weapon_look,
-				PxVec3(Pepero_Length, Pepero_Width, Pepero_Width), Pepero_Trigger, order);
+			s_pepero->skillTrigger = it->getRotateBoxTrigger(pos, weapon_look,
+				PxVec3(Pepero_Length, Pepero_Width, Pepero_Width), Pepero_Trigger, order, gPhysx);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
 			s_pepero->vel = look * Pepero_Vel;
@@ -1921,7 +1910,7 @@ void process_event(EVENT_ST &ev)
 			cout << "weapon pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
 
 			//it->m_pPhysx->m_Scene->lockWrite();
-			s_choco->skillTrigger = it->m_pPhysx->getRotateBox(pos, weapon_look, size);
+			s_choco->skillTrigger = it->getRotateBox(pos, weapon_look, size, gPhysx);
 			//it->m_pPhysx->m_Scene->unlockWrite();
 
 			it->m_skillTrigger.push_back(*s_choco);
@@ -2423,8 +2412,8 @@ void process_event(EVENT_ST &ev)
 				PxVec3 size(Lightning_Width, Lightning_Height, Lightning_Width);
 
 				//it->m_pPhysx->m_Scene->lockWrite();
-				s_light1->skillTrigger = it->m_pPhysx->getBoxTrigger(pos1, size, Light_Trigger);
-				s_light2->skillTrigger = it->m_pPhysx->getBoxTrigger(pos2, size, Light_Trigger);
+				s_light1->skillTrigger = it->getBoxTrigger(pos1, size, Light_Trigger, gPhysx);
+				s_light2->skillTrigger = it->getBoxTrigger(pos2, size, Light_Trigger, gPhysx);
 				//it->m_pPhysx->m_Scene->unlockWrite();
 
 				it->m_skillTrigger.push_back(*s_light1);
@@ -2684,6 +2673,7 @@ void process_event(EVENT_ST &ev)
 				}
 			}
 		}
+		it->room_status = ROOM_ST_END;
 		break;
 	}
 	default:
@@ -2882,7 +2872,7 @@ void clientUpdateProcess(int room_num)
 									clients[client_id].playerinfo->setAniIndex(Anim::Death);
 									clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 									clients[client_id].playerinfo->m_PlayerController->release();
-									clients[client_id].playerinfo->m_PlayerController = nullptr;
+									clients[client_id].playerinfo->m_PlayerController = NULL;
 
 									if (it->room_mode == ROOM_MODE_SOLO)
 									{
@@ -2924,7 +2914,7 @@ void clientUpdateProcess(int room_num)
 									clients[client_id].playerinfo->setAniIndex(Anim::Death);
 									clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 									clients[client_id].playerinfo->m_PlayerController->release();
-									clients[client_id].playerinfo->m_PlayerController = nullptr;
+									clients[client_id].playerinfo->m_PlayerController = NULL;
 
 									if (it->room_mode == ROOM_MODE_SOLO)
 									{
@@ -2969,7 +2959,7 @@ void clientUpdateProcess(int room_num)
 									clients[client_id].playerinfo->setAniIndex(Anim::Death);
 									clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 									clients[client_id].playerinfo->m_PlayerController->release();
-									clients[client_id].playerinfo->m_PlayerController = nullptr;
+									clients[client_id].playerinfo->m_PlayerController = NULL;
 
 									if (it->room_mode == ROOM_MODE_SOLO)
 									{
@@ -3028,7 +3018,7 @@ void clientUpdateProcess(int room_num)
 						clients[client_id].playerinfo->setAniIndex(Anim::Death);
 						clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 						clients[client_id].playerinfo->m_PlayerController->release();
-						clients[client_id].playerinfo->m_PlayerController = nullptr;
+						clients[client_id].playerinfo->m_PlayerController = NULL;
 
 						if (it->room_mode == ROOM_MODE_SOLO)
 						{
@@ -3115,10 +3105,8 @@ void logic()
 					send_room_setting_weapon(it->room_num);
 					send_room_setting_player(it->room_num);
 
+					cout << it->room_num << " Room Loding Complete\n";
 					it->room_status = 2;
-
-					cout << "¹æ ÁØºñ ³¡\n";
-					continue;
 				}
 			}
 			else if (it->room_status == ROOM_ST_LOADING_COMPLETE)
@@ -3129,6 +3117,7 @@ void logic()
 
 				add_timer(it->room_num, it->room_num + ROOM_TIMER_START, EV_TIME, high_resolution_clock::now() + 5s, 0);
 
+				cout << it->room_num << " Room Start Game\n";
 				it->room_status = 3;
 			}
 			else if (it->room_status == ROOM_ST_PLAYING)
@@ -3158,11 +3147,11 @@ void logic()
 					}
 					else
 					{
-						bool win_team = it->team_victory;			// true : 1ÆÀ ¿ì½Â, false : 2ÆÀ ¿ì½Â
+						bool win_team = it->team_victory;			// false : 1ÆÀ ¿ì½Â, true : 2ÆÀ ¿ì½Â
 						for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
 						{
 							int winner, loser;
-							if (win_team == true) {
+							if (win_team == false) {				// 1ÆÀ ¿ì½Â
 								winner = it->clientNum[i];
 								loser = it->clientNum[i + 4];
 							}
@@ -3186,18 +3175,18 @@ void logic()
 							}
 						}
 					}
-					cout << "END~~~~~~~~~~~~~~~~~~~~~~~~\n";
+					cout << it->room_num << " Room Game Over\n";
 					it->room_status = ROOM_ST_END;
 				}
 				else {
 					clientInputProcess(it->room_num);
 
-					it->m_pPhysx->m_Scene->simulate(1.f / 60.f);
-					it->m_pPhysx->m_Scene->fetchResults(true);
+					it->m_Scene->simulate(1.f / 60.f);
+					it->m_Scene->fetchResults(true);
 
 					clientUpdateProcess(it->room_num);
 
-					it->PosBroadCastTime += 1.f / 60.f;
+					it->PosBroadCastTime += gGameTimer.GetTimeElapsed();
 					if (it->PosBroadCastTime > 0.05f)
 					{
 						int room_num = it->room_num;
@@ -3208,7 +3197,59 @@ void logic()
 			}
 			else if (it->room_status == ROOM_ST_END)
 			{
-				continue;
+				for (int i = 0; i < MAX_ROOM_USER; ++i)
+				{
+					int client_id = it->clientNum[i];
+					if (client_id != -1)
+					{
+						if (clients[client_id].connected == true)
+						{
+							cout << client_id << endl;
+							//if(clients[client_id].playerinfo->m_PlayerController != NULL)
+							//	clients[client_id].playerinfo->m_PlayerController->release();
+						}
+					}
+				}
+				if (it->m_PlayerManager)
+					//it->m_PlayerManager->release();
+				if (it->m_Simulator) {
+					//delete it->m_Simulator;
+					//it->m_Simulator = NULL;
+				}
+				if (it->m_Dispatcher)
+					//it->m_Dispatcher->release();
+				if (it->m_Scene)
+					it->m_Scene->release();
+
+				it->m_timer_l.lock();
+				while (!it->m_timer_queue.empty())
+				{
+					it->m_timer_queue.pop();
+				}
+				it->m_timer_l.unlock();
+
+				cout << it->room_num << " Room Release\n";
+				it->room_status = ROOM_ST_EXIT;
+			}
+			else if (it->room_status == ROOM_ST_EXIT)
+			{
+				it->end_timer += gGameTimer.GetTimeElapsed();
+				if (it->end_timer > END_TIMER)
+				{
+					for (int i = 0; i < MAX_ROOM_USER; ++i)
+					{
+						int client_id = it->clientNum[i];
+						if (client_id != -1)
+						{
+							if (clients[client_id].connected == true)
+							{
+								send_end_packet(client_id);
+							}
+						}
+					}
+					cout << it->room_num << " Room End\n";
+					it->room_status = ROOM_ST_WAITING;
+				}
 			}
 		}
 	}
@@ -3282,6 +3323,9 @@ int main()
 	{
 		clients[i].connected = false;
 	}
+
+	gPhysx = new CPhysx();
+	gPhysx->initPhysics();
 
 	vector<thread> worker_threads;
 	g_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);

@@ -2,6 +2,7 @@
 
 #include "header.h"
 #include "Physx.h"
+#include "Room.h"
 #include "Util.h"
 
 using namespace physx;
@@ -91,8 +92,10 @@ public:
 	CPlayer();
 	~CPlayer();
 
-	void setPlayerController(CPhysx *physx);
-	void setTrigger(CPhysx *physx);
+	void setPlayerController(CRoom *room, CPhysx *physx);
+	void setTrigger(CRoom *room, CPhysx *physx);
+	//void setPlayerController(CPhysx *physx);
+	//void setTrigger(CPhysx *physx);
 	void setPosition(PxVec3 pos);
 	void setVelocity(PxVec3 vel);
 	void setJumpVelocity(PxVec3 jumpVel);

@@ -71,8 +71,6 @@ public:
 
 	char room_status;				// 방 상태 (대기 = 0, 게임 로딩 = 1, 게임 로딩완료 = 2, 게임 중 = 3, 게임 끝 = 4)
 
-	CPhysx *m_pPhysx;
-
 	float PosBroadCastTime;
 
 	priority_queue<EVENT_ST> m_timer_queue;
@@ -86,6 +84,14 @@ public:
 
 	int timer;
 
+	// Physx
+	PxDefaultCpuDispatcher* m_Dispatcher;
+	PxScene *m_Scene;
+	PhysSimulation *m_Simulator;
+	PxControllerManager *m_PlayerManager;
+
+
+	// 케이크, 웨하스의 움직이는 액터
 	PxRigidActor *move_actor;
 	bool move_actor_flag = false;
 
@@ -104,17 +110,37 @@ public:
 	bool team_dead[8] = { false, false, false, false, false, false, false };	// 팀전에 사용(false : 없는 플레이어, true : 있는 플레이어)
 	bool team_victory = false;												// true: 1팀 우승, false : 2팀 우승
 
+	float end_timer = 0.0f;
+
 public:
 	CRoom();
 	CRoom(const CRoom &);
 	CRoom& operator=(const CRoom& other);
 	void init(char *nm, int hostId, int roomNum);
 	bool attend(int Num);
-	void start(int map_type, const vector<vector<PxVec3>>& vectex, const vector<vector<int>>& index);
+	void start(int map_type, const vector<vector<PxVec3>>& vectex, const vector<vector<int>>& index, CPhysx *physx);
 	bool operator==(const int num) { return (num == room_num); }
 	bool all_load_complete();
 	bool all_setting_complete();
 	bool is_game_end();
+
+	// Physx
+	PxScene* getScene(PhysSimulation* simul, PxControllerManager *manager, CPhysx *physx);
+	PxTriangleMesh*	GetTriangleMesh(vector<PxVec3> ver, vector<int> index, CPhysx* physx);
+	void setBoxController(PxVec3 pos, PxVec3 size, CPhysx *physx);
+	PxCapsuleController* getCapsuleController(PxVec3 pos, float height, float radius, PxUserControllerHitReport* collisionCallback, CPlayer *player, CPhysx *physx);
+
+	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size, CPhysx *physx);
+	PxRigidStatic* getBoxTrigger(PxVec3& t, PxVec3 size, int trigger_type, CPhysx *physx);
+	PxRigidStatic* getRotateBoxTrigger(PxVec3& t, PxVec3& ro, PxVec3 size, int trigger_type, int order, CPhysx *physx);	// 빼빼로 세팅
+
+	PxRigidStatic* getSphereTrigger(PxVec3& t, PxReal rad, int trigger_type, int order, CPhysx *physx);	// 롤리팝, 츄파춥스 세팅
+
+	PxRigidDynamic* getBox(PxVec3& t, PxVec3 size, CPhysx *physx);						// 맵세팅
+	PxRigidDynamic* getRotateBox(PxVec3& t, PxVec3& ro, PxVec3 size, CPhysx *physx);	// 초콜릿 방패세팅
+
+	void registerPlayer(CPlayer* player, int index) { m_Simulator->setPlayer(player, index); }
+	void registerRoom(CRoom* room) { m_Simulator->setRoom(room); }
 	~CRoom();
 };
 
