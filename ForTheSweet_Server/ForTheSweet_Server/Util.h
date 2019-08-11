@@ -73,7 +73,7 @@ constexpr int Weapon_King = 5;
 // Pepero
 constexpr float Pepero_Width = 1.f;
 constexpr float Pepero_Length = 18.f;
-constexpr float Pepero_Vel = 150.f;
+constexpr float Pepero_Vel = 10.f;
 constexpr float Pepero_Trigger_Len = 27.f;
 constexpr float Pepero_Pos_Gap = 23.f;
 

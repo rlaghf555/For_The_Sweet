@@ -1201,56 +1201,65 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	{
 		if (m_pPlayer[i]) {
 			if (m_pPlayer[i]->GetConnected()) {
-				int animindex = m_pPlayer[i]->getAnimIndex();
-				m_pPlayerShader[i]->Animate(fTimeElapsed);
-				if (animindex != m_pPlayerShadowShader[i]->getAnimIndex()) {
-					m_pPlayerShadowShader[i]->ChangeAnimation(animindex);
-				}
-				XMFLOAT3 Look = m_pPlayer[i]->GetLook();
-				XMFLOAT3 Up = m_pPlayer[i]->GetUp();
-				XMFLOAT3 Right = m_pPlayer[i]->GetRight();
-				m_pPlayerShadowShader[i]->getPlayer()->SetWorld(Look, Up, Right);
+				if (m_pPlayer[i]->Get_HP() > 0)
+				{
+					int animindex = m_pPlayer[i]->getAnimIndex();
+					m_pPlayerShader[i]->Animate(fTimeElapsed);
+					if (animindex != m_pPlayerShadowShader[i]->getAnimIndex()) {
+						m_pPlayerShadowShader[i]->ChangeAnimation(animindex);
+					}
+					XMFLOAT3 Look = m_pPlayer[i]->GetLook();
+					XMFLOAT3 Up = m_pPlayer[i]->GetUp();
+					XMFLOAT3 Right = m_pPlayer[i]->GetRight();
+					m_pPlayerShadowShader[i]->getPlayer()->SetWorld(Look, Up, Right);
 
-				if (animindex == Anim_Jump) m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->GetJumpPos());
-				else m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->GetPosition().y);
-				
-				if (animindex == Anim_Stun) {	//Anim_Jump
-					m_StunShader[i]->visible = true;
-					m_StunShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition()); //Anim_Stun
-				}
-				else m_StunShader[i]->visible = false;
+					if (animindex == Anim_Jump) m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->GetJumpPos());
+					else m_pPlayerShadowShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition(), m_pPlayer[i]->GetPosition().y);
 
-				if (animindex == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1) {
-					m_SkillEffectShader[i]->getObject(0)->visible = true;
-					m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
+					if (animindex == Anim_Stun) {	//Anim_Jump
+						m_StunShader[i]->visible = true;
+						m_StunShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition()); //Anim_Stun
+					}
+					else m_StunShader[i]->visible = false;
 
-					m_SkillParticleShader[i][m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
-				}
-								
-				if (animindex == Anim_Cupckae_Eat) {
-					//if (m_pPlayer[i]->getAnimtime() >= 0 && m_pPlayer[i]->getAnimtime() < 20) m_pPlayer[i]->SetScale(1.0f);
-					if (m_pPlayer[i]->getAnimtime() >= 20 && m_pPlayer[i]->getAnimtime() < 30) { m_pPlayer[i]->SetScale(1.3f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(1.3f, true); }
-					else if (m_pPlayer[i]->getAnimtime() >= 30 && m_pPlayer[i]->getAnimtime() < 38) { m_pPlayer[i]->SetScale(1.7f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(1.7f, true);}
-					else if (m_pPlayer[i]->getAnimtime() >= 38 && m_pPlayer[i]->getAnimtime() < 40) { m_pPlayer[i]->SetScale(2.0f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(2.0f, true);}
-				}
-				else if (m_pPlayer[i]->king) {
-					m_pPlayer[i]->SetScale(2.f, true);
-					m_pPlayerShadowShader[i]->getPlayer()->SetScale(2.0f, true);
-				}
+					if (animindex == Anim_PowerUp && m_pPlayer[i]->getAnimtime() <= 1) {
+						m_SkillEffectShader[i]->getObject(0)->visible = true;
+						m_SkillEffectShader[i]->Animate(fTimeElapsed, m_pPlayer[i]->GetPosition());
 
-				if (m_pPlayer[i]->Get_Weapon_grab()) {
-					AnimateWeapon(i);
-				}
-				XMFLOAT3 tmp = m_pPlayer[i]->GetPosition();
+						m_SkillParticleShader[i][m_pPlayer[i]->selected_skill]->ShowParticle(true, m_pPlayer[i]->GetPosition());
+					}
 
-				bounding_box_test[i]->getObjects()->m_xmf4x4World = m_pPlayer[i]->m_xmf4x4World;
-				tmp.y += 40;
-				tmp.x -= 2.5;
-				if (m_ppUIShaders[21]->Get_Fog_Flag()) {
-					tmp.y -= 10000;
+					if (animindex == Anim_Cupckae_Eat) {
+						//if (m_pPlayer[i]->getAnimtime() >= 0 && m_pPlayer[i]->getAnimtime() < 20) m_pPlayer[i]->SetScale(1.0f);
+						if (m_pPlayer[i]->getAnimtime() >= 20 && m_pPlayer[i]->getAnimtime() < 30) { m_pPlayer[i]->SetScale(1.3f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(1.3f, true); }
+						else if (m_pPlayer[i]->getAnimtime() >= 30 && m_pPlayer[i]->getAnimtime() < 38) { m_pPlayer[i]->SetScale(1.7f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(1.7f, true); }
+						else if (m_pPlayer[i]->getAnimtime() >= 38 && m_pPlayer[i]->getAnimtime() < 40) { m_pPlayer[i]->SetScale(2.0f, true); m_pPlayerShadowShader[i]->getPlayer()->SetScale(2.0f, true); }
+					}
+					else if (m_pPlayer[i]->king) {
+						m_pPlayer[i]->SetScale(2.f, true);
+						m_pPlayerShadowShader[i]->getPlayer()->SetScale(2.0f, true);
+					}
+
+					//f (m_pPlayer[i]->Get_HP() <= 0 && animindex == Anim_Death && m_pPlayer[i]->getAnimtime() >= 39) {
+					//	m_pPlayer[i]->ChangeAnimation(Anim_Death);
+					//	m_pPlayer[i]->SetAnimFrame(39);
+					//	m_pPlayer[i]->DisableLoop();
+					//
+
+					if (m_pPlayer[i]->Get_Weapon_grab()) {
+						AnimateWeapon(i);
+					}
+					XMFLOAT3 tmp = m_pPlayer[i]->GetPosition();
+
+					bounding_box_test[i]->getObjects()->m_xmf4x4World = m_pPlayer[i]->m_xmf4x4World;
+					tmp.y += 40;
+					tmp.x -= 2.5;
+					if (m_ppUIShaders[21]->Get_Fog_Flag()) {
+						tmp.y -= 10000;
+					}
+					m_TeamShader->getObject(i)->SetPosition(tmp);
+					m_EnemyShader->getObject(i)->SetPosition(tmp);
 				}
-				m_TeamShader->getObject(i)->SetPosition(tmp);
-				m_EnemyShader->getObject(i)->SetPosition(tmp);
 			}
 		}
 	}

@@ -27,21 +27,63 @@ mutex lobby_l;
 
 CGameTimer gGameTimer;
 
-PxVec3 PlayerInitPos[8] = {
+PxVec3 PlayerInitPos_1[8] = {
    PxVec3(0, 10.1, 100), PxVec3(50, 10.1, 100), PxVec3(-50, 10.1, 100), PxVec3(100, 10.1, 100), PxVec3(-100, 10.1, 100),
    PxVec3(150, 10.1, 100), PxVec3(-150, 10.1, 100), PxVec3(200, 10.1, 100)
 };
-
-PxVec3 WeaponInitPos[10] = {
-   PxVec3(-200, 10, -100), PxVec3(-200, 10, 0), PxVec3(-200, 10, 100), PxVec3(-100, 10, -50), PxVec3(-100, 10, 50),
-   PxVec3(100, 10, -50), PxVec3(100, 10, 50), PxVec3(200, 10, -100), PxVec3(200, 10, 0), PxVec3(200, 10, 100)
+PxVec3 PlayerInitPos_2[8] = {
+	PxVec3(-299, 18.0011, 46),PxVec3(-299, 18.0011, 13),PxVec3(-299, 18.0011, -23),PxVec3(-299, 18.0011, -58),
+	PxVec3(299, 18.0011, 46),PxVec3(299, 18.0011, 13),PxVec3(299, 18.0011, -23),PxVec3(299, 18.0011, -58)
+};
+PxVec3 PlayerInitPos_3[8] = {
+	PxVec3(-120, 1.31468, 53),PxVec3(120, 1.31468, 53),PxVec3(-134, 1.31468, -122),PxVec3(134 , 1.31468, -122),
+	PxVec3(-368, 1.31468, -132),PxVec3(368, 1.31468,-132),PxVec3(-248, 76.6323,-32),PxVec3(248, 76.6323,-32)
 };
 
-//PxVec3(-240.f, 100.f, 110.f)
+PxVec3 Map2_Teleport[2] = {
+	PxVec3(-186, 3.77634, -1.5),
+	PxVec3(186, 3.77634, -1.5)
+};
 
-PxVec3 LightningInitPos[10] = {
+PxVec3 WeaponInitPos_1[10] = {
+	PxVec3(-200, 10, -100), PxVec3(-200, 10, 0), PxVec3(-200, 10, 100), PxVec3(-100, 10, -50), PxVec3(-100, 10, 50),
+	PxVec3(100, 10, -50), PxVec3(100, 10, 50), PxVec3(200, 10, -100), PxVec3(200, 10, 0), PxVec3(200, 10, 100)
+};
+PxVec3 WeaponInitPos_2[10] = {
+	PxVec3(0, 5.68, 115), PxVec3(-76, 5.68, 95), PxVec3(-116, 5.68, 52), PxVec3(-116, 5.68, -52), PxVec3(-76, 5.68, -95),
+	PxVec3(0, 5.68, -115), PxVec3(76, 5.68, 95), PxVec3(116, 5.68, 52), PxVec3(116, 5.68, -52), PxVec3(76, 5.68, -95)
+};
+PxVec3 WeaponInitPos_3[10] = {
+   PxVec3(-165.951, 1.31468, -127.585), PxVec3(165.951, 1.31468, -127.585), PxVec3(-306.981, 1.31468, -127.585), PxVec3(306.981, 1.31468, -127.585), PxVec3(-249.68, 76.6323, -13.0885),
+   PxVec3(249.68, 76.6323, -13.0885), PxVec3(-300.596, 500.751, 27.5226), PxVec3(310.442, 500.928, 22.9703), PxVec3(-184.102, 500.927, 22.4771), PxVec3(195.677, 500.928, 22.9703)
+};
+
+PxVec3 LightningInitPos_12[10] = {
    PxVec3(-100.f, 100.f, 100.f), PxVec3(-120.f, 100.f, 110.f), PxVec3(60.f, 100.f, 110.f), PxVec3(180.f, 100.f, 110.f), PxVec3(-150.f, 100.f, 0.f),
    PxVec3(90.f, 100.f, 0.f), PxVec3(-240.f, 100.f, -110.f), PxVec3(-120.f, 100.f, -110.f), PxVec3(60.f, 100.f, -110.f), PxVec3(180.f, 100.f, -110.f)
+};
+
+PxVec3 DoorPos[8] = {
+	PxVec3(-250.f, 10.f, -40.f),    //LEFT_DOWN_OUT
+	PxVec3(-250.f, 530.f, -80.f),    //LEFT_DOWN_IN
+	PxVec3(-250.f, 85.f, 40.f),        //LEFT_UP_OUT
+	PxVec3(-250.f, 585.f, 10.f),    //LEFT_UP_IN
+
+	PxVec3(250.f, 10.f, -40.f),        //RIGHT_DOWN_OUT
+	PxVec3(250.f, 530.f, -80.f),    //RIGHT_DOWN_IN
+	PxVec3(250.f, 85.f, 40.f),        //RIGHT_UP_OUT
+	PxVec3(250.f, 585.f, 10.f),        //RIGHT_UP_IN
+};
+PxVec3 DoorTelepos[8] = {
+	PxVec3(-250.f, 530.f, -50.f),    //LEFT_DOWN_OUT
+	PxVec3(-250.f, 10.f, -70.f),    //LEFT_DOWN_IN
+	PxVec3(-250.f, 585.f, 40.f),    //LEFT_UP_OUT
+	PxVec3(-250.f, 85.f, 10.f),        //LEFT_UP_IN
+
+	PxVec3(250.f, 530.f, -50.f),    //RIGHT_DOWN_OUT
+	PxVec3(250.f, 10.f, -70.f),        //RIGHT_DOWN_IN
+	PxVec3(250.f, 585.f, 40.f),        //RIGHT_UP_OUT
+	PxVec3(250.f, 85.f, 10.f),        //RIGHT_UP_IN
 };
 
 enum SITUATION
@@ -167,21 +209,6 @@ void sendPacket(char key, void *ptr)
 	}
 }
 
-void send_login_packet(char client) {
-	sc_packet_login p_login;
-	p_login.id = client;
-	p_login.x = PlayerInitPos[client].x;
-	p_login.y = PlayerInitPos[client].y;
-	p_login.z = PlayerInitPos[client].z;
-	p_login.vx = 0.f;
-	p_login.vy = 0.f;
-	p_login.vz = 0.f;
-	p_login.type = SC_LOGIN;
-	p_login.size = sizeof(sc_packet_login);
-
-	sendPacket(client, &p_login);
-}
-
 void send_room_info_packet(char client, const CRoom& room, int slot)
 {
 	sc_packet_room_info p_room_info;
@@ -210,6 +237,18 @@ void send_room_datail_info_packet(int client, int player, char slot, int room_nu
 	sendPacket(client, &p_room_detail_info);
 }
 
+void send_room_option_packet(int client, char room_mode, char room_map, char room_member)
+{
+	sc_packet_room_option p_room_option;
+	p_room_option.size = sizeof(sc_packet_room_option);
+	p_room_option.type = SC_ROOM_OPTION;
+	p_room_option.room_mode = room_mode;
+	p_room_option.room_map = room_map;
+	p_room_option.room_member = room_member;
+
+	sendPacket(client, &p_room_option);
+}
+
 void send_start_load_room_packet(int client)
 {
 	sc_packet_room_load p_room_load;
@@ -230,7 +269,7 @@ void send_start_game_packet(int client)
 
 void send_put_player_packet(char client, char new_id) {
 	sc_packet_put_player p_put;
-	p_put.id = new_id;
+	p_put.id = clients[new_id].slot;
 	p_put.x = clients[new_id].playerinfo->m_Pos.x;
 	p_put.y = clients[new_id].playerinfo->m_Pos.y;
 	p_put.z = clients[new_id].playerinfo->m_Pos.z;
@@ -247,7 +286,7 @@ void send_put_player_packet(char client, char new_id) {
 
 void send_pos_packet(char client, char id) {
 	sc_packet_pos p_pos;
-	p_pos.id = id;
+	p_pos.id = clients[id].slot;
 	p_pos.x = clients[id].playerinfo->m_Pos.x;
 	p_pos.y = clients[id].playerinfo->m_Pos.y;
 	p_pos.z = clients[id].playerinfo->m_Pos.z;
@@ -270,7 +309,7 @@ void send_anim_packet(char client, char id) {
 	sc_packet_anim p_anim;
 	p_anim.type = SC_ANIM;
 	p_anim.size = sizeof(sc_packet_anim);
-	p_anim.id = id;
+	p_anim.id = clients[id].slot;
 	p_anim.ani_index = clients[id].playerinfo->m_AniIndex;
 
 	sendPacket(client, &p_anim);
@@ -281,7 +320,7 @@ void send_hit_packet(char client, char id, int hp)
 	sc_packet_hit p_hit;
 	p_hit.type = SC_HIT;
 	p_hit.size = sizeof(sc_packet_hit);
-	p_hit.id = id;
+	p_hit.id = clients[id].slot;
 	p_hit.hp = hp;
 
 	sendPacket(client, &p_hit);
@@ -292,7 +331,7 @@ void send_critical_hit_packet(char client, char id, int hp, const PxVec3& dir)
 	sc_packet_critical_hit p_cri_hit;
 	p_cri_hit.type = SC_CRITICAL_HIT;
 	p_cri_hit.size = sizeof(sc_packet_critical_hit);
-	p_cri_hit.id = id;
+	p_cri_hit.id = clients[id].slot;
 	p_cri_hit.hp = hp;
 	p_cri_hit.x = dir.x;
 	p_cri_hit.y = dir.y;
@@ -306,7 +345,7 @@ void send_stun_packet(char client, char id, int hp)
 	sc_packet_stun p_stun;
 	p_stun.type = SC_STUN;
 	p_stun.size = sizeof(sc_packet_stun);
-	p_stun.id = id;
+	p_stun.id = clients[id].slot;
 	p_stun.hp = hp;
 
 	sendPacket(client, &p_stun);
@@ -317,7 +356,7 @@ void send_heal_packet(char client, char id, int hp)
 	sc_packet_heal p_heal;
 	p_heal.type = SC_HEAL;
 	p_heal.size = sizeof(sc_packet_heal);
-	p_heal.id = id;
+	p_heal.id = clients[id].slot;
 	p_heal.hp = hp;
 
 	sendPacket(client, &p_heal);
@@ -368,7 +407,7 @@ void send_pick_weapon_packet(char client, char id, char wp_type, char wp_index) 
 	sc_packet_pick_weapon p_pick_weapon;
 	p_pick_weapon.type = SC_PICK_WEAPON;
 	p_pick_weapon.size = sizeof(sc_packet_pick_weapon);
-	p_pick_weapon.id = id;
+	p_pick_weapon.id = clients[id].slot;
 	p_pick_weapon.weapon_type = wp_type;
 	p_pick_weapon.weapon_index = wp_index;
 
@@ -380,7 +419,7 @@ void send_unpick_weapon_packet(char client, char id, char wp_type, char wp_index
 
 	p_unpick_weapon.type = SC_UNPICK_WEAPON;
 	p_unpick_weapon.size = sizeof(sc_packet_unpick_weapon);
-	p_unpick_weapon.id = id;
+	p_unpick_weapon.id = clients[id].slot;
 	p_unpick_weapon.weapon_type = wp_type;
 	p_unpick_weapon.weapon_index = wp_index;
 	p_unpick_weapon.x = pos.x;
@@ -497,8 +536,8 @@ void send_room_setting_player(int room_num)
 					{
 						if (clients[client_id2].connected == true)
 						{
-							cout << client_id << ", " << j << endl;
-							send_put_player_packet(client_id2, i);
+							//cout << client_id << ", " << j << endl;
+							send_put_player_packet(client_id2, client_id);
 						}
 					}
 				}
@@ -684,6 +723,36 @@ void process_packet(char key, char *buffer)
 		break;
 	}
 
+	case CS_OPTION_ROOM:
+	{
+		cs_packet_room_option *p_room_option;
+		p_room_option = reinterpret_cast<cs_packet_room_option*>(buffer);
+
+		int room_num = p_room_option->room_num;
+
+		cout << "room Num : " << int(room_num) << endl;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					if (i != it->host_num)
+					{
+						send_room_option_packet(client_id, it->room_mode, it->room_map, it->max_num);
+					}
+				}
+			}
+		}
+		break;
+	}
+
 	case CS_START_ROOM:
 	{
 		cs_packet_start_room *p_start_room;
@@ -717,7 +786,12 @@ void process_packet(char key, char *buffer)
 
 						it->weapon_list[type][j].empty = false;
 						it->weapon_list[type][j].owner = -1;
-						it->weapon_list[type][j].pos = WeaponInitPos[i];
+						if(it->room_map == MAP_Wehas)
+							it->weapon_list[type][j].pos = WeaponInitPos_1[i];
+						//if (it->room_map == MAP_Oreo)
+						//	it->weapon_list[type][j].pos = WeaponInitPos_2[i];
+						if (it->room_map == MAP_Cake)
+							it->weapon_list[type][j].pos = WeaponInitPos_3[i];
 						it->weapon_list[type][j].respawn_index = i;
 
 						break;
@@ -734,12 +808,18 @@ void process_packet(char key, char *buffer)
 			{
 				if (clients[client_id].connected == true)
 				{
+					char slot = clients[client_id].slot;
 					// 자신을 제외한 다른 클라도 게임 업로드 시작하도록 packet send
 					send_start_load_room_packet(client_id);
 
 					clients[client_id].playerinfo = new CPlayer();
 
-					clients[client_id].playerinfo->setPosition(PlayerInitPos[client_id]);
+					if (it->room_map == MAP_Wehas)
+						clients[client_id].playerinfo->setPosition(PlayerInitPos_1[slot]);
+					if (it->room_map == MAP_Oreo)
+						clients[client_id].playerinfo->setPosition(PlayerInitPos_2[slot]);
+					//if (it->room_map == MAP_Cake)
+					//	clients[client_id].playerinfo->setPosition(PlayerInitPos_3[slot]);
 					clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 					clients[client_id].playerinfo->setLook(PxVec3(0, 0, 1));
 					clients[client_id].playerinfo->setDashed(false);
@@ -748,7 +828,7 @@ void process_packet(char key, char *buffer)
 					clients[client_id].playerinfo->setPlayerController(it->m_pPhysx);
 					clients[client_id].playerinfo->setTrigger(it->m_pPhysx);
 					it->m_pPhysx->m_Scene->unlockWrite();
-					it->m_pPhysx->registerPlayer(clients[client_id].playerinfo, i);
+					it->m_pPhysx->registerPlayer(clients[client_id].playerinfo, slot);
 				}
 			}
 		}
@@ -883,7 +963,7 @@ void process_packet(char key, char *buffer)
 			{
 				if (clients[client_id].connected == true)
 				{
-					send_pos_packet(client_id, i);
+					send_pos_packet(client_id, key);
 				}
 			}
 		}
@@ -1451,7 +1531,7 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
-						send_pick_weapon_packet(i, my_slot, wp_type, wp_index);
+						send_pick_weapon_packet(client_id, ev.id, wp_type, wp_index);
 					}
 				}
 			}
@@ -1507,7 +1587,7 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
-						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index, pos);
+						send_unpick_weapon_packet(client_id, ev.id, weapon_type, weapon_index, pos);
 					}
 				}
 			}
@@ -1582,7 +1662,7 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
-						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index, pos);
+						send_unpick_weapon_packet(client_id, ev.id, weapon_type, weapon_index, pos);
 					}
 				}
 			}
@@ -1637,7 +1717,7 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
-						send_unpick_weapon_packet(client_id, clients[ev.id].slot, weapon_type, weapon_index, pos);
+						send_unpick_weapon_packet(client_id, ev.id, weapon_type, weapon_index, pos);
 					}
 				}
 			}
@@ -1724,9 +1804,9 @@ void process_event(EVENT_ST &ev)
 				{
 					if (clients[client_id].connected == true)
 					{
-						if (clients[client_id].playerinfo->lollipop_heal = true)
+						if (clients[client_id].playerinfo->lollipop_heal == true)
 						{
-							char slot = clients[client_id].slot;
+							cout << "Heal~~~~~ : " << client_id << endl;
 							int hp = clients[client_id].playerinfo->m_hp + 2;
 							if (hp > MAX_HP) hp = MAX_HP;
 							clients[client_id].playerinfo->setHP(hp);
@@ -1739,7 +1819,7 @@ void process_event(EVENT_ST &ev)
 								{
 									if (clients[client_id2].connected == true)
 									{
-										send_heal_packet(client_id2, slot, hp);
+										send_heal_packet(client_id2, client_id, hp);
 									}
 								}
 							}
@@ -1857,7 +1937,10 @@ void process_event(EVENT_ST &ev)
 					{
 						if (type == Weapon_chupachupse) {
 							PxVec3 pos(0, 0, 0);
-							send_unpick_weapon_packet(client_id, slot, type, index, pos);
+							send_unpick_weapon_packet(client_id, it->clientNum[slot], type, index, pos);
+						}
+						if (type == Weapon_Lollipop) {
+							clients[client_id].playerinfo->setLollipopHeal(false);
 						}
 						send_remove_weapon_packet(client_id, type, index);
 					}
@@ -1870,7 +1953,6 @@ void process_event(EVENT_ST &ev)
 	case EV_CUPCAKE_REMOVE:
 	{
 		int room_num = clients[ev.id].room_num;
-		char slot = clients[ev.id].slot;
 
 		room_l.lock();
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
@@ -1884,7 +1966,7 @@ void process_event(EVENT_ST &ev)
 			{
 				if (clients[client_id].connected == true)
 				{
-					send_unpick_weapon_packet(client_id, slot, Weapon_cupcake, 0, PxVec3(1000, 1000, 1000));
+					send_unpick_weapon_packet(client_id, ev.id, Weapon_cupcake, 0, PxVec3(1000, 1000, 1000));
 				}
 			}
 		}
@@ -1915,20 +1997,27 @@ void process_event(EVENT_ST &ev)
 
 				it->weapon_respawn[i].respawn_able = false;
 
-				int type = rand() % (MAX_WEAPON_TYPE - 1);
-				//int type = (rand() % 2) + 2;
+				//int type = rand() % (MAX_WEAPON_TYPE - 1);
+				int type = (rand() % 2) + 2;
 
 				it->weapon_respawn[i].type = type;
 
 				for (int j = 0; j < MAX_WEAPON_NUM; ++j) {
 					if (it->weapon_list[type][j].empty == true) {
 						char index = j;
-						PxVec3 pos = WeaponInitPos[i];
+						PxVec3 pos;
+						if (it->room_map == MAP_Wehas)
+							pos = WeaponInitPos_1[i];
+						//if (it->room_map == MAP_Oreo)
+						//	pos = WeaponInitPos_2[i];
+						if (it->room_map == MAP_Cake)
+							pos = WeaponInitPos_3[i];
+						
 
 						it->weapon_respawn[i].index = index;
 						it->weapon_list[type][j].empty = false;
 						it->weapon_list[type][j].owner = -1;
-						it->weapon_list[type][j].pos = WeaponInitPos[i];
+						it->weapon_list[type][j].pos = pos;
 						it->weapon_list[type][j].respawn_index = i;
 
 
@@ -2093,9 +2182,19 @@ void process_event(EVENT_ST &ev)
 				//int index2 = (rand() % 5) + 5;
 				int index1 = 0;
 				int index2 = 5;
-
-				PxVec3 pos1 = LightningInitPos[index1];
-				PxVec3 pos2 = LightningInitPos[index2];
+				PxVec3 pos1;
+				PxVec3 pos2;
+				
+				if (it->room_map == MAP_Wehas || it->room_map == MAP_Oreo)
+				{
+					pos1 = LightningInitPos_12[index1];
+					pos2 = LightningInitPos_12[index2];
+				}
+				if (it->room_map == MAP_Cake)
+				{
+					pos1 = PlayerInitPos_3[index1];
+					pos2 = PlayerInitPos_3[index2];
+				}
 
 				Skill_Actor *s_light1 = new Skill_Actor(0, 0, 0, Lightning_Type);
 				Skill_Actor *s_light2 = new Skill_Actor(0, 0, 0, Lightning_Type);
@@ -2297,107 +2396,110 @@ void clientInputProcess(int room_num)
 		{
 			if (clients[client_id].connected == true)
 			{
-				int Ani_Index = clients[client_id].playerinfo->m_AniIndex;
-
-				clients[client_id].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
-
-				char status = clients[client_id].playerinfo->m_status;
-
-				PxVec3 direction;
-				PxVec3 velocity = clients[client_id].playerinfo->m_Vel;
-
-				direction = velocity.getNormalized();
-
-				if (clients[client_id].playerinfo->m_dashed) {
-					if (status != STATUS::SKILL_WEAPON_MOVE) {
-						direction *= 2.f;
-					}
-				}
-
-				if (it->fever == true)
+				if (clients[client_id].playerinfo->m_hp > 0)
 				{
-					direction *= 2.f;
-				}
+					int Ani_Index = clients[client_id].playerinfo->m_AniIndex;
 
-				if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK
-					|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
-				{
-					continue;
-				}
-				else if (status == STATUS::CRI_HITTED)
-				{
-					PxVec3 knockback_dir = clients[client_id].playerinfo->m_Knockback;
-					PxVec3 dist = knockback_dir * gGameTimer.GetTimeElapsed() * KnockBack_Vel;
+					clients[client_id].playerinfo->m_AttackTrigger->setGlobalPose(PxTransform(100, 100, 100));
 
-					float jump_height = 0.0f;
+					char status = clients[client_id].playerinfo->m_status;
 
-					if (clients[client_id].playerinfo->m_Jump.mJump == true) {
-						clients[client_id].playerinfo->m_Jump.stopJump();
-					}
-					else {
-						clients[client_id].playerinfo->m_Fall.startJump(0);
-						jump_height = clients[client_id].playerinfo->m_Fall.getHeight(gGameTimer.GetTimeElapsed());
-					}
+					PxVec3 direction;
+					PxVec3 velocity = clients[client_id].playerinfo->m_Vel;
 
-					dist.y += jump_height;
+					direction = velocity.getNormalized();
 
-					PxControllerFilters filters;
-					const PxU32 flags = clients[client_id].playerinfo->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
-
-					if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
-					{
-						if (clients[client_id].playerinfo->m_Fall.mJump) {
-							clients[client_id].playerinfo->m_Fall.stopJump();
+					if (clients[client_id].playerinfo->m_dashed) {
+						if (status != STATUS::SKILL_WEAPON_MOVE) {
+							direction *= 2.f;
 						}
 					}
-				}
-				else
-				{
-					float jump_height;
 
-					if (clients[client_id].playerinfo->m_Jump.mJump == true) {
-						jump_height = clients[client_id].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
-						direction = clients[client_id].playerinfo->m_JumpVel;
-					}
-					else {
-						clients[client_id].playerinfo->m_Fall.startJump(0);
-						jump_height = clients[client_id].playerinfo->m_Fall.getHeight(gGameTimer.GetTimeElapsed());
+					if (it->fever == true)
+					{
+						direction *= 2.f;
 					}
 
-					//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
-					float elapsedTime = gGameTimer.GetTimeElapsed();
+					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK
+						|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
+					{
+						continue;
+					}
+					else if (status == STATUS::CRI_HITTED)
+					{
+						PxVec3 knockback_dir = clients[client_id].playerinfo->m_Knockback;
+						PxVec3 dist = knockback_dir * gGameTimer.GetTimeElapsed() * KnockBack_Vel;
 
-					PxVec3 distance = direction * elapsedTime * NORMAL_SPEED;
-					distance.y += jump_height;
+						float jump_height = 0.0f;
 
-					PxControllerFilters filters;
-					if (clients[client_id].playerinfo->m_PlayerController) {
-						const PxU32 flags = clients[client_id].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
+						if (clients[client_id].playerinfo->m_Jump.mJump == true) {
+							clients[client_id].playerinfo->m_Jump.stopJump();
+						}
+						else {
+							clients[client_id].playerinfo->m_Fall.startJump(0);
+							jump_height = clients[client_id].playerinfo->m_Fall.getHeight(gGameTimer.GetTimeElapsed());
+						}
 
-						//PxExtendedVec3 pos = clients[client_id].playerinfo->m_PlayerController->getPosition();
-						//
-						//cout << pos.x << "," << pos.y << "," << pos.z << endl;
+						dist.y += jump_height;
+
+						PxControllerFilters filters;
+						const PxU32 flags = clients[client_id].playerinfo->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
 
 						if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 						{
-							//cout << "충돌\n";
-							if (clients[client_id].playerinfo->m_Jump.mJump) {
-								clients[client_id].playerinfo->m_Jump.stopJump();
-								clients[client_id].playerinfo->setJumpVelocity(PxVec3(0, 0, 0));
-								if (velocity.magnitude() > 0.f)
-								{
-									if (clients[client_id].playerinfo->m_dashed == true)
-										clients[client_id].playerinfo->setAniIndex(Anim::Run);
-									else
-										clients[client_id].playerinfo->setAniIndex(Anim::Walk);
-								}
-								else {
-									clients[client_id].playerinfo->setAniIndex(Anim::Idle);
-								}
-								clients[client_id].playerinfo->setStatus(STATUS::FREE);
-							}
 							if (clients[client_id].playerinfo->m_Fall.mJump) {
 								clients[client_id].playerinfo->m_Fall.stopJump();
+							}
+						}
+					}
+					else
+					{
+						float jump_height;
+
+						if (clients[client_id].playerinfo->m_Jump.mJump == true) {
+							jump_height = clients[client_id].playerinfo->m_Jump.getHeight(gGameTimer.GetTimeElapsed());
+							direction = clients[client_id].playerinfo->m_JumpVel;
+						}
+						else {
+							clients[client_id].playerinfo->m_Fall.startJump(0);
+							jump_height = clients[client_id].playerinfo->m_Fall.getHeight(gGameTimer.GetTimeElapsed());
+						}
+
+						//cout << int(i) << " Vel : " << direction.x << ", " << direction.y << ", " << direction.z << endl;
+						float elapsedTime = gGameTimer.GetTimeElapsed();
+
+						PxVec3 distance = direction * elapsedTime * NORMAL_SPEED;
+						distance.y += jump_height;
+
+						PxControllerFilters filters;
+						if (clients[client_id].playerinfo->m_PlayerController) {
+							const PxU32 flags = clients[client_id].playerinfo->m_PlayerController->move(distance, 0.001, 1 / 60, filters);
+
+							//PxExtendedVec3 pos = clients[client_id].playerinfo->m_PlayerController->getPosition();
+							//
+							//cout << pos.x << "," << pos.y << "," << pos.z << endl;
+
+							if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+							{
+								//cout << "충돌\n";
+								if (clients[client_id].playerinfo->m_Jump.mJump) {
+									clients[client_id].playerinfo->m_Jump.stopJump();
+									clients[client_id].playerinfo->setJumpVelocity(PxVec3(0, 0, 0));
+									if (velocity.magnitude() > 0.f)
+									{
+										if (clients[client_id].playerinfo->m_dashed == true)
+											clients[client_id].playerinfo->setAniIndex(Anim::Run);
+										else
+											clients[client_id].playerinfo->setAniIndex(Anim::Walk);
+									}
+									else {
+										clients[client_id].playerinfo->setAniIndex(Anim::Idle);
+									}
+									clients[client_id].playerinfo->setStatus(STATUS::FREE);
+								}
+								if (clients[client_id].playerinfo->m_Fall.mJump) {
+									clients[client_id].playerinfo->m_Fall.stopJump();
+								}
 							}
 						}
 					}
@@ -2437,103 +2539,126 @@ void clientUpdateProcess(int room_num)
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		int client_id = it->clientNum[i];
-		int client_slot = clients[client_id].slot;
 		if (client_id != -1)
 		{
 			if (clients[client_id].connected == true)
 			{
-				if (clients[client_id].playerinfo->hitted == true)
+				if (clients[client_id].playerinfo->m_hp > 0)
 				{
-					char status = clients[client_id].playerinfo->m_status;
-
-					if (status == STATUS::HITTED) {
-
-						add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 660ms);
-
-						clients[client_id].playerinfo->setAniIndex(Anim::Small_React);
-
-						int hp = clients[client_id].playerinfo->m_hp - 10;
-						if (hp < 0) hp = 0;
-						clients[client_id].playerinfo->setHP(hp);
-
-						for (int j = 0; j < MAX_ROOM_USER; ++j)
-						{
-							int client_id2 = it->clientNum[j];
-							if (client_id2 != -1)
-							{
-								if (clients[client_id2].connected == true)
-								{
-									send_hit_packet(client_id2, client_slot, hp);
-								}
-							}
-						}
-					}
-					if (status == STATUS::CRI_HITTED) {
-
-						add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 2000ms);
-
-						clients[client_id].playerinfo->setAniIndex(Anim::Hard_React);
-
-						int hp = clients[client_id].playerinfo->m_hp - 20;
-						if (hp < 0) hp = 0;
-						clients[client_id].playerinfo->setHP(hp);
-
-						PxVec3 dir = clients[client_id].playerinfo->m_Knockback;
-
-						for (int j = 0; j < MAX_ROOM_USER; ++j)
-						{
-							int client_id2 = it->clientNum[j];
-							if (client_id2 != -1)
-							{
-								if (clients[client_id2].connected == true)
-								{
-									send_critical_hit_packet(client_id2, client_slot, hp, dir);
-								}
-							}
-						}
-					}
-
-					if (status == STATUS::STUN) {
-
-						add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 1330ms);
-
-						clients[client_id].playerinfo->setAniIndex(Anim::Stun);
-
-						int hp = clients[client_id].playerinfo->m_hp - 2;
-						if (hp < 0) hp = 0;
-						clients[client_id].playerinfo->setHP(hp);
-
-						for (int j = 0; j < MAX_ROOM_USER; ++j)
-						{
-							int client_id2 = it->clientNum[j];
-							if (client_id2 != -1)
-							{
-								if (clients[client_id2].connected == true)
-								{
-									send_stun_packet(client_id2, client_slot, hp);
-								}
-							}
-						}
-					}
-
-					clients[client_id].playerinfo->hitted = false;
-				}
-
-				//clients[i].playerinfo->animate(fTime);
-
-				if (clients[client_id].playerinfo->m_PlayerController != nullptr) {
-					PxExtendedVec3 position = clients[client_id].playerinfo->m_PlayerController->getPosition();
-					//cout << int(i) << " Client Pos : " << position.x << "," << position.y - 17.5 << "," << position.z << endl;
-
-					clients[client_id].playerinfo->m_Pos.x = position.x;
-					if (clients[client_id].playerinfo->weapon_type == Weapon_King)
+					if (clients[client_id].playerinfo->hitted == true)
 					{
-						clients[client_id].playerinfo->m_Pos.y = position.y - 35.f;
+						char status = clients[client_id].playerinfo->m_status;
+
+						if (status == STATUS::HITTED) {
+
+							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 660ms);
+
+							int hp = clients[client_id].playerinfo->m_hp - 10;
+							if (hp <= 0) {
+								hp = 0;
+								clients[client_id].playerinfo->setAniIndex(Anim::Death);
+								clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
+								clients[client_id].playerinfo->m_PlayerController->release();
+								clients[client_id].playerinfo->m_PlayerController = nullptr;
+							}
+							else {
+								clients[client_id].playerinfo->setAniIndex(Anim::Small_React);
+							}
+							clients[client_id].playerinfo->setHP(hp);
+
+							for (int j = 0; j < MAX_ROOM_USER; ++j)
+							{
+								int client_id2 = it->clientNum[j];
+								if (client_id2 != -1)
+								{
+									if (clients[client_id2].connected == true)
+									{
+										send_hit_packet(client_id2, client_id, hp);
+									}
+								}
+							}
+						}
+						if (status == STATUS::CRI_HITTED) {
+
+							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 2000ms);
+
+							int hp = clients[client_id].playerinfo->m_hp - 20;
+							if (hp <= 0) {
+								hp = 0;
+								clients[client_id].playerinfo->setAniIndex(Anim::Death);
+								clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
+								clients[client_id].playerinfo->m_PlayerController->release();
+								clients[client_id].playerinfo->m_PlayerController = nullptr;
+							}
+							else {
+								clients[client_id].playerinfo->setAniIndex(Anim::Hard_React);
+							}
+							clients[client_id].playerinfo->setHP(hp);
+
+							PxVec3 dir = clients[client_id].playerinfo->m_Knockback;
+
+							for (int j = 0; j < MAX_ROOM_USER; ++j)
+							{
+								int client_id2 = it->clientNum[j];
+								if (client_id2 != -1)
+								{
+									if (clients[client_id2].connected == true)
+									{
+										send_critical_hit_packet(client_id2, client_id, hp, dir);
+									}
+								}
+							}
+						}
+
+						if (status == STATUS::STUN) {
+
+							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 1330ms);
+
+							int hp = clients[client_id].playerinfo->m_hp - 2;
+							if (hp <= 0) {
+								hp = 0;
+								clients[client_id].playerinfo->setAniIndex(Anim::Death);
+								clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
+								clients[client_id].playerinfo->m_PlayerController->release();
+								clients[client_id].playerinfo->m_PlayerController = nullptr;
+							}
+							else {
+								clients[client_id].playerinfo->setAniIndex(Anim::Stun);
+							}
+							clients[client_id].playerinfo->setHP(hp);
+
+							for (int j = 0; j < MAX_ROOM_USER; ++j)
+							{
+								int client_id2 = it->clientNum[j];
+								if (client_id2 != -1)
+								{
+									if (clients[client_id2].connected == true)
+									{
+										send_stun_packet(client_id2, client_id, hp);
+									}
+								}
+							}
+						}
+
+						clients[client_id].playerinfo->hitted = false;
 					}
-					else {
-						clients[client_id].playerinfo->m_Pos.y = position.y - 17.5f;
+
+					//clients[i].playerinfo->animate(fTime);
+
+					if (clients[client_id].playerinfo->m_PlayerController != nullptr) {
+						PxExtendedVec3 position = clients[client_id].playerinfo->m_PlayerController->getPosition();
+						//cout << int(i) << " Client Pos : " << position.x << "," << position.y - 17.5 << "," << position.z << endl;
+
+						clients[client_id].playerinfo->m_Pos.x = position.x;
+						if (clients[client_id].playerinfo->weapon_type == Weapon_King)
+						{
+							clients[client_id].playerinfo->m_Pos.y = position.y - 35.f;
+						}
+						else {
+							clients[client_id].playerinfo->m_Pos.y = position.y - 17.5f;
+						}
+						clients[client_id].playerinfo->m_Pos.z = position.z;
 					}
-					clients[client_id].playerinfo->m_Pos.z = position.z;
 				}
 			}
 		}
@@ -2554,13 +2679,17 @@ void broadcastPosPacket(int room_num)
 		{
 			if (clients[client_id].connected == true)
 			{
-				for (int j = 0; j < MAX_ROOM_USER; ++j)
+				if (clients[client_id].playerinfo->m_hp > 0)
 				{
-					if (it->clientNum[j] != -1)
+					for (int j = 0; j < MAX_ROOM_USER; ++j)
 					{
-						if (clients[it->clientNum[j]].connected == true)
+						int client_id2 = it->clientNum[j];
+						if (it->clientNum[j] != -1)
 						{
-							send_pos_packet(it->clientNum[i], j);
+							if (clients[it->clientNum[j]].connected == true)
+							{
+								send_pos_packet(client_id2, client_id);
+							}
 						}
 					}
 				}
@@ -2617,7 +2746,7 @@ void logic()
 				clientUpdateProcess(it->room_num);
 
 				it->PosBroadCastTime += 1.f / 60.f;
-				if (it->PosBroadCastTime > 0.1f)
+				if (it->PosBroadCastTime > 0.05f)
 				{
 					int room_num = it->room_num;
 					broadcastPosPacket(room_num);

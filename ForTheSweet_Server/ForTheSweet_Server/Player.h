@@ -141,5 +141,6 @@ public:
 
 	int m_hp;
 	bool lollipop_heal;
+	bool dead = false;
 };
 

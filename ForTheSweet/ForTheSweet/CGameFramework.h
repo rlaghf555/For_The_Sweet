@@ -171,7 +171,7 @@ public:
 	void GameOver();
 
 	//CPU와 GPU를 동기화하는 함수이다.
-
+	
 	// Socket
 	void processPacket(char *ptr);
 

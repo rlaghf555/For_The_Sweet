@@ -72,6 +72,8 @@ CPlayer::CPlayer()
 	m_PlayerController = nullptr;
 	//m_HitReport = nullptr;
 	m_AttackTrigger = nullptr;
+
+	lollipop_heal = false;
 }
 
 CPlayer::~CPlayer()
@@ -120,7 +122,7 @@ void CPlayer::setHP(int hp)
 
 void  CPlayer::setLollipopHeal(bool heal)
 {
-	lollipop_heal = true;
+	lollipop_heal = heal;
 }
 
 void CPlayer::setPlayerController(CPhysx *physx)

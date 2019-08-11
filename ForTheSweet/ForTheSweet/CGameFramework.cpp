@@ -539,9 +539,10 @@ void CGameFramework::processPacket(char *ptr)
 
 			m_pScene->getplayer(p_pos.id)->SetDashed(p_pos.dashed);
 
-			if (m_pScene->getplayer(p_pos.id)->m_Jump.mJump == false)
+			
+			if (m_pScene->getplayer(p_pos.id)->GetStatus() == STATUS::FREE)
 			{
-				if (m_pScene->getplayer(p_pos.id)->GetStatus() == STATUS::FREE)
+				if (m_pScene->getplayer(p_pos.id)->m_Jump.mJump == false)
 				{
 					if (p_pos.ani_index <= Anim_Run) {
 						m_pScene->getplayer(p_pos.id)->ChangeAnimation(p_pos.ani_index);
@@ -655,6 +656,16 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_MP());	//mp
+
+		if (m_pScene->getplayer(p_hit.id)->Get_HP() <= 0) {
+			XMFLOAT3 velzero = XMFLOAT3(0.f, 0.f, 0.f);
+			m_pScene->getplayer(p_hit.id)->SetVelocity(velzero);
+			m_pScene->getplayer(p_hit.id)->ChangeAnimation(Anim_Death);
+			m_pScene->getplayer(p_hit.id)->DisableLoop();
+			m_pPhysx->m_Scene->lockWrite();
+			m_pScene->getplayer(p_hit.id)->m_PlayerController->release();
+			m_pPhysx->m_Scene->unlockWrite();
+		}
 		break;
 	}
 
@@ -684,6 +695,16 @@ void CGameFramework::processPacket(char *ptr)
 			camerashake = true;
 			//cout << "카메라 흔들림" << endl;
 		}
+
+		if (m_pScene->getplayer(p_cri_hit.id)->Get_HP() <= 0) {
+			XMFLOAT3 velzero = XMFLOAT3(0.f, 0.f, 0.f);
+			m_pScene->getplayer(p_cri_hit.id)->SetVelocity(velzero);
+			m_pScene->getplayer(p_cri_hit.id)->ChangeAnimation(Anim_Death);
+			m_pScene->getplayer(p_cri_hit.id)->DisableLoop();
+			m_pPhysx->m_Scene->lockWrite();
+			m_pScene->getplayer(p_cri_hit.id)->m_PlayerController->release();
+			m_pPhysx->m_Scene->unlockWrite();
+		}
 		break;
 	}
 	case SC_STUN:
@@ -700,6 +721,16 @@ void CGameFramework::processPacket(char *ptr)
 
 		m_pScene->m_ppUIShaders[p_stun.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_stun.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_stun.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_stun.id]->Get_MP());	//mp
+
+		if (m_pScene->getplayer(p_stun.id)->Get_HP() <= 0) {
+			XMFLOAT3 velzero = XMFLOAT3(0.f, 0.f, 0.f);
+			m_pScene->getplayer(p_stun.id)->SetVelocity(velzero);
+			m_pScene->getplayer(p_stun.id)->ChangeAnimation(Anim_Death);
+			m_pScene->getplayer(p_stun.id)->DisableLoop();
+			m_pPhysx->m_Scene->lockWrite();
+			m_pScene->getplayer(p_stun.id)->m_PlayerController->release();
+			m_pPhysx->m_Scene->unlockWrite();
+		}
 		break;
 	}
 	case SC_HEAL:
@@ -820,8 +851,8 @@ void CGameFramework::processPacket(char *ptr)
 
 		memcpy(&p_unpick_weapon, ptr, sizeof(p_unpick_weapon));
 
-		int type = p_unpick_weapon.weapon_type;
-		int index = p_unpick_weapon.weapon_index;
+		int type = int(p_unpick_weapon.weapon_type);
+		int index = int(p_unpick_weapon.weapon_index);
 		float x = p_unpick_weapon.x;
 		float y = p_unpick_weapon.y;
 		float z = p_unpick_weapon.z;
@@ -854,13 +885,15 @@ void CGameFramework::processPacket(char *ptr)
 
 		if (type == M_Weapon_chocolate)
 		{
+			cout << "ADD CHOCO : " << int(p_unpick_weapon.weapon_index) << "," << int(p_unpick_weapon.weapon_type) << endl;
+
 			XMFLOAT3 look = m_pScene->m_pPlayer[p_unpick_weapon.id]->GetLook();
 			XMFLOAT3 right = m_pScene->m_pPlayer[p_unpick_weapon.id]->GetRight();
 			XMFLOAT3 pos = m_pScene->m_WeaponShader[type]->getObject(index)->GetPosition();
 
-			cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
-			cout << "right : " << right.x << "," << right.y << "," << right.z << endl;
-			cout << "pos : " << x << "," << y << "," << z << endl;
+			//cout << "look : " << look.x << "," << look.y << "," << look.z << endl;
+			//cout << "right : " << right.x << "," << right.y << "," << right.z << endl;
+			//cout << "pos : " << x << "," << y << "," << z << endl;
 
 			float scale_ = 1.6f;
 
@@ -874,6 +907,7 @@ void CGameFramework::processPacket(char *ptr)
 			}
 			m_pPhysx->m_Scene->lockWrite();
 			Choco_Actor[index] = m_pPhysx->getRotateBox(phyx_pos, phyx_look, phyx_size);
+			cout << "Succcess\n";
 			m_pPhysx->m_Scene->unlockWrite();
 
 			m_pScene->m_WeaponShader[type]->getObject(index)->init();
@@ -1530,6 +1564,7 @@ void CGameFramework::ProcessInput()
 	{
 		if (move_actor_flag == true)
 		{
+			m_pPhysx->m_Scene->lockWrite();
 			PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
 			pos.p.y += 25.f * m_GameTimer.GetTimeElapsed();
 			if (pos.p.y > 0.0f) {
@@ -1540,6 +1575,7 @@ void CGameFramework::ProcessInput()
 
 			XMFLOAT3 pos1(pos.p.x, pos.p.y, pos.p.z);
 			m_pScene->m_MapShader[2]->getObjects()->SetPosition(pos1);
+			m_pPhysx->m_Scene->unlockWrite();
 		}
 		if (m_pPlayer)
 		{
@@ -2626,111 +2662,114 @@ void CGameFramework::UpdateProcess()
 			if (m_pScene->m_pPlayer[i]) {
 				if (m_pScene->m_pPlayer[i]->GetConnected())
 				{
-					char status = m_pScene->m_pPlayer[i]->GetStatus();
-					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK 
-						|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
+					if (m_pScene->m_pPlayer[i]->Get_HP() > 0)
 					{
-						continue;
-					}
-					else if (status == STATUS::CRI_HITTED) 
-					{
-						PxVec3 knockback_dir = m_pScene->m_pPlayer[i]->m_Knockback;
-						PxVec3 dist = knockback_dir * m_GameTimer.GetTimeElapsed() * KnockBack_Vel;
-						
-						float jump_height = 0.0f;
-
-						if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
-							m_pScene->m_pPlayer[i]->m_Jump.stopJump();
-						}
-						else {
-							m_pScene->m_pPlayer[i]->m_Fall.startJump(0);
-							jump_height = m_pScene->m_pPlayer[i]->m_Fall.getHeight(m_GameTimer.GetTimeElapsed());
-						}
-
-						dist.y += jump_height;
-
-						PxControllerFilters filters;
-						const PxU32 flags = m_pScene->m_pPlayer[i]->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
-					}
-					else
-					{
-						PxExtendedVec3 position;
-						PxVec3 vel;
-						PxVec3 velocity;
-
-						XMFLOAT3 pos = m_pScene->m_pPlayer[i]->GetPosition();
-						position.x = pos.x;
-						//position.y = pos.y + 17.5;
-						if (m_pScene->m_pPlayer[i]->king == true) {
-							position.y = pos.y + 35.f;
-						}
-						else {
-							position.y = pos.y + 17.5f;
-						}
-						position.z = pos.z;
-						m_pScene->m_pPlayer[i]->m_PlayerController->setPosition(position);
-
-						XMFLOAT3 xmf_disp = m_pScene->m_pPlayer[i]->GetVelocity();
-
-						velocity.x = xmf_disp.x;
-						velocity.y = xmf_disp.y;
-						velocity.z = xmf_disp.z;
-
-						vel = velocity.getNormalized();
-
-						if (m_pScene->m_pPlayer[i]->GetDashed())
+						char status = m_pScene->m_pPlayer[i]->GetStatus();
+						if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK
+							|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
 						{
-							if (status != STATUS::SKILL_WEAPON_MOVE)
+							continue;
+						}
+						else if (status == STATUS::CRI_HITTED)
+						{
+							PxVec3 knockback_dir = m_pScene->m_pPlayer[i]->m_Knockback;
+							PxVec3 dist = knockback_dir * m_GameTimer.GetTimeElapsed() * KnockBack_Vel;
+
+							float jump_height = 0.0f;
+
+							if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
+								m_pScene->m_pPlayer[i]->m_Jump.stopJump();
+							}
+							else {
+								m_pScene->m_pPlayer[i]->m_Fall.startJump(0);
+								jump_height = m_pScene->m_pPlayer[i]->m_Fall.getHeight(m_GameTimer.GetTimeElapsed());
+							}
+
+							dist.y += jump_height;
+
+							PxControllerFilters filters;
+							const PxU32 flags = m_pScene->m_pPlayer[i]->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
+						}
+						else
+						{
+							PxExtendedVec3 position;
+							PxVec3 vel;
+							PxVec3 velocity;
+
+							XMFLOAT3 pos = m_pScene->m_pPlayer[i]->GetPosition();
+							position.x = pos.x;
+							//position.y = pos.y + 17.5;
+							if (m_pScene->m_pPlayer[i]->king == true) {
+								position.y = pos.y + 35.f;
+							}
+							else {
+								position.y = pos.y + 17.5f;
+							}
+							position.z = pos.z;
+							m_pScene->m_pPlayer[i]->m_PlayerController->setPosition(position);
+
+							XMFLOAT3 xmf_disp = m_pScene->m_pPlayer[i]->GetVelocity();
+
+							velocity.x = xmf_disp.x;
+							velocity.y = xmf_disp.y;
+							velocity.z = xmf_disp.z;
+
+							vel = velocity.getNormalized();
+
+							if (m_pScene->m_pPlayer[i]->GetDashed())
+							{
+								if (status != STATUS::SKILL_WEAPON_MOVE)
+								{
+									vel *= 2.f;
+								}
+							}
+
+							if (fever == true)
 							{
 								vel *= 2.f;
 							}
-						}
 
-						if (fever == true)
-						{
-							vel *= 2.f;
-						}
+							float jump_height;
 
-						float jump_height;
-
-						if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
-							jump_height = m_pScene->m_pPlayer[i]->m_Jump.getHeight(m_GameTimer.GetTimeElapsed());
-							vel = m_pScene->m_pPlayer[i]->GetJumpVelocity();
-						}
-						else {
-							m_pScene->m_pPlayer[i]->m_Fall.startJump(0);
-							jump_height = m_pScene->m_pPlayer[i]->m_Fall.getHeight(m_GameTimer.GetTimeElapsed());
-						}
-
-
-						//cout << " Vel : " << vel.x << ", " << vel.y << ", " << vel.z << endl;
-
-						PxVec3 dist = vel * m_GameTimer.GetTimeElapsed() * NORMAL_SPEED;
-						dist.y += jump_height;
-
-						PxControllerFilters filters;
-						const PxU32 flags = m_pScene->m_pPlayer[i]->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
-						if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
-						{
-							//cout << "충돌\n";
-							if (m_pScene->m_pPlayer[i]->m_Jump.mJump) {
-								m_pScene->m_pPlayer[i]->m_Jump.stopJump();
-								PxVec3 initVel = PxVec3(0, 0, 0);
-								m_pScene->m_pPlayer[i]->SetJumpVelocity(initVel);
-								if (velocity.magnitude() > 0.f)
-								{
-									if (m_pScene->m_pPlayer[i]->GetDashed())
-										m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Run);
-									else
-										m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Walk);
-								}
-								else {
-									m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Idle);
-								}
-								m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+							if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
+								jump_height = m_pScene->m_pPlayer[i]->m_Jump.getHeight(m_GameTimer.GetTimeElapsed());
+								vel = m_pScene->m_pPlayer[i]->GetJumpVelocity();
 							}
-							if (m_pScene->m_pPlayer[i]->m_Fall.mJump) {
-								m_pScene->m_pPlayer[i]->m_Fall.stopJump();
+							else {
+								m_pScene->m_pPlayer[i]->m_Fall.startJump(0);
+								jump_height = m_pScene->m_pPlayer[i]->m_Fall.getHeight(m_GameTimer.GetTimeElapsed());
+							}
+
+
+							//cout << " Vel : " << vel.x << ", " << vel.y << ", " << vel.z << endl;
+
+							PxVec3 dist = vel * m_GameTimer.GetTimeElapsed() * NORMAL_SPEED;
+							dist.y += jump_height;
+
+							PxControllerFilters filters;
+							const PxU32 flags = m_pScene->m_pPlayer[i]->m_PlayerController->move(dist, 0.001, 1 / 60, filters);
+							if (flags & PxControllerCollisionFlag::eCOLLISION_DOWN)
+							{
+								//cout << "충돌\n";
+								if (m_pScene->m_pPlayer[i]->m_Jump.mJump) {
+									m_pScene->m_pPlayer[i]->m_Jump.stopJump();
+									PxVec3 initVel = PxVec3(0, 0, 0);
+									m_pScene->m_pPlayer[i]->SetJumpVelocity(initVel);
+									if (velocity.magnitude() > 0.f)
+									{
+										if (m_pScene->m_pPlayer[i]->GetDashed())
+											m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Run);
+										else
+											m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Walk);
+									}
+									else {
+										m_pScene->m_pPlayer[i]->ChangeAnimation(Anim_Idle);
+									}
+									m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+								}
+								if (m_pScene->m_pPlayer[i]->m_Fall.mJump) {
+									m_pScene->m_pPlayer[i]->m_Fall.stopJump();
+								}
 							}
 						}
 					}
@@ -2853,20 +2892,23 @@ void CGameFramework::FrameAdvance()
 			if (m_pScene->m_pPlayer[i]) {
 				if (m_pScene->m_pPlayer[i]->GetConnected())
 				{
-					PxExtendedVec3 playerPosition = m_pScene->m_pPlayer[i]->m_PlayerController->getPosition();
-					XMFLOAT3 position;
-					position.x = playerPosition.x;
-					//position.y = playerPosition.y - 17.5f;
-					if (m_pScene->m_pPlayer[i]->king == true) {
-						position.y = playerPosition.y - 35.0f;
+					if (m_pScene->m_pPlayer[i]->Get_HP() > 0)
+					{
+						PxExtendedVec3 playerPosition = m_pScene->m_pPlayer[i]->m_PlayerController->getPosition();
+						XMFLOAT3 position;
+						position.x = playerPosition.x;
+						//position.y = playerPosition.y - 17.5f;
+						if (m_pScene->m_pPlayer[i]->king == true) {
+							position.y = playerPosition.y - 35.0f;
+						}
+						else {
+							position.y = playerPosition.y - 17.5f;
+						}
+						position.z = playerPosition.z;
+						//m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
+						//m_pCamera->SetLookAt(position);
+						m_pScene->m_pPlayer[i]->SetPosition(position);
 					}
-					else {
-						position.y = playerPosition.y - 17.5f;
-					}	
-					position.z = playerPosition.z;
-					//m_pCamera->SetPosition(Vector3::Add(position, m_pCamera->GetOffset()));
-					//m_pCamera->SetLookAt(position);
-					m_pScene->m_pPlayer[i]->SetPosition(position);
 				}
 			}
 		}
