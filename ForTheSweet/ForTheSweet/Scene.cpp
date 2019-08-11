@@ -1520,9 +1520,8 @@ int CScene::Collision_telleport_Server(int index)
 		if (result) {
 			return i;
 		}
-		else
-			return -1;
 	}
+	return -1;
 }
 
 void CScene::Collision_Cotton()

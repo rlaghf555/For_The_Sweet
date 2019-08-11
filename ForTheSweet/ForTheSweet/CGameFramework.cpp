@@ -2904,7 +2904,17 @@ void CGameFramework::CollisionProcess()
 					if (selected_map == M_Map_3) {
 						if (SERVER_ON) {
 							int result = m_pScene->Collision_telleport_Server(My_ID);
-							//-1 æ»∫ŒµÛ»˚
+							
+							if (result != -1) {
+								cs_packet_teleport p_tele;
+								p_tele.size = sizeof(cs_packet_teleport);
+								p_tele.type = CS_TELEPORT;
+								p_tele.index = result;
+
+								cout << "tele index : " << result;
+
+								send(m_pSocket->clientSocket, (char *)&p_tele, sizeof(cs_packet_teleport), 0);
+							}
 						}
 						else 
 							m_pScene->Collision_telleport(My_ID);	// ¿”Ω√

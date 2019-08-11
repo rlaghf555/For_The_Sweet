@@ -1467,6 +1467,36 @@ void process_packet(char key, char *buffer)
 
 		break;
 	}
+	case CS_TELEPORT:
+	{
+		cs_packet_teleport *p_teleport;
+		p_teleport = reinterpret_cast<cs_packet_teleport*>(buffer);
+
+		int room_num = clients[key].room_num;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		int index = p_teleport->index;
+		cout << "Teleport index : " << index << endl;
+		PxVec3 telepos = DoorTelepos[index];
+		cout << "Teleport Pos : " << telepos.x << ", " << telepos.y << ", " << telepos.z << endl;
+		clients[key].playerinfo->m_Pos = telepos;
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_pos_packet(client_id, key);
+				}
+			}
+		}
+		break;
+	}
 	}
 }
 

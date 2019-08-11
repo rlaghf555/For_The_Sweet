@@ -22,6 +22,7 @@ constexpr int CS_JUMP = 17;
 constexpr int CS_DASH = 18;
 constexpr int CS_GUARD_OFF = 19;
 constexpr int CS_WEAPON_SKILL = 20;
+constexpr int CS_TELEPORT = 21;
 
 constexpr int CS_MAKE_ROOM = 100;
 constexpr int CS_ATTEND_ROOM = 101;
@@ -171,6 +172,12 @@ struct cs_packet_weapon_skill {
 	char size;
 	char type;
 	//char weapon_type;
+};
+
+struct cs_packet_teleport {
+	char size;
+	char type;
+	char index;
 };
 
 struct sc_packet_login {
