@@ -208,7 +208,7 @@ bool CGameFramework::Restart()
 		
 	}	
 	playing = true;
-
+	game_end = false;
 
 	if (SERVER_ON) {
 		if (UI_ON) {
@@ -844,9 +844,12 @@ void CGameFramework::processPacket(char *ptr)
 		}
 		if (type == M_Weapon_chocolate)
 		{
-			m_pPhysx->m_Scene->lockWrite();
-			Choco_Actor[index]->release();
-			m_pPhysx->m_Scene->unlockWrite();
+			PxVec3 pos(0, -10000, 0);
+			PxTransform tmp(pos);
+			Choco_Actor[index]->setGlobalPose(tmp);
+			//m_pPhysx->m_Scene->lockWrite();
+			//Choco_Actor[index]->release();
+			//m_pPhysx->m_Scene->unlockWrite();
 		}
 		m_pScene->weapon_box[type][index]->pick = false;
 
@@ -1124,7 +1127,9 @@ void CGameFramework::processPacket(char *ptr)
 	}
 	case SC_WIN:
 	{
+		game_end = true;
 		m_pScene->m_ppUIShaders[20]->ShowMessage(true);
+		SoundManager::GetInstance()->PlaySounds(WIN);
 		if (mode == MODE_INDIVIDUAL) {			
 				m_pScene->m_pPlayer[My_ID]->ChangeAnimation(Anim_Victory);
 				m_pScene->m_pPlayer[My_ID]->EnableLoop();			
@@ -1151,7 +1156,9 @@ void CGameFramework::processPacket(char *ptr)
 	}
 	case SC_LOSE:
 	{
+		game_end = true;
 		m_pScene->m_ppUIShaders[20]->ShowMessage(false);
+		SoundManager::GetInstance()->PlaySounds(LOSE);
 		if (mode == MODE_INDIVIDUAL) {
 			for (int i = 0; i < MAX_USER; i++) {
 				if (m_pScene->m_pPlayer[i]->GetConnected())
@@ -1429,7 +1436,7 @@ void CGameFramework::BuildObjects()
 
 		}
 	}
-
+	game_end = false;
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
@@ -2952,7 +2959,7 @@ void CGameFramework::FrameAdvance()
 
 	m_GameTimer.Tick(60.0f);
 	if (m_pPlayer) {
-		if (m_pPlayer->Get_HP() > 0)
+		if (m_pPlayer->Get_HP() > 0 && game_end == false)
 			ProcessInput();
 	}
 
