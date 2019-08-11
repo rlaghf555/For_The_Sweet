@@ -69,8 +69,9 @@ constexpr int MAP_3_FLOOR_3 = 6;
 constexpr int MAP_3_IN = 7;
 constexpr int MAP_3_IN_STAIR_1 = 8;
 constexpr int MAP_3_IN_STAIR_2 = 9;
-constexpr int MAP_3_STAIR = 10;
-constexpr int MAP_MACARON = 11;
+constexpr int MAP_3_IN_WALL = 10;
+constexpr int MAP_3_STAIR = 11;
+constexpr int MAP_MACARON = 12;
 
 // Weapon
 constexpr int Weapon_Lollipop = 0;

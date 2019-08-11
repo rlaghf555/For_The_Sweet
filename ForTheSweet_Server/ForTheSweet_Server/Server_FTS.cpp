@@ -3197,27 +3197,6 @@ void logic()
 			}
 			else if (it->room_status == ROOM_ST_END)
 			{
-				for (int i = 0; i < MAX_ROOM_USER; ++i)
-				{
-					int client_id = it->clientNum[i];
-					if (client_id != -1)
-					{
-						if (clients[client_id].connected == true)
-						{
-							cout << client_id << endl;
-							//if(clients[client_id].playerinfo->m_PlayerController != NULL)
-							//	clients[client_id].playerinfo->m_PlayerController->release();
-						}
-					}
-				}
-				if (it->m_PlayerManager)
-					//it->m_PlayerManager->release();
-				if (it->m_Simulator) {
-					//delete it->m_Simulator;
-					//it->m_Simulator = NULL;
-				}
-				if (it->m_Dispatcher)
-					//it->m_Dispatcher->release();
 				if (it->m_Scene)
 					it->m_Scene->release();
 
@@ -3257,7 +3236,7 @@ void logic()
 
 void mapLoad()
 {
-	char title[12][40];
+	char title[13][40];
 	char txt[8];
 
 	sprintf_s(txt, sizeof(txt), ".txt");
@@ -3271,10 +3250,11 @@ void mapLoad()
 	sprintf_s(title[7], sizeof(title[7]), "map_3_in");
 	sprintf_s(title[8], sizeof(title[8]), "map_3_in_stair1");
 	sprintf_s(title[9], sizeof(title[9]), "map_3_in_stair2");
-	sprintf_s(title[10], sizeof(title[10]), "map_3_stair");
-	sprintf_s(title[11], sizeof(title[11]), "map_macaron");
+	sprintf_s(title[10], sizeof(title[10]), "map_3_in_wall");
+	sprintf_s(title[11], sizeof(title[11]), "map_3_stair");
+	sprintf_s(title[12], sizeof(title[12]), "map_macaron");
 
-	for (int i = 0; i < 12; ++i)
+	for (int i = 0; i < 13; ++i)
 	{
 		strcat_s(title[i], sizeof(title[i]), txt);
 

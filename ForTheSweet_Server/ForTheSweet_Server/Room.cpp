@@ -185,12 +185,12 @@ void CRoom::start(int map_type, const vector<vector<PxVec3>>& vectex, const vect
 	// ¸Ê ·Îµù
 	if (map_type == MAP_Wehas)
 	{
-		// ¸Ê 1 ±âº» ¹Ù´Ú
 		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
 		PxMeshScale PxScale;
 		PxScale.scale = scaleTmp;
 		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
 
+		// ¸Ê 1 ±âº» ¹Ù´Ú
 		PxTriangleMesh* triMesh = GetTriangleMesh(vectex[MAP_1_BASE], index[MAP_1_BASE], physx);
 		PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
 		PxTransform location(0, 0, 0);
@@ -216,11 +216,225 @@ void CRoom::start(int map_type, const vector<vector<PxVec3>>& vectex, const vect
 	}
 	else if (room_map == MAP_Oreo)
 	{
+		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+		PxMeshScale PxScale;
+		PxScale.scale = scaleTmp;
+		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+		PxTriangleMesh* triMesh;
 
+		// ¸Ê 2 ±âº» ¹Ù´Ú
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_2_BASE], index[MAP_2_BASE], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(0, -20, 0);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 2 ¸¶Ä«·Õ 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_MACARON], index[MAP_MACARON], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-185, -10, 0);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_MACARON], index[MAP_MACARON], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(185, -10, 0);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 2 ÃÊÄÝ¸´¹Ù 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_2_CHOCOHAR], index[MAP_2_CHOCOHAR], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-300, -20, 0);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_2_CHOCOHAR], index[MAP_2_CHOCOHAR], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(300, -20, 0);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
 	}
 	else if (room_map == MAP_Cake)
 	{
+		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+		PxMeshScale PxScale;
+		PxScale.scale = scaleTmp;
+		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+		PxTriangleMesh* triMesh;
 
+		{
+			// ¸Ê 3 1Ãþ 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_1], index[MAP_3_FLOOR_1], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, -132, 0);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_1], index[MAP_3_FLOOR_1], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(250, -132, 0);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 3 2Ãþ 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_2], index[MAP_3_FLOOR_2], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, 0, 50);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_2], index[MAP_3_FLOOR_2], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(250, 0, 50);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 3 3Ãþ 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_3], index[MAP_3_FLOOR_3], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, 0, 50);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_3], index[MAP_3_FLOOR_3], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, 0, 50);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 3 ³»ºÎ 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN], index[MAP_3_IN], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN], index[MAP_3_IN], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 3 ³»ºÎ °è´Ü 1Ãþ 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN_STAIR_1], index[MAP_3_IN_STAIR_1], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN_STAIR_1], index[MAP_3_IN_STAIR_1], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 3 ³»ºÎ °è´Ü 2Ãþ 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN_STAIR_2], index[MAP_3_IN_STAIR_2], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN_STAIR_2], index[MAP_3_IN_STAIR_2], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 3 ³»ºÎ º® 2°³
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN_WALL], index[MAP_3_IN_WALL], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(-250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_IN_WALL], index[MAP_3_IN_WALL], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(250, 500, 40);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+		{
+			// ¸Ê 3 ¸¶Ä«·Õ
+			PxTriangleMesh* macaron = GetTriangleMesh(vectex[MAP_MACARON], index[MAP_MACARON], physx);
+			PxTriangleMeshGeometry meshGeo(macaron, PxScale);
+			PxTransform location(0, 80, 50);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+			move_actor = base;
+		}
+
+		// ¸Ê 3 °¡¿îµ¥ ´Ù¸®
+		for (int i = 0; i < 4; ++i)
+		{
+			triMesh = GetTriangleMesh(vectex[MAP_3_BRIDGE], index[MAP_3_BRIDGE], physx);
+			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+			PxTransform location(0, 0, i * 20 + 30);
+			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+			m_Scene->addActor(*base);
+		}
+
+		// ¸Ê 3 ÁÂ °è´Ü
+		for (int i = 0; i < 11; ++i)
+		{
+			if (i == 10)
+			{
+				triMesh = GetTriangleMesh(vectex[MAP_3_STAIR], index[MAP_3_STAIR], physx);
+				PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+				PxTransform location(-378, (i - 1) * 8, i * 18 - 50);
+				PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+				m_Scene->addActor(*base);
+			}
+			else
+			{
+				triMesh = GetTriangleMesh(vectex[MAP_3_STAIR], index[MAP_3_STAIR], physx);
+				PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+				PxTransform location(-378, i * 8, i * 18 - 50);
+				PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+				m_Scene->addActor(*base);
+			}
+		}
+
+		// ¸Ê 3 ¿ì °è´Ü
+		for (int i = 0; i < 11; ++i)
+		{
+			if (i == 10)
+			{
+				triMesh = GetTriangleMesh(vectex[MAP_3_STAIR], index[MAP_3_STAIR], physx);
+				PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+				PxTransform location(378, (i - 1) * 8, i * 18 - 50);
+				PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+				m_Scene->addActor(*base);
+			}
+			else
+			{
+				triMesh = GetTriangleMesh(vectex[MAP_3_STAIR], index[MAP_3_STAIR], physx);
+				PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+				PxTransform location(378, i * 8, i * 18 - 50);
+				PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+				m_Scene->addActor(*base);
+			}
+		}
 	}
 
 	if (room_mode == ROOM_MODE_SOLO)
@@ -255,10 +469,12 @@ void CRoom::start(int map_type, const vector<vector<PxVec3>>& vectex, const vect
 		weapon_respawn[i].index = 0;
 		weapon_respawn[i].type = 0;
 	}
+
 	PosBroadCastTime = 0.0f;
 	trigger_order = 0;
 	move_actor_flag = false;
 	timer = MAX_TIMER;
+	end_timer = 0.0f;
 	room_status = ROOM_ST_LOADING;
 }
 
