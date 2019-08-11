@@ -41,7 +41,7 @@ PxVec3 PlayerInitPos_3[8] = {
 	PxVec3(-368, 1.31468, -132),PxVec3(368, 1.31468,-132),PxVec3(-248, 76.6323,-32),PxVec3(248, 76.6323,-32)
 };
 
-PxVec3 Map2_Teleport[2] = {
+PxVec3 OreoTeleport[2] = {
 	PxVec3(-186, 3.77634, -1.5),
 	PxVec3(186, 3.77634, -1.5)
 };
@@ -531,6 +531,18 @@ void send_end_packet(char client_id) {
 	sendPacket(client_id, &p_end);
 }
 
+void send_teleport_packet(char client_id, char slot, PxVec3 pos) {
+	sc_packet_teleport p_teleport;
+	p_teleport.type = SC_TELEPORT;
+	p_teleport.size = sizeof(sc_packet_teleport);
+	p_teleport.id = slot;
+	p_teleport.x = pos.x;
+	p_teleport.y = pos.y;
+	p_teleport.z = pos.z;
+
+	sendPacket(client_id, &p_teleport);
+}
+
 void send_room_setting_weapon(int room_num)
 {
 	room_l.lock();
@@ -991,8 +1003,8 @@ void process_packet(char key, char *buffer)
 						it->weapon_list[type][j].owner = -1;
 						if (it->room_map == MAP_Wehas)
 							it->weapon_list[type][j].pos = WeaponInitPos_1[i];
-						//if (it->room_map == MAP_Oreo)
-						//	it->weapon_list[type][j].pos = WeaponInitPos_2[i];
+						if (it->room_map == MAP_Oreo)
+							it->weapon_list[type][j].pos = WeaponInitPos_2[i];
 						if (it->room_map == MAP_Cake)
 							it->weapon_list[type][j].pos = WeaponInitPos_3[i];
 						it->weapon_list[type][j].respawn_index = i;
@@ -1514,12 +1526,13 @@ void worker_thread()
 		int key = static_cast<char>(io_key);
 
 		if (is_error == FALSE) {
-			//cout << "Error in GQCS\n";
-			cout << "[" << int(key) << "] Clients Disconnect\n";
-			sc_packet_remove p_remove;
-			p_remove.id = key;
-			p_remove.type = SC_REMOVE;
-			p_remove.size = sizeof(sc_packet_remove);
+			clients[key].connected = false;
+			////cout << "Error in GQCS\n";
+			//cout << "[" << int(key) << "] Clients Disconnect\n";
+			//sc_packet_remove p_remove;
+			//p_remove.id = key;
+			//p_remove.type = SC_REMOVE;
+			//p_remove.size = sizeof(sc_packet_remove);
 
 			// 접속 종료한 클라
 			//for (int i = 0; i < MAX_USER; ++i)
@@ -1541,11 +1554,12 @@ void worker_thread()
 		}
 		if (io_byte == 0)
 		{
+			clients[key].connected = false;
 			//cout << "[" << int(key) << "] Clients Disconnect\n";
-			sc_packet_remove p_remove;
-			p_remove.id = key;
-			p_remove.type = SC_REMOVE;
-			p_remove.size = sizeof(sc_packet_remove);
+			//sc_packet_remove p_remove;
+			//p_remove.id = key;
+			//p_remove.type = SC_REMOVE;
+			//p_remove.size = sizeof(sc_packet_remove);
 
 			//for (int i = 0; i < MAX_USER; ++i)
 			//{
@@ -2751,6 +2765,74 @@ void clientInputProcess(int room_num)
 		}
 	}
 
+	if (it->room_map == MAP_Oreo)
+	{
+		if (it->oreo_team1_spawn == true)
+		{
+			for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						if (it->team_dead[i] == true)
+						{
+							// Team1 다음 주자
+							PxExtendedVec3 pos = PXtoPXEx(OreoTeleport[0]);
+							clients[client_id].playerinfo->m_PlayerController->setFootPosition(pos);
+							for (int j = 0; j < MAX_ROOM_USER; ++j)
+							{
+								int client_id2 = it->clientNum[j];
+								if (client_id2 != -1)
+								{
+									if (clients[client_id2].connected == true)
+									{
+										send_teleport_packet(client_id2, i, OreoTeleport[0]);
+									}
+								}
+							}
+							it->oreo_team1_spawn = false;
+							break;
+						}
+					}
+				}
+			}
+		}
+		if (it->oreo_team2_spawn == true)
+		{
+			for (int i = 4; i < 4 + (MAX_ROOM_USER / 2); ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						if (it->team_dead[i] == true)
+						{
+							// Team2 다음 주자
+							PxExtendedVec3 pos = PXtoPXEx(OreoTeleport[1]);
+							clients[client_id].playerinfo->m_PlayerController->setFootPosition(pos);
+							for (int j = 0; j < MAX_ROOM_USER; ++j)
+							{
+								int client_id2 = it->clientNum[j];
+								if (client_id2 != -1)
+								{
+									if (clients[client_id2].connected == true)
+									{
+										send_teleport_packet(client_id2, i, OreoTeleport[1]);
+									}
+								}
+							}
+							it->oreo_team2_spawn = false;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		int client_id = it->clientNum[i];
@@ -2933,6 +3015,14 @@ void clientUpdateProcess(int room_num)
 									{
 										char slot = clients[client_id].slot;
 										it->team_dead[slot] = false;
+										if (it->room_mode == ROOM_MODE_KING) {
+											if (slot >= 0 && slot < 4) {
+												it->oreo_team1_spawn = true;
+											}
+											else {
+												it->oreo_team2_spawn = true;
+											}
+										}
 									}
 								}
 								else {
@@ -2975,6 +3065,14 @@ void clientUpdateProcess(int room_num)
 									{
 										char slot = clients[client_id].slot;
 										it->team_dead[slot] = false;
+										if (it->room_mode == ROOM_MODE_KING) {
+											if (slot >= 0 && slot < 4) {
+												it->oreo_team1_spawn = true;
+											}
+											else {
+												it->oreo_team2_spawn = true;
+											}
+										}
 									}
 								}
 								else {
@@ -3020,6 +3118,14 @@ void clientUpdateProcess(int room_num)
 									{
 										char slot = clients[client_id].slot;
 										it->team_dead[slot] = false;
+										if (it->room_mode == ROOM_MODE_KING) {
+											if (slot >= 0 && slot < 4) {
+												it->oreo_team1_spawn = true;
+											}
+											else {
+												it->oreo_team2_spawn = true;
+											}
+										}
 									}
 								}
 								else {
@@ -3079,6 +3185,14 @@ void clientUpdateProcess(int room_num)
 						{
 							char slot = clients[client_id].slot;
 							it->team_dead[slot] = false;
+							if (it->room_mode == ROOM_MODE_KING) {
+								if (slot >= 0 && slot < 4) {
+									it->oreo_team1_spawn = true;
+								}
+								else {
+									it->oreo_team2_spawn = true;
+								}
+							}
 						}
 
 						clients[client_id].playerinfo->setHP(hp);
@@ -3172,6 +3286,10 @@ void logic()
 
 				if (it->room_mode == MAP_Cake)
 					it->move_actor_flag = true;
+				if (it->room_map == MAP_Oreo) {
+					it->oreo_team1_spawn = true;
+					it->oreo_team2_spawn = true;
+				}
 				it->room_status = 3;
 			}
 			else if (it->room_status == ROOM_ST_PLAYING)

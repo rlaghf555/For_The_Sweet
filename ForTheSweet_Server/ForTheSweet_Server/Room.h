@@ -112,6 +112,9 @@ public:
 
 	float end_timer = 0.0f;
 
+	bool oreo_team1_spawn = false;
+	bool oreo_team2_spawn = false;
+
 public:
 	CRoom();
 	CRoom(const CRoom &);

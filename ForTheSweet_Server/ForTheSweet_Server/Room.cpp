@@ -475,6 +475,8 @@ void CRoom::start(int map_type, const vector<vector<PxVec3>>& vectex, const vect
 	move_actor_flag = false;
 	timer = MAX_TIMER;
 	end_timer = 0.0f;
+	oreo_team1_spawn = false;
+	oreo_team2_spawn = false;
 	room_status = ROOM_ST_LOADING;
 }
 

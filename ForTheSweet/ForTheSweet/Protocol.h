@@ -66,6 +66,7 @@ constexpr int SC_KING_OFF = 30;
 constexpr int SC_WIN = 31;
 constexpr int SC_LOSE = 32;
 constexpr int SC_END = 33;
+constexpr int SC_TELEPORT = 34;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
@@ -386,5 +387,13 @@ struct sc_packet_win_lose_end {
 	char type;
 };
 
+struct sc_packet_teleport {
+	char size;
+	char type;
+	char id;
+	float x;
+	float y;
+	float z;
+};
 
 #pragma pack (pop)

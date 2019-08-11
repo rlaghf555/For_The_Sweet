@@ -1147,6 +1147,13 @@ void CScene::SetTeamUI()
 			for (int i = 4; i < MAX_USER; i++)
 				m_EnemyShader->getObject(i)->visible = true;
 		}
+		else {
+			for (int i = 0; i < 4; i++)
+				m_EnemyShader->getObject(i)->visible = true;
+
+			for (int i = 4; i < MAX_USER; i++)
+				m_TeamShader->getObject(i)->visible = true;
+		}
 	}
 	else {
 		for (int i = 0; i < MAX_USER; i++) {

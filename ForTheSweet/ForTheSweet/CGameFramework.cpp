@@ -501,16 +501,23 @@ void CGameFramework::processPacket(char *ptr)
 		{
 			m_pPlayer = m_pScene->getplayer(My_ID);//pPlayer;
 			m_pCamera = m_pScene->getplayer(My_ID)->GetCamera();
+			m_pScene->m_pPlayer[My_ID]->SetStatus(STATUS::FREE);
 		}
+		XMFLOAT3 look(0, 0, -1);
 
 		m_pScene->getplayer(p_put.id)->SetPosition(pos);
 		m_pScene->getplayer(p_put.id)->SetVelocity(vel);
+		m_pScene->getplayer(p_put.id)->SetLook(look);
 		m_pScene->getplayer(p_put.id)->SetDashed(p_put.dashed);
 		m_pPhysx->m_Scene->lockWrite();
 		PxExtendedVec3 ControllerPos = PxExtendedVec3(pos.x, pos.y + 17.5, pos.z);
 		m_pScene->getplayer(p_put.id)->SetPhysController(m_pPhysx, m_pScene->getplayer(p_put.id)->getCollisionCallback(), &ControllerPos);
 		m_pPhysx->m_Scene->unlockWrite();
 		m_pScene->getplayer(p_put.id)->ChangeAnimation(p_put.ani_index);
+
+		m_pScene->m_ppUIShaders[p_put.id]->SetEnable(true, 0);
+		m_pScene->m_ppUIShaders[p_put.id]->SetEnable(true, 1);
+		m_pScene->m_ppUIShaders[p_put.id]->SetEnable(true, 2);
 
 		if (p_put.ani_index == Anim_Idle || p_put.ani_index == Anim_Walk || p_put.ani_index == Anim_Run) {
 			m_pScene->getplayer(p_put.id)->EnableLoop();
@@ -1197,6 +1204,26 @@ void CGameFramework::processPacket(char *ptr)
 		GameOver();
 		break;
 	}
+	case SC_TELEPORT:
+	{
+		sc_packet_teleport p_teleport;
+		memcpy(&p_teleport, ptr, sizeof(p_teleport));
+
+		cout << "teleport\n";
+
+		char slot = p_teleport.id;
+		float x = p_teleport.x;
+		float y = p_teleport.y;
+		float z = p_teleport.z;
+
+		XMFLOAT3 pos(x, y, z);
+		m_pScene->m_pPlayer[slot]->SetPosition(pos);
+
+		if (slot == My_ID) {
+			teleported = true;
+		}
+		break;
+	}
 	default:
 	{
 		cout << "알수 없는 패킷 type : " << int(ptr[1]) << endl;
@@ -1629,6 +1656,10 @@ void CGameFramework::ProcessInput()
 						m_pScene->ready_state = UI_NONE;
 						m_pScene->ready_state_test = 0.3f;
 						input_able = true;
+						if (selected_map != M_Map_2)
+						{
+							teleported = true;
+						}
 					}
 				}
 			}
@@ -1708,420 +1739,261 @@ void CGameFramework::ProcessInput()
 				}
 			}
 		}
-		else if (selected_map == M_Map_3)
-		{
-			//if (move_actor_flag == true)
-			//{
-			//	m_pPhysx->m_Scene->lockWrite();
-			//	PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
-			//	pos.p.y += 25.f * m_GameTimer.GetTimeElapsed();
-			//	if (pos.p.y > 0.0f) {
-			//		pos.p.y = 0.0f;
-			//		move_actor_flag = false;
-			//	}
-			//	m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
-			//
-			//	XMFLOAT3 pos1(pos.p.x, pos.p.y, pos.p.z);
-			//	m_pScene->m_MapShader[2]->getObjects()->SetPosition(pos1);
-			//	m_pPhysx->m_Scene->unlockWrite();
-			//}
-		}
 		if (m_pPlayer)
 		{
-			if (input_able)	// 나중에 input_able로 대체하기!!!!!!!!!!!!!!!!!!!!!
+			if (teleported)
 			{
-				if (::GetFocus())
+				if (input_able)	// 나중에 input_able로 대체하기!!!!!!!!!!!!!!!!!!!!!
 				{
-					char status = m_pPlayer->GetStatus();
-
-					if (status == STATUS::FREE)
+					if (::GetFocus())
 					{
-						// 이동(상, 하, 좌, 우, shift)
-						if (::GetAsyncKeyState(VK_UP) & 0x8000 && !move_state[0]) {
-							move_state[0] = true;
-							m_pSocket->sendPacket(CS_MOVE, CS_UP, 1, 0);
-						}
-						if (::GetAsyncKeyState(VK_DOWN) & 0x8000 && !move_state[1]) {
-							move_state[1] = true;
-							m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 1, 0);
-						}
-						if (::GetAsyncKeyState(VK_LEFT) & 0x8000 && !move_state[2]) {
-							move_state[2] = true;
-							m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 1, 0);
-						}
-						if (::GetAsyncKeyState(VK_RIGHT) & 0x8000 && !move_state[3]) {
-							move_state[3] = true;
-							m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 1, 0);
-						}
-						if (::GetAsyncKeyState(VK_SHIFT) & 0x8000 && !move_state[4]) {
-							move_state[4] = true;
-							m_pSocket->sendPacket(CS_MOVE, CS_DASH, 1, 0);
-						}
-					}
-					if (::GetAsyncKeyState(VK_UP) == 0 && move_state[0]) {
-						move_state[0] = false;
-						m_pSocket->sendPacket(CS_MOVE, CS_UP, 0, 0);
-					}
-					if (::GetAsyncKeyState(VK_DOWN) == 0 && move_state[1]) {
-						move_state[1] = false;
-						m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 0, 0);
-					}
-					if (::GetAsyncKeyState(VK_LEFT) == 0 && move_state[2]) {
-						move_state[2] = false;
-						m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 0, 0);
-					}
-					if (::GetAsyncKeyState(VK_RIGHT) == 0 && move_state[3]) {
-						move_state[3] = false;
-						m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
-					}
-					if (::GetAsyncKeyState(VK_SHIFT) == 0 && move_state[4]) {
-						move_state[4] = false;
-						m_pSocket->sendPacket(CS_MOVE, CS_DASH, 0, 0);
-					}
+						char status = m_pPlayer->GetStatus();
 
-
-					// 약공격(A)
-					if (::GetAsyncKeyState(0x41) & 0x8000 && !weak_attack_state) {
-						int type = m_pPlayer->Get_Weapon_type();	//무기 종류
-						int index = m_pPlayer->Get_Weapon_index();  //무기 번호
-
-						//cout << type << ", " << index << endl;
-
-						if (!m_pPlayer->Get_Weapon_grab())
+						if (status == STATUS::FREE)
 						{
-							if (type != -1 && index != -1 && isKing == false) {
-								cout << "무기줍기 Send\n";
-								m_pSocket->sendPacket(CS_WEAPON, type, index, 0);
+							// 이동(상, 하, 좌, 우, shift)
+							if (::GetAsyncKeyState(VK_UP) & 0x8000 && !move_state[0]) {
+								move_state[0] = true;
+								m_pSocket->sendPacket(CS_MOVE, CS_UP, 1, 0);
 							}
-							else
+							if (::GetAsyncKeyState(VK_DOWN) & 0x8000 && !move_state[1]) {
+								move_state[1] = true;
+								m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 1, 0);
+							}
+							if (::GetAsyncKeyState(VK_LEFT) & 0x8000 && !move_state[2]) {
+								move_state[2] = true;
+								m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 1, 0);
+							}
+							if (::GetAsyncKeyState(VK_RIGHT) & 0x8000 && !move_state[3]) {
+								move_state[3] = true;
+								m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 1, 0);
+							}
+							if (::GetAsyncKeyState(VK_SHIFT) & 0x8000 && !move_state[4]) {
+								move_state[4] = true;
+								m_pSocket->sendPacket(CS_MOVE, CS_DASH, 1, 0);
+							}
+						}
+						if (::GetAsyncKeyState(VK_UP) == 0 && move_state[0]) {
+							move_state[0] = false;
+							m_pSocket->sendPacket(CS_MOVE, CS_UP, 0, 0);
+						}
+						if (::GetAsyncKeyState(VK_DOWN) == 0 && move_state[1]) {
+							move_state[1] = false;
+							m_pSocket->sendPacket(CS_MOVE, CS_DOWN, 0, 0);
+						}
+						if (::GetAsyncKeyState(VK_LEFT) == 0 && move_state[2]) {
+							move_state[2] = false;
+							m_pSocket->sendPacket(CS_MOVE, CS_LEFT, 0, 0);
+						}
+						if (::GetAsyncKeyState(VK_RIGHT) == 0 && move_state[3]) {
+							move_state[3] = false;
+							m_pSocket->sendPacket(CS_MOVE, CS_RIGHT, 0, 0);
+						}
+						if (::GetAsyncKeyState(VK_SHIFT) == 0 && move_state[4]) {
+							move_state[4] = false;
+							m_pSocket->sendPacket(CS_MOVE, CS_DASH, 0, 0);
+						}
+
+
+						// 약공격(A)
+						if (::GetAsyncKeyState(0x41) & 0x8000 && !weak_attack_state) {
+							int type = m_pPlayer->Get_Weapon_type();	//무기 종류
+							int index = m_pPlayer->Get_Weapon_index();  //무기 번호
+
+							//cout << type << ", " << index << endl;
+
+							if (!m_pPlayer->Get_Weapon_grab())
 							{
-								cout << "무기 X 약공격 Send\n";
-								if (status == STATUS::FREE)
-								{
-									if (!defense_check)
-									{
-										defense_check = true;
-										defense_key = KEY_A;
-										defense_time = high_resolution_clock::now();
-
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-									else {
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
+								if (type != -1 && index != -1 && isKing == false) {
+									cout << "무기줍기 Send\n";
+									m_pSocket->sendPacket(CS_WEAPON, type, index, 0);
 								}
-								else if (status == STATUS::WEAK_ATTACK) {
-									if (weak_attack_count < 2)
+								else
+								{
+									cout << "무기 X 약공격 Send\n";
+									if (status == STATUS::FREE)
 									{
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_A;
+											defense_time = high_resolution_clock::now();
 
-										bool key = KEY_A;
-										high_resolution_clock::time_point start = weak_attack_time;
-
-										auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
-											if (k.key != key) {
-												return false;
-											}
-											else {
-												auto temp1 = duration_cast<milliseconds>(k.time - start).count();
-												if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
-													if (temp1 < duration_cast<milliseconds>(800ms).count()) {
-														return true;
-													}
-												}
-												return false;
-											}
-										});
-
-										if (t != key_buffer.end()) {
-											weak_attack_count += 1;
-											m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, weak_attack_count, 0);
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+										else {
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
 										}
 									}
-								}
-							}
-						}
-						else {
-							cout << "무기 O 약공격 Send\n";
-							if (type != M_Weapon_cupcake)
-							{
-								if (status == STATUS::FREE)
-								{
-									if (!defense_check)
-									{
-										defense_check = true;
-										defense_key = KEY_A;
-										defense_time = high_resolution_clock::now();
+									else if (status == STATUS::WEAK_ATTACK) {
+										if (weak_attack_count < 2)
+										{
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
 
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-									else {
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-								}
-								else if (status == STATUS::WEAK_ATTACK) {
-									if (weak_attack_count < 1)
-									{
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
+											bool key = KEY_A;
+											high_resolution_clock::time_point start = weak_attack_time;
 
-										bool key = KEY_A;
-										high_resolution_clock::time_point start = weak_attack_time;
-
-										auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
-											if (k.key != key) {
-												return false;
-											}
-											else {
-												auto temp1 = duration_cast<milliseconds>(k.time - start).count();
-												if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
-													if (temp1 < duration_cast<milliseconds>(800ms).count()) {
-														return true;
-													}
+											auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
+												if (k.key != key) {
+													return false;
 												}
-												return false;
-											}
-										});
+												else {
+													auto temp1 = duration_cast<milliseconds>(k.time - start).count();
+													if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
+														if (temp1 < duration_cast<milliseconds>(800ms).count()) {
+															return true;
+														}
+													}
+													return false;
+												}
+											});
 
-										if (t != key_buffer.end()) {
-											weak_attack_count += 1;
-											m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, weak_attack_count, 0);
+											if (t != key_buffer.end()) {
+												weak_attack_count += 1;
+												m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, weak_attack_count, 0);
+											}
 										}
 									}
 								}
 							}
 							else {
-								if (status == STATUS::FREE)
+								cout << "무기 O 약공격 Send\n";
+								if (type != M_Weapon_cupcake)
 								{
-									if (!defense_check)
+									if (status == STATUS::FREE)
 									{
-										defense_check = true;
-										defense_key = KEY_A;
-										defense_time = high_resolution_clock::now();
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_A;
+											defense_time = high_resolution_clock::now();
 
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-									else {
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-								}
-								else if (status == STATUS::WEAK_ATTACK) {
-									if (weak_attack_count < 2)
-									{
-										KEY temp;
-										temp.key = KEY_A;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-
-										bool key = KEY_A;
-										high_resolution_clock::time_point start = weak_attack_time;
-
-										auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
-											if (k.key != key) {
-												return false;
-											}
-											else {
-												auto temp1 = duration_cast<milliseconds>(k.time - start).count();
-												if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
-													if (temp1 < duration_cast<milliseconds>(800ms).count()) {
-														return true;
-													}
-												}
-												return false;
-											}
-										});
-
-										if (t != key_buffer.end()) {
-											weak_attack_count += 1;
-											m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, weak_attack_count, 0);
-										}
-									}
-								}
-							}
-						}
-						weak_attack_state = true;
-					}
-					if (::GetAsyncKeyState(0x41) == 0 && weak_attack_state) {
-						if (defense_state) {
-							defense_state = false;
-							m_pSocket->sendPacket(CS_ATTACK, CS_GUARD_OFF, 0, 0);
-						}
-						weak_attack_state = false;
-					}
-
-					// 강공격(S)
-					if (::GetAsyncKeyState(0x53) & 0x8000 && !hard_attack_state) {
-						int type = m_pPlayer->Get_Weapon_type();	//무기 종류
-						int index = m_pPlayer->Get_Weapon_index();  //무기 번호
-
-						if (!m_pPlayer->Get_Weapon_grab())
-						{
-							if (status == STATUS::FREE)
-							{
-								if (!defense_check)
-								{
-									defense_check = true;
-									defense_key = KEY_S;
-									defense_time = high_resolution_clock::now();
-
-									KEY temp;
-									temp.key = KEY_S;
-									temp.time = high_resolution_clock::now();
-									key_buffer.push_back(temp);
-								}
-								else {
-									KEY temp;
-									temp.key = KEY_S;
-									temp.time = high_resolution_clock::now();
-									key_buffer.push_back(temp);
-								}
-							}
-							else if (status == STATUS::HARD_ATTACK) {
-								if (hard_attack_count < 1)
-								{
-									KEY temp;
-									temp.key = KEY_S;
-									temp.time = high_resolution_clock::now();
-									key_buffer.push_back(temp);
-
-									bool key = KEY_S;
-									high_resolution_clock::time_point start = hard_attack_time;
-
-									auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
-										if (k.key != key) {
-											return false;
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
 										}
 										else {
-											auto temp1 = duration_cast<milliseconds>(k.time - start).count();
-											if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
-												if (temp1 < duration_cast<milliseconds>(800ms).count()) {
-													return true;
-												}
-											}
-											return false;
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
 										}
-									});
+									}
+									else if (status == STATUS::WEAK_ATTACK) {
+										if (weak_attack_count < 1)
+										{
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
 
-									if (t != key_buffer.end()) {
-										hard_attack_count += 1;
-										m_pSocket->sendPacket(CS_ATTACK, CS_HARD, hard_attack_count, 0);
+											bool key = KEY_A;
+											high_resolution_clock::time_point start = weak_attack_time;
+
+											auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
+												if (k.key != key) {
+													return false;
+												}
+												else {
+													auto temp1 = duration_cast<milliseconds>(k.time - start).count();
+													if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
+														if (temp1 < duration_cast<milliseconds>(800ms).count()) {
+															return true;
+														}
+													}
+													return false;
+												}
+											});
+
+											if (t != key_buffer.end()) {
+												weak_attack_count += 1;
+												m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, weak_attack_count, 0);
+											}
+										}
+									}
+								}
+								else {
+									if (status == STATUS::FREE)
+									{
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_A;
+											defense_time = high_resolution_clock::now();
+
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+										else {
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+									}
+									else if (status == STATUS::WEAK_ATTACK) {
+										if (weak_attack_count < 2)
+										{
+											KEY temp;
+											temp.key = KEY_A;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+
+											bool key = KEY_A;
+											high_resolution_clock::time_point start = weak_attack_time;
+
+											auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
+												if (k.key != key) {
+													return false;
+												}
+												else {
+													auto temp1 = duration_cast<milliseconds>(k.time - start).count();
+													if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
+														if (temp1 < duration_cast<milliseconds>(800ms).count()) {
+															return true;
+														}
+													}
+													return false;
+												}
+											});
+
+											if (t != key_buffer.end()) {
+												weak_attack_count += 1;
+												m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, weak_attack_count, 0);
+											}
+										}
 									}
 								}
 							}
+							weak_attack_state = true;
 						}
-						else {
-							if (type == M_Weapon_Lollipop) {
-								if (status == STATUS::FREE)
-								{
-									if (!defense_check)
-									{
-										defense_check = true;
-										defense_key = KEY_S;
-										defense_time = high_resolution_clock::now();
-
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-									else {
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-								}
+						if (::GetAsyncKeyState(0x41) == 0 && weak_attack_state) {
+							if (defense_state) {
+								defense_state = false;
+								m_pSocket->sendPacket(CS_ATTACK, CS_GUARD_OFF, 0, 0);
 							}
-							else if (type == M_Weapon_chupachupse) {
-								if (status == STATUS::FREE)
-								{
-									if (!defense_check)
-									{
-										defense_check = true;
-										defense_key = KEY_S;
-										defense_time = high_resolution_clock::now();
+							weak_attack_state = false;
+						}
 
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-									else {
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-								}
-							}
-							else if (type == M_Weapon_pepero) {
-								if (status == STATUS::FREE)
-								{
-									if (!defense_check)
-									{
-										defense_check = true;
-										defense_key = KEY_S;
-										defense_time = high_resolution_clock::now();
+						// 강공격(S)
+						if (::GetAsyncKeyState(0x53) & 0x8000 && !hard_attack_state) {
+							int type = m_pPlayer->Get_Weapon_type();	//무기 종류
+							int index = m_pPlayer->Get_Weapon_index();  //무기 번호
 
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-									else {
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-								}
-							}
-							else if (type == M_Weapon_chocolate) {
-								if (status == STATUS::FREE)
-								{
-									if (!defense_check)
-									{
-										defense_check = true;
-										defense_key = KEY_S;
-										defense_time = high_resolution_clock::now();
-
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-									else {
-										KEY temp;
-										temp.key = KEY_S;
-										temp.time = high_resolution_clock::now();
-										key_buffer.push_back(temp);
-									}
-								}
-							}
-							else if (type == M_Weapon_cupcake) {
+							if (!m_pPlayer->Get_Weapon_grab())
+							{
 								if (status == STATUS::FREE)
 								{
 									if (!defense_check)
@@ -2175,103 +2047,247 @@ void CGameFramework::ProcessInput()
 									}
 								}
 							}
-						}
-						hard_attack_state = true;
-					}
-					if (::GetAsyncKeyState(0x53) == 0 && hard_attack_state) {
-						if (defense_state) {
-							defense_state = false;
-							m_pSocket->sendPacket(CS_ATTACK, CS_GUARD_OFF, 0, 0);
-						}
-						hard_attack_state = false;
-					}
+							else {
+								if (type == M_Weapon_Lollipop) {
+									if (status == STATUS::FREE)
+									{
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_S;
+											defense_time = high_resolution_clock::now();
 
-					// 점프(space)
-					if (status == STATUS::FREE)
-					{
-						if (::GetAsyncKeyState(VK_SPACE) & 0x8000 && !jump_state) {
-							if (m_pPlayer->m_Jump.mJump == false) {
-								cout << "jump" << endl;
-								m_pSocket->sendPacket(CS_ATTACK, CS_JUMP, 0, 0);
-							}
-							jump_state = true;
-						}
-					}
-					if (::GetAsyncKeyState(VK_SPACE) == 0 && jump_state) {
-						jump_state = false;
-					}
-
-					// 스킬()
-					if (::GetAsyncKeyState(0x44) & 0x8000 && !skill_state) {
-						if (status == STATUS::FREE) {
-							int type = m_pPlayer->Get_Weapon_type();	//무기 종류
-
-							if (type >= M_Weapon_Lollipop && type <= M_Weapon_cupcake) {
-								cout << type << " 무기 스킬 Send\n";
-								m_pSocket->sendPacket(CS_WEAPON_SKILL, 0, 0, 0);
-							}
-						}
-						skill_state = true;
-					}
-					if (::GetAsyncKeyState(0x44) == 0 && skill_state) {
-						skill_state = false;
-					}
-
-					if (defense_check) {
-						if (duration_cast<milliseconds>(high_resolution_clock::now() - defense_time).count() < duration_cast<milliseconds>(35ms).count())
-						{
-							bool def_key = defense_key;
-							high_resolution_clock::time_point def_time = defense_time;
-
-							auto t = find_if(key_buffer.begin(), key_buffer.end(), [&def_key, &def_time](const KEY& k) {
-								if (k.key == def_key) {
-									return false;
-								}
-								else {
-									auto temp1 = duration_cast<milliseconds>(def_time - k.time).count();
-									if (temp1 <= duration_cast<milliseconds>(0ms).count()) {
-										if (temp1 > duration_cast<milliseconds>(-35ms).count()) {
-											return true;
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+										else {
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
 										}
 									}
-									return false;
 								}
-							});
+								else if (type == M_Weapon_chupachupse) {
+									if (status == STATUS::FREE)
+									{
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_S;
+											defense_time = high_resolution_clock::now();
 
-							//cout << int(key_buffer.end()->key) << endl;
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+										else {
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+									}
+								}
+								else if (type == M_Weapon_pepero) {
+									if (status == STATUS::FREE)
+									{
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_S;
+											defense_time = high_resolution_clock::now();
 
-							if (t != key_buffer.end())
-							{
-								defense_check = false;
-								defense_state = true;
-								m_pPlayer->SetStatus(STATUS::DEFENSE);
-								m_pSocket->sendPacket(CS_ATTACK, CS_GUARD, 0, 0);
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+										else {
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+									}
+								}
+								else if (type == M_Weapon_chocolate) {
+									if (status == STATUS::FREE)
+									{
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_S;
+											defense_time = high_resolution_clock::now();
+
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+										else {
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+									}
+								}
+								else if (type == M_Weapon_cupcake) {
+									if (status == STATUS::FREE)
+									{
+										if (!defense_check)
+										{
+											defense_check = true;
+											defense_key = KEY_S;
+											defense_time = high_resolution_clock::now();
+
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+										else {
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+										}
+									}
+									else if (status == STATUS::HARD_ATTACK) {
+										if (hard_attack_count < 1)
+										{
+											KEY temp;
+											temp.key = KEY_S;
+											temp.time = high_resolution_clock::now();
+											key_buffer.push_back(temp);
+
+											bool key = KEY_S;
+											high_resolution_clock::time_point start = hard_attack_time;
+
+											auto t = find_if(key_buffer.begin(), key_buffer.end(), [&key, &start](const KEY& k) {
+												if (k.key != key) {
+													return false;
+												}
+												else {
+													auto temp1 = duration_cast<milliseconds>(k.time - start).count();
+													if (temp1 >= duration_cast<milliseconds>(0ms).count()) {
+														if (temp1 < duration_cast<milliseconds>(800ms).count()) {
+															return true;
+														}
+													}
+													return false;
+												}
+											});
+
+											if (t != key_buffer.end()) {
+												hard_attack_count += 1;
+												m_pSocket->sendPacket(CS_ATTACK, CS_HARD, hard_attack_count, 0);
+											}
+										}
+									}
+								}
+							}
+							hard_attack_state = true;
+						}
+						if (::GetAsyncKeyState(0x53) == 0 && hard_attack_state) {
+							if (defense_state) {
+								defense_state = false;
+								m_pSocket->sendPacket(CS_ATTACK, CS_GUARD_OFF, 0, 0);
+							}
+							hard_attack_state = false;
+						}
+
+						// 점프(space)
+						if (status == STATUS::FREE)
+						{
+							if (::GetAsyncKeyState(VK_SPACE) & 0x8000 && !jump_state) {
+								if (m_pPlayer->m_Jump.mJump == false) {
+									cout << "jump" << endl;
+									m_pSocket->sendPacket(CS_ATTACK, CS_JUMP, 0, 0);
+								}
+								jump_state = true;
 							}
 						}
-						else {
-							if (defense_key == KEY_A) {
-								m_pPlayer->SetStatus(STATUS::WEAK_ATTACK);
-								weak_attack_time = high_resolution_clock::now();
-								m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
+						if (::GetAsyncKeyState(VK_SPACE) == 0 && jump_state) {
+							jump_state = false;
+						}
+
+						// 스킬()
+						if (::GetAsyncKeyState(0x44) & 0x8000 && !skill_state) {
+							if (status == STATUS::FREE) {
+								int type = m_pPlayer->Get_Weapon_type();	//무기 종류
+
+								if (type >= M_Weapon_Lollipop && type <= M_Weapon_cupcake) {
+									cout << type << " 무기 스킬 Send\n";
+									m_pSocket->sendPacket(CS_WEAPON_SKILL, 0, 0, 0);
+								}
+							}
+							skill_state = true;
+						}
+						if (::GetAsyncKeyState(0x44) == 0 && skill_state) {
+							skill_state = false;
+						}
+
+						if (defense_check) {
+							if (duration_cast<milliseconds>(high_resolution_clock::now() - defense_time).count() < duration_cast<milliseconds>(35ms).count())
+							{
+								bool def_key = defense_key;
+								high_resolution_clock::time_point def_time = defense_time;
+
+								auto t = find_if(key_buffer.begin(), key_buffer.end(), [&def_key, &def_time](const KEY& k) {
+									if (k.key == def_key) {
+										return false;
+									}
+									else {
+										auto temp1 = duration_cast<milliseconds>(def_time - k.time).count();
+										if (temp1 <= duration_cast<milliseconds>(0ms).count()) {
+											if (temp1 > duration_cast<milliseconds>(-35ms).count()) {
+												return true;
+											}
+										}
+										return false;
+									}
+								});
+
+								//cout << int(key_buffer.end()->key) << endl;
+
+								if (t != key_buffer.end())
+								{
+									defense_check = false;
+									defense_state = true;
+									m_pPlayer->SetStatus(STATUS::DEFENSE);
+									m_pSocket->sendPacket(CS_ATTACK, CS_GUARD, 0, 0);
+								}
 							}
 							else {
-								m_pPlayer->SetStatus(STATUS::HARD_ATTACK);
-								hard_attack_time = high_resolution_clock::now();
-								m_pSocket->sendPacket(CS_ATTACK, CS_HARD, 0, 0);
+								if (defense_key == KEY_A) {
+									m_pPlayer->SetStatus(STATUS::WEAK_ATTACK);
+									weak_attack_time = high_resolution_clock::now();
+									m_pSocket->sendPacket(CS_ATTACK, CS_WEAK, 0, 0);
+								}
+								else {
+									m_pPlayer->SetStatus(STATUS::HARD_ATTACK);
+									hard_attack_time = high_resolution_clock::now();
+									m_pSocket->sendPacket(CS_ATTACK, CS_HARD, 0, 0);
+								}
+								defense_check = false;
 							}
-							defense_check = false;
 						}
-					}
 
-					// key_buffer erase (3초 전)
-					for (auto it = key_buffer.begin(); it != key_buffer.end();)
-					{
-						if (it->time < high_resolution_clock::now() - 3000ms)
+						// key_buffer erase (3초 전)
+						for (auto it = key_buffer.begin(); it != key_buffer.end();)
 						{
-							it = key_buffer.erase(it);
-						}
-						else {
-							it++;
+							if (it->time < high_resolution_clock::now() - 3000ms)
+							{
+								it = key_buffer.erase(it);
+							}
+							else {
+								it++;
+							}
 						}
 					}
 				}
@@ -3360,8 +3376,38 @@ void CGameFramework::GameOver()
 	for (int i = 0; i < MAX_USER; i++) {
 		m_pScene->m_pPlayer[i]->SetConnected(false);
 	}
-	*state = STATE_GAMEEND;
+	
 	move_actor_flag = false;
+
+	setting_player = false;
+	setting_weapon = false;
+	setting_send = false;
+	input_able = false;
+	teleported = false;
+	fever = false;
+	move_actor_flag = false;
+	isKing = false;
+
+	for (int i = 0; i < 5; ++i) move_state[i] = false;
+
+	weak_attack_state = false;
+	weak_attack_count = 0;
+
+	hard_attack_state = false;
+	hard_attack_count = 0;
+
+	jump_state = false;
+
+	defense_state = false;
+	defense_check = false;
+	defense_key;
+
+	// 스킬 관련
+	skill_state = false;
+
+	key_buffer.clear();
+
+	*state = STATE_GAMEEND;
 }
 void CGameFramework::OnResizeBackBuffers()
 {

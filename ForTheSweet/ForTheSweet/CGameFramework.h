@@ -29,6 +29,7 @@ public:
 	bool setting_send;
 
 	bool input_able = false;
+	bool teleported = false;
 	bool fever = false;
 	bool move_actor_flag = false;
 	bool isKing = false;
