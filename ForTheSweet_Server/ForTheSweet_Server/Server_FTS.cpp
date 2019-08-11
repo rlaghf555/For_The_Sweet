@@ -2393,7 +2393,107 @@ void process_event(EVENT_ST &ev)
 	}
 	case EV_END:
 	{
+		int room_num = ev.id - ROOM_TIMER_START;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
 		cout << "게임 종료\n";
+
+		// 게임 시간 끝 : HP 총합으로 승패 결정
+		if (it->room_mode == ROOM_MODE_SOLO)
+		{
+			int winer_id;
+			int high_hp = 0;
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						int hp = clients[client_id].playerinfo->m_hp;
+						if (hp > high_hp)
+						{
+							high_hp = hp;
+							winer_id = client_id;
+						}
+					}
+				}
+			}
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						if (winer_id == client_id)
+							send_win_packet(client_id);
+						else
+							send_lose_packet(client_id);
+					}
+				}
+			}
+		}
+		else {
+			int team1_hp_total = 0;
+			int team2_hp_total = 0;
+
+			for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
+			{
+				int team1_id = it->clientNum[i];
+				int team2_id = it->clientNum[i + 4];
+				if (team1_id != -1)
+				{
+					if (clients[team1_id].connected == true)
+					{
+						team1_hp_total += clients[team1_id].playerinfo->m_hp;
+					}
+				}
+				if (team2_id != -1)
+				{
+					if (clients[team2_id].connected == true)
+					{
+						team2_hp_total += clients[team2_id].playerinfo->m_hp;
+					}
+				}
+			}
+
+			if (team1_hp_total >= team2_hp_total)
+				it->team_victory = true;
+			else
+				it->team_victory = false;
+
+			bool win_team = it->team_victory;
+			for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
+			{
+				int winner, loser;
+				if (win_team == true) {
+					winner = it->clientNum[i];
+					loser = it->clientNum[i + 4];
+				}
+				else {
+					winner = it->clientNum[i + 4];
+					loser = it->clientNum[i];
+				}
+				if (winner != -1)
+				{
+					if (clients[winner].connected == true)
+					{
+						send_win_packet(winner);
+					}
+				}
+				if (loser != -1)
+				{
+					if (clients[loser].connected == true)
+					{
+						send_lose_packet(loser);
+					}
+				}
+			}
+		}
 		break;
 	}
 	default:
