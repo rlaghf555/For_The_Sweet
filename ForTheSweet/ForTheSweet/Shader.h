@@ -556,6 +556,9 @@ public:
 	virtual void ChangeAnimation(int m_animindex);
 	void ChangeAnimationSpeed(UINT AnimIndex, float speed = 2.0f);
 	void ResetAnimationSpeed(UINT AnimIndex);
+	void EnableLoop();
+	void DisableLoop();
+	void SetAnimFrame(UINT AnimIndex,float ftime) { m_bbObjects[0]->m_ani[AnimIndex]->SetAnimFrame(ftime); }
 	void init();
 	virtual int getAnimIndex();
 };

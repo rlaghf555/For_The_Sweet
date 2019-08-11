@@ -1205,6 +1205,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 					m_pPlayerShader[i]->Animate(fTimeElapsed);
 					if (animindex != m_pPlayerShadowShader[i]->getAnimIndex()) {
 						m_pPlayerShadowShader[i]->ChangeAnimation(animindex);
+						if (animindex == Anim_Death) {
+							m_pPlayerShadowShader[i]->DisableLoop();
+						}
 					}
 					XMFLOAT3 Look = m_pPlayer[i]->GetLook();
 					XMFLOAT3 Up = m_pPlayer[i]->GetUp();
@@ -1243,6 +1246,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 						m_pPlayer[i]->ChangeAnimation(Anim_Death);
 						m_pPlayer[i]->SetAnimFrame(37);
 						m_pPlayer[i]->DisableLoop();
+						m_pPlayerShadowShader[i]->ChangeAnimation(Anim_Death);
+						m_pPlayerShadowShader[i]->SetAnimFrame(Anim_Death,37);
+						m_pPlayerShadowShader[i]->DisableLoop();
 					}					
 
 					if (m_pPlayer[i]->Get_Weapon_grab()) {

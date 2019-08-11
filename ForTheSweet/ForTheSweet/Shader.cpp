@@ -2673,6 +2673,16 @@ void PlayerShadowShader::ResetAnimationSpeed(UINT AnimIndex)
 	if (m_bbObjects[0]) m_bbObjects[0]->ResetAnimationSpeed(AnimIndex);
 }
 
+void PlayerShadowShader::EnableLoop()
+{
+	if (m_bbObjects[0]) m_bbObjects[0]->EnableLoop();
+}
+
+void PlayerShadowShader::DisableLoop()
+{
+	if (m_bbObjects[0]) m_bbObjects[0]->DisableLoop();
+}
+
 void PlayerShadowShader::init()
 {
 	for (int i = 0; i < m_bbObjects[0]->GetNumofAnim(); i++) {
