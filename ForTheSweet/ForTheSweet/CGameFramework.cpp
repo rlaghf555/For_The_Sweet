@@ -3146,7 +3146,11 @@ void CGameFramework::FrameAdvance()
 	CollisionProcess();
 	CameraShake();
 	AnimateObjects();
-	
+	if (selected_map == M_Map_2) {
+		if (teleported == false) {
+			Map2Camera();
+		}
+	}
 	if (SERVER_ON)
 	{
 		for (int i = 0; i < MAX_USER; ++i)
