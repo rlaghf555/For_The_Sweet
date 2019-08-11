@@ -73,18 +73,18 @@ PxVec3 DoorPos[8] = {
 	PxVec3(250.f, 10.f, -40.f),        //RIGHT_DOWN_OUT
 	PxVec3(250.f, 530.f, -80.f),    //RIGHT_DOWN_IN
 	PxVec3(250.f, 85.f, 40.f),        //RIGHT_UP_OUT
-	PxVec3(250.f, 585.f, 10.f),        //RIGHT_UP_IN
+	PxVec3(250.f, 585.f, 10.f)        //RIGHT_UP_IN
 };
 PxVec3 DoorTelepos[8] = {
-	PxVec3(-250.f, 530.f, -50.f),    //LEFT_DOWN_OUT
-	PxVec3(-250.f, 10.f, -70.f),    //LEFT_DOWN_IN
-	PxVec3(-250.f, 585.f, 40.f),    //LEFT_UP_OUT
-	PxVec3(-250.f, 85.f, 10.f),        //LEFT_UP_IN
+	PxVec3(-250.f, 530.f, -80.f + 30.f),    //LEFT_DOWN_OUT
+	PxVec3(-250.f, 10.f, -40.f - 30.f),    //LEFT_DOWN_IN
+	PxVec3(-250.f, 585.f, 10.f+ 30.f),    //LEFT_UP_OUT
+	PxVec3(-250.f, 85.f, 40.f- 30.f),        //LEFT_UP_IN
 
-	PxVec3(250.f, 530.f, -50.f),    //RIGHT_DOWN_OUT
-	PxVec3(250.f, 10.f, -70.f),        //RIGHT_DOWN_IN
-	PxVec3(250.f, 585.f, 40.f),        //RIGHT_UP_OUT
-	PxVec3(250.f, 85.f, 10.f),        //RIGHT_UP_IN
+	PxVec3(250.f, 530.f, -80.f + 30.f),    //RIGHT_DOWN_OUT
+	PxVec3(250.f, 10.f, -40.f - 30.f),        //RIGHT_DOWN_IN
+	PxVec3(250.f, 585.f, 10.f + 30.f),        //RIGHT_UP_OUT
+	PxVec3(250.f, 85.f, 40.f- 30.f)        //RIGHT_UP_IN
 };
 
 enum SITUATION

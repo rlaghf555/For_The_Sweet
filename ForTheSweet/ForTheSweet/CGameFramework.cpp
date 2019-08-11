@@ -2903,17 +2903,24 @@ void CGameFramework::CollisionProcess()
 
 					if (selected_map == M_Map_3) {
 						if (SERVER_ON) {
-							int result = m_pScene->Collision_telleport_Server(My_ID);
-							
-							if (result != -1) {
-								cs_packet_teleport p_tele;
-								p_tele.size = sizeof(cs_packet_teleport);
-								p_tele.type = CS_TELEPORT;
-								p_tele.index = result;
+							if (teletimecheck < 0.5f) {
+								teletimecheck += m_GameTimer.GetTimeElapsed();
+							}
+							else {
+								teletimecheck = 0.f;
+								int result = m_pScene->Collision_telleport_Server(My_ID);
+								if (result != -1) {
+									cs_packet_teleport p_tele;
+									p_tele.size = sizeof(cs_packet_teleport);
+									p_tele.type = CS_TELEPORT;
+									p_tele.index = result;
 
-								cout << "tele index : " << result;
+									cout << "tele index : " << result;
 
-								send(m_pSocket->clientSocket, (char *)&p_tele, sizeof(cs_packet_teleport), 0);
+									send(m_pSocket->clientSocket, (char *)&p_tele, sizeof(cs_packet_teleport), 0);
+									teletimecheck = -1.f;
+
+								}
 							}
 						}
 						else 
@@ -3312,6 +3319,9 @@ void CGameFramework::EndAdvance()
 }
 void CGameFramework::GameOver()
 {
+	for (int i = 0; i < MAX_USER; i++) {
+		m_pScene->m_pPlayer[i]->SetConnected(false);
+	}
 	*state = STATE_GAMEEND;
 	move_actor_flag = false;
 }
