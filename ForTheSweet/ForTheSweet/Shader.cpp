@@ -875,7 +875,7 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	m_pMaterial->SetReflection(1);
 
 	float map_3_distance = 250.f;
-
+	maptype = map_type;
 	for (UINT i = 0; i < m_nObjects; i++) {
 		ModelObject* map = new ModelObject(static_model, pd3dDevice, pd3dCommandList);
 		if (map_type == M_Map_1_macaron_1) map->SetPosition(0.f, -50.f, 0.f);
@@ -905,26 +905,6 @@ void CModelShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
-
-		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices());
-		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
-
-		PxMeshScale PxScale;
-		PxScale.scale = scaleTmp;
-
-		PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
-		XMFLOAT3 pos = map->GetPosition();
-		PxTransform location(pos.x, pos.y, pos.z);
-
-		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
-
-		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
-		physx->m_Scene->addActor(*m_Actor);
-
-		if (map_type == M_Map_1_macaron_1) {
-			physx->move_actor = m_Actor;
-			physx->move_actor->userData = (void *)(int)1;
-		}
 	}
 	delete pTexture;
 }
@@ -949,6 +929,7 @@ void CModelShader::BuildPhysx(CPhysx * physx)
 	if (maptype == M_Map_1_macaron_1) {
 		physx->move_actor = m_Actor;
 		physx->move_actor->userData = (void *)(int)100;
+		cout << "asdfasdfasdf" << endl;
 	}
 }
 

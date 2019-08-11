@@ -930,6 +930,8 @@ void CScene::initUI(wchar_t *character_id[])
 	//Fight
 	pos = XMFLOAT2(1280, 400);
 	m_ppUIShaders[11]->SetPos(&pos, 0);
+	m_ppUIShaders[20]->getObejct(0)->m_bEnabled = false;
+	m_ppUIShaders[20]->getObejct(1)->m_bEnabled = false;
 
 	//id √ ±‚»≠
 	for (int i = 12; i < 20; i++) {

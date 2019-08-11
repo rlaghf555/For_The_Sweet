@@ -165,7 +165,7 @@ public:
 	void CollisionProcess();
 	void Map2Camera();
 	void FrameAdvance();
-
+	void EndAdvance();
 	void WaitForGpuComplete();
 
 	void CameraShake();
