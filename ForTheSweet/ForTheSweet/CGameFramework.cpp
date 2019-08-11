@@ -2915,7 +2915,9 @@ void CGameFramework::CollisionProcess()
 									p_tele.type = CS_TELEPORT;
 									p_tele.index = result;
 
-									cout << "tele index : " << result;
+									//m_pScene->Collision_telleport(My_ID);
+
+									//cout << "tele index : " << result;
 
 									send(m_pSocket->clientSocket, (char *)&p_tele, sizeof(cs_packet_teleport), 0);
 									teletimecheck = -1.f;

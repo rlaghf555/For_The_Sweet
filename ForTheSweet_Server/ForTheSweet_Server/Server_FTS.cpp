@@ -1482,7 +1482,10 @@ void process_packet(char key, char *buffer)
 		cout << "Teleport index : " << index << endl;
 		PxVec3 telepos = DoorTelepos[index];
 		cout << "Teleport Pos : " << telepos.x << ", " << telepos.y << ", " << telepos.z << endl;
-		clients[key].playerinfo->m_Pos = telepos;
+		//clients[key].playerinfo->m_Pos = telepos;
+		PxExtendedVec3 pos = PXtoPXEx(telepos);
+		clients[key].playerinfo->m_PlayerController->setFootPosition(pos);
+		//clients[key].playerinfo->m_PlayerController()->
 
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
