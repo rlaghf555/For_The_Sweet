@@ -968,7 +968,7 @@ void process_packet(char key, char *buffer)
 		room_l.unlock();
 
 		// Physx¿¡ ¸Ê ÃÊ±âÈ­
-		it->start(MAP_Wehas, gMapVertexs, gMapIndexs, gPhysx);
+		it->start(it->room_map, gMapVertexs, gMapIndexs, gPhysx);
 
 		it->registerRoom(&(*it));
 

@@ -1654,20 +1654,41 @@ void CGameFramework::ProcessInput()
 
 	if (SERVER_ON)
 	{
-		if (move_actor_flag == true)
+		if (selected_map == M_Map_1)
 		{
-			m_pPhysx->m_Scene->lockWrite();
-			PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
-			pos.p.y += 25.f * m_GameTimer.GetTimeElapsed();
-			if (pos.p.y > 0.0f) {
-				pos.p.y = 0.0f;
-				move_actor_flag = false;
-			}
-			m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
+			if (move_actor_flag == true)
+			{
+				m_pPhysx->m_Scene->lockWrite();
+				PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
+				pos.p.y += 25.f * m_GameTimer.GetTimeElapsed();
+				if (pos.p.y > 0.0f) {
+					pos.p.y = 0.0f;
+					move_actor_flag = false;
+				}
+				m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
 
-			XMFLOAT3 pos1(pos.p.x, pos.p.y, pos.p.z);
-			m_pScene->m_MapShader[2]->getObjects()->SetPosition(pos1);
-			m_pPhysx->m_Scene->unlockWrite();
+				XMFLOAT3 pos1(pos.p.x, pos.p.y, pos.p.z);
+				m_pScene->m_MapShader[2]->getObjects()->SetPosition(pos1);
+				m_pPhysx->m_Scene->unlockWrite();
+			}
+		}
+		else if (selected_map == M_Map_3)
+		{
+			//if (move_actor_flag == true)
+			//{
+			//	m_pPhysx->m_Scene->lockWrite();
+			//	PxTransform pos = m_pPhysx->move_actor->getGlobalPose();
+			//	pos.p.y += 25.f * m_GameTimer.GetTimeElapsed();
+			//	if (pos.p.y > 0.0f) {
+			//		pos.p.y = 0.0f;
+			//		move_actor_flag = false;
+			//	}
+			//	m_pPhysx->move_actor->setGlobalPose(PxTransform(pos));
+			//
+			//	XMFLOAT3 pos1(pos.p.x, pos.p.y, pos.p.z);
+			//	m_pScene->m_MapShader[2]->getObjects()->SetPosition(pos1);
+			//	m_pPhysx->m_Scene->unlockWrite();
+			//}
 		}
 		if (m_pPlayer)
 		{
@@ -3282,6 +3303,7 @@ void CGameFramework::EndAdvance()
 void CGameFramework::GameOver()
 {
 	*state = STATE_GAMEEND;
+	move_actor_flag = false;
 }
 void CGameFramework::OnResizeBackBuffers()
 {

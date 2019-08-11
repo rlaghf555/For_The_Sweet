@@ -303,14 +303,14 @@ void CRoom::start(int map_type, const vector<vector<PxVec3>>& vectex, const vect
 			// ¸Ê 3 3Ãþ 2°³
 			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_3], index[MAP_3_FLOOR_3], physx);
 			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
-			PxTransform location(-250, 0, 50);
+			PxTransform location(-250, 80, 80);
 			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
 			m_Scene->addActor(*base);
 		}
 		{
 			triMesh = GetTriangleMesh(vectex[MAP_3_FLOOR_3], index[MAP_3_FLOOR_3], physx);
 			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
-			PxTransform location(-250, 0, 50);
+			PxTransform location(250, 80, 80);
 			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
 			m_Scene->addActor(*base);
 		}
