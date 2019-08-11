@@ -744,6 +744,28 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_heal.id]->Get_MP());	//mp
 		break;
 	}
+	case SC_FALL:
+	{
+		sc_packet_fall p_fall;
+
+		memcpy(&p_fall, ptr, sizeof(p_fall));
+		m_pScene->getplayer(p_fall.id)->Set_HP(int(p_fall.hp));
+
+		cout << "FALL\n";
+
+		m_pScene->m_ppUIShaders[p_fall.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_fall.id]->Get_HP());	//hp
+		m_pScene->m_ppUIShaders[p_fall.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_fall.id]->Get_MP());	//mp
+
+		XMFLOAT3 velzero = XMFLOAT3(0.f, 0.f, 0.f);
+		m_pScene->getplayer(p_fall.id)->SetVelocity(velzero);
+		//m_pScene->getplayer(p_fall.id)->ChangeAnimation(Anim_Death);
+		//m_pScene->getplayer(p_fall.id)->DisableLoop();
+		m_pPhysx->m_Scene->lockWrite();
+		m_pScene->getplayer(p_fall.id)->m_PlayerController->release();
+		m_pPhysx->m_Scene->unlockWrite();
+
+		break;
+	}
 	case SC_PUT_WEAPON:
 	{
 		sc_packet_put_weapon p_put_weapon;

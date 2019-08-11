@@ -17,6 +17,8 @@ constexpr int RESPAWN_WEAPON_NUM = 10;
 constexpr int MAX_ANIM = 33;
 constexpr int MAX_HP = 100;
 
+constexpr float FALL_HEIGHT = -100.f;
+
 // Timer
 constexpr int MAX_TIMER = 150;			// 원래 300
 constexpr int MINUTE = 30;				// 원래 60

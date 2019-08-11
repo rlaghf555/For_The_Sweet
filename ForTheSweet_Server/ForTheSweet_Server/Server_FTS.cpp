@@ -362,6 +362,17 @@ void send_heal_packet(char client, char id, int hp)
 	sendPacket(client, &p_heal);
 }
 
+void send_fall_packet(char client, char id, int hp)
+{
+	sc_packet_fall p_fall;
+	p_fall.type = SC_FALL;
+	p_fall.size = sizeof(sc_packet_fall);
+	p_fall.id = clients[id].slot;
+	p_fall.hp = hp;
+
+	sendPacket(client, &p_fall);
+}
+
 void send_put_weapon_packet(char client, char wp_type, char wp_index, const PxVec3& pos) {
 	sc_packet_put_weapon p_put_weapon;
 
@@ -2813,8 +2824,7 @@ void clientUpdateProcess(int room_num)
 						clients[client_id].playerinfo->hitted = false;
 					}
 
-					//clients[i].playerinfo->animate(fTime);
-
+					// 위치 동기화
 					if (clients[client_id].playerinfo->m_PlayerController != nullptr) {
 						PxExtendedVec3 position = clients[client_id].playerinfo->m_PlayerController->getPosition();
 						//cout << int(i) << " Client Pos : " << position.x << "," << position.y - 17.5 << "," << position.z << endl;
@@ -2828,6 +2838,42 @@ void clientUpdateProcess(int room_num)
 							clients[client_id].playerinfo->m_Pos.y = position.y - 17.5f;
 						}
 						clients[client_id].playerinfo->m_Pos.z = position.z;
+					}
+
+					// 낙사 체크(-100 이하는 낙사로 인정)
+					PxVec3 pos = clients[client_id].playerinfo->m_Pos;
+					if (pos.y < FALL_HEIGHT) {
+						cout << "FALL\n";
+
+						int hp = 0;
+						clients[client_id].playerinfo->setAniIndex(Anim::Death);
+						clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
+						clients[client_id].playerinfo->m_PlayerController->release();
+						clients[client_id].playerinfo->m_PlayerController = nullptr;
+
+						if (it->room_mode == ROOM_MODE_SOLO)
+						{
+							it->solo_dead_count += 1;
+						}
+						else if (it->room_mode == ROOM_MODE_TEAM || it->room_mode == ROOM_MODE_KING)
+						{
+							char slot = clients[client_id].slot;
+							it->team_dead[slot] = false;
+						}
+
+						clients[client_id].playerinfo->setHP(hp);
+
+						for (int j = 0; j < MAX_ROOM_USER; ++j)
+						{
+							int client_id2 = it->clientNum[j];
+							if (client_id2 != -1)
+							{
+								if (clients[client_id2].connected == true)
+								{
+									send_fall_packet(client_id2, client_id, hp);
+								}
+							}
+						}
 					}
 				}
 			}

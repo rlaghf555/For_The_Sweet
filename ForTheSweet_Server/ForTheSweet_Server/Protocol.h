@@ -47,6 +47,7 @@ constexpr int SC_REMOVE_WEAPON = 12;
 constexpr int SC_HEAL = 13;
 constexpr int SC_CRITICAL_HIT = 14;
 constexpr int SC_STUN = 15;
+constexpr int SC_FALL = 16;
 
 constexpr int SC_PATERN_MESSAGE = 20;
 constexpr int SC_FOG = 21;
@@ -255,6 +256,13 @@ struct sc_packet_stun {
 };
 
 struct sc_packet_heal {
+	char size;
+	char type;
+	char id;
+	char hp;
+};
+
+struct sc_packet_fall {
 	char size;
 	char type;
 	char id;
