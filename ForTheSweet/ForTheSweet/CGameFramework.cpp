@@ -649,6 +649,9 @@ void CGameFramework::processPacket(char *ptr)
 				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::SKILL_WEAPON_MOVE);
 				SoundManager::GetInstance()->PlaySounds(SPINNING);
 			}
+			if (anim_index == Anim_PowerUp) {
+				m_pScene->getplayer(p_anim.id)->SetStatus(STATUS::CH_SKILL);
+			}
 
 		}
 
@@ -2881,7 +2884,7 @@ void CGameFramework::UpdateProcess()
 					{
 						char status = m_pScene->m_pPlayer[i]->GetStatus();
 						if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK
-							|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
+							|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN || status == STATUS::CH_SKILL)
 						{
 							continue;
 						}
@@ -3269,6 +3272,10 @@ void CGameFramework::FrameAdvance()
 						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
 					}
 					else if (status == STATUS::STUN)
+					{
+						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
+					}
+					else if (status == STATUS::CH_SKILL)
 					{
 						m_pScene->m_pPlayer[i]->SetStatus(STATUS::FREE);
 					}

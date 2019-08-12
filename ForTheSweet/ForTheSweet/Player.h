@@ -22,10 +22,11 @@ enum STATUS {
 	DEFENSE,
 	JUMP,
 	HITTED,
-	STUN,
 	CRI_HITTED,
+	STUN,
 	SKILL_WEAPON_MOVE,
 	SKILL_WEAPON_NO_MOVE,
+	CH_SKILL,
 };
 
 static PxF32 gJumpGravity = -140.0f;

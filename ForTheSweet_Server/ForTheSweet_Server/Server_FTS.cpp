@@ -1513,6 +1513,7 @@ void process_packet(char key, char *buffer)
 		{
 			clients[key].playerinfo->m_attack = 5;
 			add_timer(room_num, key, EV_CH_ATTACK_END, high_resolution_clock::now() + 10s);
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 660ms);
 			clients[key].playerinfo->m_mp = 0;
 			clients[key].playerinfo->setAniIndex(Anim::PowerUp);
 			clients[key].playerinfo->setStatus(STATUS::CH_SKILL);
@@ -1540,6 +1541,7 @@ void process_packet(char key, char *buffer)
 		{
 			clients[key].playerinfo->speed_skill = 1.5f;
 			add_timer(room_num, key, EV_CH_SPEED_END, high_resolution_clock::now() + 10s);
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 660ms);
 			clients[key].playerinfo->m_mp = 0;
 			clients[key].playerinfo->setAniIndex(Anim::PowerUp);
 			clients[key].playerinfo->setStatus(STATUS::CH_SKILL);
@@ -1570,6 +1572,7 @@ void process_packet(char key, char *buffer)
 			hp += 20;
 			if (hp > 100) hp = 100;
 			clients[key].playerinfo->m_hp = hp;
+			add_timer(room_num, key, EV_FREE, high_resolution_clock::now() + 660ms);
 			clients[key].playerinfo->m_mp = 0;
 			clients[key].playerinfo->setAniIndex(Anim::PowerUp);
 			clients[key].playerinfo->setStatus(STATUS::CH_SKILL);

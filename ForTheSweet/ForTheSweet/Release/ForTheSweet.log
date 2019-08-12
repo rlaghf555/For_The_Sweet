@@ -1,40 +1,33 @@
-﻿  stdafx.cpp
-  Animation.cpp
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\animation.cpp(36): warning C4244: '=': 'const double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\animation.cpp(88): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\animation.cpp(111): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-  ButtonUI.cpp
-  Camera.cpp
-  CGameFramework.cpp
+﻿  CGameFramework.cpp
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(9): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(10): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(669): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(670): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(705): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(706): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(736): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(737): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(758): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(759): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(771): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(772): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2719): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2720): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2721): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2372): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2906): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2967): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3134): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(672): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(673): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(708): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(709): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(739): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(740): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(761): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(762): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(774): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(775): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2722): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2723): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2724): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2375): warning C4101: 'ptCursorPos' :참조되지 않은 지역 변수입니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2909): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(2970): warning C4305: '인수': 'double'에서 'physx::PxF32'(으)로 잘립니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3137): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3140): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3142): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3172): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3177): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3178): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3179): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3189): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3190): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3191): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3143): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3145): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3175): warning C4305: '인수': 'float'에서 'bool'(으)로 잘립니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3180): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3181): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3182): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3192): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3193): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(3194): warning C4244: '=': 'physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(240): warning C4244: '초기화 중': '_Ty'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
@@ -65,24 +58,15 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
           [
               _Ty=std::pair<std::string,float>
           ]
-  c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(1324): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
+  c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\cgameframework.cpp(1327): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::vector<std::pair<std::string,float>,std::allocator<_Ty>>::emplace_back<std::pair<const char *,int>>(std::pair<const char *,int> &&)'에 대한 참조를 확인하십시오.
           with
           [
               _Ty=std::pair<std::string,float>
           ]
-  D3DMath.cpp
-  D3DUtil.cpp
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\d3dutil.cpp(40): warning C4244: '인수': 'std::streamoff'에서 'SIZE_T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\d3dutil.cpp(81): warning C4244: '=': 'UINT64'에서 'LONG_PTR'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  DDSTextureLoader12.cpp
+  Camera.cpp
   ForTheSweet.cpp
-  Mesh.cpp
-  Model.cpp
   ModelObject.cpp
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\modelobject.cpp(95): warning C4316: 'LoadAnimation': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-  Model_Animation.cpp
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\model_animation.cpp(20): warning C4316: 'LoadAnimation': 힙에 할당된 개체가 16에 맞추어져 있지 않을 수도 있습니다
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\model_animation.cpp(12): warning C4101: 'index' :참조되지 않은 지역 변수입니다.
   Object.cpp
   Physx.cpp
   Player.cpp
@@ -160,12 +144,7 @@ c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\shader.cpp(365
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\shader.cpp(3671): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\shader.cpp(3681): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\shader.cpp(3682): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  Socket.cpp
-  SoundManager.cpp
   Texture.cpp
-  컴파일하고 있습니다...
-  Timer.cpp
-  UIobject.cpp
   UIShader.cpp
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\uishader.cpp(408): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\uishader.cpp(480): warning C4244: '인수': 'UINT64'에서 'uint32_t'(으)로 변환하면서 데이터가 손실될 수 있습니다.
@@ -177,8 +156,10 @@ c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\uishader.cpp(7
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\uishader.cpp(1186): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\uishader.cpp(1219): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
 c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\uishader.cpp(1229): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  UIobject.cpp
   코드를 생성하고 있습니다.
-c:\users\kyh\desktop\0812_1\for_the_sweet\forthesweet\forthesweet\buttonui.cpp(68): warning C4715: 'RoomMakeUI::Collision1': 모든 제어 경로에서 값을 반환하지는 않습니다.
-  All 4123 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  5 of 4123 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    4 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   ForTheSweet.vcxproj -> C:\Users\KYH\Desktop\0812_1\For_The_Sweet\ForTheSweet\Release\ForTheSweet.exe
