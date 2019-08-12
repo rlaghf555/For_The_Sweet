@@ -48,6 +48,7 @@ public:
 	virtual void SetAlpha(float alpha);
 	virtual void SetNumSprite(XMUINT2& numSprite, XMUINT2& nowSprite);
 	virtual void SetHP(float hp) {}
+	virtual void SetMP(float mp) {}
 	virtual void SetType(UINT type) { m_nTexType = type; }
 	virtual XMFLOAT2 GetPos() { return m_xmf2ScreenPos; }
 
@@ -85,9 +86,12 @@ public:
 
 public:
 	void SetHP(float hp) { Now_Gauge = hp; UpdateScale(); }
+	void SetMP(float mp) { Now_Gauge = mp; UpdateScale2(); }
 	void SetMaxGauge(float Gauge) { Max_Gauge = Gauge; }
+
 	//virtual void Update(float fTimeElapsed);
 	void UpdateScale();
+	void UpdateScale2();
 protected:
 	float Max_Gauge = 100;		// √÷¥Î HP
 	float Now_Gauge = 100;

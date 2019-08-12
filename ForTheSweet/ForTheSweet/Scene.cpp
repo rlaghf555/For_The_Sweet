@@ -905,14 +905,14 @@ void CScene::initUI(wchar_t *character_id[])
 
 	for (int i = 0; i < 8; i++) {
 		m_ppUIShaders[i]->getObejct(1)->SetHP(m_pPlayer[i]->Get_HP());	//hp
-		m_ppUIShaders[i]->getObejct(2)->SetHP(m_pPlayer[i]->Get_MP());	//mp
+		m_ppUIShaders[i]->getObejct(2)->SetMP(m_pPlayer[i]->Get_MP());	//mp
 	}
 	for (int i = 0; i < 4; i++) {
 		XMFLOAT2 pos = XMFLOAT2(172 + i * 313, 150);
 		m_ppUIShaders[i]->SetPos(&pos, 0);
 		pos = XMFLOAT2(172 + i * 313, 156);
 		m_ppUIShaders[i]->SetPos(&pos, 1);
-		pos = XMFLOAT2(172 + i * 313, 136);
+		pos = XMFLOAT2(57 + i * 313, 136);
 		m_ppUIShaders[i]->SetPos(&pos, 2);
 	}
 	for (int i = 0; i < 4; i++) {
@@ -920,7 +920,7 @@ void CScene::initUI(wchar_t *character_id[])
 		m_ppUIShaders[i + 4]->SetPos(&pos, 0);
 		pos = XMFLOAT2(172 + i * 313, 46);
 		m_ppUIShaders[i + 4]->SetPos(&pos, 1);
-		pos = XMFLOAT2(172 + i * 313, 26);
+		pos = XMFLOAT2(57 + i * 313, 26);
 		m_ppUIShaders[i + 4]->SetPos(&pos, 2);
 	}
 

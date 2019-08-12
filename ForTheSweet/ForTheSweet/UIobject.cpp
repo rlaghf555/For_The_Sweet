@@ -99,6 +99,15 @@ void HPBarObject::UpdateScale()
 	m_xmf2ScreenPos.x -= (tmp / 2);
 }
 
+void HPBarObject::UpdateScale2()
+{
+	float tmp = m_nSize.x *m_xmf2Scale.x;
+	m_xmf2Scale.x = 0.88f *Now_Gauge / Max_Gauge;
+	float tmp2 = m_nSize.x * m_xmf2Scale.x;
+	tmp -= tmp2;
+	m_xmf2ScreenPos.x -= (tmp / 2);
+}
+
 
 
 void MessageObject::Update(float fTimeElapsed)	//날아오는 메세지 속도조정

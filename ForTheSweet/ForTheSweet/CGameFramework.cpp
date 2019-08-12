@@ -670,7 +670,7 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->getplayer(p_hit.id)->DisableLoop();
 
 		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_HP());	//hp
-		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_hit.id]->Get_MP());	//mp
+		m_pScene->m_ppUIShaders[p_hit.id]->getObejct(2)->SetMP(m_pScene->m_pPlayer[p_hit.id]->Get_MP());	//mp
 
 		if (m_pScene->getplayer(p_hit.id)->Get_HP() <= 0) {
 			XMFLOAT3 velzero = XMFLOAT3(0.f, 0.f, 0.f);
@@ -706,7 +706,7 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->getplayer(p_cri_hit.id)->DisableLoop();
 
 		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_HP());	//hp
-		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_MP());	//mp
+		m_pScene->m_ppUIShaders[p_cri_hit.id]->getObejct(2)->SetMP(m_pScene->m_pPlayer[p_cri_hit.id]->Get_MP());	//mp
 		if (My_ID == p_cri_hit.id) {
 			camerashake = true;
 			//cout << "카메라 흔들림" << endl;
@@ -737,7 +737,7 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->getplayer(p_stun.id)->DisableLoop();
 
 		m_pScene->m_ppUIShaders[p_stun.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_stun.id]->Get_HP());	//hp
-		m_pScene->m_ppUIShaders[p_stun.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_stun.id]->Get_MP());	//mp
+		m_pScene->m_ppUIShaders[p_stun.id]->getObejct(2)->SetMP(m_pScene->m_pPlayer[p_stun.id]->Get_MP());	//mp
 
 		if (m_pScene->getplayer(p_stun.id)->Get_HP() <= 0) {
 			XMFLOAT3 velzero = XMFLOAT3(0.f, 0.f, 0.f);
@@ -759,7 +759,7 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->getplayer(p_heal.id)->Set_MP(int(p_heal.mp));
 
 		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_heal.id]->Get_HP());	//hp
-		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_heal.id]->Get_MP());	//mp
+		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(2)->SetMP(m_pScene->m_pPlayer[p_heal.id]->Get_MP());	//mp
 		break;
 	}
 	case SC_FALL:
@@ -772,7 +772,7 @@ void CGameFramework::processPacket(char *ptr)
 		cout << "FALL\n";
 
 		m_pScene->m_ppUIShaders[p_fall.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_fall.id]->Get_HP());	//hp
-		m_pScene->m_ppUIShaders[p_fall.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_fall.id]->Get_MP());	//mp
+		m_pScene->m_ppUIShaders[p_fall.id]->getObejct(2)->SetMP(m_pScene->m_pPlayer[p_fall.id]->Get_MP());	//mp
 
 		XMFLOAT3 velzero = XMFLOAT3(0.f, 0.f, 0.f);
 		m_pScene->getplayer(p_fall.id)->SetVelocity(velzero);
