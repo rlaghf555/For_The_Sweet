@@ -63,12 +63,17 @@ CPlayer::CPlayer()
 	m_status = STATUS::FREE;
 	attack_count = 0;
 	m_hp = 100;
+	m_mp = 0;
+	m_attack = 0;
+	speed_skill = 1.0f;
 
 	m_PlayerController = nullptr;
 	//m_HitReport = nullptr;
 	m_AttackTrigger = nullptr;
 
 	lollipop_heal = false;
+
+	m_skill = Skill_Attack;
 }
 
 CPlayer::~CPlayer()

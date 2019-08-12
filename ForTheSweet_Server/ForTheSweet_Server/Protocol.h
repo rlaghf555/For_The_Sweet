@@ -23,6 +23,7 @@ constexpr int CS_DASH = 18;
 constexpr int CS_GUARD_OFF = 19;
 constexpr int CS_WEAPON_SKILL = 20;
 constexpr int CS_TELEPORT = 21;
+constexpr int CS_CH_SKILL = 22;
 
 constexpr int CS_MAKE_ROOM = 100;
 constexpr int CS_ATTEND_ROOM = 101;
@@ -67,6 +68,8 @@ constexpr int SC_WIN = 31;
 constexpr int SC_LOSE = 32;
 constexpr int SC_END = 33;
 constexpr int SC_TELEPORT = 34;
+constexpr int SC_CH_SPEED_UP = 35;
+constexpr int SC_CH_SPEED_RESET = 36;
 
 constexpr int SC_ROOM_INFO = 100;
 constexpr int SC_ROOM_DETAIL_INFO = 101;
@@ -141,6 +144,7 @@ struct cs_packet_ready_room {
 struct cs_packet_load_complete {
 	char size;
 	char type;
+	char skill;
 };
 
 struct cs_packet_settting_complete {
@@ -175,6 +179,11 @@ struct cs_packet_weapon_skill {
 	//char weapon_type;
 };
 
+struct cs_packet_ch_skill {
+	char size;
+	char type;
+};
+
 struct cs_packet_teleport {
 	char size;
 	char type;
@@ -205,6 +214,8 @@ struct sc_packet_room_detail_info {
 	int room_num;
 	char room_index;
 	char room_mode;
+	char room_map;
+	char room_user;
 	char player_name[15];
 	char host;
 };
@@ -251,6 +262,7 @@ struct sc_packet_put_player {
 	float vx, vy, vz;
 	char ani_index;
 	char dashed;
+	char skill;
 };
 
 struct sc_packet_anim {
@@ -265,6 +277,7 @@ struct sc_packet_hit {
 	char type;
 	char id;
 	char hp;
+	char mp;
 };
 
 struct sc_packet_critical_hit {
@@ -272,6 +285,7 @@ struct sc_packet_critical_hit {
 	char type;
 	char id;
 	char hp;
+	char mp;
 	float x;
 	float y;
 	float z;
@@ -282,6 +296,7 @@ struct sc_packet_stun {
 	char type;
 	char id;
 	char hp;
+	char mp;
 };
 
 struct sc_packet_heal {
@@ -289,6 +304,7 @@ struct sc_packet_heal {
 	char type;
 	char id;
 	char hp;
+	char mp;
 };
 
 struct sc_packet_fall {
@@ -361,6 +377,12 @@ struct sc_packet_patern_message {
 struct sc_packet_patern {
 	char size;
 	char type;
+};
+
+struct sc_packet_ch_speed {
+	char size;
+	char type;
+	char id;
 };
 
 struct sc_packet_light_index {

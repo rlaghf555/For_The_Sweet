@@ -118,6 +118,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 			cs_packet_load_complete p_load_complete;
 			p_load_complete.type = CS_LOAD_COMPLETE;
 			p_load_complete.size = sizeof(cs_packet_load_complete);
+			p_load_complete.skill = selected_skill;
 
 			cout << "send load complete packet\n";
 
@@ -659,6 +660,7 @@ void CGameFramework::processPacket(char *ptr)
 
 		memcpy(&p_hit, ptr, sizeof(p_hit));
 		m_pScene->getplayer(p_hit.id)->Set_HP(int(p_hit.hp));
+		m_pScene->getplayer(p_hit.id)->Set_MP(int(p_hit.mp));
 
 		m_pScene->getplayer(p_hit.id)->SetStatus(STATUS::HITTED);
 		m_pScene->getplayer(p_hit.id)->ChangeAnimation(Anim_Small_React);
@@ -693,6 +695,7 @@ void CGameFramework::processPacket(char *ptr)
 		XMFLOAT3 look(x, y, z);
 
 		m_pScene->getplayer(p_cri_hit.id)->Set_HP(int(p_cri_hit.hp));
+		m_pScene->getplayer(p_cri_hit.id)->Set_MP(int(p_cri_hit.mp));
 		m_pScene->getplayer(p_cri_hit.id)->SetLook(look);
 		m_pScene->getplayer(p_cri_hit.id)->m_Knockback = knockback;
 		m_pScene->getplayer(p_cri_hit.id)->SetStatus(STATUS::CRI_HITTED);
@@ -724,6 +727,7 @@ void CGameFramework::processPacket(char *ptr)
 		memcpy(&p_stun, ptr, sizeof(p_stun));
 
 		m_pScene->getplayer(p_stun.id)->Set_HP(int(p_stun.hp));
+		m_pScene->getplayer(p_stun.id)->Set_MP(int(p_stun.mp));
 
 		m_pScene->getplayer(p_stun.id)->SetStatus(STATUS::STUN);
 		m_pScene->getplayer(p_stun.id)->ChangeAnimation(Anim_Stun);
@@ -749,6 +753,7 @@ void CGameFramework::processPacket(char *ptr)
 
 		memcpy(&p_heal, ptr, sizeof(p_heal));
 		m_pScene->getplayer(p_heal.id)->Set_HP(int(p_heal.hp));
+		m_pScene->getplayer(p_heal.id)->Set_MP(int(p_heal.mp));
 
 		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(1)->SetHP(m_pScene->m_pPlayer[p_heal.id]->Get_HP());	//hp
 		m_pScene->m_ppUIShaders[p_heal.id]->getObejct(2)->SetHP(m_pScene->m_pPlayer[p_heal.id]->Get_MP());	//mp
@@ -1027,6 +1032,8 @@ void CGameFramework::processPacket(char *ptr)
 				fever = false;
 				m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Walk);
 				m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Run);
+				m_pScene->m_pPlayerShadowShader[i]->ResetAnimationSpeed(Anim_Walk);
+				m_pScene->m_pPlayerShadowShader[i]->ResetAnimationSpeed(Anim_Run);
 			}
 		}
 		SoundManager::GetInstance()->StopBackGroundSounds();
@@ -1089,6 +1096,38 @@ void CGameFramework::processPacket(char *ptr)
 		}
 		SoundManager::GetInstance()->StopBackGroundSounds();
 		SoundManager::GetInstance()->PlayBackGroundSounds(BACKGROUND);
+		break;
+	}
+	case SC_CH_SPEED_RESET:
+	{
+		sc_packet_ch_speed p_speed;
+		memcpy(&p_speed, ptr, sizeof(p_speed));
+
+		m_pScene->m_pPlayer[p_speed.id]->m_skillSpeed = 1.0f;
+		if (m_pScene->m_pPlayer[p_speed.id]->GetConnected() == true)
+		{
+			fever = true;
+			m_pScene->m_pPlayer[p_speed.id]->ResetAnimationSpeed(Anim_Walk);
+			m_pScene->m_pPlayer[p_speed.id]->ResetAnimationSpeed(Anim_Run);
+			m_pScene->m_pPlayerShadowShader[p_speed.id]->ResetAnimationSpeed(Anim_Walk);
+			m_pScene->m_pPlayerShadowShader[p_speed.id]->ResetAnimationSpeed(Anim_Run);
+		}
+		break;
+	}
+	case SC_CH_SPEED_UP:
+	{
+		sc_packet_ch_speed p_speed;
+		memcpy(&p_speed, ptr, sizeof(p_speed));
+
+		m_pScene->m_pPlayer[p_speed.id]->m_skillSpeed = 1.5f;
+		if (m_pScene->m_pPlayer[p_speed.id]->GetConnected() == true)
+		{
+			fever = true;
+			m_pScene->m_pPlayer[p_speed.id]->ChangeAnimationSpeed(Anim_Walk, 1.5f);
+			m_pScene->m_pPlayer[p_speed.id]->ChangeAnimationSpeed(Anim_Run, 1.5f);
+			m_pScene->m_pPlayerShadowShader[p_speed.id]->ChangeAnimationSpeed(Anim_Walk, 1.5f);
+			m_pScene->m_pPlayerShadowShader[p_speed.id]->ChangeAnimationSpeed(Anim_Run, 1.5f);
+		}
 		break;
 	}
 	case SC_KING:
@@ -2232,6 +2271,17 @@ void CGameFramework::ProcessInput()
 							skill_state = false;
 						}
 
+						if (::GetAsyncKeyState(0x46) & 0x8000 && !ch_skill_state)
+						{
+							if (status == STATUS::FREE) {
+								if (m_pScene->m_pPlayer[My_ID]->Get_MP() == 100)
+								{
+									m_pSocket->sendPacket(CS_CH_SKILL, 0, 0, 0);
+								}
+							}
+							skill_state = true;
+						}
+
 						if (defense_check) {
 							if (duration_cast<milliseconds>(high_resolution_clock::now() - defense_time).count() < duration_cast<milliseconds>(35ms).count())
 							{
@@ -2894,6 +2944,8 @@ void CGameFramework::UpdateProcess()
 								vel *= 2.f;
 							}
 
+							vel *= m_pScene->m_pPlayer[i]->m_skillSpeed;
+
 							float jump_height;
 
 							if (m_pScene->m_pPlayer[i]->m_Jump.mJump == true) {
@@ -3408,6 +3460,7 @@ void CGameFramework::GameOver()
 
 	// 스킬 관련
 	skill_state = false;
+	ch_skill_state = false;
 
 	key_buffer.clear();
 

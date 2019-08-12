@@ -120,5 +120,13 @@ void CSocket::sendPacket(char type, char key, char state, char id)
 		send(clientSocket, (char *)&p_weapon_skill, sizeof(cs_packet_weapon_skill), 0);
 		break;
 	}
+	case CS_CH_SKILL:
+	{
+		cs_packet_ch_skill p_ch_skill;
+		p_ch_skill.type = CS_CH_SKILL;
+		p_ch_skill.size = sizeof(cs_packet_ch_skill);
+		send(clientSocket, (char *)&p_ch_skill, sizeof(cs_packet_ch_skill), 0);
+		break;
+	}
 	}
 }

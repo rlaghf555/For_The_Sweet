@@ -224,7 +224,7 @@ void send_room_info_packet(char client, const CRoom& room, int slot)
 	sendPacket(client, &p_room_info);
 }
 
-void send_room_datail_info_packet(int client, int player, char slot, int room_num, char room_mode, char host)
+void send_room_datail_info_packet(int client, int player, char slot, int room_num, char room_mode, char room_map, char room_user, char host)
 {
 	sc_packet_room_detail_info p_room_detail_info;
 	p_room_detail_info.size = sizeof(sc_packet_room_detail_info);
@@ -232,6 +232,8 @@ void send_room_datail_info_packet(int client, int player, char slot, int room_nu
 	p_room_detail_info.room_num = room_num;
 	p_room_detail_info.room_index = slot;
 	p_room_detail_info.room_mode = room_mode;
+	p_room_detail_info.room_map = room_map;
+	p_room_detail_info.room_user = room_user;
 	p_room_detail_info.host = host;
 	strcpy_s(p_room_detail_info.player_name, _countof(p_room_detail_info.player_name), clients[player].id);
 
@@ -289,6 +291,7 @@ void send_put_player_packet(char client, char new_id) {
 	p_put.vz = clients[new_id].playerinfo->m_Vel.z;
 	p_put.ani_index = clients[new_id].playerinfo->m_AniIndex;
 	p_put.dashed = clients[new_id].playerinfo->m_dashed;
+	p_put.skill = clients[new_id].playerinfo->m_skill;
 	p_put.type = SC_PUT_PLAYER;
 	p_put.size = sizeof(sc_packet_put_player);
 
@@ -326,24 +329,26 @@ void send_anim_packet(char client, char id) {
 	sendPacket(client, &p_anim);
 }
 
-void send_hit_packet(char client, char id, int hp)
+void send_hit_packet(char client, char id, int hp, int mp)
 {
 	sc_packet_hit p_hit;
 	p_hit.type = SC_HIT;
 	p_hit.size = sizeof(sc_packet_hit);
 	p_hit.id = clients[id].slot;
 	p_hit.hp = hp;
+	p_hit.mp = mp;
 
 	sendPacket(client, &p_hit);
 }
 
-void send_critical_hit_packet(char client, char id, int hp, const PxVec3& dir)
+void send_critical_hit_packet(char client, char id, int hp, int mp, const PxVec3& dir)
 {
 	sc_packet_critical_hit p_cri_hit;
 	p_cri_hit.type = SC_CRITICAL_HIT;
 	p_cri_hit.size = sizeof(sc_packet_critical_hit);
 	p_cri_hit.id = clients[id].slot;
 	p_cri_hit.hp = hp;
+	p_cri_hit.mp = mp;
 	p_cri_hit.x = dir.x;
 	p_cri_hit.y = dir.y;
 	p_cri_hit.z = dir.z;
@@ -351,24 +356,26 @@ void send_critical_hit_packet(char client, char id, int hp, const PxVec3& dir)
 	sendPacket(client, &p_cri_hit);
 }
 
-void send_stun_packet(char client, char id, int hp)
+void send_stun_packet(char client, char id, int hp, int mp)
 {
 	sc_packet_stun p_stun;
 	p_stun.type = SC_STUN;
 	p_stun.size = sizeof(sc_packet_stun);
 	p_stun.id = clients[id].slot;
 	p_stun.hp = hp;
+	p_stun.mp = mp;
 
 	sendPacket(client, &p_stun);
 }
 
-void send_heal_packet(char client, char id, int hp)
+void send_heal_packet(char client, char id, int hp, int mp)
 {
 	sc_packet_heal p_heal;
 	p_heal.type = SC_HEAL;
 	p_heal.size = sizeof(sc_packet_heal);
 	p_heal.id = clients[id].slot;
 	p_heal.hp = hp;
+	p_heal.mp = mp;
 
 	sendPacket(client, &p_heal);
 }
@@ -541,6 +548,15 @@ void send_teleport_packet(char client_id, char slot, PxVec3 pos) {
 	p_teleport.z = pos.z;
 
 	sendPacket(client_id, &p_teleport);
+}
+
+void send_ch_speed_packet(char client_id, char speeder, char type) {
+	sc_packet_ch_speed p_speed;
+	p_speed.type = type;
+	p_speed.size = sizeof(sc_packet_ch_speed);
+	p_speed.id = clients[speeder].slot;
+
+	sendPacket(client_id, &p_speed);
 }
 
 void send_room_setting_weapon(int room_num)
@@ -718,8 +734,7 @@ void process_packet(char key, char *buffer)
 		gLobby.erase(key);
 		lobby_l.unlock();
 
-		send_room_datail_info_packet(key, key, 0, room.room_num, room.room_mode, 1);
-
+		send_room_datail_info_packet(key, key, 0, room.room_num, room.room_mode, room.room_map, room.max_num, 1);
 
 		break;
 	}
@@ -745,6 +760,8 @@ void process_packet(char key, char *buffer)
 		lobby_l.unlock();
 
 		char room_mode = it->room_mode;
+		char room_map = it->room_map;
+		char room_user = it->max_num;
 
 		char my_slot;
 
@@ -758,7 +775,7 @@ void process_packet(char key, char *buffer)
 				if (client_id != key)
 				{
 					if (i == it->host_num) host = 1;
-					send_room_datail_info_packet(key, client_id, i, room_num, room_mode, host);
+					send_room_datail_info_packet(key, client_id, i, room_num, room_mode, room_map, room_user, host);
 				}
 				else {
 					my_slot = i;
@@ -772,7 +789,7 @@ void process_packet(char key, char *buffer)
 			int client_id = it->clientNum[i];
 			if (client_id != -1)
 			{
-				send_room_datail_info_packet(client_id, key, my_slot, room_num, room_mode, 0);
+				send_room_datail_info_packet(client_id, key, my_slot, room_num, room_mode, room_map, room_user, 0);
 			}
 		}
 
@@ -826,6 +843,8 @@ void process_packet(char key, char *buffer)
 		room_l.unlock();
 
 		int room_mode = it->room_mode;
+		char room_map = it->room_map;
+		char room_user = it->max_num;
 
 		char oldslot = clients[key].slot;
 		char newslot = -1;
@@ -861,7 +880,7 @@ void process_packet(char key, char *buffer)
 					if (clients[client_id].connected == true)
 					{
 						send_room_detail_delete_packet(client_id, oldslot);
-						send_room_datail_info_packet(client_id, key, newslot, room_num, room_mode, host);
+						send_room_datail_info_packet(client_id, key, newslot, room_num, room_mode, room_map, room_user, host);
 					}
 				}
 			}
@@ -883,6 +902,8 @@ void process_packet(char key, char *buffer)
 
 		char myslot = clients[key].slot;
 		int room_mode = it->room_mode;
+		char room_map = it->room_map;
+		char room_user = it->max_num;
 
 		//cout << "OLD HOST : " << int(it->host_num) << endl;
 
@@ -919,7 +940,7 @@ void process_packet(char key, char *buffer)
 									{
 										if (clients[client_id].connected == true)
 										{
-											send_room_datail_info_packet(client_id, host_id, i, room_num, room_mode, 1);
+											send_room_datail_info_packet(client_id, host_id, i, room_num, room_mode, room_map, room_user, 1);
 											send_room_detail_delete_packet(client_id, myslot);
 										}
 									}
@@ -1067,7 +1088,12 @@ void process_packet(char key, char *buffer)
 
 	case CS_LOAD_COMPLETE:
 	{
+		cs_packet_load_complete *p_load_complete;
+		p_load_complete = reinterpret_cast<cs_packet_load_complete*>(buffer);
+
 		int room_num = clients[key].room_num;
+		char skill = p_load_complete->skill;
+		clients[key].playerinfo->m_skill = skill;
 
 		room_l.lock();
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
@@ -1477,6 +1503,96 @@ void process_packet(char key, char *buffer)
 			}
 		}
 
+		break;
+	}
+	case CS_CH_SKILL:
+	{
+		char skill = clients[key].playerinfo->m_skill;
+		int room_num = clients[key].room_num;
+		if (skill == Skill_Attack)
+		{
+			clients[key].playerinfo->m_attack = 5;
+			add_timer(room_num, key, EV_CH_ATTACK_END, high_resolution_clock::now() + 10s);
+			clients[key].playerinfo->m_mp = 0;
+			clients[key].playerinfo->setAniIndex(Anim::PowerUp);
+			clients[key].playerinfo->setStatus(STATUS::CH_SKILL);
+
+			int room_num = clients[key].room_num;
+
+			room_l.lock();
+			auto it = find(gRoom.begin(), gRoom.end(), room_num);
+			room_l.unlock();
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_heal_packet(client_id, key, clients[key].playerinfo->m_hp, clients[key].playerinfo->m_mp);
+						send_anim_packet(client_id, key);
+					}
+				}
+			}
+		}
+		else if (skill == Skill_Speed)
+		{
+			clients[key].playerinfo->speed_skill = 1.5f;
+			add_timer(room_num, key, EV_CH_SPEED_END, high_resolution_clock::now() + 10s);
+			clients[key].playerinfo->m_mp = 0;
+			clients[key].playerinfo->setAniIndex(Anim::PowerUp);
+			clients[key].playerinfo->setStatus(STATUS::CH_SKILL);
+
+			int room_num = clients[key].room_num;
+
+			room_l.lock();
+			auto it = find(gRoom.begin(), gRoom.end(), room_num);
+			room_l.unlock();
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_ch_speed_packet(client_id, key, SC_CH_SPEED_UP);
+						send_heal_packet(client_id, key, clients[key].playerinfo->m_hp, clients[key].playerinfo->m_mp);
+						send_anim_packet(client_id, key);
+					}
+				}
+			}
+		}
+		else if (skill == Skill_Heal)
+		{
+			int hp = clients[key].playerinfo->m_hp;
+			hp += 20;
+			if (hp > 100) hp = 100;
+			clients[key].playerinfo->m_hp = hp;
+			clients[key].playerinfo->m_mp = 0;
+			clients[key].playerinfo->setAniIndex(Anim::PowerUp);
+			clients[key].playerinfo->setStatus(STATUS::CH_SKILL);
+
+			int room_num = clients[key].room_num;
+
+			room_l.lock();
+			auto it = find(gRoom.begin(), gRoom.end(), room_num);
+			room_l.unlock();
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int client_id = it->clientNum[i];
+				if (client_id != -1)
+				{
+					if (clients[client_id].connected == true)
+					{
+						send_heal_packet(client_id, key, hp, clients[key].playerinfo->m_mp);
+						send_anim_packet(client_id, key);
+					}
+				}
+			}
+		}
 		break;
 	}
 	case CS_TELEPORT:
@@ -2063,7 +2179,7 @@ void process_event(EVENT_ST &ev)
 							int hp = clients[client_id].playerinfo->m_hp + 2;
 							if (hp > MAX_HP) hp = MAX_HP;
 							clients[client_id].playerinfo->setHP(hp);
-
+							
 							for (int j = 0; j < MAX_ROOM_USER; ++j)
 							{
 								int client_id2 = it->clientNum[j];
@@ -2072,7 +2188,7 @@ void process_event(EVENT_ST &ev)
 								{
 									if (clients[client_id2].connected == true)
 									{
-										send_heal_packet(client_id2, client_id, hp);
+										send_heal_packet(client_id2, client_id, hp, clients[client_id].playerinfo->m_mp);
 									}
 								}
 							}
@@ -2517,7 +2633,15 @@ void process_event(EVENT_ST &ev)
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
 
-		PxVec3 pos(0, 15.1f, 0);
+		PxVec3 pos;
+		if (it->room_map == MAP_Wehas)
+		{
+			pos = PxVec3(0.f, 15.f, 0.f);
+		}
+		else if (it->room_map == MAP_Cake)
+		{
+			pos = PxVec3(0.f, 20.f, 30.f);
+		}
 
 		for (int i = 0; i < MAX_ROOM_USER; ++i)
 		{
@@ -2528,6 +2652,34 @@ void process_event(EVENT_ST &ev)
 				if (clients[client_id].connected == true)
 				{
 					send_put_weapon_packet(client_id, Weapon_cupcake, 0, pos);
+				}
+			}
+		}
+		break;
+	}
+	case EV_CH_ATTACK_END:
+	{
+		clients[ev.id].playerinfo->m_attack = 0;
+		break;
+	}
+	case EV_CH_SPEED_END:
+	{
+		clients[ev.id].playerinfo->speed_skill = 1.f;
+		int room_num = clients[ev.id].room_num;
+
+		room_l.lock();
+		auto it = find(gRoom.begin(), gRoom.end(), room_num);
+		room_l.unlock();
+
+		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		{
+			int client_id = it->clientNum[i];
+
+			if (client_id != -1)
+			{
+				if (clients[client_id].connected == true)
+				{
+					send_ch_speed_packet(client_id, ev.id, SC_CH_SPEED_RESET);
 				}
 			}
 		}
@@ -2566,13 +2718,36 @@ void process_event(EVENT_ST &ev)
 			char patern;
 			count += 1;
 
-			if (count == 1) {	// 컵케이크
-				patern = EV_RFR_SLIME;	// 12. 컵케이크
+			if (count == 1)
+			{
+				patern = Rfr_Start_Num;
 			}
-			else {				// 나머지
-				patern = (rand() % 3) + Rfr_Start_Num;	// 9. 안개, 10. 피버, 11.번개
-				//patern = EV_RFR_FEVER;
+			else if(count == 2){
+				patern = Rfr_Start_Num + 1;
 			}
+			else if (count == 3) {
+				if (it->room_map != MAP_Oreo)
+					patern = EV_RFR_SLIME;	// 12. 컵케이크
+				else
+					patern = (rand() % 3) + Rfr_Start_Num;
+			}
+			else if (count == 4) {
+				patern = Rfr_Start_Num + 2;
+			}
+			else if (count == 5)
+			{
+				patern = (rand() % 3) + Rfr_Start_Num;
+			}
+			//if (count == 3) {	// 컵케이크
+			//	if(it->room_map != MAP_Oreo)
+			//		patern = EV_RFR_SLIME;	// 12. 컵케이크
+			//	else
+			//		patern = (rand() % 3) + Rfr_Start_Num;
+			//}
+			//else {				// 나머지
+			//	patern = (rand() % 3) + Rfr_Start_Num;	// 11. 안개, 12. 피버, 13.번개
+			//	//patern = EV_RFR_FEVER;
+			//}
 
 			it->referee.patern_count = count;
 			it->referee.patern_type = patern;
@@ -2591,7 +2766,8 @@ void process_event(EVENT_ST &ev)
 
 			add_timer(room_num, room_num + ROOM_TIMER_START, EVENT_TYPE(patern), high_resolution_clock::now() + 3s, 0);
 			if (patern == EV_RFR_SLIME) {
-				it->move_actor_flag = true;
+				if(it->room_map == MAP_Wehas)
+					it->move_actor_flag = true;
 			}
 			if (patern == EV_RFR_LIGHTNING) {
 				it->lighting = true;
@@ -2864,8 +3040,10 @@ void clientInputProcess(int room_num)
 						direction *= 2.f;
 					}
 
+					direction *= clients[client_id].playerinfo->speed_skill;
+
 					if (status == STATUS::DEFENSE || status == STATUS::WEAK_ATTACK || status == STATUS::HARD_ATTACK
-						|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN)
+						|| status == STATUS::HITTED || status == STATUS::SKILL_WEAPON_NO_MOVE || status == STATUS::STUN || status == STATUS::CH_SKILL)
 					{
 						continue;
 					}
@@ -2998,10 +3176,16 @@ void clientUpdateProcess(int room_num)
 							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 660ms);
 
 							int hp = clients[client_id].playerinfo->m_hp;
+							int mp = clients[client_id].playerinfo->m_mp;
 							if (hp > 0) {
 								hp -= 10;
+								mp += 20;
+								if (mp > 100) {
+									mp = 100;
+								}
 								if (hp <= 0) {
 									hp = 0;
+									mp = 0;
 									clients[client_id].playerinfo->setAniIndex(Anim::Death);
 									clients[client_id].playerinfo->setVelocity(PxVec3(0, 0, 0));
 									clients[client_id].playerinfo->m_PlayerController->release();
@@ -3029,6 +3213,7 @@ void clientUpdateProcess(int room_num)
 									clients[client_id].playerinfo->setAniIndex(Anim::Small_React);
 								}
 								clients[client_id].playerinfo->setHP(hp);
+								clients[client_id].playerinfo->m_mp = mp;
 
 								for (int j = 0; j < MAX_ROOM_USER; ++j)
 								{
@@ -3037,7 +3222,7 @@ void clientUpdateProcess(int room_num)
 									{
 										if (clients[client_id2].connected == true)
 										{
-											send_hit_packet(client_id2, client_id, hp);
+											send_hit_packet(client_id2, client_id, hp, mp);
 										}
 									}
 								}
@@ -3048,8 +3233,13 @@ void clientUpdateProcess(int room_num)
 							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 2000ms);
 
 							int hp = clients[client_id].playerinfo->m_hp;
+							int mp = clients[client_id].playerinfo->m_mp;
 							if (hp > 0) {
 								hp -= 20;
+								mp += 20;
+								if (mp > 100) {
+									mp = 100;
+								}
 								if (hp <= 0) {
 									hp = 0;
 									clients[client_id].playerinfo->setAniIndex(Anim::Death);
@@ -3079,7 +3269,7 @@ void clientUpdateProcess(int room_num)
 									clients[client_id].playerinfo->setAniIndex(Anim::Hard_React);
 								}
 								clients[client_id].playerinfo->setHP(hp);
-
+								clients[client_id].playerinfo->m_mp = mp;
 								PxVec3 dir = clients[client_id].playerinfo->m_Knockback;
 
 								for (int j = 0; j < MAX_ROOM_USER; ++j)
@@ -3089,7 +3279,7 @@ void clientUpdateProcess(int room_num)
 									{
 										if (clients[client_id2].connected == true)
 										{
-											send_critical_hit_packet(client_id2, client_id, hp, dir);
+											send_critical_hit_packet(client_id2, client_id, hp, mp, dir);
 										}
 									}
 								}
@@ -3101,8 +3291,14 @@ void clientUpdateProcess(int room_num)
 							add_timer(room_num, client_id, EV_FREE, high_resolution_clock::now() + 1330ms);
 
 							int hp = clients[client_id].playerinfo->m_hp;
+							int mp = clients[client_id].playerinfo->m_mp;
 							if (hp > 0) {
 								hp -= 10;
+								mp += 20;
+								if (mp > 100)
+								{
+									mp = 100;
+								}
 								if (hp <= 0) {
 									hp = 0;
 									clients[client_id].playerinfo->setAniIndex(Anim::Death);
@@ -3132,7 +3328,7 @@ void clientUpdateProcess(int room_num)
 									clients[client_id].playerinfo->setAniIndex(Anim::Stun);
 								}
 								clients[client_id].playerinfo->setHP(hp);
-
+								clients[client_id].playerinfo->m_mp = mp;
 								for (int j = 0; j < MAX_ROOM_USER; ++j)
 								{
 									int client_id2 = it->clientNum[j];
@@ -3140,7 +3336,7 @@ void clientUpdateProcess(int room_num)
 									{
 										if (clients[client_id2].connected == true)
 										{
-											send_stun_packet(client_id2, client_id, hp);
+											send_stun_packet(client_id2, client_id, hp, mp);
 										}
 									}
 								}

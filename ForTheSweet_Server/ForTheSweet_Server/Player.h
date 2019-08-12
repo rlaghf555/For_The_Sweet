@@ -20,6 +20,7 @@ enum STATUS {
 	STUN,
 	SKILL_WEAPON_MOVE,
 	SKILL_WEAPON_NO_MOVE,
+	CH_SKILL,
 };
 
 enum Anim {
@@ -132,6 +133,8 @@ public:
 	volatile bool m_dashed = false;
 	volatile bool hitted = false;
 
+	float speed_skill;
+
 	char m_AniIndex;
 
 	char weapon_type;
@@ -143,7 +146,11 @@ public:
 	char attack_count;
 
 	int m_hp;
+	int m_mp;
+	int m_attack;
 	bool lollipop_heal;
 	bool dead = false;
+
+	char m_skill;
 };
 

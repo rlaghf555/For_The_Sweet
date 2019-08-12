@@ -94,6 +94,7 @@ protected:
 
 	int m_hp = 100;
 	int m_mp = 0;
+
 public:
 	int selected_skill = 0;
 	PxCapsuleController *m_PlayerController;
@@ -108,6 +109,7 @@ public:
 
 	PxVec3 m_Knockback;
 	bool king = false;
+	float m_skillSpeed = 1.f;
 
 public:
 	CPlayer(Model_Animation* ma, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);

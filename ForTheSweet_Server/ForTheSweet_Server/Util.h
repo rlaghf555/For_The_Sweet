@@ -112,3 +112,8 @@ constexpr int Light_Trigger = 4;
 
 // KnockBack Vel
 constexpr float KnockBack_Vel = 40.f;
+
+// character skill
+constexpr int Skill_Attack = 0;
+constexpr int Skill_Speed = 1;
+constexpr int Skill_Heal = 2;

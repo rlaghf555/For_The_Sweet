@@ -17,6 +17,8 @@ public:
 	// Socket
 	CSocket *m_pSocket;
 
+	char selected_skill = 0;
+
 	int current_player_num;
 	int current_weapon_num;
 
@@ -60,6 +62,7 @@ public:
 
 	// 스킬 관련
 	bool skill_state = false;
+	bool ch_skill_state = false;
 
 	PxRigidActor *Choco_Actor[WEAPON_EACH_NUM];
 
