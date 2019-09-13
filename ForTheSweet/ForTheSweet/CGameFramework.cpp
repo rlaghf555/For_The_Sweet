@@ -3437,6 +3437,18 @@ void CGameFramework::EndAdvance()
 void CGameFramework::GameOver()
 {
 	for (int i = 0; i < MAX_USER; i++) {
+		if (m_pScene->m_pPlayer[i]->GetConnected() == true && fever == true)
+		{
+			fever = false;
+			m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Walk);
+			m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Run);
+			m_pScene->m_pPlayerShadowShader[i]->ResetAnimationSpeed(Anim_Walk);
+			m_pScene->m_pPlayerShadowShader[i]->ResetAnimationSpeed(Anim_Run);
+		}
+	}
+	m_pScene->m_DarkShader->is_dark = false;	//¾îµÎ¿öÁü È¿°ú ¾ø¾Ú
+
+	for (int i = 0; i < MAX_USER; i++) {
 		m_pScene->m_pPlayer[i]->SetConnected(false);
 	}
 	
