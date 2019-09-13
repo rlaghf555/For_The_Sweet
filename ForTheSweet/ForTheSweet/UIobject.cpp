@@ -102,7 +102,7 @@ void HPBarObject::UpdateScale()
 void HPBarObject::UpdateScale2()
 {
 	float tmp = m_nSize.x *m_xmf2Scale.x;
-	m_xmf2Scale.x = 0.88f *Now_Gauge / Max_Gauge;
+	m_xmf2Scale.x = 0.8f *Now_Gauge / Max_Gauge;
 	float tmp2 = m_nSize.x * m_xmf2Scale.x;
 	tmp -= tmp2;
 	m_xmf2ScreenPos.x -= (tmp / 2);

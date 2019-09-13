@@ -515,7 +515,7 @@ void CGameFramework::processPacket(char *ptr)
 		m_pScene->getplayer(p_put.id)->SetPhysController(m_pPhysx, m_pScene->getplayer(p_put.id)->getCollisionCallback(), &ControllerPos);
 		m_pPhysx->m_Scene->unlockWrite();
 		m_pScene->getplayer(p_put.id)->ChangeAnimation(p_put.ani_index);
-
+		m_pScene->getplayer(p_put.id)->selected_skill = p_put.skill;
 		m_pScene->m_ppUIShaders[p_put.id]->SetEnable(true, 0);
 		m_pScene->m_ppUIShaders[p_put.id]->SetEnable(true, 1);
 		m_pScene->m_ppUIShaders[p_put.id]->SetEnable(true, 2);

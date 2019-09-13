@@ -56,7 +56,7 @@ public:
 	virtual void FogOn(bool flag) {};	//IDshader hpbarshader 전용
 
 	virtual void SetID(wchar_t *str) {};
-
+	virtual void reset() {};
 protected:
 	unique_ptr<UploadBuffer<CB_UI_INFO>>	m_ObjectCB = nullptr;
 	std::vector<UIObject*>					m_pUIObjects;
@@ -119,6 +119,11 @@ public:
 	bool Fog_Flag = false;
 	bool Fog_Off_Flag = false;
 	float ftime;
+	virtual void reset() { Fog_Flag = false; Fog_Off_Flag = false; ftime = 0.f;
+		for (UINT i = 0; i < m_nObjects; ++i) {
+			m_pUIObjects[i]->m_bEnabled = false;
+		}
+	}
 };
 
 class UIHPBarShader : public UIShader
@@ -134,6 +139,7 @@ public:
 	bool Fog_Flag = false;
 	float ftime;
 	float ypos = 0.f;
+	virtual void reset() { Fog_Flag = false; ftime = 0.f; ypos = 0.f; }
 
 };
 class UIIDShader : public UIShader
@@ -150,6 +156,8 @@ public:
 	bool Fog_Flag = false;
 	float ftime;
 	float ypos = 0.f;
+	virtual void reset() { Fog_Flag = false; ftime = 0.f; ypos = 0.f; }
+
 };
 class UITimeShader : public UIShader
 {
@@ -162,6 +170,8 @@ public:
 	virtual void SetTime(int t);	//초(sec) 단위
 	virtual void Animate(float fTimeElapsed);
 	float Time=300;
+	virtual void reset() { Time = 300.f; }
+
 };
 
 class UIDotShader : public UIShader

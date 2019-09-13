@@ -902,7 +902,9 @@ void CScene::initUI(wchar_t *character_id[])
 {
 	ready_state = UI_READY;
 	ready_state_test = 0.3f;
-
+	for (int i = 0; i < m_nUIShaders; i++) {
+		m_ppUIShaders[i]->reset();
+	}
 	for (int i = 0; i < 8; i++) {
 		m_ppUIShaders[i]->getObejct(1)->SetHP(m_pPlayer[i]->Get_HP());	//hp
 		m_ppUIShaders[i]->getObejct(2)->SetMP(m_pPlayer[i]->Get_MP());	//mp
