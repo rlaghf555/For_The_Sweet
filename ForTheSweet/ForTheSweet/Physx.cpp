@@ -2,18 +2,18 @@
 #include "Physx.h"
 #include "Player.h"
 
-PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor)
-{
-	cout << "1\n";
-}
-PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller)
-{
-	cout << "2\n";
-}
-PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) 
-{
-	cout << "3\n";
-}
+//PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor)
+//{
+//	cout << "1\n";
+//}
+//PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller)
+//{
+//	cout << "2\n";
+//}
+//PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) 
+//{
+//	cout << "3\n";
+//}
 void PhysSimulation::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
 	//cout << "Trigger Count : " << count << endl;
@@ -175,15 +175,15 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count) {
 	//
 	//char title[20];
 	//char test[8];
-	//
+	////
 	//sprintf_s(title, sizeof(title), "%d", type);
 	//sprintf_s(test, sizeof(test), ".txt");
-	//
+	////
 	//strcat_s(title, sizeof(title), test);
-	//
+	////
 	//ofstream out(title);
 	//out << meshes->m_vertices.size() << endl;
-
+	//
 	//for (auto d : meshes->m_vertices)
 	//{
 	//	//cout << d.m_pos.x << "," << d.m_pos.y << "," << d.m_pos.z << endl;
@@ -203,12 +203,74 @@ PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count) {
 	//	//cout << d << endl;
 	//	out << d << endl;;
 	//}
-	////cout << "size : " << meshes->m_indices.size() << endl;
-	////cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-	//
+	//cout << "size : " << meshes->m_indices.size() << endl;
+	//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+	
 	//out.close();
-	//cout << type << endl;
+	////cout << type << endl;
 	//type += 1;
+
+	meshDesc.flags = PxMeshFlags(0);
+	PxCookingParams params = m_Cooking->getParams();
+	params.midphaseDesc = PxMeshMidPhase::eBVH33;
+	params.suppressTriangleMeshRemapTable = true;
+	params.meshPreprocessParams &= ~static_cast<PxMeshPreprocessingFlags>(PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH);
+	params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+	params.midphaseDesc.mBVH33Desc.meshCookingHint = PxMeshCookingHint::eCOOKING_PERFORMANCE;
+	params.midphaseDesc.mBVH33Desc.meshSizePerformanceTradeOff = 0.0f;
+	m_Cooking->setParams(params);
+
+	PxTriangleMesh* triMesh = nullptr;
+	//triMesh = gCooking->createTriangleMesh(meshDesc, gPhysics->getPhysicsInsertionCallback());
+
+	//PxU32 meshSize = 0;
+
+	PxDefaultMemoryOutputStream outBuffer;
+	m_Cooking->cookTriangleMesh(meshDesc, outBuffer);
+
+	PxDefaultMemoryInputData stream(outBuffer.getData(), outBuffer.getSize());
+	triMesh = m_Physics->createTriangleMesh(stream);
+	//meshSize = outBuffer.getSize();
+
+	return triMesh;
+}
+
+PxTriangleMesh*	CPhysx::GetTriangleMesh(mesh* meshes, UINT count, bool test) {
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count = meshes->m_vertices.size();
+	meshDesc.points.stride = sizeof(PxVec3);
+	meshDesc.points.data = fromVertex(meshes->m_vertices.data(), meshes->m_vertices.size());
+
+
+	//
+	ofstream out("test.txt");
+	out << meshes->m_vertices.size() << endl;
+
+	for (auto d : meshes->m_vertices)
+	{
+		//cout << d.m_pos.x << "," << d.m_pos.y << "," << d.m_pos.z << endl;
+		out << d.m_pos.x << endl << d.m_pos.y << endl << d.m_pos.z << endl;
+	}
+	//cout << "size : " << meshes->m_vertices.size() << endl;
+	//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+
+	meshDesc.triangles.count = meshes->m_indices.size() / 3;
+	meshDesc.triangles.stride = sizeof(int) * 3;
+	meshDesc.triangles.data = meshes->m_indices.data();
+
+	//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+	out << meshes->m_indices.size() << endl;
+	for (auto d : meshes->m_indices)
+	{
+		//cout << d << endl;
+		out << d << endl;;
+	}
+	//cout << "size : " << meshes->m_indices.size() << endl;
+	//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+
+	out.close();
+	//cout << type << endl;
+	type += 1;
 
 	meshDesc.flags = PxMeshFlags(0);
 	PxCookingParams params = m_Cooking->getParams();

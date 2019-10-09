@@ -491,7 +491,8 @@ void CGameFramework::processPacket(char *ptr)
 		XMFLOAT3 pos(p_put.x, p_put.y, p_put.z);
 		XMFLOAT3 vel(p_put.vx, p_put.vy, p_put.vz);
 
-		//cout << "Put Player : " << int(p_put.id) << endl;
+		cout << "Put Player : " << int(p_put.id) << endl;
+		cout << "Pos : " << pos.x << ", " << pos.y << ", " << pos.z << endl;
 
 		current_player_num += 1;
 		if (current_player_num == max_player_num) {
@@ -527,6 +528,8 @@ void CGameFramework::processPacket(char *ptr)
 			m_pScene->getplayer(p_put.id)->DisableLoop();
 		}
 		m_pScene->m_pPlayer[p_put.id]->SetConnected(true);
+		m_pScene->m_pPlayerShader[p_put.id]->render = true;
+		m_pScene->m_pPlayerShadowShader[p_put.id]->render = true;
 
 		break;
 	}
@@ -804,7 +807,7 @@ void CGameFramework::processPacket(char *ptr)
 			}
 		}
 
-		cout << "Put Weapon (" << type << "," << index << ") : " << x << "," << y << "," << z << endl;
+		//cout << "Put Weapon (" << type << "," << index << ") : " << x << "," << y << "," << z << endl;
 
 		m_pScene->m_WeaponShader[type]->getObject(index)->visible = true;
 		m_pScene->m_WeaponShader[type]->getObject(index)->init();
@@ -3437,9 +3440,8 @@ void CGameFramework::EndAdvance()
 void CGameFramework::GameOver()
 {
 	for (int i = 0; i < MAX_USER; i++) {
-		if (m_pScene->m_pPlayer[i]->GetConnected() == true && fever == true)
+		if (m_pScene->m_pPlayer[i]->GetConnected() == true)
 		{
-			fever = false;
 			m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Walk);
 			m_pScene->m_pPlayer[i]->ResetAnimationSpeed(Anim_Run);
 			m_pScene->m_pPlayerShadowShader[i]->ResetAnimationSpeed(Anim_Walk);

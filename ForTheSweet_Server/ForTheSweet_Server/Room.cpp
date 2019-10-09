@@ -389,7 +389,7 @@ void CRoom::start(int map_type, const vector<vector<PxVec3>>& vectex, const vect
 		{
 			triMesh = GetTriangleMesh(vectex[MAP_3_BRIDGE], index[MAP_3_BRIDGE], physx);
 			PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
-			PxTransform location(0, 0, i * 20 + 30);
+			PxTransform location(0.f, 0.f, float(i) * 20.f + 30.f);
 			PxRigidActor* base = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
 			m_Scene->addActor(*base);
 		}
@@ -475,8 +475,15 @@ void CRoom::start(int map_type, const vector<vector<PxVec3>>& vectex, const vect
 	move_actor_flag = false;
 	timer = MAX_TIMER;
 	end_timer = 0.0f;
+	fever = false;
+	lighting = false;
+	light_count = 0;
+	light_index1 = 0;
+	light_index2 = 0;
 	oreo_team1_spawn = false;
 	oreo_team2_spawn = false;
+	referee.patern_count = 0;
+	referee.patern_type = Rfr_Start_Num;
 	room_status = ROOM_ST_LOADING;
 }
 
@@ -562,10 +569,10 @@ bool CRoom::is_game_end()
 		if (is_Team1_end || is_Team2_end) {
 			if (is_Team1_end == true)
 			{
-				team_victory = false;			// 1ÆÀ ¿ì½Â
+				team_victory = false;			// 2ÆÀ ¿ì½Â
 			}
-			if (is_Team2_end = true) {
-				team_victory = true;			// 2ÆÀ ¿ì½Â
+			if (is_Team2_end == true) {
+				team_victory = true;			// 1ÆÀ ¿ì½Â
 			}
 			return true;
 		}

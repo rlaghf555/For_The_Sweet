@@ -87,6 +87,8 @@ public:
 
 	PxRigidActor *move_actor;
 
+	int type = 0;
+
 public:
 	CPhysx();
 	~CPhysx();
@@ -95,6 +97,7 @@ public:
 	void move(DWORD direction, float distance);
 
 	PxTriangleMesh*	GetTriangleMesh(mesh* meshes, UINT count);
+	PxTriangleMesh*	GetTriangleMesh(mesh* meshes, UINT count, bool test);
 	PxCapsuleController* getCapsuleController(PxExtendedVec3 pos, PxUserControllerHitReport* collisionCallback, CPlayer *player);
 	PxRigidStatic*	getTrigger(PxVec3& t, XMFLOAT3 size);
 	PxRigidDynamic* getRotateBox(PxVec3& t, PxVec3& ro, PxVec3 size);	// 초콜릿 방패세팅

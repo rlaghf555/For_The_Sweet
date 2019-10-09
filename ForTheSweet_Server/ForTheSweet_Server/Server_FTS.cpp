@@ -2369,8 +2369,7 @@ void process_event(EVENT_ST &ev)
 
 				it->weapon_respawn[i].respawn_able = false;
 
-				//int type = rand() % (MAX_WEAPON_TYPE - 1);
-				int type = (rand() % 2) + 2;
+				int type = rand() % (MAX_WEAPON_TYPE - 1);
 
 				it->weapon_respawn[i].type = type;
 
@@ -2380,8 +2379,8 @@ void process_event(EVENT_ST &ev)
 						PxVec3 pos;
 						if (it->room_map == MAP_Wehas)
 							pos = WeaponInitPos_1[i];
-						//if (it->room_map == MAP_Oreo)
-						//	pos = WeaponInitPos_2[i];
+						if (it->room_map == MAP_Oreo)
+							pos = WeaponInitPos_2[i];
 						if (it->room_map == MAP_Cake)
 							pos = WeaponInitPos_3[i];
 
@@ -3518,11 +3517,11 @@ void logic()
 					}
 					else
 					{
-						bool win_team = it->team_victory;			// false : 1ÆÀ ¿ì½Â, true : 2ÆÀ ¿ì½Â
+						bool win_team = it->team_victory;			// false : 2ÆÀ ¿ì½Â, true : 1ÆÀ ¿ì½Â
 						for (int i = 0; i < MAX_ROOM_USER / 2; ++i)
 						{
 							int winner, loser;
-							if (win_team == false) {				// 1ÆÀ ¿ì½Â
+							if (win_team == true) {				// 1ÆÀ ¿ì½Â
 								winner = it->clientNum[i];
 								loser = it->clientNum[i + 4];
 							}

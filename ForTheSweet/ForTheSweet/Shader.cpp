@@ -1171,7 +1171,7 @@ void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 		map->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_bbObjects[i] = map;
 
-		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices());
+		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices(), true);
 		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
 
 		PxMeshScale PxScale;
