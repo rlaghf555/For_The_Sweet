@@ -820,7 +820,8 @@ void CGameFramework::processPacket(char *ptr)
 		if (type == 3) m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, -90);
 		else if(type == 4) m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, 0);
 		else m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(0, 0, 90);
-		m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(&a, D3DMath::Rand(0, 4) * 90.f);
+
+		if(type != 4) m_pScene->m_WeaponShader[type]->getObject(index)->Rotate(&a, D3DMath::Rand(0, 4) * 90.f);
 
 		break;
 	}
@@ -3454,6 +3455,11 @@ void CGameFramework::GameOver()
 		m_pScene->m_pPlayer[i]->SetConnected(false);
 	}
 	
+	for (int i = 0; i < WEAPON_EACH_NUM; i++) {
+		m_pScene->m_MagicShader->getObjects(i)->visible = false;
+		m_pScene->m_MagicShader->getObjects(i)->SetPosition(1000.f, 1000.f, 1000.f);
+	}
+
 	move_actor_flag = false;
 
 	setting_player = false;
