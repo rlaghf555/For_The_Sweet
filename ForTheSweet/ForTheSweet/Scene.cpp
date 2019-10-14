@@ -520,6 +520,10 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 			Map_3_Build = true;
 		}
 		else if (Map_3_Build == true) {
+			for (int i = 0; i < 2; i++) {
+				m_StairShader[i]->BuildPhysx(physx);
+			}
+			m_BridgeShader->BuildPhysx(physx);
 			m_MapShader[8]->BuildPhysx(physx);
 			m_MapShader[9]->BuildPhysx(physx);
 			m_MapShader[10]->BuildPhysx(physx);

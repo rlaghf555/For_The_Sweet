@@ -227,6 +227,7 @@ public:
 	~StairShader() {};
 
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int type, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildPhysx(CPhysx* physx);
 };
 
 class BridgeShader : public CModelShader
@@ -237,6 +238,7 @@ public:
 	~BridgeShader() {};
 
 	virtual void BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int nRenderTargets = 1, void * pContext = NULL);
+	virtual void BuildPhysx(CPhysx* physx);
 };
 
 class MeshShader : public CModelShader

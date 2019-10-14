@@ -1141,6 +1141,27 @@ void StairShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 	delete pTexture;
 }
 
+void StairShader::BuildPhysx(CPhysx * physx)
+{
+	for (UINT i = 0; i < m_nObjects; i++) {
+
+		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices());
+		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+
+		PxMeshScale PxScale;
+		PxScale.scale = scaleTmp;
+
+		PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+		XMFLOAT3 pos = m_bbObjects[i]->GetPosition();
+		PxTransform location(pos.x, pos.y, pos.z);
+
+		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+
+		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+		physx->m_Scene->addActor(*m_Actor);
+	}
+}
+
 void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, CPhysx* physx, int nRenderTargets, void * pContext)
 {
 	m_nPSO = 1;
@@ -1188,6 +1209,26 @@ void BridgeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommand
 	}
 	delete pTexture;
 
+}
+
+void BridgeShader::BuildPhysx(CPhysx * physx)
+{
+	for (UINT i = 0; i < m_nObjects; i++) {	
+		PxTriangleMesh* triMesh = physx->GetTriangleMesh(static_model->getMesh(0), static_model->getNumVertices(), true);
+		PxVec3 scaleTmp = PxVec3(1.0f, 1.0f, 1.0f);
+
+		PxMeshScale PxScale;
+		PxScale.scale = scaleTmp;
+
+		PxTriangleMeshGeometry meshGeo(triMesh, PxScale);
+		XMFLOAT3 pos = m_bbObjects[i]->GetPosition();
+		PxTransform location(pos.x, pos.y, pos.z);
+
+		PxMaterial* mat = physx->m_Physics->createMaterial(0.2f, 0.2f, 0.2f);
+
+		PxRigidActor* m_Actor = PxCreateStatic(*physx->m_Physics, location, meshGeo, *mat);
+		physx->m_Scene->addActor(*m_Actor);
+	}
 }
 
 
