@@ -1051,6 +1051,8 @@ void CScene::initObject()
 				}
 			}
 		}
+		//마카롱 위치
+		m_MapShader[2]->getObjects()->SetPosition(0.f, -50.f, 0.f);
 	}
 	else if (Selected_Map == M_Map_2) {
 		//캐릭터 좌표 및 스킬 초기화

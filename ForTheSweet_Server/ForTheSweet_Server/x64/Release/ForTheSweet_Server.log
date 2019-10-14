@@ -1,15 +1,1 @@
-﻿  Room.cpp
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\physx.h(87): warning C4244: '인수': 'const physx::PxExtended'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\room.cpp(404): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\room.cpp(412): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\room.cpp(425): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\room.cpp(433): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\room.cpp(611): warning C4267: '=': 'size_t'에서 'physx::PxU32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\room.cpp(613): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\kyh\desktop\1009\for_the_sweet\forthesweet_server\forthesweet_server\room.cpp(615): warning C4267: '=': 'size_t'에서 'physx::PxU32'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  코드를 생성하고 있습니다.
-  2 of 1942 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
-  코드를 생성했습니다.
-  ForTheSweet_Server.vcxproj -> C:\Users\KYH\Desktop\1009\For_The_Sweet\ForTheSweet_Server\x64\Release\ForTheSweet_Server.exe
+﻿  ForTheSweet_Server.vcxproj -> C:\Users\Hol\Desktop\졸작\ForTheSweet_Server\x64\Release\ForTheSweet_Server.exe

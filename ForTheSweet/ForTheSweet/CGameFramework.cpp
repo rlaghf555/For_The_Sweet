@@ -1247,6 +1247,8 @@ void CGameFramework::processPacket(char *ptr)
 	}
 	case SC_END:
 	{
+		SoundManager::GetInstance()->StopBackGroundSounds();
+		SoundManager::GetInstance()->PlayBackGroundSounds(BACKGROUND);
 		GameOver();
 		break;
 	}
