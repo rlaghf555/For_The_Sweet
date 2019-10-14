@@ -5,6 +5,7 @@ XMFLOAT3 LightningInitPos[10] = {
    XMFLOAT3(-100.f, 200.f, 100.f), XMFLOAT3(-120.f, 200.f, 110.f), XMFLOAT3(60.f, 200.f, 110.f), XMFLOAT3(180.f, 200.f, 110.f), XMFLOAT3(-150.f, 200.f, 0.f),
    XMFLOAT3(90.f, 200.f, 0.f), XMFLOAT3(-240.f, 200.f, -110.f), XMFLOAT3(-120.f, 200.f, -110.f), XMFLOAT3(60.f, 200.f, -110.f), XMFLOAT3(180.f, 200.f, -110.f)
 };
+
 XMFLOAT3 LightningInitPos_Map3[8] = {
 	XMFLOAT3(-120, 201.31468, 53),XMFLOAT3(120, 201.31468, 53),XMFLOAT3(-134, 201.31468, -122),XMFLOAT3(134 , 201.31468, -122),
 	XMFLOAT3(-368, 201.31468, -132),XMFLOAT3(368, 201.31468,-132),XMFLOAT3(-248, 276.6323,-32),XMFLOAT3(248, 276.6323,-32)
@@ -1062,9 +1063,19 @@ void CGameFramework::processPacket(char *ptr)
 
 		memcpy(&p_light_index, ptr, sizeof(p_light_index));
 
+		XMFLOAT3 pos1, pos2;
 		//번개인덱스 2개 
-		XMFLOAT3 pos1 = LightningInitPos[p_light_index.index1];
-		XMFLOAT3 pos2 = LightningInitPos[p_light_index.index2];
+		if (selected_map == M_Map_3)
+		{
+			pos1 = LightningInitPos_Map3[p_light_index.index1];
+			pos2 = LightningInitPos_Map3[p_light_index.index2];
+		}
+		else
+		{
+			pos1 = LightningInitPos[p_light_index.index1];
+			pos2 = LightningInitPos[p_light_index.index2];
+		}
+		
 		m_pScene->m_EffectShader->ShowEffects(0, pos1);
 		m_pScene->m_EffectShader->ShowEffects(1, pos2);
 		SoundManager::GetInstance()->PlaySounds(LIGHTNING);
