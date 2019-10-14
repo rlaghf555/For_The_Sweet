@@ -453,6 +453,7 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 
 			m_MapShader[15] = new CModelShader(Map_Model[M_Map_1_macaron]);
 			m_MapShader[15]->BuildObjects(pd3dDevice, pd3dCommandList, physx, M_Map_1_macaron_3);
+			m_MapShader[15]->getObjects()->SetPosition(0, 80.f, 50.f);
 			m_MapShader[15]->BuildPhysx(physx);
 
 			m_MapShader[16] = new CModelShader(Map_Model[M_Map_3_in]);
@@ -520,6 +521,7 @@ void CScene::ReBuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList
 			Map_3_Build = true;
 		}
 		else if (Map_3_Build == true) {
+			m_MapShader[15]->getObjects()->SetPosition(0, 80.f, 50.f);
 			for (int i = 0; i < 2; i++) {
 				m_StairShader[i]->BuildPhysx(physx);
 			}
