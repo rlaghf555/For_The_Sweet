@@ -1007,6 +1007,18 @@ void process_packet(char key, char *buffer)
 
 		// 무기 초기화
 		for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i) {
+			it->weapon_respawn[i].respawn_able = true;
+		}
+		for (int i = 0; i < MAX_WEAPON_TYPE; ++i) {
+			for (int j = 0; j < MAX_WEAPON_NUM; ++j) {
+				it->weapon_list[i][j].init();
+			}
+		}
+
+		// 캐릭터 초기화
+
+		// 무기 최초 생성
+		for (int i = 0; i < RESPAWN_WEAPON_NUM; ++i) {
 			if (it->weapon_respawn[i].respawn_able == true) {
 
 				it->weapon_respawn[i].respawn_able = false;
