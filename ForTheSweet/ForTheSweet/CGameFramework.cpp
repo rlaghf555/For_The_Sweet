@@ -3462,9 +3462,12 @@ void CGameFramework::GameOver()
 		m_pScene->m_MagicShader->getObjects(i)->SetPosition(1000.f, 1000.f, 1000.f);
 	}
 
-	for (int i = 0; i < WEAPON_EACH_NUM; i++) {
+	for (int i = 0; i < WEAPON_MAX_NUM; i++) {
 		for (int j = 0; j < WEAPON_EACH_NUM; j++) {
 			m_pScene->weapon_box[i][j]->pick = false;
+			if (i == 4) {
+				j = WEAPON_EACH_NUM;
+			}
 		}
 	}
 
