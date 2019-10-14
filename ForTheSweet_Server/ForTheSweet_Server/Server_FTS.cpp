@@ -2610,7 +2610,8 @@ void process_event(EVENT_ST &ev)
 				it->light_count += 1;
 				//cout << "count : " << int(it->light_count) << endl;
 
-				add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_LIGHTNING_INDEX, high_resolution_clock::now() + 2s, 0);
+				if(it->light_count != 4)
+					add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_LIGHTNING_INDEX, high_resolution_clock::now() + 2s, 0);
 				add_timer(room_num, room_num + ROOM_TIMER_START, EV_RFR_LIGHTNING_DELETE, high_resolution_clock::now() + 1s, 0);
 			}
 		}
