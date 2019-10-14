@@ -2146,23 +2146,26 @@ void process_event(EVENT_ST &ev)
 		auto it = find(gRoom.begin(), gRoom.end(), room_num);
 		room_l.unlock();
 
-		clients[ev.id].playerinfo->m_PlayerController->setRadius(CH_CAPSULE_RADIUS);
-		clients[ev.id].playerinfo->m_PlayerController->setHeight(CH_CAPSULE_HEIGHT);
-		PxExtendedVec3 pos = clients[ev.id].playerinfo->m_PlayerController->getPosition();
-		pos.y -= 17.5f;
-		clients[ev.id].playerinfo->m_PlayerController->setPosition(pos);
-
-		clients[ev.id].playerinfo->weapon_type = -1;
-
-		for (int i = 0; i < MAX_ROOM_USER; ++i)
+		if (clients[ev.id].playerinfo->m_hp > 0)
 		{
-			int client_id = it->clientNum[i];
+			clients[ev.id].playerinfo->m_PlayerController->setRadius(CH_CAPSULE_RADIUS);
+			clients[ev.id].playerinfo->m_PlayerController->setHeight(CH_CAPSULE_HEIGHT);
+			PxExtendedVec3 pos = clients[ev.id].playerinfo->m_PlayerController->getPosition();
+			pos.y -= 17.5f;
+			clients[ev.id].playerinfo->m_PlayerController->setPosition(pos);
 
-			if (client_id != -1)
+			clients[ev.id].playerinfo->weapon_type = -1;
+
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
-				if (clients[client_id].connected == true)
+				int client_id = it->clientNum[i];
+
+				if (client_id != -1)
 				{
-					send_king_off_packet(client_id, slot);
+					if (clients[client_id].connected == true)
+					{
+						send_king_off_packet(client_id, slot);
+					}
 				}
 			}
 		}
